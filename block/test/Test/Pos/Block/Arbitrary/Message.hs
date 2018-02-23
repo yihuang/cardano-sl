@@ -44,3 +44,26 @@ instance ( HasProtocolConstants
          Arbitrary T.MsgBlock where
     arbitrary = genericArbitrary
     shrink = genericShrink
+
+instance Arbitrary T.MsgStream where
+    arbitrary = genericArbitrary
+    shrink = genericShrink
+
+instance Arbitrary T.MsgStreamStart where
+    arbitrary = genericArbitrary
+    shrink = genericShrink
+
+instance Arbitrary T.MsgStreamUpdate where
+    arbitrary = genericArbitrary
+    shrink = genericShrink
+
+instance ( Arbitrary SscPayload
+         , Arbitrary SscProof
+         , Arbitrary SscPayloadDependsOnSlot
+         , HasProtocolConstants
+         , HasProtocolMagic
+         , HasGenesisHash
+         ) =>
+         Arbitrary T.MsgStreamBlock where
+    arbitrary = genericArbitrary
+    shrink = genericShrink

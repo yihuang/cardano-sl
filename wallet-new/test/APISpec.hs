@@ -134,14 +134,30 @@ v1Server diffusion = do
   ctx <- testV1Context
   return (V1.handlers (Migration.v1MonadNat ctx) diffusion)
 
+withV1Server
+    :: D.Diffusion Migration.MonadV1
+    -> (Server V1.API -> IO a)
+    -> IO a
+withV1Server diffusion callback =
+    unProduction $ bracketNodeResources _ _ _ _ $ \nodeResources ->
+        rmc <- getRealModeContext
+        ctx <- testV1Context rmc
+        let server = V1.handlers (Migration.v1MonadNat ctx) diffusion
+        Production $ callback server
+
+
+
 -- | Returns a test 'V1Context' which can be used for the API specs.
 -- Such context will use an in-memory database.
-testV1Context :: Migration.HasConfiguration => IO Migration.V1Context
-testV1Context =
+testV1Context
+    :: Migration.HasConfiguration
+    => RealModeContext
+    -> IO Migration.V1Context
+testV1Context rmc =
     WalletWebModeContext <$> testStorage
                          <*> testConnectionsVar
                          <*> testAddrCIdHashes
-                         <*> testRealModeContext
+                         <*> pure rmc
   where
     testStorage :: IO WalletState
     testStorage = openMemoryExtendedState def
@@ -168,5 +184,6 @@ spec = withCompileInfo def $ do
           withServantServer (Proxy @V0.API) (v0Server (D.diffusion D.dummyDiffusionLayer)) $ \burl ->
             serverSatisfies (Proxy @V0.API) burl stdArgs predicates
         it "V1 API follows best practices & is RESTful abiding" $ do
-          withServantServer (Proxy @V1.API) (v1Server (D.diffusion D.dummyDiffusionLayer)) $ \burl ->
-            serverSatisfies (Proxy @V1.API) burl stdArgs predicates
+          withV1Server (D.diffusion D.dummyDiffusionLayer) $ \v1Server ->
+            withServantServer (Proxy @V1.API) (v1Server ) $ \burl ->
+              serverSatisfies (Proxy @V1.API) burl stdArgs predicates

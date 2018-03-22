@@ -24,6 +24,7 @@ module Cardano.Wallet.API.V1.Types (
   , PasswordUpdate (..)
   , AccountUpdate (..)
   , NewAccount (..)
+  , NewExternalAccount (..)
   , Update
   , New
   -- * Domain-specific types
@@ -42,6 +43,7 @@ module Cardano.Wallet.API.V1.Types (
   -- * Accounts
   , Account (..)
   , AccountIndex
+  , ExternalAccount (..)
   -- * Addresses
   , WalletAddress (..)
   , NewAddress (..)
@@ -974,6 +976,34 @@ instance BuildableSafeGen Account where
 
 instance Buildable [Account] where
     build = bprint listJson
+
+-- | An external wallet 'ExternalAccount'.
+data ExternalAccount = ExternalAccount
+  { accExtIndex     :: !AccountIndex
+  , accExtAddresses :: [V1 Core.Address]  -- should be WalletAddress
+  , accExtAmount    :: !(V1 Core.Coin)
+  , accExtName      :: !Text
+  , accExtWalletId  :: WalletId
+  } deriving (Show, Ord, Eq, Generic)
+
+deriveJSON Serokell.defaultOptions ''ExternalAccount
+
+instance ToSchema ExternalAccount where
+  declareNamedSchema =
+    genericSchemaDroppingPrefix "accExt" (\(--^) props -> props
+      & ("index"     --^ "Account's index in external wallet, starting at 0")
+      & ("addresses" --^ "Public addresses pointing to this account")
+      & ("amount"    --^ "Available funds, in ADA")
+      & ("name"      --^ "Account's name")
+      & ("walletId"  --^ "Id of external wallet this account belongs to")
+    )
+
+instance Arbitrary ExternalAccount where
+  arbitrary = ExternalAccount <$> arbitrary
+                              <*> arbitrary
+                              <*> arbitrary
+                              <*> pure "My external account"
+                              <*> arbitrary
 
 -- | Account Update
 data AccountUpdate = AccountUpdate {

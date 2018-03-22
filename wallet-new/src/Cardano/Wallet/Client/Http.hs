@@ -30,6 +30,8 @@ mkHttpClient baseUrl manager = WalletClient
         = run . postAddressR
     , getAddress
         = run . getAddressR
+    , postExternalAddress
+        = run . postExternalAddressR
     -- wallets endpoints
     , postWallet
         = run . postWalletR
@@ -44,6 +46,10 @@ mkHttpClient baseUrl manager = WalletClient
         = run . getWalletR
     , updateWallet
         = \x -> run . updateWalletR x
+    , postExternalWallet
+        = run . postExternalWalletR
+    , postAddressPath
+        = run . postAddressPathR
     -- account endpoints
     , deleteAccount
         = \x -> unNoContent . run . deleteAccountR x
@@ -55,6 +61,8 @@ mkHttpClient baseUrl manager = WalletClient
         = \w -> run . postAccountR w
     , updateAccount
         = \x y -> run . updateAccountR x y
+    , postExternalAccount
+        = \w -> run . postExternalAccountR w
     -- transactions endpoints
     , postTransaction
         = run . postTransactionR
@@ -63,6 +71,10 @@ mkHttpClient baseUrl manager = WalletClient
              run . getTransactionIndexFilterSortsR walletId mAccountIndex mAddress mPage mpp filters
     , getTransactionFee
         = run . getTransactionFeeR
+    , postUnsignedTransaction
+        = run . postUnsignedTransactionR
+    , postSignedTransaction
+        = run . postSignedTransactionR
     -- settings
     , getNodeSettings
         = run getNodeSettingsR
@@ -78,6 +90,7 @@ mkHttpClient baseUrl manager = WalletClient
     getAddressIndexR
         :<|> postAddressR
         :<|> getAddressR
+        :<|> postExternalAddressR
         = addressesAPI
 
     postWalletR
@@ -86,6 +99,8 @@ mkHttpClient baseUrl manager = WalletClient
         :<|> deleteWalletR
         :<|> getWalletR
         :<|> updateWalletR
+        :<|> postExternalWalletR
+        :<|> postAddressPathR
         = walletsAPI
 
     deleteAccountR
@@ -93,11 +108,14 @@ mkHttpClient baseUrl manager = WalletClient
         :<|> getAccountIndexPagedR
         :<|> postAccountR
         :<|> updateAccountR
+        :<|> postExternalAccountR
         = accountsAPI
 
     postTransactionR
         :<|> getTransactionIndexFilterSortsR
         :<|> getTransactionFeeR
+        :<|> postUnsignedTransactionR
+        :<|> postSignedTransactionR
         = transactionsAPI
 
     addressesAPI

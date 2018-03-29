@@ -148,6 +148,7 @@ extra-deps:
 # Because serokell-util
 - formatting-6.2.5
 
+- katip-0.5.4.0
 # Following 9 are not on stackage.
 - pvss-0.2.0
 - base58-bytestring-0.1.0

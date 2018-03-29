@@ -66,6 +66,7 @@ executable dbgen
                      , optparse-applicative
                      , mtl
                      , network-transport-tcp >= 0.6
+                     , katip
                      , log-warper
                      , data-default
                      , lens
@@ -126,6 +127,7 @@ executable cardano-dht-keygen
                      , formatting
                      , kademlia
                      , lens
+                     , katip
                      , log-warper
                      , optparse-applicative
                      , parsec
@@ -231,6 +233,7 @@ executable cardano-keygen
                      , canonical-json
                      , cardano-sl
                      , cardano-sl-core
+                     , cardano-sl-util
                      , cardano-sl-crypto
                      , cardano-sl-txp
                      , containers
@@ -241,6 +244,7 @@ executable cardano-keygen
                      , filepath
                      , formatting
                      , lens
+                     , katip
                      , log-warper
                      , neat-interpolation
                      , optparse-applicative >= 0.12
@@ -255,7 +259,6 @@ executable cardano-keygen
                      , yaml
   default-language:    Haskell2010
   ghc-options:         -threaded -rtsopts
-                       -Wall
                        -fno-warn-orphans
                        -O2
 

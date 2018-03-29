@@ -12,8 +12,8 @@ import           Formatting (build, sformat, stext, string, (%))
 import           System.Directory (createDirectoryIfMissing)
 import           System.FilePath ((</>))
 import           System.FilePath.Glob (glob)
-import           System.Wlog (WithLogger, debugPlus, logInfo, productionB, setupLogging,
-                              termSeveritiesOutB, usingLoggerName)
+--import           System.Wlog (WithLogger, debugPlus, logInfo, productionB, setupLogging,
+--                              termSeveritiesOutB, usingLoggerName)
 import qualified Text.JSON.Canonical as CanonicalJSON
 
 import           Pos.Binary (asBinary, serialize')
@@ -30,12 +30,14 @@ import           Pos.Util.UserSecret (readUserSecret, takeUserSecret, usKeys, us
 import           Dump (dumpFakeAvvmSeed, dumpGeneratedGenesisData, dumpRichSecrets)
 import           KeygenOptions (DumpAvvmSeedsOptions (..), GenKeysOptions (..), KeygenCommand (..),
                                 KeygenOptions (..), getKeygenOptions)
+import qualified Pos.Util.Log as Log
+import qualified Katip as K
 
 ----------------------------------------------------------------------------
 -- Helpers
 ----------------------------------------------------------------------------
 
-rearrangeKeyfile :: (MonadIO m, MonadThrow m, WithLogger m) => FilePath -> m ()
+rearrangeKeyfile :: (MonadIO m, MonadThrow m, K.KatipContext m) => FilePath -> m ()
 rearrangeKeyfile fp = do
     us <- takeUserSecret fp
     let sk = maybeToList $ us ^. usPrimKey
@@ -46,15 +48,16 @@ rearrangeKeyfile fp = do
 -- Commands
 ----------------------------------------------------------------------------
 
-rearrange :: (MonadIO m, MonadThrow m, WithLogger m) => FilePath -> m ()
+rearrange :: (MonadIO m, MonadThrow m, K.KatipContext m) => FilePath -> m ()
 rearrange msk = mapM_ rearrangeKeyfile =<< liftIO (glob msk)
 
-genPrimaryKey :: (HasConfigurations, MonadIO m, MonadThrow m, WithLogger m, MonadRandom m) => FilePath -> m ()
+{-
+genPrimaryKey :: (HasConfigurations, MonadIO m, MonadThrow m, K.KatipContext m, MonadRandom m) => FilePath -> m ()
 genPrimaryKey path = do
     rs <- liftIO generateRichSecrets
     dumpRichSecrets path rs
     let pk = toPublic (rsPrimaryKey rs)
-    logInfo $
+    Log.logInfo $
         sformat
             ("Successfully generated primary key and dumped to "%string%
              ", stakeholder id: "%hashHexF%
@@ -62,20 +65,21 @@ genPrimaryKey path = do
             path
             (addressHash pk)
             pk
+-}
 
-readKey :: (MonadIO m, MonadThrow m, WithLogger m) => FilePath -> m ()
+readKey :: (MonadIO m, MonadThrow m, K.KatipContext m) => FilePath -> m ()
 readKey path = do
     us <- readUserSecret path
-    logInfo $ maybe "No Primary key"
+    Log.logInfo $ maybe "No Primary key"
                     (("Primary: " <>) . showKeyWithAddressHash) $
                     view usPrimKey us
-    logInfo $ maybe "No wallet set"
+    Log.logInfo $ maybe "No wallet set"
                     (("Wallet set: " <>) . showKeyWithAddressHash . decryptESK . view wusRootKey) $
                     view usWallet us
-    logInfo $ "Keys: " <> (T.concat $ L.intersperse "\n" $
+    Log.logInfo $ "Keys: " <> (T.concat $ L.intersperse "\n" $
                            map (showKeyWithAddressHash . decryptESK) $
                            view usKeys us)
-    logInfo $ maybe "No vss"
+    Log.logInfo $ maybe "No vss"
                     (("Vss PK: " <>) . showPvssKey) $
                     view usVss us
 
@@ -94,10 +98,10 @@ decryptESK :: EncryptedSecretKey -> SecretKey
 decryptESK (EncryptedSecretKey sk _) = SecretKey sk
 
 dumpAvvmSeeds
-    :: (MonadIO m, WithLogger m)
+    :: (MonadIO m, K.KatipContext m)
     => DumpAvvmSeedsOptions -> m ()
 dumpAvvmSeeds DumpAvvmSeedsOptions{..} = do
-    logInfo $ "Generating fake avvm data into " <> fromString dasPath
+    Log.logInfo $ "Generating fake avvm data into " <> fromString dasPath
     liftIO $ createDirectoryIfMissing True dasPath
 
     when (dasNumber <= 0) $ error $
@@ -112,10 +116,11 @@ dumpAvvmSeeds DumpAvvmSeedsOptions{..} = do
         \(rPk,i) -> writeFile (dasPath </> "key"<>show i<>".pk")
                               (sformat redeemPkB64F rPk)
 
-    logInfo $ "Seeds were generated"
+    Log.logInfo $ "Seeds were generated"
 
+{-
 generateKeysByGenesis
-    :: (HasConfigurations, MonadIO m, WithLogger m, MonadThrow m, MonadRandom m)
+    :: (HasConfigurations, MonadIO m, K.KatipContext m, MonadThrow m, MonadRandom m)
     => GenKeysOptions -> m ()
 generateKeysByGenesis GenKeysOptions{..} = do
     case ccGenesis coreConfiguration of
@@ -123,10 +128,11 @@ generateKeysByGenesis GenKeysOptions{..} = do
             error $ "Launched source file conf"
         GCSpec {} -> do
             dumpGeneratedGenesisData (gkoOutDir, gkoKeyPattern)
-            logInfo (toText gkoOutDir <> " generated successfully")
+            Log.logInfo (toText gkoOutDir <> " generated successfully")
+-}
 
 genVssCert
-    :: (HasConfigurations, WithLogger m, MonadIO m)
+    :: (HasConfigurations, K.KatipContext m, MonadIO m)
     => FilePath -> m ()
 genVssCert path = do
     us <- readUserSecret path
@@ -136,7 +142,7 @@ genVssCert path = do
                  primKey
                  (asBinary (toVssPublicKey vssKey))
                  (vssMaxTTL - 1)
-    putText $ sformat ("JSON: key "%hashHexF%", value "%stext)
+    Log.logInfo $ sformat ("JSON: key "%hashHexF%", value "%stext)
               (addressHash $ vcSigningKey cert)
               (decodeUtf8 $
                     CanonicalJSON.renderCanonicalJSON $
@@ -149,15 +155,26 @@ genVssCert path = do
 
 main :: IO ()
 main = do
+  {- -}
+    handleScribe <- K.mkHandleScribe K.ColorIfTerminal stdout K.DebugS K.V2
+    let mkLogEnv = K.registerScribe "stdout" handleScribe K.defaultScribeSettings =<< K.initLogEnv "MyApp" "production"
     KeygenOptions{..} <- getKeygenOptions
+{-
     setupLogging Nothing $ productionB <> termSeveritiesOutB debugPlus
     usingLoggerName "keygen" $ withConfigurations koConfigurationOptions $ do
-        logInfo "Processing command"
+-}
+    bracket mkLogEnv K.closeScribes $ \le -> do
+      --ns <- K.getKatipNamespace
+      --ctx <- K.getKatipContext
+      K.runKatipContextT le () "ns" $ do
+
+        Log.logInfo "Processing command"
         case koCommand of
             RearrangeMask msk       -> rearrange msk
-            GenerateKey path        -> genPrimaryKey path
-            GenerateVss path        -> genVssCert path
+            --GenerateKey path        -> genPrimaryKey path
+            --GenerateVss path        -> genVssCert path
             ReadKey path            -> readKey path
             DumpAvvmSeeds opts      -> dumpAvvmSeeds opts
-            GenerateKeysBySpec gkbg -> generateKeysByGenesis gkbg
-            DumpGenesisData {..}    -> CLI.dumpGenesisData dgdCanonical dgdPath
+            --GenerateKeysBySpec gkbg -> generateKeysByGenesis gkbg
+            --DumpGenesisData {..}    -> CLI.dumpGenesisData dgdCanonical dgdPath
+

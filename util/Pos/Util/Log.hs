@@ -18,7 +18,7 @@ import qualified Katip                       as K
 -------------------------------------------------------------------------------
 -- | log a Text with severity = Info
 logInfo :: (K.KatipContext m, HasCallStack) => Text -> m ()
-logInfo msg = K.logItemM Nothing K.InfoS $ show msg
+logInfo msg = K.logItemM Nothing K.InfoS $ K.logStr msg
 
 -------------------------------------------------------------------------------
 -- | log a JSON structure with severity = Info

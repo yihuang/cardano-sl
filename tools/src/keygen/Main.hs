@@ -159,7 +159,7 @@ main :: IO ()
 main = do
   {- -}
     handleScribe <- K.mkHandleScribe K.ColorIfTerminal stdout K.DebugS K.V2
-    let mkLogEnv = K.registerScribe "stdout" handleScribe K.defaultScribeSettings =<< K.initLogEnv "MyApp" "production"
+    let mkLogEnv = K.registerScribe "stdout" handleScribe K.defaultScribeSettings =<< K.initLogEnv "keygen" "production"
     KeygenOptions{..} <- getKeygenOptions
 {-
     setupLogging Nothing $ productionB <> termSeveritiesOutB debugPlus
@@ -168,7 +168,7 @@ main = do
     bracket mkLogEnv K.closeScribes $ \le -> do
       --ns <- K.getKatipNamespace
       --ctx <- K.getKatipContext
-      K.runKatipContextT le () "ns" $ do
+      K.runKatipContextT le () "proc" $ do
 
         Log.logInfo "Processing command"
         case koCommand of

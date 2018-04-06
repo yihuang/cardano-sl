@@ -157,10 +157,11 @@ genVssCert path = do
 
 main :: IO ()
 main = do
+    KeygenOptions{..} <- getKeygenOptions
   {- -}
     handleScribe <- K.mkHandleScribe K.ColorIfTerminal stdout K.DebugS K.V2
     let mkLogEnv = K.registerScribe "stdout" handleScribe K.defaultScribeSettings =<< K.initLogEnv "keygen" "production"
-    KeygenOptions{..} <- getKeygenOptions
+  {- -}
 {-
     setupLogging Nothing $ productionB <> termSeveritiesOutB debugPlus
     usingLoggerName "keygen" $ withConfigurations koConfigurationOptions $ do
@@ -169,7 +170,7 @@ main = do
       --ns <- K.getKatipNamespace
       --ctx <- K.getKatipContext
       K.runKatipContextT le () "proc" $ do
-
+    --Log.bracketLogging "keygen" $ do
         Log.logInfo "Processing command"
         case koCommand of
             RearrangeMask msk       -> rearrange msk

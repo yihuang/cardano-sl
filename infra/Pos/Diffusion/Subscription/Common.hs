@@ -22,7 +22,6 @@ import           Network.Broadcast.OutboundQueue.Types (removePeer, simplePeers)
 import           Formatting (sformat, shown, (%))
 import           Node.Message.Class (Message)
 import           System.Clock (Clock (Monotonic), TimeSpec, getTime, toNanoSecs)
-import           System.Wlog (Severity (..))
 
 import           Pos.Binary.Class (Bi)
 import           Pos.Communication.Listener (listenerConv)
@@ -35,7 +34,7 @@ import           Pos.Communication.Protocol (Conversation (..), ConversationActi
 import           Pos.Diffusion.Types (SubscriptionStatus (..))
 import           Pos.Network.Types (Bucket (..), NodeType)
 import           Pos.Util.Timer (Timer, startTimer, waitTimer, setTimerDuration)
-import           Pos.Util.Trace (Trace, traceWith)
+import           Pos.Util.Trace (Trace, traceWith, Severity (..))
 import           Pos.Worker.Types (Worker, WorkerSpec, worker)
 
 -- FIXME rename? What's a Mode in this context?

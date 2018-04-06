@@ -3,13 +3,14 @@
 module Pos.Util.Log
        ( logInfo
        , slogInfo
+       --, bracketLogging
        ) where
 
 import           Universum
 
-import           Data.Aeson                  (ToJSON(..), encode)
+import           Data.Aeson (ToJSON(..), encode)
 
-import qualified Katip                       as K
+import qualified Katip as K
 
 
 {- same for other severities
@@ -25,4 +26,13 @@ logInfo msg = K.logItemM Nothing K.InfoS $ K.logStr msg
 slogInfo :: (ToJSON a, K.KatipContext m, HasCallStack) => a -> m ()
 slogInfo json = K.logItemM Nothing K.InfoS $ K.logStr $ encode json
 
+{-
+--bracketLogging :: K.KatipContext m => Text -> IO (m ())
+bracketLogging name = do
+    handleScribe <- K.mkHandleScribe K.ColorIfTerminal stdout K.DebugS K.V2
+    let mkLogEnv = K.registerScribe "stdout" handleScribe K.defaultScribeSettings =<< K.initLogEnv (K.Namespace [name]) "production"
+
+    bracket mkLogEnv K.closeScribes $ \le -> do
+      K.runKatipContextT le () "bracket"
+-}
 

@@ -23,7 +23,7 @@ import           JsonLog (jsonLog)
 import           Mockable (race)
 import           Mockable.Production (Production (..))
 import           System.Exit (ExitCode (..))
-import           System.Wlog (askLoggerName)
+--import           System.Wlog (askLoggerName)
 
 import           Pos.Binary ()
 import           Pos.Block.Configuration (HasBlockConfiguration, recoveryHeadersMessage)
@@ -138,7 +138,8 @@ runServer
     -> ActionSpec m t
     -> m t
 runServer runIO NodeParams {..} ekgNodeMetrics _ (ActionSpec act) = do
-    lname <- askLoggerName
+    --lname <- askLoggerName
+    let lname = "server"
     exitOnShutdown . logicLayerFull jsonLog $ \logicLayer ->
         liftIO $ diffusionLayerFull (fdconf lname) npNetworkConfig (Just ekgNodeMetrics) (hoistLogic runIO (logic logicLayer)) $ \diffusionLayer -> do
             when npEnableMetrics (registerEkgMetrics ekgStore)

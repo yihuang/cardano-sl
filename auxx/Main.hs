@@ -36,7 +36,7 @@ import           Pos.Util (logException)
 import           Pos.Util.CompileInfo (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
 import           Pos.Util.Config (ConfigurationException (..))
 import           Pos.Util.UserSecret (usVss)
-import           Pos.Util.Trace (wlogTrace)
+import           Pos.Util.Trace (klogTrace)
 import           Pos.WorkMode (EmptyMempoolExt, RealMode)
 import           Pos.Worker.Types (WorkerSpec)
 
@@ -107,6 +107,7 @@ action opts@AuxxOptions {..} command = do
     runWithConfig :: HasConfigurations => PrintAction Production -> NtpConfiguration -> Production ()
     runWithConfig printAction ntpConfig = do
         printAction "Mode: with-config"
+        klog <- liftIO $ klogTrace "auxx"
         CLI.printInfoOnStart aoCommonNodeArgs ntpConfig
         (nodeParams, tempDbUsed) <-
             correctNodeParams opts =<< CLI.getNodeParams loggerName cArgs nArgs
@@ -116,7 +117,8 @@ action opts@AuxxOptions {..} command = do
                 , fdcRecoveryHeadersMessage = recoveryHeadersMessage
                 , fdcLastKnownBlockVersion = lastKnownBlockVersion
                 , fdcConvEstablishTimeout = networkConnectionTimeout
-                , fdcTrace = wlogTrace "auxx"
+                --, fdcTrace = wlogTrace "auxx"
+                , fdcTrace = klog
                 }
             toRealMode :: AuxxMode a -> RealMode EmptyMempoolExt a
             toRealMode auxxAction = do

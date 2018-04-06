@@ -157,7 +157,6 @@ genVssCert path = do
 
 main :: IO ()
 main = do
-    KeygenOptions{..} <- getKeygenOptions
   {- -}
     handleScribe <- K.mkHandleScribe K.ColorIfTerminal stdout K.DebugS K.V2
     let mkLogEnv = K.registerScribe "stdout" handleScribe K.defaultScribeSettings =<< K.initLogEnv "keygen" "production"

@@ -26,7 +26,7 @@ logInfo msg = K.logItemM Nothing K.InfoS $ K.logStr msg
 slogInfo :: (ToJSON a, K.KatipContext m, HasCallStack) => a -> m ()
 slogInfo json = K.logItemM Nothing K.InfoS $ K.logStr $ encode json
 
-{-
+{-    WIP - needs some thinking
 --bracketLogging :: K.KatipContext m => Text -> IO (m ())
 bracketLogging name = do
     handleScribe <- K.mkHandleScribe K.ColorIfTerminal stdout K.DebugS K.V2

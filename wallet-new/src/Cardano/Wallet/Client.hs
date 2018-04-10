@@ -71,7 +71,7 @@ data WalletClient m
     , getAddress
          :: Text -> Resp m WalletAddress
     , postExternalAddress
-         :: NewExternalAddress -> Resp m WalletAddress
+         :: NewAddress -> Resp m WalletAddress
     -- wallets endpoints
     , postWallet
          :: New Wallet -> Resp m Wallet
@@ -105,7 +105,7 @@ data WalletClient m
     , updateAccount
          :: WalletId -> AccountIndex -> Update Account -> Resp m Account
     , postExternalAccount
-        :: WalletId -> New ExternalAccount -> Resp m Account
+        :: WalletId -> New Account -> Resp m Account
     -- transactions endpoints
     , postTransaction
          :: Payment -> Resp m Transaction

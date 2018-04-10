@@ -72,7 +72,9 @@ library
                      , QuickCheck
                      , aeson
                      , aeson-pretty
+                     , base58-bytestring
                      , bytestring
+                     , cardano-crypto
                      , containers
                      , data-default
                      , exceptions

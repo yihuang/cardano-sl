@@ -158,9 +158,11 @@ genVssCert path = do
 main :: IO ()
 main = do
   {- -}
-    handleScribe <- K.mkHandleScribe K.ColorIfTerminal stdout K.DebugS K.V2
+    --handleScribe <- K.mkHandleScribe K.ColorIfTerminal stdout K.DebugS K.V2
+    handleScribe <- Log.mkJsonScribe stdout K.DebugS K.V2
     let mkLogEnv = K.registerScribe "stdout" handleScribe K.defaultScribeSettings =<< K.initLogEnv "keygen" "production"
   {- -}
+    KeygenOptions{..} <- getKeygenOptions
 {-
     setupLogging Nothing $ productionB <> termSeveritiesOutB debugPlus
     usingLoggerName "keygen" $ withConfigurations koConfigurationOptions $ do

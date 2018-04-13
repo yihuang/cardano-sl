@@ -4,11 +4,11 @@ import           Universum
 
 import           Cardano.Wallet.API.Request
 import           Cardano.Wallet.API.Response
+import           Cardano.Wallet.API.V1.Errors
 import           Cardano.Wallet.API.V1.Migration (HasCompileInfo, HasConfigurations, MonadV1,
                                                   migrate)
 import qualified Cardano.Wallet.API.V1.Transactions as Transactions
 import           Cardano.Wallet.API.V1.Types
-import           Cardano.Wallet.API.V1.Errors
 import qualified Data.IxSet.Typed as IxSet
 import qualified Data.List.NonEmpty as NE
 import           Pos.Client.Txp.Util (defaultInputSelectionPolicy)
@@ -17,11 +17,13 @@ import           Pos.Core (TxAux)
 import qualified Pos.Core as Core
 import           Pos.Util (eitherToThrow)
 import qualified Pos.Util.Servant as V0
+import qualified Pos.Wallet.WalletMode as V0
 import qualified Pos.Wallet.Web.ClientTypes.Types as V0
 import qualified Pos.Wallet.Web.Methods.History as V0
 import qualified Pos.Wallet.Web.Methods.Payment as V0
 import qualified Pos.Wallet.Web.Methods.Txp as V0
 import qualified Pos.Wallet.Web.State as V0
+import           Pos.Wallet.Web.State.Storage (WalletInfo (_wiSyncStatistics))
 import qualified Pos.Wallet.Web.Util as V0
 import           Servant
 import           Test.QuickCheck (arbitrary, generate)

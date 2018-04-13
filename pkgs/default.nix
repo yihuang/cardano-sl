@@ -7672,8 +7672,8 @@ inherit (pkgs) mesa;};
              cardano-sl-networking cardano-sl-ssc cardano-sl-txp
              cardano-sl-update cardano-sl-util containers data-default ether
              formatting hspec lens log-warper MonadRandom mtl QuickCheck
-             safecopy serokell-util stm text-format universum
-             unordered-containers
+             safe-exceptions safecopy serokell-util servant-server stm
+             text-format universum unordered-containers
            ];
            testToolDepends = [ cpphs ];
            doHaddock = false;
@@ -7696,8 +7696,8 @@ inherit (pkgs) mesa;};
          , servant-client, servant-client-core, servant-quickcheck
          , servant-server, servant-swagger, servant-swagger-ui, stdenv, stm
          , string-conv, swagger2, text, text-format, time, time-units
-         , transformers, universum, unordered-containers, vector, wai
-         , wai-cors, wai-extra, warp
+         , transformers, universum, unliftio, unordered-containers, vector
+         , wai, wai-cors, wai-extra, warp
          }:
          mkDerivation {
            pname = "cardano-sl-wallet-new";
@@ -7707,17 +7707,17 @@ inherit (pkgs) mesa;};
            isExecutable = true;
            libraryHaskellDepends = [
              aeson aeson-pretty base base58-bytestring bytestring cardano-crypto
-             cardano-sl cardano-sl-block cardano-sl-client cardano-sl-core
-             cardano-sl-crypto cardano-sl-db cardano-sl-infra
-             cardano-sl-networking cardano-sl-ssc cardano-sl-txp
-             cardano-sl-update cardano-sl-util cardano-sl-wallet containers
-             data-default exceptions formatting generics-sop http-api-data
-             http-client http-types ixset-typed json-sop lens log-warper memory
-             mtl QuickCheck reflection safe-exceptions serokell-util servant
-             servant-client servant-client-core servant-quickcheck
-             servant-server servant-swagger-ui string-conv swagger2 text
-             text-format time time-units transformers universum
-             unordered-containers vector wai
+             cardano-sl cardano-sl-block
+             cardano-sl-client cardano-sl-core cardano-sl-crypto cardano-sl-db
+             cardano-sl-infra cardano-sl-networking cardano-sl-ssc
+             cardano-sl-txp cardano-sl-update cardano-sl-util cardano-sl-wallet
+             containers data-default exceptions formatting generics-sop
+             http-api-data http-client http-types ixset-typed json-sop lens
+             log-warper memory mtl QuickCheck reflection safe-exceptions
+             serokell-util servant servant-client servant-client-core
+             servant-quickcheck servant-server servant-swagger-ui stm
+             string-conv swagger2 text text-format time time-units transformers
+             universum unordered-containers vector wai
            ];
            executableHaskellDepends = [
              aeson aeson-pretty base bytestring cardano-sl cardano-sl-client
@@ -7729,8 +7729,8 @@ inherit (pkgs) mesa;};
              memory mtl neat-interpolation optparse-applicative QuickCheck
              safe-exceptions serokell-util servant servant-server
              servant-swagger servant-swagger-ui stm string-conv swagger2 text
-             text-format time-units universum unordered-containers wai wai-cors
-             wai-extra warp
+             text-format time-units universum unliftio unordered-containers wai
+             wai-cors wai-extra warp
            ];
            testHaskellDepends = [
              aeson aeson-pretty base bytestring cardano-sl cardano-sl-block
@@ -7743,7 +7743,7 @@ inherit (pkgs) mesa;};
              QuickCheck quickcheck-instances safe-exceptions serokell-util
              servant servant-quickcheck servant-server servant-swagger stm
              string-conv swagger2 text text-format time time-units universum
-             unordered-containers
+             unliftio unordered-containers
            ];
            doHaddock = false;
            homepage = "https://github.com/input-output-hk/cardano-sl/#readme";

@@ -24,7 +24,7 @@ import           Pos.Util.CompileInfo (HasCompileInfo, withCompileInfo)
 import           Pos.Util.QuickCheck.Property (assertProperty)
 import qualified Pos.Wallet.Web.State as WS
 import           Pos.Wallet.Web.State.Storage (WalletStorage (..))
-import           Pos.Wallet.Web.Tracking.Decrypt (eskToWalletDecrCredentials)
+import           Pos.Wallet.Web.Tracking.Decrypt (keyToWalletDecrCredentials)
 import           Pos.Wallet.Web.Tracking.Sync (evalChange, syncWalletWithBlockchain)
 import           Pos.Wallet.Web.Tracking.Types (newSyncRequest)
 import           Test.Pos.Block.Logic.Util (EnableTxPayload (..), InplaceDB (..))
@@ -53,7 +53,7 @@ twoApplyTwoRollbacksSpec = walletPropertySpec twoApplyTwoRollbacksDesc $ do
     -- way of restoring.
     void $ importSomeWallets (pure emptyPassphrase)
     sks <- lift getSecretKeysPlain
-    lift $ forM_ sks $ \s -> syncWalletWithBlockchain (newSyncRequest (eskToWalletDecrCredentials s))
+    lift $ forM_ sks $ \sk -> syncWalletWithBlockchain (newSyncRequest (keyToWalletDecrCredentials $ Right sk))
 
     -- Testing starts here
     genesisWalletDB <- lift WS.askWalletSnapshot

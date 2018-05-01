@@ -121,10 +121,6 @@ let
       cp ${./lib}/*genesis*.json config
       cp ${cardanoPkgs.cardano-sl-tools}/bin/cardano-launcher bin
       cp ${cardanoPkgs.cardano-sl-wallet}/bin/cardano-node bin
-
-      # test that binaries exit with 0
-      ./bin/cardano-node --help > /dev/null
-      HOME=$TMP ./bin/cardano-launcher --help > /dev/null
     '';
   };
 in cardanoPkgs // other

@@ -581,7 +581,7 @@ runWallet shouldLog nd nLogPath = do
     let wpath = ndPath nd
         wargs = ndArgs nd
         mWLogPath = ndLogPath nd
-    logNotice "Starting the wallet"
+    logNotice $ sformat ("Starting the wallet shouldLog="%shown%" logPath="%shown) shouldLog nLogPath
     phvar <- newEmptyMVar
     liftIO $ case mWLogPath of
         Just lp -> do

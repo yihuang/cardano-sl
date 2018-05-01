@@ -120,7 +120,7 @@ let
       cp ${./lib}/configuration.yaml config
       cp ${./lib}/*genesis*.json config
       cp ${cardanoPkgs.cardano-sl-tools}/bin/cardano-launcher bin
-      cp ${cardanoPkgs.cardano-sl-wallet-new}/bin/cardano-node bin
+      cp ${cardanoPkgs.cardano-sl-wallet}/bin/cardano-node bin
 
       # test that binaries exit with 0
       ./bin/cardano-node --help > /dev/null

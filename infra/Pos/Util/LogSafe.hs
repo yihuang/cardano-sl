@@ -8,6 +8,9 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 -- | Safe/secure logging
+--
+-- FIXME most of this is deprecated, replaced by
+-- similarly-named definitions in Pos.Util.Trace.Compat.
 
 module Pos.Util.LogSafe
        ( -- * Logging functions
@@ -89,6 +92,19 @@ instance MonadTrans (SelectiveLogWrapped s) where
     lift = SelectiveLogWrapped
 
 -- | Whether to log to given log handler.
+--
+-- TODO FIXME all of this Data.Reflection crap is completely unnecessary.
+-- Classic case of over-engineering.
+-- This 'SelectionMode', along with the "secure buildable", is really all we
+-- need. We can come up with a more general log-warper 'Trace' with "secure"
+-- input flag.
+--
+--   'Trace IO (Privacy, (Severity, Text))'
+--
+-- and derive the typical one via
+--
+--   'contramap ((,) NotPrivate)'
+--
 type SelectionMode = LogHandlerTag -> Bool
 
 selectPublicLogs :: SelectionMode
@@ -270,6 +286,10 @@ deriveSafeBuildable typeName =
 -- | Same as 'logMesssage', put to public logs only (these logs don't go
 -- to terminal). Use it along with 'logMessageS' when want to specify
 -- secret and public log alternatives manually.
+--
+-- FIXME is this an abuse of the term "unsafe"? Typically it means it violates
+-- referential transparency or type safety etc. but here I think it just means
+-- "it may be the wrong thing to do".
 logMessageUnsafeP
     :: (HasLoggerName m, MonadIO m)
     => Severity

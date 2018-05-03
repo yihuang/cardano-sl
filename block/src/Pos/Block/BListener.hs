@@ -13,7 +13,6 @@ module Pos.Block.BListener
 import           Universum
 
 import           Control.Monad.Trans (MonadTrans (..))
-import           Mockable (SharedAtomicT)
 
 import           Pos.Block.Types (Blund)
 import           Pos.DB.BatchOp (SomeBatchOp)
@@ -29,8 +28,7 @@ class Monad m => MonadBListener m where
     onRollbackBlocks :: NewestFirst NE Blund -> m SomeBatchOp
 
 instance {-# OVERLAPPABLE #-}
-    ( MonadBListener m, Monad m, MonadTrans t, Monad (t m)
-    , SharedAtomicT m ~ SharedAtomicT (t m) ) =>
+    ( MonadBListener m, Monad m, MonadTrans t, Monad (t m) ) =>
         MonadBListener (t m)
   where
     onApplyBlocks = lift . onApplyBlocks

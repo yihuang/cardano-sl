@@ -18,8 +18,7 @@ import           Universum
 
 import           Control.Lens (makeLensesWith)
 import qualified Control.Monad.Reader as Mtl
-import           Mockable (Production)
-import           System.Wlog (HasLoggerName (..), LoggerName)
+import           Data.Aeson (Value)
 
 import           Pos.Block.BListener (MonadBListener (..), onApplyBlocksStub, onRollbackBlocksStub)
 import           Pos.Block.Slog (HasSlogContext (..), HasSlogGState (..))
@@ -47,13 +46,11 @@ import           Pos.Ssc.Mem (SscMemTag)
 import           Pos.Ssc.Types (SscState)
 import           Pos.Txp (GenericTxpLocalData, HasTxpConfiguration, MempoolExt, MonadTxpLocal (..),
                           TxpHolderTag, txNormalize, txProcessTransaction)
-import           Pos.Util.JsonLog.Events (HasJsonLogConfig (..), JsonLogConfig, jsonLogDefault)
 import           Pos.Util.Lens (postfixLFields)
-import           Pos.Util.LoggerName (HasLoggerName' (..), askLoggerNameDefault,
-                                      modifyLoggerNameDefault)
-import           Pos.Util.TimeWarp (CanJsonLog (..))
 import           Pos.Util.UserSecret (HasUserSecret (..))
 import           Pos.Util.Util (HasLens (..))
+import           Pos.Util.Trace (Trace, natTrace)
+import           Pos.Util.Trace.Unstructured (LogItem)
 import           Pos.WorkMode.Class (MinWorkMode, WorkMode)
 
 data RealModeContext ext = RealModeContext
@@ -61,19 +58,19 @@ data RealModeContext ext = RealModeContext
     , rmcSscState      :: !SscState
     , rmcTxpLocalData  :: !(GenericTxpLocalData ext)
     , rmcDelegationVar :: !DelegationVar
-    , rmcJsonLogConfig :: !JsonLogConfig
-    , rmcLoggerName    :: !LoggerName
     , rmcNodeContext   :: !NodeContext
     , rmcReporter      :: !(Reporter IO)
       -- ^ How to do reporting. It's in here so that we can have
       -- 'MonadReporting (RealMode ext)' in the mean-time, until we
       -- re-architecht the reporting system so that it's not built-in to the
       -- application's monad.
+    , rmcLogTrace      :: !(Trace IO LogItem)
+    , rmcJsonLogTrace  :: !(Trace IO Value)
     }
 
 type EmptyMempoolExt = ()
 
-type RealMode ext = Mtl.ReaderT (RealModeContext ext) Production
+type RealMode ext = Mtl.ReaderT (RealModeContext ext) IO
 
 makeLensesWith postfixLFields ''RealModeContext
 
@@ -129,19 +126,6 @@ instance HasSlogGState (RealModeContext ext) where
 instance HasNodeContext (RealModeContext ext) where
     nodeContext = rmcNodeContext_L
 
-instance HasLoggerName' (RealModeContext ext) where
-    loggerName = rmcLoggerName_L
-
-instance HasJsonLogConfig (RealModeContext ext) where
-    jsonLogConfig = rmcJsonLogConfig_L
-
-instance {-# OVERLAPPING #-} HasLoggerName (RealMode ext) where
-    askLoggerName = askLoggerNameDefault
-    modifyLoggerName = modifyLoggerNameDefault
-
-instance {-# OVERLAPPING #-} CanJsonLog (RealMode ext) where
-    jsonLog = jsonLogDefault
-
 instance (HasConfiguration, MonadSlotsData ctx (RealMode ext))
       => MonadSlots ctx (RealMode ext)
   where
@@ -174,7 +158,11 @@ type instance MempoolExt (RealMode ext) = ext
 instance (HasConfiguration, HasTxpConfiguration) =>
          MonadTxpLocal (RealMode ()) where
     txpNormalize = txNormalize
-    txpProcessTx = txProcessTransaction
+    txpProcessTx it = do
+        ctx <- ask
+        txProcessTransaction (natTrace liftIO (rmcLogTrace ctx))
+                             (natTrace liftIO (rmcJsonLogTrace ctx))
+                             it
 
 instance MonadReporting (RealMode ext) where
     report rt = Mtl.ask >>= liftIO . flip runReporter rt . rmcReporter

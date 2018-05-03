@@ -25,18 +25,6 @@ Library
 
                         Node
 
-                        Mockable
-                        Mockable.Channel
-                        Mockable.Class
-                        Mockable.Concurrent
-                        Mockable.CurrentTime
-                        Mockable.Instances
-                        Mockable.Monad
-                        Mockable.Production
-                        Mockable.SharedAtomic
-                        Mockable.SharedExclusive
-                        Mockable.Metrics
-
                         Node.Internal
                         Node.Conversation
                         Node.Message.Decoder
@@ -50,9 +38,8 @@ Library
                         Bench.Network.Commons
 
                         JsonLog
-                        JsonLog.CanJsonLog
                         JsonLog.Event
-                        JsonLog.JsonLogT
+                        JsonLog.Trace
 
   other-modules:        Ntp.Packet
                         Ntp.Util
@@ -64,6 +51,7 @@ Library
                       , base
                       , cardano-sl-util
                       , containers
+                      , contravariant
                       , cryptonite
                       , binary >= 0.8
                       , bytestring

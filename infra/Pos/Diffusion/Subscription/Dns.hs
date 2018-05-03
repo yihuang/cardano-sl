@@ -29,8 +29,10 @@ import           Pos.Diffusion.Subscription.Status (SubscriptionStates)
 import           Pos.Network.DnsDomains (NodeAddr)
 import           Pos.Network.Types (Bucket (..), DnsDomains (..), NodeId (..),
                                     NodeType (..), resolveDnsDomains)
+
 import           Pos.Util.Timer (Timer, startTimer, waitTimer)
-import           Pos.Util.Trace (Trace, Severity (..), traceWith)
+import           Pos.Util.Trace (Trace, traceWith)
+import           Pos.Util.Trace.Unstructured (Severity (..))
 
 -- | Resolve a fixed list of names to a NodeId (using a given port) repeatedly.
 -- If the resolution may give more than one address, the addresses are given

@@ -98,7 +98,6 @@ library
                         -- Util code for tests
                         Test.Pos.Configuration
 
-                        Pos.Util.Mockable
                         Pos.Util.Servant
 
 

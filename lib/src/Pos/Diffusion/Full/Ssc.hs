@@ -9,6 +9,7 @@ module Pos.Diffusion.Full.Ssc
 
 import           Universum
 
+import           Data.Functor.Contravariant (contramap)
 import           Data.Tagged (Tagged (..))
 import qualified Network.Broadcast.OutboundQueue as OQ
 import           Node.Message.Class (Message)
@@ -33,15 +34,20 @@ import           Pos.Logic.Types (Logic (..))
 import qualified Pos.Logic.Types as KV (KeyVal (..))
 import           Pos.Ssc.Message (MCCommitment (..), MCOpening (..), MCShares (..),
                                   MCVssCertificate (..))
-import           Pos.Util.Trace (Trace, Severity)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
 
 sscListeners
-    :: Trace IO (Severity, Text)
+    :: Trace IO LogItem
     -> Logic IO
     -> OQ.OutboundQ pack NodeId Bucket
     -> EnqueueMsg
     -> MkListeners
-sscListeners logTrace logic oq enqueue = relayListeners logTrace oq enqueue (sscRelays logic)
+sscListeners logTrace logic oq enqueue = relayListeners
+    (contramap publicPrivateLogItem logTrace)
+    oq
+    enqueue
+    (sscRelays logic)
 
 sscRelays
     :: Logic IO

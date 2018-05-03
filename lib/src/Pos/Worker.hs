@@ -22,17 +22,22 @@ import           Pos.Slotting (logNewSlotWorker)
 import           Pos.Ssc.Worker (sscWorkers)
 import           Pos.Update.Worker (usWorkers)
 import           Pos.WorkMode (WorkMode)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem)
+import           Pos.Util.Trace.Wlog (LogNamed)
 
 -- | All, but in reality not all, workers used by full node.
 allWorkers
     :: forall ext ctx m .
        WorkMode ctx m
-    => NodeResources ext -> [Diffusion m -> m ()]
-allWorkers NodeResources {..} = mconcat
-    [ sscWorkers
-    , usWorkers
-    , blkWorkers
-    , dlgWorkers
+    => Trace m (LogNamed LogItem)
+    -> NodeResources ext
+    -> [Diffusion m -> m ()]
+allWorkers logTrace NodeResources {..} = mconcat
+    [ sscWorkers logTrace
+    , usWorkers logTrace
+    , blkWorkers logTrace
+    , dlgWorkers logTrace
     , [properSlottingWorker, staticConfigMonitoringWorker]
     ]
   where

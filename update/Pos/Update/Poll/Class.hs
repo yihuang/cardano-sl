@@ -10,7 +10,6 @@ module Pos.Update.Poll.Class
 import           Universum
 
 import           Control.Monad.Trans (MonadTrans)
-import           System.Wlog (WithLogger)
 
 import           Pos.Core (ApplicationName, BlockVersion, BlockVersionData, ChainDifficulty, Coin,
                            EpochIndex, NumSoftwareVersion, SlotId,
@@ -26,7 +25,7 @@ import           Pos.Update.Poll.Types (BlockVersionState, ConfirmedProposalStat
 
 -- | Type class which provides function necessary for read-only
 -- verification of US data.
-class (Monad m, WithLogger m) => MonadPollRead m where
+class (Monad m) => MonadPollRead m where
     getBVState :: BlockVersion -> m (Maybe BlockVersionState)
     -- ^ Retrieve state of given block version.
     getProposedBVs :: m [BlockVersion]
@@ -71,7 +70,7 @@ class (Monad m, WithLogger m) => MonadPollRead m where
     getAdoptedBVData = snd <$> getAdoptedBVFull
 
 instance {-# OVERLAPPABLE #-}
-    (MonadPollRead m, MonadTrans t, Monad (t m), WithLogger (t m)) =>
+    (MonadPollRead m, MonadTrans t, Monad (t m)) =>
         MonadPollRead (t m)
   where
     getBVState = lift . getBVState
@@ -122,7 +121,7 @@ class MonadPollRead m => MonadPoll m where
     -- ^ Set proposers.
 
 instance {-# OVERLAPPABLE #-}
-    (MonadPoll m, MonadTrans t, Monad (t m), WithLogger (t m)) =>
+    (MonadPoll m, MonadTrans t, Monad (t m)) =>
         MonadPoll (t m)
   where
     putBVState pv = lift . putBVState pv

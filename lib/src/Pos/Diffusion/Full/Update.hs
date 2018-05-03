@@ -11,6 +11,7 @@ module Pos.Diffusion.Full.Update
 
 import           Universum
 
+import           Data.Functor.Contravariant (contramap)
 import qualified Network.Broadcast.OutboundQueue as OQ
 
 import           Pos.Core.Update (UpId, UpdateVote, UpdateProposal, mkVoteId)
@@ -26,17 +27,18 @@ import           Pos.Logic.Types (Logic (..))
 import qualified Pos.Logic.Types as KV (KeyVal (..))
 import           Pos.Network.Types (Bucket)
 import           Pos.Update ()
-import           Pos.Util.Trace (Trace, Severity)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
 
 -- Send UpdateVote to given addresses.
 sendVote
-    :: Trace IO (Severity, Text)
+    :: Trace IO LogItem
     -> EnqueueMsg
     -> UpdateVote
     -> IO ()
 sendVote logTrace enqueue vote =
     void $ invReqDataFlowTK
-        logTrace
+        (contramap publicPrivateLogItem logTrace)
         "UpdateVote"
         enqueue
         (MsgMPC OriginSender)
@@ -45,7 +47,7 @@ sendVote logTrace enqueue vote =
 
 -- Send UpdateProposal to given address.
 sendUpdateProposal
-    :: Trace IO (Severity, Text)
+    :: Trace IO LogItem
     -> EnqueueMsg
     -> UpId
     -> UpdateProposal
@@ -53,7 +55,7 @@ sendUpdateProposal
     -> IO ()
 sendUpdateProposal logTrace enqueue upid proposal votes = do
     void $ invReqDataFlowTK
-        logTrace
+        (contramap publicPrivateLogItem logTrace)
         "UpdateProposal"
         enqueue
         (MsgMPC OriginSender)
@@ -61,12 +63,16 @@ sendUpdateProposal logTrace enqueue upid proposal votes = do
         (proposal, votes)
 
 updateListeners
-    :: Trace IO (Severity, Text)
+    :: Trace IO LogItem
     -> Logic IO
     -> OQ.OutboundQ pack NodeId Bucket
     -> EnqueueMsg
     -> MkListeners
-updateListeners logTrace logic oq enqueue = relayListeners logTrace oq enqueue (usRelays logic)
+updateListeners logTrace logic oq enqueue = relayListeners
+    (contramap publicPrivateLogItem logTrace)
+    oq
+    enqueue
+    (usRelays logic)
 
 -- | Relays for data related to update system
 usRelays :: Logic IO -> [Relay]

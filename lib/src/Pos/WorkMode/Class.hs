@@ -14,8 +14,6 @@ import           Universum
 
 import           Control.Monad.Trans.Control (MonadBaseControl)
 import qualified Crypto.Random as Rand
-import           Mockable (MonadMockable)
-import           System.Wlog (WithLogger)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Block.BListener (MonadBListener)
@@ -47,7 +45,6 @@ import           Pos.Update.Context (UpdateContext)
 import           Pos.Update.Params (UpdateParams)
 import           Pos.Util (HasLens, HasLens')
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason)
-import           Pos.Util.TimeWarp (CanJsonLog)
 
 -- | Bunch of constraints to perform work for real world distributed system.
 type WorkMode ctx m
@@ -92,10 +89,7 @@ type WorkMode ctx m
 
 -- | More relaxed version of 'WorkMode'.
 type MinWorkMode m
-    = ( WithLogger m
-      , CanJsonLog m
-      , MonadMockable m
-      , MonadIO m
+    = ( MonadIO m
       , MonadUnliftIO m
       , HasConfiguration
       , HasUpdateConfiguration

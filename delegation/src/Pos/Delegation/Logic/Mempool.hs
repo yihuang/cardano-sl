@@ -22,7 +22,7 @@ import           Universum
 import           Control.Lens (at, uses, (%=), (+=), (-=), (.=))
 import qualified Data.Cache.LRU as LRU
 import qualified Data.HashMap.Strict as HM
-import           Mockable (CurrentTime, Mockable, currentTime)
+import           Data.Time.Clock.POSIX (getPOSIXTime)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Binary.Class (biSize)
@@ -106,14 +106,13 @@ data PskHeavyVerdict
     deriving (Show,Eq)
 
 type ProcessHeavyConstraint ctx m =
-       ( MonadIO m
-       , MonadUnliftIO m
+       ( MonadUnliftIO m
+       , MonadMask m
        , MonadDBRead m
        , MonadGState m
        , MonadDelegation ctx m
        , MonadReader ctx m
        , HasLrcContext ctx
-       , Mockable CurrentTime m
        )
 
 -- | Processes heavyweight psk. Puts it into the mempool
@@ -123,7 +122,6 @@ processProxySKHeavy
     :: forall ctx m.
        ( ProcessHeavyConstraint ctx m
        , HasLens' ctx StateLock
-       , MonadMask m
        )
     => ProxySKHeavy -> m PskHeavyVerdict
 processProxySKHeavy psk =
@@ -138,7 +136,7 @@ processProxySKHeavyInternal ::
     => ProxySKHeavy
     -> m PskHeavyVerdict
 processProxySKHeavyInternal psk = do
-    curTime <- microsecondsToUTC <$> currentTime
+    curTime <- microsecondsToUTC . round . (* 1000000) <$> liftIO getPOSIXTime
     dbTip <- DB.getTipHeader
     let dbTipHash = headerHash dbTip
     let headEpoch = dbTip ^. epochIndexL

@@ -26,10 +26,10 @@ import           Universum
 import           Control.Lens (_Wrapped)
 import           Control.Monad.Except (MonadError (throwError))
 import qualified Data.List.NonEmpty as NE
+import           Data.Functor.Contravariant (contramap)
 import           Formatting (build, sformat, (%))
 import           Serokell.Util (Color (Red), colorize)
 import           Serokell.Util.Verify (formatAllErrors, verResToMonadError)
-import           System.Wlog (WithLogger)
 
 import           Pos.Binary.Core ()
 import           Pos.Block.BListener (MonadBListener (..))
@@ -58,6 +58,8 @@ import           Pos.Util (_neHead, _neLast)
 import           Pos.Util.AssertMode (inAssertMode)
 import           Pos.Util.Chrono (NE, NewestFirst (getNewestFirst), OldestFirst (..), toOldestFirst,
                                   _OldestFirst)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
 
 ----------------------------------------------------------------------------
 -- Helpers
@@ -104,7 +106,6 @@ type MonadSlogBase ctx m =
     ( MonadSlots ctx m
     , MonadIO m
     , MonadDBRead m
-    , WithLogger m
     , HasUpdateConfiguration
     )
 
@@ -276,15 +277,16 @@ newtype BypassSecurityCheck = BypassSecurityCheck Bool
 --     3. Reverting @lastBlkSlots@
 --     4. Removing forward links
 --     5. Removing @inMainChain@ flags
-slogRollbackBlocks ::
-       MonadSlogApply ctx m
-    => BypassSecurityCheck -- ^ is rollback for more than k blocks allowed?
+slogRollbackBlocks
+    :: MonadSlogApply ctx m
+    => Trace m LogItem
+    -> BypassSecurityCheck -- ^ is rollback for more than k blocks allowed?
     -> ShouldCallBListener
     -> NewestFirst NE Blund
     -> m SomeBatchOp
-slogRollbackBlocks (BypassSecurityCheck bypassSecurity) (ShouldCallBListener callBListener) blunds = do
+slogRollbackBlocks logTrace (BypassSecurityCheck bypassSecurity) (ShouldCallBListener callBListener) blunds = do
     inAssertMode $ when (isGenesis0 (blocks ^. _Wrapped . _neLast)) $
-        assertionFailed $
+        assertionFailed (contramap publicPrivateLogItem logTrace) $
         colorize Red "FATAL: we are TRYING TO ROLLBACK 0-TH GENESIS block"
     -- We should never allow a situation when we summarily roll back by more
     -- than 'k' blocks
@@ -299,7 +301,8 @@ slogRollbackBlocks (BypassSecurityCheck bypassSecurity) (ShouldCallBListener cal
             -- no rollback further than k blocks
             maxSeenDifficulty - resultingDifficulty <= fromIntegral blkSecurityParam
     unless (bypassSecurity || secure) $
-        reportFatalError "slogRollbackBlocks: the attempted rollback would \
+        reportFatalError (contramap publicPrivateLogItem logTrace)
+                         "slogRollbackBlocks: the attempted rollback would \
                          \lead to a more than 'k' distance between tip and \
                          \last seen block, which is a security risk. Aborting."
     bListenerBatch <- if callBListener then onRollbackBlocks blunds

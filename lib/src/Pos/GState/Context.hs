@@ -12,13 +12,15 @@ module Pos.GState.Context
 import           Universum
 
 import           Control.Lens (lens, makeClassy)
-import           System.Wlog (WithLogger)
+import           Data.Functor.Contravariant (contramap)
 
 import           Pos.Block.Slog (HasSlogGState (..), SlogGState, cloneSlogGState)
 import           Pos.DB.Pure (cloneDBPure)
 import           Pos.DB.Sum (DBSum (..))
 import           Pos.Lrc.Context (HasLrcContext, LrcContext, cloneLrcContext)
 import           Pos.Slotting (HasSlottingVar, SlottingVar, cloneSlottingVar, slottingVar)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
 import           Pos.Util.Util (HasLens', lensOf)
 
 -- | This type contains DB and in-memory contexts which basically
@@ -64,27 +66,28 @@ getGStateImplicit = lens getter setter
 -- | Create a new 'GStateContext' which is a copy of the given context
 -- and can be modified independently.
 cloneGStateContext ::
-       (MonadIO m, WithLogger m, MonadThrow m)
-    => GStateContext
+       (MonadIO m, MonadThrow m)
+    => Trace m LogItem
+    -> GStateContext
     -> m GStateContext
-cloneGStateContext GStateContext {..} = case _gscDB of
+cloneGStateContext logTrace GStateContext {..} = case _gscDB of
     RealDB _ -> error "You may not copy RealDB" -- TODO maybe exception?
     PureDB pdb -> GStateContext <$>
         (PureDB <$> cloneDBPure pdb) <*>
-        cloneLrcContext _gscLrcContext <*>
+        cloneLrcContext (contramap publicPrivateLogItem logTrace) _gscLrcContext <*>
         cloneSlogGState _gscSlogGState <*>
         cloneSlottingVar _gscSlottingVar
 
 -- | Make a full copy of GState and run given action with this copy.
 withClonedGState ::
        ( MonadIO m
-       , WithLogger m
        , MonadThrow m
        , MonadReader ctx m
        , HasGStateContext ctx
        )
-    => m a
+    => Trace m LogItem
     -> m a
-withClonedGState action = do
-    cloned <- cloneGStateContext =<< view gStateContext
+    -> m a
+withClonedGState logTrace action = do
+    cloned <- cloneGStateContext logTrace =<< view gStateContext
     local (set gStateContext cloned) action

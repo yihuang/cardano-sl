@@ -59,7 +59,6 @@ import qualified Network.Transport.TCP as TCP
 import           Node.Internal (NodeId (..))
 import qualified Prelude
 import qualified System.Metrics as Monitoring
-import           System.Wlog (LoggerName (..))
 
 import           Pos.Network.DnsDomains (DnsDomains (..), NodeAddr)
 import qualified Pos.Network.DnsDomains as DnsDomains
@@ -67,7 +66,8 @@ import qualified Pos.Network.Policy as Policy
 import           Pos.Reporting.Health.Types (HealthStatus (..))
 import           Pos.System.Metrics.Constants (cardanoNamespace)
 import           Pos.Util.TimeWarp (addressToNodeId)
-import           Pos.Util.Trace (wlogTrace)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (Severity)
 import           Pos.Util.Util (HasLens', lensOf)
 
 {-------------------------------------------------------------------------------
@@ -323,7 +323,7 @@ topologyMaxBucketSize topology bucket =
           Nothing                               -> Nothing -- subscription not allowed
       _otherBucket -> Just OQ.BucketSizeUnlimited
 
-topologyHealthStatus :: MonadIO m => Topology kademlia -> OutboundQ msg nid Bucket -> m HealthStatus
+topologyHealthStatus :: Topology kademlia -> OutboundQ msg nid Bucket -> IO HealthStatus
 topologyHealthStatus topology = case topology of
     TopologyCore{}        -> const (pure topologyHealthStatusCore)
     TopologyRelay{..}     -> topologyHealthStatusRelay topologyMaxSubscrs
@@ -338,16 +338,15 @@ topologyHealthStatusCore = HSHealthy ""
 
 -- | Health of a relay is determined by its spare capacity.
 topologyHealthStatusRelay
-    :: MonadIO m
-    => OQ.MaxBucketSize
+    :: OQ.MaxBucketSize
     -> OQ.OutboundQ msg nid Bucket
-    -> m HealthStatus
+    -> IO HealthStatus
 topologyHealthStatusRelay mbs oq = do
     let maxCapacityText :: Text
         maxCapacityText = case mbs of
             OQ.BucketSizeUnlimited -> fromString "unlimited"
             OQ.BucketSizeMax x     -> fromString (show x)
-    spareCapacity <- liftIO $ OQ.bucketSpareCapacity oq BucketSubscriptionListener
+    spareCapacity <- OQ.bucketSpareCapacity oq BucketSubscriptionListener
     pure $ case spareCapacity of
         OQ.SpareCapacity sc  | sc == 0 -> HSUnhealthy (fromString "0/" <> maxCapacityText)
         OQ.SpareCapacity sc  -> HSHealthy $ fromString (show sc) <> "/" <> maxCapacityText
@@ -355,11 +354,10 @@ topologyHealthStatusRelay mbs oq = do
 
 -- | Health of a behind-NAT node is good iff it is connected to some other node.
 topologyHealthStatusNAT
-    :: MonadIO m
-    => OQ.OutboundQ msg nid bucket
-    -> m HealthStatus
+    :: OQ.OutboundQ msg nid bucket
+    -> IO HealthStatus
 topologyHealthStatusNAT oq = do
-    peers <- liftIO $ OQ.getAllPeers oq
+    peers <- OQ.getAllPeers oq
     if (Set.null (peersSet peers))
     then pure $ HSUnhealthy "not connected"
     else pure $ HSHealthy "connected"
@@ -367,24 +365,21 @@ topologyHealthStatusNAT oq = do
 -- | Health status of a P2P node is the same as for behind NAT. Its capacity to
 -- support new subscribers is ignored.
 topologyHealthStatusP2P
-    :: MonadIO m
-    => OQ.OutboundQ msg nid bucket
-    -> m HealthStatus
+    :: OQ.OutboundQ msg nid bucket
+    -> IO HealthStatus
 topologyHealthStatusP2P = topologyHealthStatusNAT
 
 -- | Health status of a traditional node is the same as for behind NAT. Its
 -- capacity to support new subscribers is ignored.
 topologyHealthStatusTraditional
-    :: MonadIO m
-    => OQ.OutboundQ msg nid bucket
-    -> m HealthStatus
+    :: OQ.OutboundQ msg nid bucket
+    -> IO HealthStatus
 topologyHealthStatusTraditional = topologyHealthStatusTraditional
 
 -- | Auxx health status is the same as for behind-NAT.
 topologyHealthStatusAuxx
-    :: MonadIO m
-    => OQ.OutboundQ msg nid bucket
-    -> m HealthStatus
+    :: OQ.OutboundQ msg nid bucket
+    -> IO HealthStatus
 topologyHealthStatusAuxx = topologyHealthStatusNAT
 
 -- | Whether or not we want to enable the health-check endpoint to be used by Route53
@@ -433,15 +428,13 @@ data Bucket =
 --
 -- This will use the log-warper trace for logging from the outbound queue.
 -- You can choose what name to give it.
-initQueue :: (MonadIO m, FormatMsg msg)
+initQueue :: (FormatMsg msg)
           => NetworkConfig kademlia
-          -> LoggerName
+          -> Trace IO (Severity, Text)
           -> Maybe Monitoring.Store -- ^ EKG store (if used)
-          -> m (OutboundQ msg NodeId Bucket)
-initQueue NetworkConfig{..} loggerName mStore = liftIO $ do
-    let NodeName selfName = fromMaybe (NodeName "self") ncSelfName
-        oqTrace           = wlogTrace (loggerName <> LoggerName selfName)
-    oq <- OQ.new oqTrace
+          -> IO (OutboundQ msg NodeId Bucket)
+initQueue NetworkConfig{..} logTrace mStore = do
+    oq <- OQ.new logTrace
                  ncEnqueuePolicy
                  ncDequeuePolicy
                  ncFailurePolicy
@@ -450,7 +443,7 @@ initQueue NetworkConfig{..} loggerName mStore = liftIO $ do
 
     case mStore of
       Nothing    -> return () -- EKG store not used
-      Just store -> liftIO $ OQ.registerQueueMetrics (Just (toString cardanoNamespace)) oq store
+      Just store -> OQ.registerQueueMetrics (Just (toString cardanoNamespace)) oq store
 
     case ncTopology of
       TopologyAuxx peers -> do

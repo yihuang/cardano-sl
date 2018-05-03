@@ -27,6 +27,7 @@ import           Control.Monad.State (gets)
 import           Data.Binary (decodeOrFail, encode)
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Maybe (catMaybes, isNothing)
+import           Data.Time.Clock.POSIX (getPOSIXTime)
 import           Data.Time.Units (TimeUnit, Microsecond, Second, toMicroseconds)
 import           Data.Typeable (Typeable)
 import           Formatting (sformat, shown, (%))
@@ -36,7 +37,6 @@ import           Serokell.Util.Concurrent (modifyTVarS, threadDelay)
 import           System.Wlog (LoggerNameBox)
 import qualified System.Wlog as Wlog
 
-import           Mockable (realTime)
 import           Ntp.Packet (NtpPacket (..), evalClockOffset, mkCliNtpPacket, ntpPacketSize)
 import           Ntp.Util (createAndBindSock, resolveNtpHost, selectIPv4, selectIPv6,
                            udpLocalAddresses, withSocketsDoLifted)
@@ -126,7 +126,7 @@ handleCollectedResponses cli = do
     handler :: (Microsecond, Microsecond) -> IO ()
     handler (newMargin, transmitTime) = do
         let ntpTime = transmitTime + newMargin
-        localTime <- realTime
+        localTime <- round . (* 1000000) <$> getPOSIXTime
         atomically $ writeTVar (ncStatus cli) (NtpDrift $ ntpTime - localTime)
 
 

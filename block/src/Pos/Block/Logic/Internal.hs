@@ -28,8 +28,8 @@ import           Universum
 
 import           Control.Lens (each, _Wrapped)
 import qualified Crypto.Random as Rand
+import           Data.Functor.Contravariant (contramap)
 import           Formatting (sformat, (%))
-import           Mockable (CurrentTime, Mockable)
 import           Serokell.Util.Text (listJson)
 import           UnliftIO (MonadUnliftIO)
 
@@ -63,6 +63,10 @@ import           Pos.Update.Poll (PollModifier)
 import           Pos.Util (Some (..), spanSafe)
 import           Pos.Util.Chrono (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.Util.Util (HasLens', lensOf)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
+-- FIXME no more direct wlog dependencies.
+import           Pos.Util.Trace.Wlog (LogNamed, named)
 
 -- | Set of basic constraints used by high-level block processing.
 type MonadBlockBase ctx m
@@ -100,8 +104,6 @@ type MonadBlockApply ctx m
        , MonadMask m
        -- Needed to embed custom logic.
        , MonadBListener m
-       -- Needed for rollback
-       , Mockable CurrentTime m
        )
 
 type MonadMempoolNormalization ctx m
@@ -118,19 +120,21 @@ type MonadMempoolNormalization ctx m
       , MonadReporting m
       -- 'MonadRandom' for crypto.
       , Rand.MonadRandom m
-      , Mockable CurrentTime m
       , HasSscConfiguration
       )
 
 -- | Normalize mempool.
-normalizeMempool :: MonadMempoolNormalization ctx m => m ()
-normalizeMempool = do
+normalizeMempool
+    :: MonadMempoolNormalization ctx m
+    => Trace m LogItem
+    -> m ()
+normalizeMempool logTrace = do
     -- We normalize all mempools except the delegation one.
     -- That's because delegation mempool normalization is harder and is done
     -- within block application.
-    sscNormalize
-    txpNormalize
-    usNormalize
+    sscNormalize logTrace
+    txpNormalize 
+    usNormalize logTrace
 
 -- | Applies a definitely valid prefix of blocks. This function is unsafe,
 -- use it only if you understand what you're doing. That means you can break
@@ -139,13 +143,14 @@ normalizeMempool = do
 -- Invariant: all blocks have the same epoch.
 applyBlocksUnsafe
     :: MonadBlockApply ctx m
-    => ShouldCallBListener
+    => Trace m (LogNamed LogItem)
+    -> ShouldCallBListener
     -> OldestFirst NE Blund
     -> Maybe PollModifier
     -> m ()
-applyBlocksUnsafe scb blunds pModifier = do
+applyBlocksUnsafe logTrace scb blunds pModifier = do
     -- Check that all blunds have the same epoch.
-    unless (null nextEpoch) $ assertionFailed $
+    unless (null nextEpoch) $ assertionFailed (contramap publicPrivateLogItem (named logTrace)) $
         sformat ("applyBlocksUnsafe: tried to apply more than we should"%
                  "thisEpoch"%listJson%"\nnextEpoch:"%listJson)
                 (map (headerHash . fst) thisEpoch)
@@ -163,29 +168,30 @@ applyBlocksUnsafe scb blunds pModifier = do
         (b@(Left _,_):|(x:xs)) -> app' (b:|[]) >> app' (x:|xs)
         _                      -> app blunds
   where
-    app x = applyBlocksDbUnsafeDo scb x pModifier
+    app x = applyBlocksDbUnsafeDo logTrace scb x pModifier
     app' = app . OldestFirst
     (thisEpoch, nextEpoch) =
         spanSafe ((==) `on` view (_1 . epochIndexL)) $ getOldestFirst blunds
 
 applyBlocksDbUnsafeDo
     :: MonadBlockApply ctx m
-    => ShouldCallBListener
+    => Trace m (LogNamed LogItem)
+    -> ShouldCallBListener
     -> OldestFirst NE Blund
     -> Maybe PollModifier
     -> m ()
-applyBlocksDbUnsafeDo scb blunds pModifier = do
+applyBlocksDbUnsafeDo logTrace scb blunds pModifier = do
     let blocks = fmap fst blunds
     -- Note: it's important to do 'slogApplyBlocks' first, because it
     -- puts blocks in DB.
     slogBatch <- slogApplyBlocks scb blunds
     TxpGlobalSettings {..} <- view (lensOf @TxpGlobalSettings)
-    usBatch <- SomeBatchOp <$> usApplyBlocks (map toUpdateBlock blocks) pModifier
-    delegateBatch <- SomeBatchOp <$> dlgApplyBlocks (map toDlgBlund blunds)
-    txpBatch <- tgsApplyBlocks $ map toTxpBlund blunds
+    usBatch <- SomeBatchOp <$> usApplyBlocks logTrace (map toUpdateBlock blocks) pModifier
+    delegateBatch <- SomeBatchOp <$> dlgApplyBlocks (named logTrace) (map toDlgBlund blunds)
+    txpBatch <- tgsApplyBlocks (named logTrace) $ map toTxpBlund blunds
     sscBatch <- SomeBatchOp <$>
         -- TODO: pass not only 'Nothing'
-        sscApplyBlocks (map toSscBlock blocks) Nothing
+        sscApplyBlocks (named logTrace) (map toSscBlock blocks) Nothing
     GS.writeBatchGState
         [ delegateBatch
         , usBatch
@@ -193,25 +199,26 @@ applyBlocksDbUnsafeDo scb blunds pModifier = do
         , sscBatch
         , slogBatch
         ]
-    sanityCheckDB
+    sanityCheckDB (named logTrace)
 
 -- | Rollback sequence of blocks, head-newest order expected with head being
 -- current tip. It's also assumed that lock on block db is taken already.
 rollbackBlocksUnsafe
     :: MonadBlockApply ctx m
-    => BypassSecurityCheck -- ^ is rollback for more than k blocks allowed?
+    => Trace m LogItem
+    -> BypassSecurityCheck -- ^ is rollback for more than k blocks allowed?
     -> ShouldCallBListener
     -> NewestFirst NE Blund
     -> m ()
-rollbackBlocksUnsafe bsc scb toRollback = do
-    slogRoll <- slogRollbackBlocks bsc scb toRollback
-    dlgRoll <- SomeBatchOp <$> dlgRollbackBlocks (map toDlgBlund toRollback)
+rollbackBlocksUnsafe logTrace bsc scb toRollback = do
+    slogRoll <- slogRollbackBlocks logTrace bsc scb toRollback
+    dlgRoll <- SomeBatchOp <$> dlgRollbackBlocks logTrace (map toDlgBlund toRollback)
     usRoll <- SomeBatchOp <$> usRollbackBlocks
                   (toRollback & each._2 %~ undoUS
                               & each._1 %~ toUpdateBlock)
     TxpGlobalSettings {..} <- view (lensOf @TxpGlobalSettings)
-    txRoll <- tgsRollbackBlocks $ map toTxpBlund toRollback
-    sscBatch <- SomeBatchOp <$> sscRollbackBlocks
+    txRoll <- tgsRollbackBlocks logTrace $ map toTxpBlund toRollback
+    sscBatch <- SomeBatchOp <$> sscRollbackBlocks logTrace
         (map (toSscBlock . fst) toRollback)
     GS.writeBatchGState
         [ dlgRoll
@@ -226,7 +233,7 @@ rollbackBlocksUnsafe bsc scb toRollback = do
     -- in 'applyBlocksUnsafe' and we always ensure that some blocks
     -- are applied after rollback.
     dlgNormalizeOnRollback
-    sanityCheckDB
+    sanityCheckDB logTrace
 
 
 toComponentBlock :: (MainBlock -> payload) -> Block -> ComponentBlock payload

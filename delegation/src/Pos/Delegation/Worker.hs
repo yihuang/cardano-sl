@@ -6,11 +6,10 @@ module Pos.Delegation.Worker
 
 import           Universum
 
+import           Control.Concurrent (threadDelay)
 import           Control.Lens ((%=))
 import           Data.Time.Clock (UTCTime, addUTCTime)
-import           Mockable (CurrentTime, Delay, Mockable, currentTime, delay)
-import           Serokell.Util (sec)
-import           System.Wlog (WithLogger)
+import           Data.Time.Clock.POSIX (getPOSIXTime)
 
 import           Pos.Delegation.Class (MonadDelegation, dwMessageCache)
 import           Pos.Delegation.Configuration (HasDlgConfiguration, dlgMessageCacheTimeout)
@@ -20,29 +19,28 @@ import           Pos.Reporting (MonadReporting, reportOrLogE)
 import           Pos.Shutdown (HasShutdownContext)
 import           Pos.Util (microsecondsToUTC)
 import           Pos.Util.LRU (filterLRU)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem)
 
 -- | This is a subset of 'WorkMode'.
 type DlgWorkerConstraint ctx m
      = ( MonadIO m
        , MonadDelegation ctx m
        , MonadMask m
-       , Mockable Delay m
        , HasShutdownContext ctx
        , MonadDelegation ctx m
-       , WithLogger m
        , MonadReporting m
        , MonadReader ctx m
-       , Mockable CurrentTime m
-       , HasDlgConfiguration)
-
+       , HasDlgConfiguration
+       )
 
 -- | All workers specific to proxy sertificates processing.
-dlgWorkers :: (DlgWorkerConstraint ctx m) => [Diffusion m -> m ()]
-dlgWorkers = [\_ -> dlgInvalidateCaches]
+dlgWorkers :: (DlgWorkerConstraint ctx m) => Trace m LogItem -> [Diffusion m -> m ()]
+dlgWorkers logTrace = [\_ -> dlgInvalidateCaches logTrace]
 
 -- | Runs proxy caches invalidating action every second.
-dlgInvalidateCaches :: DlgWorkerConstraint ctx m => m ()
-dlgInvalidateCaches =
+dlgInvalidateCaches :: DlgWorkerConstraint ctx m => Trace m LogItem -> m ()
+dlgInvalidateCaches logTrace =
     -- When dlgInvalidateCaches calls itself directly, it leaks memory. The
     -- reason for that is that reference to dlgInvalidateCaches is kept in
     -- memory (by usage of dlgWorkers) and as it is executed it expands
@@ -51,12 +49,12 @@ dlgInvalidateCaches =
     -- size. Relevant GHC ticket: https://ghc.haskell.org/trac/ghc/ticket/13080
     fix $ \loop -> do
         -- REPORT:ERROR 'reportOrLogE' in delegation worker.
-        invalidate `catchAny` reportOrLogE "Delegation worker, error occurred: "
-        delay (sec 1)
+        invalidate `catchAny` reportOrLogE logTrace "Delegation worker, error occurred: "
+        liftIO (threadDelay 1000000)
         loop
   where
     invalidate = do
-        curTime <- microsecondsToUTC <$> currentTime
+        curTime <- microsecondsToUTC . round . (* 1000000) <$> liftIO getPOSIXTime
         runDelegationStateAction $ invalidateProxyCaches curTime
 
 -- | Invalidates proxy caches using built-in constants.

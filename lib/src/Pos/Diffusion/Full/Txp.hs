@@ -8,6 +8,8 @@ module Pos.Diffusion.Full.Txp
        ) where
 
 import           Universum
+
+import           Data.Functor.Contravariant (contramap)
 import           Data.Tagged (Tagged)
 import qualified Network.Broadcast.OutboundQueue as OQ
 
@@ -28,14 +30,15 @@ import           Pos.Logic.Types (Logic (..))
 import qualified Pos.Logic.Types as KV (KeyVal (..))
 import           Pos.Network.Types (Bucket)
 import           Pos.Txp.Network.Types (TxMsgContents (..))
-import           Pos.Util.Trace (Trace, Severity)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
 
 -- | Send Tx to given addresses.
 -- Returns 'True' if any peer accepted and applied this transaction.
-sendTx :: Trace IO (Severity, Text) -> EnqueueMsg -> TxAux -> IO Bool
+sendTx :: Trace IO LogItem -> EnqueueMsg -> TxAux -> IO Bool
 sendTx logTrace enqueue txAux = do
     anySucceeded <$> invReqDataFlowTK
-        logTrace
+        (contramap publicPrivateLogItem logTrace)
         "tx"
         enqueue
         (MsgTransaction OriginSender)
@@ -50,12 +53,16 @@ sendTx logTrace enqueue txAux = do
         ]
 
 txListeners
-    :: Trace IO (Severity, Text)
+    :: Trace IO LogItem
     -> Logic IO
     -> OQ.OutboundQ pack NodeId Bucket
     -> EnqueueMsg
     -> MkListeners
-txListeners logTrace logic oq enqueue = relayListeners logTrace oq enqueue (txRelays logic)
+txListeners logTrace logic oq enqueue = relayListeners
+    (contramap publicPrivateLogItem logTrace)
+    oq
+    enqueue
+    (txRelays logic)
 
 -- | 'OutSpecs' for the tx relays, to keep up with the 'InSpecs'/'OutSpecs'
 -- motif required for communication.

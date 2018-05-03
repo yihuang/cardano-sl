@@ -4,8 +4,7 @@
 -- | Parameters for launching everything.
 
 module Pos.Launcher.Param
-       ( LoggingParams (..)
-       , BaseParams (..)
+       ( WlogParams (..)
        , NodeParams (..)
        ) where
 
@@ -29,20 +28,16 @@ import           Pos.Util.UserSecret (UserSecret)
 import           Pos.Util.Util (HasLens (..))
 
 -- | Contains all parameters required for hierarchical logger initialization.
-data LoggingParams = LoggingParams
-    { lpDefaultName   :: !LoggerName
+-- FIXME quarantine to its own module, as it's log-warper specific.
+data WlogParams = WlogParams
+    { wpDefaultName   :: !LoggerName
     -- ^ Logger name which will be used by default
-    , lpHandlerPrefix :: !(Maybe FilePath)
+    , wpHandlerPrefix :: !(Maybe FilePath)
     -- ^ Prefix of path for all logs
-    , lpConfigPath    :: !(Maybe FilePath)
+    , wpConfigPath    :: !(Maybe FilePath)
     -- ^ Path to logger configuration
-    , lpConsoleLog    :: !(Maybe Bool)
+    , wpConsoleLog    :: !(Maybe Bool)
     -- ^ Enable console logging (override)
-    } deriving (Show)
-
--- | Contains basic & networking parameters for running node.
-data BaseParams = BaseParams
-    { bpLoggingParams   :: !LoggingParams  -- ^ Logger parameters
     } deriving (Show)
 
 -- | This data type contains all data necessary to launch node and
@@ -52,7 +47,6 @@ data NodeParams = NodeParams
     , npRebuildDb      :: !Bool                 -- ^ @True@ if data-base should be rebuilt
     , npSecretKey      :: !SecretKey            -- ^ Primary secret key of node
     , npUserSecret     :: !UserSecret           -- ^ All node secret keys
-    , npBaseParams     :: !BaseParams           -- ^ See 'BaseParams'
     , npJLFile         :: !(Maybe FilePath)     -- ^ File to use for JSON logging.
     , npReportServers  :: ![Text]               -- ^ List of report server URLs
     , npUpdateParams   :: !UpdateParams         -- ^ Params for update system

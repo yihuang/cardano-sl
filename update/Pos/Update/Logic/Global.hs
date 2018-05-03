@@ -13,7 +13,7 @@ import           Universum
 
 import           Control.Monad.Except (MonadError, runExceptT)
 import           Data.Default (Default (def))
-import           System.Wlog (WithLogger, modifyLoggerName)
+import           Data.Functor.Contravariant (contramap)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Core (ApplicationName, BlockVersion, ComponentBlock (..), HasCoreConfiguration,
@@ -38,6 +38,11 @@ import           Pos.Update.Poll (BlockVersionState, ConfirmedProposalState, DBP
 import           Pos.Util.AssertMode (inAssertMode)
 import           Pos.Util.Chrono (NE, NewestFirst, OldestFirst)
 import qualified Pos.Util.Modifier as MM
+import           Pos.Util.Trace (Trace, natTrace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
+-- FIXME do not explicitly depend upon Wlog here.
+-- structured logging will fix this.
+import           Pos.Util.Trace.Wlog (LogNamed, modifyName, named)
 
 ----------------------------------------------------------------------------
 -- UpdateBlock
@@ -50,8 +55,7 @@ type UpdateBlock = ComponentBlock UpdatePayload
 ----------------------------------------------------------------------------
 
 type USGlobalVerifyMode ctx m =
-    ( WithLogger m
-    , MonadIO m
+    ( MonadIO m
     , MonadReader ctx m
     , HasLrcContext ctx
     , HasUpdateConfiguration
@@ -69,8 +73,11 @@ type USGlobalApplyMode ctx m =
 -- Implementation
 ----------------------------------------------------------------------------
 
-withUSLogger :: WithLogger m => m a -> m a
-withUSLogger = modifyLoggerName (<> "us")
+-- FIXME
+-- The indication that a thing is related to the update system should be
+-- determined by the actual thing being logged, not a 'LoggerName'.
+withUSLogger :: Trace m (LogNamed t) -> Trace m t
+withUSLogger = named . modifyName (<> "us")
 
 -- | Apply chain of /definitely/ valid blocks to US part of GState DB
 -- and to US local data. This function assumes that no other thread
@@ -91,36 +98,38 @@ usApplyBlocks
     :: ( MonadThrow m
        , USGlobalApplyMode ctx m
        )
-    => OldestFirst NE UpdateBlock
+    => Trace m (LogNamed LogItem)
+    -> OldestFirst NE UpdateBlock
     -> Maybe PollModifier
     -> m [DB.SomeBatchOp]
-usApplyBlocks blocks modifierMaybe =
-    withUSLogger $
+usApplyBlocks logTrace blocks modifierMaybe =
     processModifier =<<
     case modifierMaybe of
         Nothing -> do
-            verdict <- usVerifyBlocks False blocks
+            verdict <- usVerifyBlocks logTrace False blocks
             either onFailure (return . fst) verdict
         Just modifier -> do
             -- TODO: I suppose such sanity checks should be done at higher
             -- level.
             inAssertMode $ do
-                verdict <- usVerifyBlocks False blocks
+                verdict <- usVerifyBlocks logTrace False blocks
                 whenLeft verdict $ \v -> onFailure v
             return modifier
   where
     onFailure failure = do
         let msg = "usVerifyBlocks failed in 'apply': " <> pretty failure
-        reportFatalError msg
+        reportFatalError (contramap publicPrivateLogItem logTrace') msg
+    logTrace' = withUSLogger logTrace
 
 -- | Revert application of given blocks to US part of GState DB and US local
 -- data. The caller must ensure that the tip stored in DB is 'headerHash' of
 -- head.
 usRollbackBlocks
-    :: USGlobalApplyMode ctx m
-    => NewestFirst NE (UpdateBlock, USUndo) -> m [DB.SomeBatchOp]
+    :: forall ctx m.
+       (USGlobalApplyMode ctx m)
+    => NewestFirst NE (UpdateBlock, USUndo)
+    -> m [DB.SomeBatchOp]
 usRollbackBlocks blunds =
-    withUSLogger $
     processModifier =<<
     (runDBPoll . execPollT def $ mapM_ (rollbackUS . snd) blunds)
 
@@ -155,17 +164,16 @@ usVerifyBlocks ::
        , MonadUnliftIO m
        , MonadReporting m
        )
-    => Bool
+    => Trace m (LogNamed LogItem)
+    -> Bool
     -> OldestFirst NE UpdateBlock
     -> m (Either PollVerFailure (PollModifier, OldestFirst NE USUndo))
-usVerifyBlocks verifyAllIsKnown blocks =
-    withUSLogger $
-    reportUnexpectedError $
-    processRes <$> run (runExceptT action)
+usVerifyBlocks logTrace verifyAllIsKnown blocks = do
+    reportUnexpectedError (processRes <$> run (runExceptT action))
   where
     action = do
         lastAdopted <- getAdoptedBV
-        mapM (verifyBlock lastAdopted verifyAllIsKnown) blocks
+        mapM (verifyBlock (natTrace (lift . lift . lift) logTrace') lastAdopted verifyAllIsKnown) blocks
     run :: PollT (DBPoll n) a -> n (a, PollModifier)
     run = runDBPoll . runPollT def
     processRes ::
@@ -173,15 +181,18 @@ usVerifyBlocks verifyAllIsKnown blocks =
         -> Either PollVerFailure (PollModifier, OldestFirst NE USUndo)
     processRes (Left failure, _)       = Left failure
     processRes (Right undos, modifier) = Right (modifier, undos)
+    logTrace' = withUSLogger logTrace
 
 verifyBlock
     :: (USGlobalVerifyMode ctx m, MonadPoll m, MonadError PollVerFailure m, HasProtocolMagic, HasProtocolConstants)
-    => BlockVersion -> Bool -> UpdateBlock -> m USUndo
-verifyBlock _ _ (ComponentBlockGenesis genBlk) =
-    execRollT $ processGenesisBlock (genBlk ^. epochIndexL)
-verifyBlock lastAdopted verifyAllIsKnown (ComponentBlockMain header payload) =
+    => Trace m LogItem
+    -> BlockVersion -> Bool -> UpdateBlock -> m USUndo
+verifyBlock logTrace _ _ (ComponentBlockGenesis genBlk) =
+    execRollT $ processGenesisBlock (natTrace lift logTrace) (genBlk ^. epochIndexL)
+verifyBlock logTrace lastAdopted verifyAllIsKnown (ComponentBlockMain header payload) =
     execRollT $ do
         verifyAndApplyUSPayload
+            (natTrace lift logTrace)
             lastAdopted
             verifyAllIsKnown
             (Right header)
@@ -200,8 +211,7 @@ verifyBlock lastAdopted verifyAllIsKnown (ComponentBlockMain header payload) =
 -- | Checks whether our software can create block according to current
 -- global state.
 usCanCreateBlock ::
-       ( WithLogger m
-       , MonadUnliftIO m
+       ( MonadUnliftIO m
        , DB.MonadDBRead m
        , MonadReader ctx m
        , HasLrcContext ctx
@@ -209,7 +219,7 @@ usCanCreateBlock ::
        )
     => m Bool
 usCanCreateBlock =
-    withUSLogger $ runDBPoll $ do
+    runDBPoll $ do
         lastAdopted <- getAdoptedBV
         canCreateBlockBV lastAdopted lastKnownBlockVersion
 

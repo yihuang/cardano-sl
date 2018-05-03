@@ -25,16 +25,17 @@ import           Universum
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Exception (throwIO)
+import           Control.Monad.IO.Unlift (MonadUnliftIO)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Text.Buildable as B
 import           Formatting (bprint, build, sformat, (%))
-import           Mockable (Async, Delay, Mockable, Mockables, SharedAtomic)
 import qualified Network.Broadcast.OutboundQueue as OQ
 import qualified Node as N
 import           Node.Message.Class (Message (..), MessageCode, messageCode)
 import           Serokell.Util.Text (listJson)
-import           Pos.Util.Trace (Trace, Severity (..), traceWith)
+import           Pos.Util.Trace (Trace, traceWith)
+import           Pos.Util.Trace.Unstructured (Severity (..))
 
 import           Pos.Communication.Types.Protocol
 import           Pos.Recovery.Info (MonadRecoveryInfo)
@@ -165,11 +166,10 @@ instance Buildable MismatchedProtocolMagic where
 
 
 type LocalOnNewSlotComm ctx m =
-    ( MonadIO m
+    ( MonadUnliftIO m
     , MonadReader ctx m
     , MonadSlots ctx m
     , MonadMask m
-    , Mockables m [Async, Delay]
     , MonadReporting m
     , HasShutdownContext ctx
     , MonadRecoveryInfo m
@@ -178,7 +178,6 @@ type LocalOnNewSlotComm ctx m =
 type OnNewSlotComm ctx m =
     ( LocalOnNewSlotComm ctx m
     , MonadThrow m
-    , Mockable SharedAtomic m
     )
 
 -- FIXME network layer is not concerned with this.

@@ -11,11 +11,9 @@ logging to JSON files.
 -}
 
 module JsonLog
-    ( module JsonLog.CanJsonLog
-    , module JsonLog.Event
-    , module JsonLog.JsonLogT
+    ( module JsonLog.Event
+    , module JsonLog.Trace
     ) where
 
-import           JsonLog.CanJsonLog
 import           JsonLog.Event
-import           JsonLog.JsonLogT
+import           JsonLog.Trace

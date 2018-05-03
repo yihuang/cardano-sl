@@ -62,6 +62,7 @@ library
 
   build-depends:        QuickCheck
                       , aeson
+                      , async
                       , base
                       , bytestring
                       , cardano-sl-binary
@@ -82,6 +83,7 @@ library
                       , cborg
                       , conduit
                       , containers
+                      , contravariant
                       , cryptonite
                       , data-default
                       , directory
@@ -106,6 +108,7 @@ library
                       , transformers
                       , universum
                       , unliftio
+                      , unliftio-core
                       , unordered-containers
 
 

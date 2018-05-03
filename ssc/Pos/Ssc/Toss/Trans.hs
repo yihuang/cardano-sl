@@ -15,7 +15,6 @@ import           Universum
 
 import           Control.Lens (at, (%=), (.=))
 import qualified Ether
-import           Mockable (ChannelT, Promise, SharedAtomicT, ThreadId)
 
 import           Pos.Core.Ssc (insertVss)
 import           Pos.Ssc.Base (deleteSignedCommitment, insertSignedCommitment)
@@ -94,12 +93,3 @@ instance MonadToss m =>
         tmShares .= mempty
         resetShares
     setEpochOrSlot = ether . setEpochOrSlot
-
-----------------------------------------------------------------------------
--- Common instances used all over the code
-----------------------------------------------------------------------------
-
-type instance ThreadId (TossT m) = ThreadId m
-type instance Promise (TossT m) = Promise m
-type instance SharedAtomicT (TossT m) = SharedAtomicT m
-type instance ChannelT (TossT m) = ChannelT m

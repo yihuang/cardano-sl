@@ -12,25 +12,24 @@ module Pos.Block.Lrc
 
 import           Universum
 
+import           Control.Concurrent.Async (forConcurrently)
 import           Control.Exception.Safe (bracketOnError)
 import           Control.Lens (views)
+import           Control.Monad.IO.Unlift (withRunInIO)
 import           Control.Monad.STM (retry)
 import           Data.Coerce (coerce)
 import           Data.Conduit (ConduitT, runConduitRes, (.|))
+import           Data.Functor.Contravariant (contramap)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Formatting (build, ords, sformat, (%))
-import           Mockable (forConcurrently)
 import qualified System.Metrics.Counter as Metrics
-import           System.Wlog (logDebug, logInfo, logWarning)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Block.Logic.Internal (BypassSecurityCheck (..), MonadBlockApply,
                                            applyBlocksUnsafe, rollbackBlocksUnsafe)
 import           Pos.Block.Slog.Logic (ShouldCallBListener (..))
-import           Pos.Core (Coin, EpochIndex, EpochOrSlot (..), HasGeneratedSecrets,
-                           HasGenesisBlockVersionData, HasGenesisData, HasGenesisHash,
-                           HasProtocolConstants, HasProtocolMagic, SharedSeed, StakeholderId,
+import           Pos.Core (Coin, EpochIndex, EpochOrSlot (..), SharedSeed, StakeholderId,
                            blkSecurityParam, crucialSlot, epochIndexL, getEpochOrSlot)
 import qualified Pos.DB.Block.Load as DB
 import           Pos.DB.Class (MonadDBRead, MonadGState)
@@ -56,9 +55,14 @@ import           Pos.Update.DB (getCompetingBVStates)
 import           Pos.Update.Poll.Types (BlockVersionState (..))
 import           Pos.Util (maybeThrow)
 import           Pos.Util.Chrono (NE, NewestFirst (..), toOldestFirst)
-import           Pos.Util.TimeLimit (logWarningWaitLinear)
+import           Pos.Util.TimeLimit (logWaitLinear)
 import           Pos.Util.Util (HasLens (..))
-
+import           Pos.Util.Trace (Trace, natTrace)
+import           Pos.Util.Trace.Unstructured (LogItem, Severity (..), logDebug,
+                                              logInfo, logWarning,
+                                              publicPrivateLogItem)
+-- FIXME no more wlog dependencies.
+import           Pos.Util.Trace.Wlog (LogNamed, named)
 
 ----------------------------------------------------------------------------
 -- Single shot
@@ -82,10 +86,12 @@ lrcSingleShot
        ( LrcModeFull ctx m
        , HasMisbehaviorMetrics ctx
        )
-    => EpochIndex -> m ()
-lrcSingleShot epoch = do
+    => Trace m (LogNamed LogItem)
+    -> EpochIndex
+    -> m ()
+lrcSingleShot logTrace epoch = do
     lock <- views (lensOf @LrcContext) lcLrcSync
-    logDebug $ sformat
+    logDebug (named logTrace) $ sformat
         ("lrcSingleShot is trying to acquire LRC lock, the epoch is "
          %build) epoch
     tryAcquireExclusiveLock epoch lock onAcquiredLock
@@ -93,26 +99,29 @@ lrcSingleShot epoch = do
     consumers = allLrcConsumers @ctx @m
     for_thEpochMsg = sformat (" for "%ords%" epoch") epoch
     onAcquiredLock = do
-        logDebug "lrcSingleShot has acquired LRC lock"
+        logDebug (named logTrace) "lrcSingleShot has acquired LRC lock"
         (need, filteredConsumers) <-
-            logWarningWaitLinear 5 "determining whether LRC is needed" $ do
-                expectedRichmenComp <-
-                    filterM (flip lcIfNeedCompute epoch) consumers
-                needComputeLeaders <- not <$> LrcDB.hasLeaders epoch
-                let needComputeRichmen = not . null $ expectedRichmenComp
-                when needComputeLeaders $ logInfo
-                    ("Need to compute leaders" <> for_thEpochMsg)
-                when needComputeRichmen $ logInfo
-                    ("Need to compute richmen" <> for_thEpochMsg)
-                return $
-                    ( needComputeLeaders || needComputeRichmen
-                    , expectedRichmenComp)
+            withRunInIO $ \runInIO -> do
+                let makeWarning = \txt -> publicPrivateLogItem (Warning, txt)
+                    logTraceWarning = natTrace runInIO (contramap makeWarning (named logTrace))
+                logWaitLinear logTraceWarning 5 "determining whether LRC is needed" $ runInIO $ do
+                    expectedRichmenComp <-
+                        filterM (flip lcIfNeedCompute epoch) consumers
+                    needComputeLeaders <- not <$> LrcDB.hasLeaders epoch
+                    let needComputeRichmen = not . null $ expectedRichmenComp
+                    when needComputeLeaders $ logInfo (named logTrace) $
+                        ("Need to compute leaders" <> for_thEpochMsg)
+                    when needComputeRichmen $ logInfo (named logTrace) $
+                        ("Need to compute richmen" <> for_thEpochMsg)
+                    return $
+                        ( needComputeLeaders || needComputeRichmen
+                        , expectedRichmenComp)
         when need $ do
-            logInfo "LRC is starting actual computation"
-            lrcDo epoch filteredConsumers
-            logInfo "LRC has finished actual computation"
+            logInfo (named logTrace) ("LRC is starting actual computation")
+            lrcDo logTrace epoch filteredConsumers
+            logInfo (named logTrace) ("LRC has finished actual computation")
         putEpoch epoch
-        logInfo ("LRC has updated LRC DB" <> for_thEpochMsg)
+        logInfo (named logTrace) ("LRC has updated LRC DB" <> for_thEpochMsg)
 
 tryAcquireExclusiveLock
     :: (MonadMask m, MonadIO m)
@@ -135,16 +144,13 @@ tryAcquireExclusiveLock epoch lock action =
 lrcDo
     :: forall ctx m.
        ( LrcModeFull ctx m
-       , HasGeneratedSecrets
-       , HasGenesisBlockVersionData
-       , HasProtocolConstants
-       , HasProtocolMagic
-       , HasGenesisData
-       , HasGenesisHash
        , HasMisbehaviorMetrics ctx
        )
-    => EpochIndex -> [LrcConsumer m] -> m ()
-lrcDo epoch consumers = do
+    => Trace m (LogNamed LogItem)
+    -> EpochIndex
+    -> [LrcConsumer m]
+    -> m ()
+lrcDo logTrace epoch consumers = do
     blundsUpToGenesis <- DB.loadBlundsFromTipWhile upToGenesis
     -- If there are blocks from 'epoch' it means that we somehow accepted them
     -- before running LRC for 'epoch'. It's very bad.
@@ -159,9 +165,9 @@ lrcDo epoch consumers = do
     blundsToRollback <- DB.loadBlundsFromTipWhile whileAfterCrucial
     blundsToRollbackNE <-
         maybeThrow UnknownBlocksForLrc (atLeastKNewestFirst blundsToRollback)
-    seed <- sscCalculateSeed epoch >>= \case
+    seed <- sscCalculateSeed (named logTrace) epoch >>= \case
         Right s -> do
-            logInfo $ sformat
+            logInfo (named logTrace) $ sformat
                 ("Calculated seed for epoch "%build%" successfully") epoch
             return s
         Left _ -> do
@@ -175,9 +181,9 @@ lrcDo epoch consumers = do
     putSeed epoch seed
     -- Roll back to the crucial slot and calculate richmen, etc.
     withBlocksRolledBack blundsToRollbackNE $ do
-        issuersComputationDo epoch
-        richmenComputationDo epoch consumers
-        DB.sanityCheckDB
+        issuersComputationDo (named logTrace) epoch
+        richmenComputationDo (named logTrace) epoch consumers
+        DB.sanityCheckDB (named logTrace)
         leadersComputationDo epoch seed
   where
     atLeastKNewestFirst :: forall a. NewestFirst [] a -> Maybe (NewestFirst NE a)
@@ -186,7 +192,7 @@ lrcDo epoch consumers = do
         then coerce (nonEmpty @a) l
         else Nothing
 
-    applyBack blunds = applyBlocksUnsafe scb blunds Nothing
+    applyBack blunds = applyBlocksUnsafe logTrace scb blunds Nothing
     upToGenesis b = b ^. epochIndexL >= epoch
     whileAfterCrucial b = getEpochOrSlot b > crucial
     crucial = EpochOrSlot $ Right $ crucialSlot epoch
@@ -201,11 +207,16 @@ lrcDo epoch consumers = do
         -- and outer viewers mustn't know about it.
         ShouldCallBListener False
     withBlocksRolledBack blunds =
-        bracket_ (rollbackBlocksUnsafe bsc scb blunds)
+        bracket_ (rollbackBlocksUnsafe (named logTrace) bsc scb blunds)
                  (applyBack (toOldestFirst blunds))
 
-issuersComputationDo :: forall ctx m . LrcMode ctx m => EpochIndex -> m ()
-issuersComputationDo epochId = do
+issuersComputationDo
+    :: forall ctx m .
+       LrcMode ctx m
+    => Trace m LogItem
+    -> EpochIndex
+    -> m ()
+issuersComputationDo logTrace epochId = do
     issuers <- unionHSs .
                map (bvsIssuersStable . snd) <$>
                getCompetingBVStates
@@ -216,7 +227,7 @@ issuersComputationDo epochId = do
     putIsStake :: IssuersStakes -> StakeholderId -> m IssuersStakes
     putIsStake hm id = GS.getRealStake id >>= \case
         Nothing ->
-           hm <$ (logWarning $ sformat ("Stake for issuer "%build% " not found") id)
+           hm <$ (logWarning logTrace (sformat ("Stake for issuer "%build% " not found") id))
         Just stake -> pure $ HM.insert id stake hm
 
 leadersComputationDo :: LrcMode ctx m
@@ -237,10 +248,10 @@ leadersComputationDo epochId seed =
 richmenComputationDo
     :: forall ctx m.
        LrcMode ctx m
-    => EpochIndex -> [LrcConsumer m] -> m ()
-richmenComputationDo epochIdx consumers = unless (null consumers) $ do
+    => Trace m LogItem -> EpochIndex -> [LrcConsumer m] -> m ()
+richmenComputationDo logTrace epochIdx consumers = unless (null consumers) $ do
     total <- GS.getRealTotalStake
-    logDebug $ "Effective total stake: " <> pretty total
+    logDebug logTrace ("Effective total stake: " <> pretty total)
     consumersAndThds <-
         zip consumers <$> mapM (flip lcThreshold total) consumers
     let minThreshold :: Maybe Coin
@@ -249,15 +260,15 @@ richmenComputationDo epochIdx consumers = unless (null consumers) $ do
         minThresholdD = safeThreshold consumersAndThds lcConsiderDelegated
     (richmen, richmenD) <- runConduitRes $
         GS.stakeSource .| findAllRichmenMaybe minThreshold minThresholdD
-    logDebug $ "Size of richmen: " <> show (HM.size richmen)
-    logDebug $ "Size of richmenD: " <> show (HM.size richmenD)
+    logDebug logTrace ("Size of richmen: " <> show (HM.size richmen))
+    logDebug logTrace ("Size of richmenD: " <> show (HM.size richmenD))
     let callCallback (cons, thd) =
             if lcConsiderDelegated cons
             then lcComputedCallback cons epochIdx total
                    (HM.filter (>= thd) richmenD)
             else lcComputedCallback cons epochIdx total
                    (HM.filter (>= thd) richmen)
-    void $ forConcurrently consumersAndThds callCallback
+    void $ withRunInIO $ \runInIO -> forConcurrently consumersAndThds (runInIO . callCallback)
   where
     safeThreshold consumersAndThds f =
         safeMinimum $ map snd $ filter (f . fst) consumersAndThds

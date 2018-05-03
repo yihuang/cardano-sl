@@ -19,9 +19,9 @@ import           Universum
 import           Control.Concurrent.Async (race)
 import qualified Control.Monad.Reader as Mtl
 import           Data.Default (Default)
-import           JsonLog (jsonLog)
-import           Mockable.Production (Production (..))
+import           JsonLog.Trace (jsonLogIO)
 import           System.Exit (ExitCode (..))
+import           System.Wlog (LoggingParams (..))
 
 import           Pos.Behavior (bcSecurityParams)
 import           Pos.Binary ()
@@ -35,7 +35,7 @@ import           Pos.Crypto.Configuration (HasProtocolMagic, protocolMagic)
 import           Pos.Diffusion.Full (FullDiffusionConfiguration (..), diffusionLayerFull)
 import           Pos.Diffusion.Types (Diffusion (..), DiffusionLayer (..), hoistDiffusion)
 import           Pos.Launcher.Configuration (HasConfigurations)
-import           Pos.Launcher.Param (BaseParams (..), LoggingParams (..), NodeParams (..))
+import           Pos.Launcher.Param (NodeParams (..))
 import           Pos.Launcher.Resource (NodeResources (..))
 import           Pos.Logic.Full (logicFull)
 import           Pos.Logic.Types (Logic, hoistLogic)
@@ -52,7 +52,7 @@ import           Pos.Util.JsonLog.Events (JsonLogConfig (..),
                                           jsonLogConfigFromHandle)
 import           Pos.Web.Server (withRoute53HealthCheckApplication)
 import           Pos.WorkMode (RealMode, RealModeContext (..))
-import           Pos.Util.Trace (wlogTrace)
+import           Pos.Util.Trace.Wlog (wlogTrace)
 
 ----------------------------------------------------------------------------
 -- High level runners
@@ -95,7 +95,7 @@ runRealMode nr@NodeResources {..} act = runServer
          in elimRealMode nr diffusion (act diffusion')
 
 -- | RealMode runner: creates a JSON log configuration and uses the
--- resources provided to eliminate the RealMode, yielding a Production (IO).
+-- resources provided to eliminate the RealMode, yielding an IO.
 elimRealMode
     :: forall t ext .
        ( HasConfigurations

@@ -39,7 +39,6 @@ import qualified Data.Text.Buildable
 import qualified Database.RocksDB as Rocks
 import           Formatting (bprint, build, sformat, (%))
 import           Serokell.Util (Color (Red), colorize)
-import           System.Wlog (WithLogger, logError)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Core (Address, Coin, coinF, mkCoin, sumCoins, unsafeAddCoin,
@@ -51,6 +50,8 @@ import           Pos.DB (DBError (..), DBIteratorClass (..), DBTag (GStateDB), I
 import           Pos.DB.GState.Common (gsGetBi, writeBatchGState)
 import           Pos.Txp.Base (addrBelongsToSet, txOutStake)
 import           Pos.Txp.Toil.Types (GenesisUtxo (..), Utxo)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, logError)
 
 ----------------------------------------------------------------------------
 -- Getters
@@ -133,9 +134,10 @@ getAllPotentiallyHugeUtxo = runConduitRes $ utxoSource .| utxoSink
 ----------------------------------------------------------------------------
 
 sanityCheckUtxo
-    :: (MonadDBRead m, WithLogger m, MonadUnliftIO m)
-    => Coin -> m ()
-sanityCheckUtxo expectedTotalStake = do
+    :: (MonadDBRead m, MonadUnliftIO m)
+    => Trace m LogItem
+    -> Coin -> m ()
+sanityCheckUtxo logTrace expectedTotalStake = do
     let stakesSource =
             mapOutput (map snd . txOutStake . toaOut . snd) utxoSource
     calculatedTotalStake <-
@@ -145,7 +147,7 @@ sanityCheckUtxo expectedTotalStake = do
              %coinF%", while the latter is "%coinF%")")
     let msg = sformat fmt calculatedTotalStake expectedTotalStake
     unless (calculatedTotalStake == expectedTotalStake) $ do
-        logError $ colorize Red msg
+        logError logTrace (colorize Red msg)
         throwM $ DBMalformed msg
   where
     foldAdd acc stakes =

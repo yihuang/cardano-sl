@@ -18,11 +18,11 @@ import           Universum
 
 import           Control.Lens (uses, (-=), (.=), _Wrapped)
 import           Control.Monad.Except (MonadError (throwError), runExceptT)
+import           Data.Aeson (Value)
 import           Data.Default (Default (def))
+import           Data.Functor.Contravariant (contramap)
 import           Formatting (build, fixed, ords, sformat, stext, (%))
-import           JsonLog (CanJsonLog (..))
 import           Serokell.Data.Memory.Units (Byte, memory)
-import           System.Wlog (WithLogger, logDebug)
 
 import           Pos.Binary.Class (biSize)
 import           Pos.Block.Base (mkGenesisBlock, mkMainBlock)
@@ -31,8 +31,7 @@ import           Pos.Block.Logic.Util (calcChainQualityM)
 import           Pos.Block.Logic.VAR (verifyBlocksPrefix)
 import           Pos.Block.Lrc (LrcModeFull, lrcSingleShot)
 import           Pos.Block.Slog (HasSlogGState (..), ShouldCallBListener (..))
-import           Pos.Core (Blockchain (..), EpochIndex, EpochOrSlot (..), HasGeneratedSecrets,
-                           HasGenesisBlockVersionData, HasGenesisData, HasGenesisHash,
+import           Pos.Core (Blockchain (..), EpochIndex, EpochOrSlot (..),
                            HasProtocolConstants, HasProtocolMagic, HeaderHash, SlotId (..),
                            chainQualityThreshold, epochIndexL, epochSlots, flattenSlotId,
                            getEpochOrSlot, headerHash, protocolMagic)
@@ -67,8 +66,12 @@ import qualified Pos.Update.DB as UDB
 import           Pos.Update.Logic (clearUSMemPool, usCanCreateBlock, usPreparePayload)
 import           Pos.Util (_neHead)
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason (..))
-import           Pos.Util.LogSafe (logInfoS)
 import           Pos.Util.Util (HasLens (..), HasLens')
+import           Pos.Util.Trace (Trace, natTrace)
+import           Pos.Util.Trace.Unstructured (LogItem, logDebug, logInfoS,
+                                              publicPrivateLogItem)
+-- FIXME no more explicit wlog dependencies
+import           Pos.Util.Trace.Wlog (LogNamed, named)
 
 -- | A set of constraints necessary to create a block from mempool.
 type MonadCreateBlock ctx m
@@ -76,7 +79,6 @@ type MonadCreateBlock ctx m
        , MonadReader ctx m
        , HasPrimaryKey ctx
        , HasSlogGState ctx -- to check chain quality
-       , WithLogger m
        , MonadDBRead m
        , MonadIO m
        , MonadMask m
@@ -113,32 +115,27 @@ type MonadCreateBlock ctx m
 createGenesisBlockAndApply ::
        forall ctx m.
        ( MonadCreateBlock ctx m
-       , MonadBlockApply ctx m
-       , CanJsonLog m
        , HasLens StateLock ctx StateLock
        , HasLens (StateLockMetrics MemPoolModifyReason) ctx (StateLockMetrics MemPoolModifyReason)
-       , HasGeneratedSecrets
-       , HasGenesisBlockVersionData
-       , HasGenesisData
-       , HasGenesisHash
-       , HasProtocolConstants
-       , HasProtocolMagic
        , HasMisbehaviorMetrics ctx
        )
-    => EpochIndex
+    => Trace m (LogNamed LogItem)
+    -> Trace m Value -- Json log.
+    -> EpochIndex
     -> m (Maybe GenesisBlock)
 -- Genesis block for 0-th epoch is hardcoded.
-createGenesisBlockAndApply 0 = pure Nothing
-createGenesisBlockAndApply epoch = do
+createGenesisBlockAndApply _ _ 0 = pure Nothing
+createGenesisBlockAndApply logTrace jsonLogTrace epoch = do
     tipHeader <- DB.getTipHeader
     -- preliminary check outside the lock,
     -- must be repeated inside the lock
-    needGen <- needCreateGenesisBlock epoch tipHeader
+    needGen <- needCreateGenesisBlock (named logTrace) epoch tipHeader
     if needGen
         then modifyStateLock
+                 jsonLogTrace
                  HighPriority
                  ApplyBlock
-                 (\_ -> createGenesisBlockDo epoch)
+                 (\_ -> createGenesisBlockDo logTrace epoch)
         else return Nothing
 
 createGenesisBlockDo
@@ -146,12 +143,13 @@ createGenesisBlockDo
        ( MonadCreateBlock ctx m
        , HasMisbehaviorMetrics ctx
        )
-    => EpochIndex
+    => Trace m (LogNamed LogItem)
+    -> EpochIndex
     -> m (HeaderHash, Maybe GenesisBlock)
-createGenesisBlockDo epoch = do
+createGenesisBlockDo logTrace epoch = do
     tipHeader <- DB.getTipHeader
-    logDebug $ sformat msgTryingFmt epoch tipHeader
-    needCreateGenesisBlock epoch tipHeader >>= \case
+    logDebug (named logTrace) (sformat msgTryingFmt epoch tipHeader)
+    needCreateGenesisBlock (named logTrace) epoch tipHeader >>= \case
         False -> (BC.blockHeaderHash tipHeader, Nothing) <$ logShouldNot
         True -> actuallyCreate tipHeader
   where
@@ -160,20 +158,21 @@ createGenesisBlockDo epoch = do
     -- Note that it shouldn't fail, because 'shouldCreate' guarantees that we
     -- have enough blocks for LRC.
     actuallyCreate tipHeader = do
-        lrcSingleShot epoch
+        lrcSingleShot logTrace epoch
         leaders <- lrcActionOnEpochReason epoch "createGenesisBlockDo "
             LrcDB.getLeadersForEpoch
         let blk = mkGenesisBlock protocolMagic (Right tipHeader) epoch leaders
         let newTip = headerHash blk
-        verifyBlocksPrefix (one (Left blk)) >>= \case
-            Left err -> reportFatalError $ pretty err
+        verifyBlocksPrefix logTrace (one (Left blk)) >>= \case
+            Left err -> reportFatalError (contramap publicPrivateLogItem (named logTrace)) $
+                pretty err
             Right (undos, pollModifier) -> do
                 let undo = undos ^. _Wrapped . _neHead
-                applyBlocksUnsafe (ShouldCallBListener True) (one (Left blk, undo)) (Just pollModifier)
-                normalizeMempool
+                applyBlocksUnsafe logTrace (ShouldCallBListener True) (one (Left blk, undo)) (Just pollModifier)
+                normalizeMempool (named logTrace)
                 pure (newTip, Just blk)
     logShouldNot =
-        logDebug
+        logDebug (named logTrace)
             "After we took lock for genesis block creation, we noticed that we shouldn't create it"
     msgTryingFmt =
         "We are trying to create genesis block for " %ords %
@@ -182,10 +181,11 @@ createGenesisBlockDo epoch = do
 needCreateGenesisBlock ::
        ( MonadCreateBlock ctx m
        )
-    => EpochIndex
+    => Trace m LogItem
+    -> EpochIndex
     -> BlockHeader
     -> m Bool
-needCreateGenesisBlock epoch tipHeader = do
+needCreateGenesisBlock logTrace epoch tipHeader = do
     case tipHeader of
         BlockHeaderGenesis _ -> pure False
         -- This is true iff tip is from 'epoch' - 1 and last
@@ -194,7 +194,7 @@ needCreateGenesisBlock epoch tipHeader = do
         BlockHeaderMain mb ->
             if mb ^. epochIndexL /= epoch - 1
                 then pure False
-                else calcChainQualityM (flattenSlotId $ SlotId epoch minBound) <&> \case
+                else calcChainQualityM logTrace (flattenSlotId $ SlotId epoch minBound) <&> \case
                          Nothing -> False -- if we can't compute chain
                                           -- quality, we probably
                                           -- shouldn't try to create
@@ -219,20 +219,21 @@ needCreateGenesisBlock epoch tipHeader = do
 createMainBlockAndApply ::
        forall ctx m.
        ( MonadCreateBlock ctx m
-       , CanJsonLog m
        , HasLens' ctx StateLock
        , HasLens' ctx (StateLockMetrics MemPoolModifyReason)
        )
-    => SlotId
+    => Trace m (LogNamed LogItem)
+    -> Trace m Value -- Json log.
+    -> SlotId
     -> ProxySKBlockInfo
     -> m (Either Text MainBlock)
-createMainBlockAndApply sId pske =
-    modifyStateLock HighPriority ApplyBlock createAndApply
+createMainBlockAndApply logTrace jsonLogTrace sId pske =
+    modifyStateLock jsonLogTrace HighPriority ApplyBlock createAndApply
   where
     createAndApply tip =
-        createMainBlockInternal sId pske >>= \case
+        createMainBlockInternal (named logTrace) sId pske >>= \case
             Left reason -> pure (tip, Left reason)
-            Right blk -> convertRes <$> applyCreatedBlock pske blk
+            Right blk -> convertRes <$> applyCreatedBlock logTrace pske blk
     convertRes createdBlk = (headerHash createdBlk, Right createdBlk)
 
 ----------------------------------------------------------------------------
@@ -247,39 +248,40 @@ createMainBlockAndApply sId pske =
 createMainBlockInternal ::
        forall ctx m.
        ( MonadCreateBlock ctx m
-       , HasProtocolConstants
-       , HasProtocolMagic
-       , HasGenesisBlockVersionData
        )
-    => SlotId
+    => Trace m LogItem
+    -> SlotId
     -> ProxySKBlockInfo
     -> m (Either Text MainBlock)
-createMainBlockInternal sId pske = do
+createMainBlockInternal logTrace sId pske = do
     tipHeader <- DB.getTipHeader
-    logInfoS $ sformat msgFmt tipHeader
-    canCreateBlock sId tipHeader >>= \case
+    logInfoS logTrace (sformat msgFmt tipHeader)
+    canCreateBlock logTrace sId tipHeader >>= \case
         Left reason -> pure (Left reason)
         Right () -> runExceptT (createMainBlockFinish tipHeader)
   where
     msgFmt = "We are trying to create main block, our tip header is\n"%build
     createMainBlockFinish :: BlockHeader -> ExceptT Text m MainBlock
     createMainBlockFinish prevHeader = do
-        rawPay <- lift $ getRawPayload (headerHash prevHeader) sId
+        rawPay <- lift $ getRawPayload logTrace (headerHash prevHeader) sId
         sk <- getOurSecretKey
         -- 100 bytes is substracted to account for different unexpected
         -- overhead.  You can see that in bitcoin blocks are 1-2kB less
         -- than limit. So i guess it's fine in general.
         sizeLimit <- (\x -> bool 0 (x - 100) (x > 100)) <$> lift UDB.getMaxBlockSize
         block <- createMainBlockPure sizeLimit prevHeader pske sId sk rawPay
-        logInfoS $
+        lift $ logInfoS logTrace $
+            -- FIXME 'biSize' performance.
             "Created main block of size: " <> sformat memory (biSize block)
         block <$ evaluateNF_ block
 
-canCreateBlock :: MonadCreateBlock ctx m
-    => SlotId
+canCreateBlock ::
+       forall ctx m. (MonadCreateBlock ctx m)
+    => Trace m LogItem
+    -> SlotId
     -> BlockHeader
     -> m (Either Text ())
-canCreateBlock sId tipHeader =
+canCreateBlock logTrace sId tipHeader =
     runExceptT $ do
         unlessM (lift usCanCreateBlock) $
             throwError "this software is obsolete and can't create block"
@@ -293,7 +295,7 @@ canCreateBlock sId tipHeader =
         -- weird things can happen (we just launched the system) and
         -- usually we monitor it manually anyway.
         unless (flatSId <= fromIntegral (epochSlots `div` 4)) $ do
-            chainQualityMaybe <- calcChainQualityM flatSId
+            chainQualityMaybe <- calcChainQualityM (natTrace lift logTrace) flatSId
             chainQuality <-
                 maybe
                     (throwError "can't compute chain quality")
@@ -354,32 +356,28 @@ applyCreatedBlock ::
       forall ctx m.
     ( MonadBlockApply ctx m
     , MonadCreateBlock ctx m
-    , CanJsonLog m
-    , HasProtocolConstants
-    , HasProtocolMagic
-    , HasGeneratedSecrets
-    , HasGenesisData
-    , HasGenesisBlockVersionData
     )
-    => ProxySKBlockInfo
+    => Trace m (LogNamed LogItem)
+    -> ProxySKBlockInfo
     -> MainBlock
     -> m MainBlock
-applyCreatedBlock pske createdBlock = applyCreatedBlockDo False createdBlock
+applyCreatedBlock logTrace pske createdBlock = applyCreatedBlockDo False createdBlock
   where
     slotId = createdBlock ^. BC.mainBlockSlot
     applyCreatedBlockDo :: Bool -> MainBlock -> m MainBlock
     applyCreatedBlockDo isFallback blockToApply =
-        verifyBlocksPrefix (one (Right blockToApply)) >>= \case
+        verifyBlocksPrefix logTrace (one (Right blockToApply)) >>= \case
             Left (pretty -> reason)
                 | isFallback -> onFailedFallback reason
                 | otherwise -> fallback reason
             Right (undos, pollModifier) -> do
                 let undo = undos ^. _Wrapped . _neHead
                 applyBlocksUnsafe
+                    logTrace
                     (ShouldCallBListener True)
                     (one (Right blockToApply, undo))
                     (Just pollModifier)
-                normalizeMempool
+                normalizeMempool (named logTrace)
                 pure blockToApply
     clearMempools :: m ()
     clearMempools = do
@@ -392,16 +390,16 @@ applyCreatedBlock pske createdBlock = applyCreatedBlockDo False createdBlock
         let message = sformat ("We've created bad main block: "%stext) reason
         -- REPORT:ERROR Created bad main block
         reportError message
-        logDebug $ "Clearing mempools"
+        logDebug (named logTrace) "Clearing mempools"
         clearMempools
-        logDebug $ "Creating empty block"
-        createMainBlockInternal slotId pske >>= \case
+        logDebug (named logTrace) "Creating empty block"
+        createMainBlockInternal (named logTrace) slotId pske >>= \case
             Left err ->
-                assertionFailed $
+                assertionFailed (contramap publicPrivateLogItem (named logTrace)) $
                 sformat ("Couldn't create a block in fallback: "%stext) err
             Right mainBlock -> applyCreatedBlockDo True mainBlock
     onFailedFallback =
-        assertionFailed .
+        assertionFailed (contramap publicPrivateLogItem (named logTrace)) .
         sformat
             ("We've created bad main block even with empty payload: "%stext)
 
@@ -416,14 +414,16 @@ data RawPayload = RawPayload
     , rpUpdate :: !UpdatePayload
     }
 
-getRawPayload :: MonadCreateBlock ctx m
-    => HeaderHash
+getRawPayload ::
+       forall ctx m. (MonadCreateBlock ctx m)
+    => Trace m LogItem
+    -> HeaderHash
     -> SlotId
     -> m RawPayload
-getRawPayload tip slotId = do
-    localTxs <- txGetPayload tip -- result is topsorted
-    sscData <- sscGetLocalPayload slotId
-    usPayload <- usPreparePayload tip slotId
+getRawPayload logTrace tip slotId = do
+    localTxs <- txGetPayload logTrace tip -- result is topsorted
+    sscData <- sscGetLocalPayload logTrace slotId
+    usPayload <- usPreparePayload logTrace tip slotId
     dlgPayload <- getDlgMempool
     let rawPayload =
             RawPayload

@@ -22,13 +22,13 @@ import           Universum
 
 import           Control.Concurrent.STM (newEmptyTMVarIO, newTBQueueIO)
 import           Data.Default (Default)
+import           Data.Functor.Contravariant (contramap)
 import qualified Data.Time as Time
 import           Formatting (sformat, shown, (%))
-import           Mockable (Production (..))
 import           System.IO (BufferMode (..), Handle, hClose, hSetBuffering)
 import qualified System.Metrics as Metrics
-import           System.Wlog (LoggerConfig (..), WithLogger, consoleActionB, defaultHandleAction,
-                              logDebug, logInfo, maybeLogsDirB, productionB, removeAllHandlers,
+import           System.Wlog (LoggerConfig (..), consoleActionB, defaultHandleAction,
+                              maybeLogsDirB, productionB, removeAllHandlers,
                               setupLogging, showTidB)
 
 import           Pos.Binary ()
@@ -43,7 +43,7 @@ import           Pos.DB.Rocks (closeNodeDBs, openNodeDBs)
 import           Pos.Delegation (DelegationVar, HasDlgConfiguration, mkDelegationVar)
 import           Pos.DHT.Real (KademliaParams (..))
 import qualified Pos.GState as GS
-import           Pos.Launcher.Param (BaseParams (..), LoggingParams (..), NodeParams (..))
+import           Pos.Launcher.Param (WlogParams (..), NodeParams (..))
 import           Pos.Lrc.Context (LrcContext (..), mkLrcSyncData)
 import           Pos.Network.Types (NetworkConfig (..))
 import           Pos.Reporting (initializeMisbehaviorMetrics)
@@ -58,11 +58,16 @@ import           Pos.Txp (GenericTxpLocalData (..), TxpGlobalSettings, mkTxpLoca
 import           Pos.Launcher.Mode (InitMode, InitModeContext (..), runInitMode)
 import           Pos.Update.Context (mkUpdateContext)
 import qualified Pos.Update.DB as GState
-import           Pos.Util (bracketWithLogging, newInitFuture)
+-- FIXME stop using newInitFuture. Surely it's not needed.
+import           Pos.Util (newInitFuture)
+import           Pos.Util.Trace (Trace, natTrace)
+import           Pos.Util.Trace.Unstructured (LogItem, Severity (..), bracketWithLogging,
+                                              logDebug, logInfo, publicPrivateLogItem)
+import           Pos.Util.Trace.Wlog (LogNamed, appendName, named)
 
 #ifdef linux_HOST_OS
 import qualified System.Systemd.Daemon as Systemd
-import qualified System.Wlog as Logger
+import           Pos.Util.Trace.Unstructured (logWarning)
 #endif
 
 -- Remove this once there's no #ifdef-ed Pos.Txp import
@@ -97,17 +102,20 @@ allocateNodeResources
        , HasDlgConfiguration
        , HasBlockConfiguration
        )
-    => NodeParams
+    => Trace IO (LogNamed LogItem)
+    -> NodeParams
     -> SscParams
     -> TxpGlobalSettings
+    -> WlogParams
     -> InitMode ()
-    -> Production (NodeResources ext)
-allocateNodeResources np@NodeParams {..} sscnp txpSettings initDB = do
-    logInfo "Allocating node resources..."
+    -> IO (NodeResources ext)
+allocateNodeResources namedLogTrace np@NodeParams {..} sscnp txpSettings wlogParams initDB = do
+    let logTrace = named namedLogTrace
+    logInfo logTrace "Allocating node resources..."
     npDbPath <- case npDbPathM of
         Nothing -> do
             let dbPath = "node-db" :: FilePath
-            logInfo $ sformat ("DB path not specified, defaulting to "%
+            logInfo logTrace $ sformat ("DB path not specified, defaulting to "%
                                shown) dbPath
             return dbPath
         Just dbPath -> return dbPath
@@ -123,13 +131,13 @@ allocateNodeResources np@NodeParams {..} sscnp txpSettings initDB = do
             futureSlottingVar
             futureSlottingContext
             futureLrcContext
-    logDebug "Opened DB, created some futures, going to run InitMode"
+    logDebug logTrace "Opened DB, created some futures, going to run InitMode"
     runInitMode initModeContext $ do
         initDB
-        logDebug "Initialized DB"
+        liftIO $ logDebug logTrace "Initialized DB"
 
         nrEkgStore <- liftIO $ Metrics.newStore
-        logDebug "Created EKG store"
+        liftIO $ logDebug logTrace "Created EKG store"
 
         txpVar <- mkTxpLocalData -- doesn't use slotting or LRC
         let ancd =
@@ -141,13 +149,18 @@ allocateNodeResources np@NodeParams {..} sscnp txpSettings initDB = do
                 , ancdEkgStore = nrEkgStore
                 , ancdTxpMemState = txpVar
                 }
-        ctx@NodeContext {..} <- allocateNodeContext ancd txpSettings nrEkgStore
+        ctx@NodeContext {..} <- allocateNodeContext
+            (natTrace liftIO namedLogTrace)
+            ancd
+            txpSettings
+            wlogParams
+            nrEkgStore
         putLrcContext ncLrcContext
-        logDebug "Filled LRC Context future"
+        liftIO $ logDebug logTrace "Filled LRC Context future"
         dlgVar <- mkDelegationVar
-        logDebug "Created DLG var"
-        sscState <- mkSscState
-        logDebug "Created SSC var"
+        liftIO $ logDebug logTrace "Created DLG var"
+        sscState <- mkSscState (natTrace liftIO logTrace)
+        liftIO $ logDebug logTrace "Created SSC var"
         nrJLogHandle <-
             case npJLFile of
                 Nothing -> pure Nothing
@@ -156,7 +169,7 @@ allocateNodeResources np@NodeParams {..} sscnp txpSettings initDB = do
                     liftIO $ hSetBuffering h NoBuffering
                     return $ Just h
 
-        logDebug "Finished allocating node resources!"
+        liftIO $ logDebug logTrace "Finished allocating node resources!"
         return NodeResources
             { nrContext = ctx
             , nrDBs = db
@@ -168,7 +181,7 @@ allocateNodeResources np@NodeParams {..} sscnp txpSettings initDB = do
 
 -- | Release all resources used by node. They must be released eventually.
 releaseNodeResources ::
-       NodeResources ext -> Production ()
+       NodeResources ext -> IO ()
 releaseNodeResources NodeResources {..} = do
     whenJust nrJLogHandle (liftIO . hClose)
     closeNodeDBs nrDBs
@@ -183,47 +196,50 @@ bracketNodeResources :: forall ext a.
       , HasDlgConfiguration
       , HasBlockConfiguration
       )
-    => NodeParams
+    => Trace IO (LogNamed LogItem)
+    -> NodeParams
     -> SscParams
     -> TxpGlobalSettings
+    -> WlogParams
     -> InitMode ()
-    -> (HasConfiguration => NodeResources ext -> Production a)
-    -> Production a
-bracketNodeResources np sp txp initDB action = do
+    -> (HasConfiguration => NodeResources ext -> IO a)
+    -> IO a
+bracketNodeResources logTrace np sp txp wp initDB action = do
     let msg = "`NodeResources'"
-    bracketWithLogging msg
-            (allocateNodeResources np sp txp initDB)
+        logTraceText = contramap (publicPrivateLogItem . (,) Error) (named logTrace)
+    bracketWithLogging logTraceText msg
+            (allocateNodeResources logTrace np sp txp wp initDB)
             releaseNodeResources $ \nodeRes ->do
         -- Notify systemd we are fully operative
         -- FIXME this is not the place to notify.
         -- The network transport is not up yet.
-        notifyReady
+        notifyReady (named logTrace)
         action nodeRes
 
 ----------------------------------------------------------------------------
 -- Logging
 ----------------------------------------------------------------------------
 
-getRealLoggerConfig :: MonadIO m => LoggingParams -> m LoggerConfig
-getRealLoggerConfig LoggingParams{..} = do
+getRealLoggerConfig :: WlogParams -> IO LoggerConfig
+getRealLoggerConfig WlogParams {..} = do
     let cfgBuilder = productionB
                   <> showTidB
-                  <> maybeLogsDirB lpHandlerPrefix
-    cfg <- readLoggerConfig lpConfigPath
+                  <> maybeLogsDirB wpHandlerPrefix
+    cfg <- readLoggerConfig wpConfigPath
     pure $ overrideConsoleLog $ cfg <> cfgBuilder
   where
     overrideConsoleLog :: LoggerConfig -> LoggerConfig
-    overrideConsoleLog = case lpConsoleLog of
+    overrideConsoleLog = case wpConsoleLog of
         Nothing    -> identity
         Just True  -> (<>) (consoleActionB defaultHandleAction)
         Just False -> (<>) (consoleActionB (\_ _ -> pass))
 
-setupLoggers :: MonadIO m => LoggingParams -> m ()
+setupLoggers :: WlogParams -> IO ()
 setupLoggers params = setupLogging Nothing =<< getRealLoggerConfig params
 
 -- | RAII for Logging.
-loggerBracket :: LoggingParams -> IO a -> IO a
-loggerBracket lp = bracket_ (setupLoggers lp) removeAllHandlers
+loggerBracket :: WlogParams -> IO a -> IO a
+loggerBracket wp = bracket_ (setupLoggers wp) removeAllHandlers
 
 ----------------------------------------------------------------------------
 -- NodeContext
@@ -241,55 +257,60 @@ data AllocateNodeContextData ext = AllocateNodeContextData
 allocateNodeContext
     :: forall ext .
       (HasConfiguration, HasNodeConfiguration, HasBlockConfiguration)
-    => AllocateNodeContextData ext
+    => Trace InitMode (LogNamed LogItem)
+    -> AllocateNodeContextData ext
     -> TxpGlobalSettings
+    -> WlogParams
     -> Metrics.Store
     -> InitMode NodeContext
-allocateNodeContext ancd txpSettings ekgStore = do
-    let AllocateNodeContextData { ancdNodeParams = np@NodeParams {..}
+allocateNodeContext namedLogTrace ancd txpSettings wlogParams ekgStore = do
+    let logTrace = named namedLogTrace
+        AllocateNodeContextData { ancdNodeParams = np@NodeParams {..}
                                 , ancdSscParams = sscnp
                                 , ancdPutSlotting = putSlotting
                                 , ancdNetworkCfg = networkConfig
                                 , ancdEkgStore = store
                                 , ancdTxpMemState = TxpLocalData {..}
                                 } = ancd
-    logInfo "Allocating node context..."
-    ncLoggerConfig <- getRealLoggerConfig $ bpLoggingParams npBaseParams
-    logDebug "Got logger config"
+    logInfo logTrace "Allocating node context..."
+    ncLoggerConfig <- liftIO $ getRealLoggerConfig wlogParams
+    logDebug logTrace "Got logger config"
     ncStateLock <- newStateLock =<< GS.getTip
-    logDebug "Created a StateLock"
-    ncStateLockMetrics <- liftIO $ recordTxpMetrics store txpMemPool
-    logDebug "Created StateLock metrics"
+    logDebug logTrace "Created a StateLock"
+    rctx <- ask
+    let txpMetricsTrace = natTrace (flip runReaderT rctx) (named (appendName "metrics" namedLogTrace))
+    ncStateLockMetrics <- liftIO $ recordTxpMetrics txpMetricsTrace store txpMemPool
+    logDebug logTrace "Created StateLock metrics"
     lcLrcSync <- mkLrcSyncData >>= newTVarIO
-    logDebug "Created LRC sync"
+    logDebug logTrace "Created LRC sync"
     ncSlottingVar <- (gdStartTime genesisData,) <$> mkSlottingVar
-    logDebug "Created slotting variable"
+    logDebug logTrace "Created slotting variable"
     ncSlottingContext <- mkSimpleSlottingStateVar
-    logDebug "Created slotting context"
+    logDebug logTrace "Created slotting context"
     putSlotting ncSlottingVar ncSlottingContext
-    logDebug "Filled slotting future"
+    logDebug logTrace "Filled slotting future"
     ncUserSecret <- newTVarIO $ npUserSecret
-    logDebug "Created UserSecret variable"
+    logDebug logTrace "Created UserSecret variable"
     ncBlockRetrievalQueue <- liftIO $ newTBQueueIO blockRetrievalQueueSize
     ncRecoveryHeader <- liftIO newEmptyTMVarIO
-    logDebug "Created block retrieval queue, recovery and progress headers"
+    logDebug logTrace "Created block retrieval queue, recovery and progress headers"
     ncShutdownFlag <- newTVarIO False
     ncStartTime <- StartTime <$> liftIO Time.getCurrentTime
     ncLastKnownHeader <- newTVarIO Nothing
-    logDebug "Created last known header and shutdown flag variables"
+    logDebug logTrace "Created last known header and shutdown flag variables"
     ncUpdateContext <- mkUpdateContext
-    logDebug "Created context for update"
+    logDebug logTrace "Created context for update"
     ncSscContext <- createSscContext sscnp
-    logDebug "Created context for ssc"
+    logDebug logTrace "Created context for ssc"
     ncSlogContext <- mkSlogContext store
-    logDebug "Created context for slog"
+    logDebug logTrace "Created context for slog"
     -- TODO synchronize the NodeContext peers var with whatever system
     -- populates it.
     peersVar <- newTVarIO mempty
-    logDebug "Created peersVar"
+    logDebug logTrace "Created peersVar"
     mm <- initializeMisbehaviorMetrics ekgStore
 
-    logDebug "Finished allocating node context!"
+    logDebug logTrace "Finished allocating node context!"
     let ctx =
             NodeContext
             { ncConnectedPeers = ConnectedPeers peersVar
@@ -314,13 +335,13 @@ mkSlottingVar = newTVarIO =<< GState.getSlottingData
 -- | Notify process manager tools like systemd the node is ready.
 -- Available only on Linux for systems where `libsystemd-dev` is installed.
 -- It defaults to a noop for all the other platforms.
+notifyReady :: Trace IO LogItem -> IO ()
 #ifdef linux_HOST_OS
-notifyReady :: (MonadIO m, WithLogger m) => m ()
-notifyReady = do
+notifyReady logTrace = do
     res <- liftIO Systemd.notifyReady
     case res of
         Just () -> return ()
-        Nothing -> Logger.logWarning "notifyReady failed to notify systemd."
+        Nothing -> logWarning logTrace "notifyReady failed to notify systemd."
 #else
 notifyReady :: (WithLogger m) => m ()
 notifyReady = logInfo "notifyReady: no systemd support enabled"

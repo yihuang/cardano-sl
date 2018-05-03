@@ -9,15 +9,17 @@ module Pos.Block.Worker
 
 import           Universum
 
+import           Control.Concurrent (threadDelay)
 import           Control.Lens (ix)
+import           Control.Monad.IO.Unlift (withRunInIO)
+import           Data.Aeson (Value, toJSON)
+import           Data.Functor.Contravariant (contramap)
 import qualified Data.List.NonEmpty as NE
 import           Data.Time.Units (Microsecond)
 import           Formatting (Format, bprint, build, fixed, int, now, sformat, shown, (%))
-import           Mockable (delay)
 import           Serokell.Util (enumerate, listJson, pairF, sec)
 import qualified System.Metrics.Label as Label
 import           System.Random (randomRIO)
-import           System.Wlog (logDebug, logError, logInfo, logWarning)
 
 import           Pos.Block.BlockWorkMode (BlockWorkMode)
 import           Pos.Block.Configuration (networkDiameter)
@@ -52,13 +54,17 @@ import           Pos.Reporting (MetricMonitor (..), MetricMonitorState,
                                 recordValue, reportOrLogE)
 import           Pos.Slotting (ActionTerminationPolicy (..), OnNewSlotParams (..),
                                currentTimeSlotting, defaultOnNewSlotParams,
-                               getSlotStartEmpatically, onNewSlot)
+                               getSlotStartEmpatically, onNewSlotNoLogging)
 import           Pos.Update.DB (getAdoptedBVData)
 import           Pos.Util.Chrono (OldestFirst (..))
 import           Pos.Util.JsonLog.Events (jlCreatedBlock)
-import           Pos.Util.LogSafe (logDebugS, logInfoS, logWarningS)
-import           Pos.Util.TimeLimit (logWarningSWaitLinear)
-import           Pos.Util.TimeWarp (CanJsonLog (..))
+import           Pos.Util.TimeLimit (logWaitLinear)
+import           Pos.Util.Trace (Trace, traceWith, natTrace)
+import           Pos.Util.Trace.Unstructured (LogItem (..), LogPrivacy (..), Severity (..),
+                                              logDebug, logDebugS, logError, logInfo,
+                                              logInfoS, logWarning, logWarningS)
+-- FIXME no explicit wlog dependencies.
+import           Pos.Util.Trace.Wlog (LogNamed, named)
 
 ----------------------------------------------------------------------------
 -- All workers
@@ -69,33 +75,39 @@ blkWorkers
     :: ( BlockWorkMode ctx m
        , HasMisbehaviorMetrics ctx
        )
-    => [Diffusion m -> m ()]
-blkWorkers =
-    [ blkCreatorWorker
-    , informerWorker
-    , retrievalWorker
-    , recoveryTriggerWorker
+    => Trace m (LogNamed LogItem)
+    -> Trace m Value
+    -> [Diffusion m -> m ()]
+blkWorkers logTrace jsonLogTrace =
+    [ blkCreatorWorker logTrace jsonLogTrace
+    , informerWorker logTrace
+    , retrievalWorker logTrace jsonLogTrace
+    , recoveryTriggerWorker (named logTrace)
     ]
 
 informerWorker
     :: ( BlockWorkMode ctx m
-    ) => Diffusion m -> m ()
-informerWorker =
-    \_ -> onNewSlot defaultOnNewSlotParams $ \slotId ->
-        recoveryCommGuard "onNewSlot worker, informerWorker" $ do
+       )
+    => Trace m (LogNamed LogItem)
+    -> Diffusion m
+    -> m ()
+informerWorker namedLogTrace =
+    \_ -> onNewSlotNoLogging defaultOnNewSlotParams $ \slotId ->
+        recoveryCommGuard logTrace "onNewSlot worker, informerWorker" $ do
             tipHeader <- DB.getTipHeader
             -- Printe tip header
-            logDebug $ sformat ("Our tip header: "%build) tipHeader
+            logDebug logTrace (sformat ("Our tip header: "%build) tipHeader)
             -- Print the difference between tip slot and current slot.
             logHowManySlotsBehind slotId tipHeader
             -- Compute and report metrics
-            metricWorker slotId
+            metricWorker logTrace slotId
   where
     logHowManySlotsBehind slotId tipHeader =
         let tipSlot = epochOrSlotToSlot (getEpochOrSlot tipHeader)
             slotDiff = flattenSlotId slotId - flattenSlotId tipSlot
-        in logInfo $ sformat ("Difference between current slot and tip slot is: "
-                              %int) slotDiff
+        in logInfo logTrace $ sformat ("Difference between current slot and tip slot is: "
+                                      %int) slotDiff
+    logTrace = named namedLogTrace
 
 
 ----------------------------------------------------------------------------
@@ -105,13 +117,18 @@ informerWorker =
 blkCreatorWorker
     :: ( BlockWorkMode ctx m
        , HasMisbehaviorMetrics ctx
-       ) => Diffusion m -> m ()
-blkCreatorWorker =
-    \diffusion -> onNewSlot onsp $ \slotId ->
-        recoveryCommGuard "onNewSlot worker, blkCreatorWorker" $
-        blockCreator slotId diffusion `catchAny` onBlockCreatorException
+       )
+    => Trace m (LogNamed LogItem)
+    -> Trace m Value
+    -> Diffusion m
+    -> m ()
+blkCreatorWorker namedLogTrace jsonLogTrace =
+    \diffusion -> onNewSlotNoLogging onsp $ \slotId ->
+        recoveryCommGuard logTrace "onNewSlot worker, blkCreatorWorker" $
+        blockCreator namedLogTrace jsonLogTrace slotId diffusion `catchAny` onBlockCreatorException
   where
-    onBlockCreatorException = reportOrLogE "blockCreator failed: "
+    logTrace = named namedLogTrace
+    onBlockCreatorException = reportOrLogE logTrace "blockCreator failed: "
     onsp :: OnNewSlotParams
     onsp =
         defaultOnNewSlotParams
@@ -121,20 +138,24 @@ blockCreator
     :: ( BlockWorkMode ctx m
        , HasMisbehaviorMetrics ctx
        )
-    => SlotId -> Diffusion m -> m ()
-blockCreator (slotId@SlotId {..}) diffusion = do
+    => Trace m (LogNamed LogItem)
+    -> Trace m Value
+    -> SlotId
+    -> Diffusion m
+    -> m ()
+blockCreator namedLogTrace jsonLogTrace (slotId@SlotId {..}) diffusion = do
 
     -- First of all we create genesis block if necessary.
-    mGenBlock <- createGenesisBlockAndApply siEpoch
+    mGenBlock <- createGenesisBlockAndApply namedLogTrace jsonLogTrace siEpoch
     whenJust mGenBlock $ \createdBlk -> do
-        logInfo $ sformat ("Created genesis block:\n" %build) createdBlk
-        jsonLog $ jlCreatedBlock (Left createdBlk)
+        logInfo logTrace $ sformat ("Created genesis block:\n" %build) createdBlk
+        traceWith jsonLogTrace $ toJSON (jlCreatedBlock (Left createdBlk))
 
     -- Then we get leaders for current epoch.
     leadersMaybe <- LrcDB.getLeadersForEpoch siEpoch
     case leadersMaybe of
         -- If we don't know leaders, we can't do anything.
-        Nothing -> logWarning "Leaders are not known for new slot"
+        Nothing -> logWarning logTrace "Leaders are not known for new slot"
         -- If we know leaders, we check whether we are leader and
         -- create a new block if we are. We also create block if we
         -- have suitable PSK.
@@ -143,10 +164,11 @@ blockCreator (slotId@SlotId {..}) diffusion = do
                   (onKnownLeader leaders)
                   (leaders ^? ix (fromIntegral $ getSlotIndex siSlot))
   where
+    logTrace = named namedLogTrace
     onNoLeader =
-        logError "Couldn't find a leader for current slot among known ones"
-    logOnEpochFS = if siSlot == minBound then logInfoS else logDebugS
-    logOnEpochF = if siSlot == minBound then logInfo else logDebug
+        logError logTrace "Couldn't find a leader for current slot among known ones"
+    logOnEpochFS = if siSlot == minBound then logInfoS logTrace else logDebugS logTrace
+    logOnEpochF = if siSlot == minBound then logInfo logTrace else logDebug logTrace
     onKnownLeader leaders leader = do
         ourPk <- getOurPublicKey
         let ourPkHash = addressHash ourPk
@@ -160,65 +182,72 @@ blockCreator (slotId@SlotId {..}) diffusion = do
             dropAround :: Int -> Int -> [a] -> [a]
             dropAround p s = take (2*s + 1) . drop (max 0 (p - s))
             strLeaders = map (bprint pairF) (enumerate @Int (toList leaders))
-        logDebug $ sformat ("Trimmed leaders: "%listJson)
-                 $ dropAround (fromEnum siSlot) 10 strLeaders
+        logDebug logTrace $ sformat ("Trimmed leaders: "%listJson)
+                          $ dropAround (fromEnum siSlot) 10 strLeaders
 
         ourHeavyPsk <- getPskByIssuer (Left ourPk)
         let heavyWeAreIssuer = isJust ourHeavyPsk
         dlgTransM <- getDlgTransPsk leader
         let finalHeavyPsk = snd <$> dlgTransM
-        logDebug $ "End delegation psk for this slot: " <> maybe "none" pretty finalHeavyPsk
+        logDebug logTrace $ "End delegation psk for this slot: " <> maybe "none" pretty finalHeavyPsk
         let heavyWeAreDelegate = maybe False ((== ourPk) . pskDelegatePk) finalHeavyPsk
 
         let weAreLeader = leader == ourPkHash
         if | weAreLeader && heavyWeAreIssuer ->
-                 logInfoS $ sformat
+                 logInfoS logTrace $ sformat
                  ("Not creating the block (though we're leader) because it's "%
                   "delegated by heavy psk: "%build)
                  ourHeavyPsk
            | weAreLeader ->
-                 onNewSlotWhenLeader slotId Nothing diffusion
+                 onNewSlotWhenLeader namedLogTrace jsonLogTrace slotId Nothing diffusion
            | heavyWeAreDelegate ->
                  let pske = swap <$> dlgTransM
-                 in onNewSlotWhenLeader slotId pske diffusion
+                 in onNewSlotWhenLeader namedLogTrace jsonLogTrace slotId pske diffusion
            | otherwise -> pass
 
 onNewSlotWhenLeader
     :: ( BlockWorkMode ctx m
        )
-    => SlotId
+    => Trace m (LogNamed LogItem)
+    -> Trace m Value
+    -> SlotId
     -> ProxySKBlockInfo
     -> Diffusion m
     -> m ()
-onNewSlotWhenLeader slotId pske diffusion = do
+onNewSlotWhenLeader namedLogTrace jsonLogTrace slotId pske diffusion = do
     let logReason =
             sformat ("I have a right to create a block for the slot "%slotIdF%" ")
                     slotId
         logLeader = "because i'm a leader"
         logCert (psk,_) =
             sformat ("using heavyweight proxy signature key "%build%", will do it soon") psk
-    logInfoS $ logReason <> maybe logLeader logCert pske
+    logInfoS logTrace $ logReason <> maybe logLeader logCert pske
     nextSlotStart <- getSlotStartEmpatically (succ slotId)
     currentTime <- currentTimeSlotting
     let timeToCreate =
             max currentTime (nextSlotStart - Timestamp networkDiameter)
         Timestamp timeToWait = timeToCreate - currentTime
-    logInfoS $
+    logInfoS logTrace $
         sformat ("Waiting for "%shown%" before creating block") timeToWait
-    delay timeToWait
-    logWarningSWaitLinear 8 "onNewSlotWhenLeader" onNewSlotWhenLeaderDo
+    -- timeToWait is 'Microseconds'.
+    liftIO $ threadDelay (fromIntegral timeToWait)
+    let makeSecureWarning = LogItem Private Warning
+    withRunInIO $ \run ->
+        logWaitLinear (natTrace run (contramap makeSecureWarning logTrace))
+            8 "onNewSlotWhenLeader" (run onNewSlotWhenLeaderDo)
   where
+    logTrace = named namedLogTrace
     onNewSlotWhenLeaderDo = do
-        logInfoS "It's time to create a block for current slot"
-        createdBlock <- createMainBlockAndApply slotId pske
+        logInfoS logTrace "It's time to create a block for current slot"
+        createdBlock <- createMainBlockAndApply namedLogTrace jsonLogTrace slotId pske
         either whenNotCreated whenCreated createdBlock
-        logInfoS "onNewSlotWhenLeader: done"
+        logInfoS logTrace "onNewSlotWhenLeader: done"
     whenCreated createdBlk = do
-            logInfoS $
-                sformat ("Created a new block:\n" %build) createdBlk
-            jsonLog $ jlCreatedBlock (Right createdBlk)
+            logInfoS logTrace $ sformat ("Created a new block:\n" %build) createdBlk
+            traceWith jsonLogTrace $ toJSON (jlCreatedBlock (Right createdBlk))
             void $ Diffusion.announceBlockHeader diffusion $ createdBlk ^. gbHeader
-    whenNotCreated = logWarningS . (mappend "I couldn't create a new block: ")
+    whenNotCreated = \msg ->
+        logWarningS logTrace ("I couldn't create a new block: " <> msg)
 
 ----------------------------------------------------------------------------
 -- Recovery trigger worker
@@ -228,17 +257,19 @@ recoveryTriggerWorker
     :: forall ctx m.
        ( BlockWorkMode ctx m
        )
-    => Diffusion m -> m ()
-recoveryTriggerWorker diffusion = do
+    => Trace m LogItem
+    -> Diffusion m
+    -> m ()
+recoveryTriggerWorker logTrace diffusion = do
     -- Initial heuristic delay is needed (the system takes some time
     -- to initialize).
-    delay $ sec 3
+    liftIO $ threadDelay 3000000
 
     repeatOnInterval $ do
         doTrigger <- needTriggerRecovery <$> getSyncStatusK
         when doTrigger $ do
-            logInfo "Triggering recovery because we need it"
-            triggerRecovery diffusion
+            logInfo logTrace "Triggering recovery because we need it"
+            triggerRecovery logTrace diffusion
 
         -- Sometimes we want to trigger recovery just in case. Maybe
         -- we're just 5 slots late, but nobody wants to send us
@@ -250,10 +281,10 @@ recoveryTriggerWorker diffusion = do
         -- P = 0.004 ~ every 250th time (250 seconds ~ every 4.2 minutes)
         let triggerSafety = not doTrigger && d < 0.004
         when triggerSafety $ do
-            logInfo "Checking if we need recovery as a safety measure"
+            logInfo logTrace "Checking if we need recovery as a safety measure"
             whenM (needTriggerRecovery <$> getSyncStatus 5) $ do
-                logInfo "Triggering recovery as a safety measure"
-                triggerRecovery diffusion
+                logInfo logTrace "Triggering recovery as a safety measure"
+                triggerRecovery logTrace diffusion
 
         -- We don't want to ask for tips too frequently.
         -- E.g. there may be a tip processing mistake so that we
@@ -261,14 +292,16 @@ recoveryTriggerWorker diffusion = do
         -- headers. Or it may happen that we will receive only
         -- useless broken tips for some reason (attack?). This
         -- will minimize risks and network load.
-        when (doTrigger || triggerSafety) $ delay $ sec 20
+        when (doTrigger || triggerSafety) $ liftIO (threadDelay 20000000)
   where
     repeatOnInterval action = void $ do
-        delay $ sec 1
-        -- REPORT:ERROR 'reportOrLogE' in recovery trigger worker
+        liftIO $ threadDelay 1000000
+        -- NB: catchAny is from Universum, is from Control.Exception.Safe,
+        -- which doesn't squelch async exceptions.
         void $ action `catchAny` \e -> do
-            reportOrLogE "recoveryTriggerWorker" e
-            delay $ sec 15
+            -- REPORT:ERROR 'reportOrLogE' in recovery trigger worker
+            reportOrLogE logTrace "recoveryTriggerWorker" e
+            liftIO $ threadDelay 15000000
         repeatOnInterval action
 
 ----------------------------------------------------------------------------
@@ -285,11 +318,13 @@ recoveryTriggerWorker diffusion = do
 -- Apart from chain quality check we also record some generally useful values.
 metricWorker
     :: BlockWorkMode ctx m
-    => SlotId -> m ()
-metricWorker curSlot = do
+    => Trace m LogItem
+    -> SlotId
+    -> m ()
+metricWorker logTrace curSlot = do
     OldestFirst lastSlots <- slogGetLastSlots
-    reportTotalBlocks
-    reportSlottingData curSlot
+    reportTotalBlocks logTrace
+    reportSlottingData logTrace curSlot
     reportCrucialValues
     -- If total number of blocks is less than `blkSecurityParam' we do
     -- nothing with regards to chain quality for two reasons:
@@ -300,7 +335,7 @@ metricWorker curSlot = do
         Nothing -> pass
         Just slotsNE
             | length slotsNE < fromIntegral blkSecurityParam -> pass
-            | otherwise -> chainQualityChecker curSlot (NE.head slotsNE)
+            | otherwise -> chainQualityChecker logTrace curSlot (NE.head slotsNE)
 
 ----------------------------------------------------------------------------
 -- -- General metrics
@@ -308,36 +343,41 @@ metricWorker curSlot = do
 
 reportTotalBlocks ::
        forall ctx m. BlockWorkMode ctx m
-    => m ()
-reportTotalBlocks = do
+    => Trace m LogItem
+    -> m ()
+reportTotalBlocks logTrace = do
     difficulty <- view difficultyL <$> DB.getTipHeader
     monitor <- difficultyMonitor <$> view scDifficultyMonitorState
-    recordValue monitor difficulty
+    recordValue logTrace monitor difficulty
 
 -- We don't need debug messages, we can see it from other messages.
 difficultyMonitor ::
        MetricMonitorState ChainDifficulty -> MetricMonitor ChainDifficulty
 difficultyMonitor = noReportMonitor fromIntegral Nothing
 
-reportSlottingData :: BlockWorkMode ctx m => SlotId -> m ()
-reportSlottingData slotId = do
+reportSlottingData
+    :: BlockWorkMode ctx m
+    => Trace m LogItem
+    -> SlotId
+    -> m ()
+reportSlottingData logTrace slotId = do
     -- epoch
     let epoch = siEpoch slotId
     epochMonitor <-
         noReportMonitor fromIntegral Nothing <$> view scEpochMonitorState
-    recordValue epochMonitor epoch
+    recordValue logTrace epochMonitor epoch
     -- local slot
     let localSlot = siSlot slotId
     localSlotMonitor <-
         noReportMonitor (fromIntegral . getSlotIndex) Nothing <$>
         view scLocalSlotMonitorState
-    recordValue localSlotMonitor localSlot
+    recordValue logTrace localSlotMonitor localSlot
     -- global slot
     let globalSlot = flattenSlotId slotId
     globalSlotMonitor <-
         noReportMonitor fromIntegral Nothing <$>
         view scGlobalSlotMonitorState
-    recordValue globalSlotMonitor globalSlot
+    recordValue logTrace globalSlotMonitor globalSlot
 
 reportCrucialValues :: BlockWorkMode ctx m => m ()
 reportCrucialValues = do
@@ -359,12 +399,14 @@ reportCrucialValues = do
 chainQualityChecker ::
        ( BlockWorkMode ctx m
        )
-    => SlotId
+    => Trace m LogItem
+    -> SlotId
     -> FlatSlotId
     -> m ()
-chainQualityChecker curSlot kThSlot = do
-    logDebug $ sformat ("Block with depth 'k' ("%int%
-                        ") was created during slot "%slotIdF)
+chainQualityChecker logTrace curSlot kThSlot = do
+    logDebug logTrace $
+        sformat ("Block with depth 'k' ("%int%
+                 ") was created during slot "%slotIdF)
         blkSecurityParam (unflattenSlotId kThSlot)
     let curFlatSlot = flattenSlotId curSlot
     isBootstrapEra <- gsIsBootstrapEra (siEpoch curSlot)
@@ -372,9 +414,9 @@ chainQualityChecker curSlot kThSlot = do
     let monitorK = cqkMetricMonitor monitorStateK isBootstrapEra
     monitorOverall <- cqOverallMetricMonitor <$> view scCQOverallMonitorState
     monitorFixed <- cqFixedMetricMonitor <$> view scCQFixedMonitorState
-    whenJustM (calcChainQualityM curFlatSlot) (recordValue monitorK)
-    whenJustM calcOverallChainQuality $ recordValue monitorOverall
-    whenJustM calcChainQualityFixedTime $ recordValue monitorFixed
+    whenJustM (calcChainQualityM logTrace curFlatSlot) (recordValue logTrace monitorK)
+    whenJustM calcOverallChainQuality $ recordValue logTrace monitorOverall
+    whenJustM calcChainQualityFixedTime $ recordValue logTrace monitorFixed
 
 -- Monitor for chain quality for last k blocks.
 cqkMetricMonitor ::

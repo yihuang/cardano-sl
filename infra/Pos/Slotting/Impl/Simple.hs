@@ -19,10 +19,9 @@ module Pos.Slotting.Impl.Simple
 
 import           Universum
 
-import           Mockable (CurrentTime, Mockable, currentTime)
-
 import           Pos.Core.Configuration (HasProtocolConstants)
-import           Pos.Core.Slotting (SlotId (..), Timestamp (..), unflattenSlotId)
+import           Pos.Core.Slotting (SlotId (..), Timestamp (..), unflattenSlotId,
+                                    getCurrentTimestamp)
 import           Pos.Slotting.Impl.Util (approxSlotUsingOutdated, slotFromTimestamp)
 import           Pos.Slotting.MemState (MonadSlotsData, getCurrentNextEpochIndexM,
                                         waitCurrentEpochEqualsM)
@@ -33,8 +32,7 @@ import           Pos.Util (HasLens (..))
 ----------------------------------------------------------------------------
 
 type SimpleSlottingMode ctx m
-    = ( Mockable CurrentTime m
-      , MonadSlotsData ctx m
+    = ( MonadSlotsData ctx m
       , MonadIO m
       )
 
@@ -112,7 +110,7 @@ getCurrentSlotInaccurateSimple =
     view (lensOf @SimpleSlottingStateVar) >>= getCurrentSlotInaccurateSimple'
 
 currentTimeSlottingSimple :: (SimpleSlottingMode ctx m) => m Timestamp
-currentTimeSlottingSimple = Timestamp <$> currentTime
+currentTimeSlottingSimple = liftIO getCurrentTimestamp
 
 updateLastSlot :: MonadIO m => SimpleSlottingStateVar -> SlotId -> m SlotId
 updateLastSlot var slot = atomically $ do

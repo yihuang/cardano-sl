@@ -33,15 +33,6 @@ module Pos.Util.Util
        , lensOf'
        , lensOfProxy
 
-       -- * Lifting monads
-       , PowerLift(..)
-
-       -- * MinMax
-       , MinMax(..)
-       , _MinMax
-       , mkMinMax
-       , minMaxOf
-
        -- * Aeson
        , parseJSONWithRead
 
@@ -54,8 +45,6 @@ module Pos.Util.Util
        -- * Logging helpers
        , buildListBounds
        , multilineBounds
-       , logException
-       , bracketWithLogging
 
        -- * Misc
        , mconcatPair
@@ -79,10 +68,7 @@ import           Universum
 
 import qualified Codec.CBOR.Decoding as CBOR
 import           Control.Concurrent (threadDelay)
-import qualified Control.Exception.Safe as E
-import           Control.Lens (Getting, Iso', coerced, foldMapOf, ( # ))
 import           Control.Monad.Except (MonadError, throwError)
-import           Control.Monad.Trans.Class (MonadTrans)
 import           Data.Aeson (FromJSON (..))
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Types as A
@@ -91,7 +77,6 @@ import           Data.List (span, zipWith3, zipWith4)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import           Data.Ratio ((%))
-import qualified Data.Semigroup as Smg
 import qualified Data.Serialize as Cereal
 import           Data.Time.Clock (NominalDiffTime, UTCTime, diffUTCTime, getCurrentTime)
 import           Data.Time.Clock.POSIX (posixSecondsToUTCTime)
@@ -104,7 +89,6 @@ import qualified Language.Haskell.TH as TH
 import qualified Prelude
 import           Serokell.Util (listJson)
 import           Serokell.Util.Exceptions ()
-import           System.Wlog (LoggerName, WithLogger, logDebug, logError, logInfo, usingLoggerName)
 import qualified Text.Megaparsec as P
 
 ----------------------------------------------------------------------------
@@ -224,35 +208,6 @@ lensOfProxy :: forall proxy tag a b. HasLens tag a b => proxy tag -> Lens' a b
 lensOfProxy _ = lensOf @tag
 
 ----------------------------------------------------------------------------
--- PowerLift
-----------------------------------------------------------------------------
-
-class PowerLift m n where
-    powerLift :: m a -> n a
-
-instance {-# OVERLAPPING #-} PowerLift m m where
-    powerLift = identity
-
-instance (MonadTrans t, PowerLift m n, Monad n) => PowerLift m (t n) where
-  powerLift = lift . powerLift @m @n
-
-----------------------------------------------------------------------------
--- MinMax
-----------------------------------------------------------------------------
-
-newtype MinMax a = MinMax (Smg.Option (Smg.Min a, Smg.Max a))
-    deriving (Monoid)
-
-_MinMax :: Iso' (MinMax a) (Maybe (a, a))
-_MinMax = coerced
-
-mkMinMax :: a -> MinMax a
-mkMinMax a = _MinMax # Just (a, a)
-
-minMaxOf :: Getting (MinMax a) s a -> s -> Maybe (a, a)
-minMaxOf l = view _MinMax . foldMapOf l mkMinMax
-
-----------------------------------------------------------------------------
 -- Aeson
 ----------------------------------------------------------------------------
 
@@ -316,34 +271,6 @@ multilineBounds maxSize = F.later formatList
    maxSize' = max 2 maxSize -- splitting list into two with maximum size below 2 doesn't make sense
    half = maxSize' `div` 2
    remaining = maxSize' - half
-
--- | Catch and log an exception, then rethrow it
-logException :: LoggerName -> IO a -> IO a
-logException name = E.handleAsync (\e -> handler e >> E.throw e)
-  where
-    handler :: E.SomeException -> IO ()
-    handler exc = do
-        let message = "logException: " <> pretty exc
-        usingLoggerName name (logError message) `E.catchAny` \loggingExc -> do
-            putStrLn message
-            putStrLn $
-                "logException failed to use logging: " <> pretty loggingExc
-
--- | 'bracket' which logs given message after acquiring the resource
--- and before calling the callback with 'Info' severity.
-bracketWithLogging ::
-       (MonadMask m, WithLogger m)
-    => Text
-    -> m a
-    -> (a -> m b)
-    -> (a -> m c)
-    -> m c
-bracketWithLogging msg acquire release = bracket acquire release . addLogging
-  where
-    addLogging callback resource = do
-        logInfo $ "<bracketWithLogging:before> " <> msg
-        callback resource <*
-            logInfo ("<bracketWithLogging:after> " <> msg)
 
 ----------------------------------------------------------------------------
 -- Misc
@@ -426,16 +353,15 @@ sleep :: MonadIO m => NominalDiffTime -> m ()
 sleep n = liftIO (threadDelay (truncate (n * 10^(6::Int))))
 
 -- | 'tMeasure' with 'logDebug'.
-tMeasureLog :: (MonadIO m, WithLogger m) => Text -> m a -> m a
-tMeasureLog label = fmap fst . tMeasure logDebug label
+tMeasureLog :: (MonadIO m) => (Text -> m ()) -> Text -> m a -> m a
+tMeasureLog logAction label = fmap fst . tMeasure logAction label
 
--- | 'tMeasure' with 'putText'. For places you don't have
--- 'WithLogger' constraint.
+-- | 'tMeasure' with 'putText'.
 tMeasureIO :: (MonadIO m) => Text -> m a -> m a
 tMeasureIO label = fmap fst . tMeasure putText label
 
-timed :: (MonadIO m, WithLogger m) => Text -> m a -> m (a, Microsecond)
-timed = tMeasure logDebug
+timed :: (MonadIO m) => (Text -> m ()) -> Text -> m a -> m (a, Microsecond)
+timed = tMeasure
 
 -- | Takes the first time sample, executes action (forcing its
 -- result), takes the second time sample, logs it.

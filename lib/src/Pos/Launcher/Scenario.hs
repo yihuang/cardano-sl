@@ -11,11 +11,11 @@ module Pos.Launcher.Scenario
 
 import           Universum
 
+import           Control.Concurrent.Async (Async, mapConcurrently)
 import qualified Data.HashMap.Strict as HM
 import           Formatting (bprint, build, int, sformat, shown, (%))
-import           Mockable (mapConcurrently)
 import           Serokell.Util (listJson)
-import           System.Wlog (WithLogger, askLoggerName, logInfo)
+import           System.Wlog (askLoggerName, logInfo)
 
 import           Pos.Context (getOurPublicKey)
 import           Pos.Core (GenesisData (gdBootStakeholders, gdHeavyDelegation),
@@ -33,7 +33,7 @@ import           Pos.Update.Configuration (HasUpdateConfiguration, curSoftwareVe
                                            lastKnownBlockVersion, ourSystemTag)
 import           Pos.Util.AssertMode (inAssertMode)
 import           Pos.Util.CompileInfo (HasCompileInfo, compileInfo)
-import           Pos.Util.LogSafe (logInfoS)
+import           Pos.Util.Trace.Unstructured (LogItem, logInfo, logInfoS)
 import           Pos.Worker (allWorkers)
 import           Pos.WorkMode.Class (WorkMode)
 
@@ -44,21 +44,22 @@ runNode'
        ( HasCompileInfo
        , WorkMode ctx m
        )
-    => NodeResources ext
+    => Trace m LogItem
+    -> NodeResources ext
     -> [Diffusion m -> m ()]
     -> [Diffusion m -> m ()]
     -> Diffusion m -> m ()
-runNode' NodeResources {..} workers' plugins' = \diffusion -> do
-    logInfo $ "Built with: " <> pretty compileInfo
-    nodeStartMsg
-    inAssertMode $ logInfo "Assert mode on"
+runNode' logTrace NodeResources {..} workers' plugins' = \diffusion -> do
+    logInfo logTrace $ "Built with: " <> pretty compileInfo
+    nodeStartMsg logTrace
+    inAssertMode $ logInfo logTrace "Assert mode on"
     pk <- getOurPublicKey
     let pkHash = addressHash pk
-    logInfoS $ sformat ("My public key is: "%build%", pk hash: "%build)
+    logInfoS logTrace $ sformat ("My public key is: "%build%", pk hash: "%build)
         pk pkHash
 
     let genesisStakeholders = gdBootStakeholders genesisData
-    logInfo $ sformat
+    logInfo logTrace $ sformat
         ("Genesis stakeholders ("%int%" addresses, dust threshold "%build%"): "%build)
         (length $ getGenesisWStakeholders genesisStakeholders)
         bootDustThreshold
@@ -67,19 +68,20 @@ runNode' NodeResources {..} workers' plugins' = \diffusion -> do
     let genesisDelegation = gdHeavyDelegation genesisData
     let formatDlgPair (issuerId, delegateId) =
             bprint (build%" -> "%build) issuerId delegateId
-    logInfo $ sformat ("GenesisDelegation (stakeholder ids): "%listJson)
-            $ map (formatDlgPair . second (addressHash . pskDelegatePk))
-            $ HM.toList
-            $ unGenesisDelegation genesisDelegation
+    logInfo logTrace
+        $ sformat ("GenesisDelegation (stakeholder ids): "%listJson)
+        $ map (formatDlgPair . second (addressHash . pskDelegatePk))
+        $ HM.toList
+        $ unGenesisDelegation genesisDelegation
 
     firstGenesisHash <- GS.getFirstGenesisBlockHash
-    logInfo $ sformat
+    logInfo logTrace $ sformat
         ("First genesis block hash: "%build%", genesis seed is "%build)
         firstGenesisHash
         (gdFtsSeed genesisData)
 
     tipHeader <- DB.getTipHeader
-    logInfo $ sformat ("Current tip header: "%build) tipHeader
+    logInfo logTrace $ sformat ("Current tip header: "%build) tipHeader
 
     waitSystemStart
     let runWithReportHandler action =
@@ -114,8 +116,8 @@ runNode nr plugins = runNode' nr workers' plugins
     workers' = allWorkers nr
 
 -- | This function prints a very useful message when node is started.
-nodeStartMsg :: (HasUpdateConfiguration, WithLogger m) => m ()
-nodeStartMsg = logInfo msg
+nodeStartMsg :: (HasUpdateConfiguration) => Trace m LogItem -> m ()
+nodeStartMsg logTrace = logInfo logTrace msg
   where
     msg = sformat ("Application: " %build% ", last known block version "
                     %build% ", systemTag: " %build)

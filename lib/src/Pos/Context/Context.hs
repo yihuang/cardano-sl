@@ -10,7 +10,6 @@ module Pos.Context.Context
        , HasSscContext(..)
        , NodeContext (..)
        , NodeParams(..)
-       , BaseParams(..)
        , TxpGlobalSettings
        , StartTime(..)
 
@@ -33,7 +32,7 @@ import           Pos.Block.Types (LastKnownHeader, LastKnownHeaderTag, RecoveryH
 import           Pos.Communication.Types (NodeId)
 import           Pos.Core (HasPrimaryKey (..), Timestamp)
 import           Pos.DHT.Real.Param (KademliaParams)
-import           Pos.Launcher.Param (BaseParams (..), NodeParams (..))
+import           Pos.Launcher.Param (NodeParams (..))
 import           Pos.Lrc.Context (LrcContext)
 import           Pos.Network.Types (NetworkConfig (..))
 import           Pos.Reporting.MemState (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))

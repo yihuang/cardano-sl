@@ -15,11 +15,10 @@ module Pos.Client.CLI.Util
 import           Universum
 
 import qualified Data.ByteString.Lazy as BSL
+import           Data.Time.Clock.POSIX (getPOSIXTime)
 import qualified Data.Yaml as Yaml
 import           Formatting (sformat, shown, (%))
-import           Mockable (CurrentTime, Mockable, currentTime)
-import           System.Wlog (LoggerConfig (..), WithLogger, logInfo, parseLoggerConfig,
-                              productionB)
+import           System.Wlog (LoggerConfig (..), parseLoggerConfig, productionB)
 import           Text.Parsec (parserFail, try)
 import qualified Text.Parsec.Char as P
 import qualified Text.Parsec.Text as P
@@ -43,22 +42,25 @@ import           Pos.Txp.Configuration (txpConfiguration)
 import           Pos.Update.Configuration (updateConfiguration)
 import           Pos.Util.AssertMode (inAssertMode)
 import           Pos.Util.TimeWarp (addrParser)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, logInfo)
 
-printFlags :: WithLogger m => m ()
-printFlags = do
-    inAssertMode $ logInfo "Asserts are ON"
+printFlags :: Trace IO LogItem -> IO ()
+printFlags logTrace =
+    inAssertMode $ logInfo logTrace "Asserts are ON"
 
 printInfoOnStart ::
-       (HasConfigurations, WithLogger m, Mockable CurrentTime m, MonadIO m)
-    => CommonNodeArgs
+       (HasConfigurations)
+    => Trace IO LogItem
+    -> CommonNodeArgs
     -> NtpConfiguration
-    -> m ()
-printInfoOnStart CommonNodeArgs {..} ntpConfig = do
-    whenJust cnaDumpGenesisDataPath $ dumpGenesisData True
+    -> IO ()
+printInfoOnStart logTrace CommonNodeArgs {..} ntpConfig = do
+    whenJust cnaDumpGenesisDataPath $ dumpGenesisData logTrace True
     when cnaDumpConfiguration $ dumpConfiguration ntpConfig
-    printFlags
-    t <- currentTime
-    mapM_ logInfo $
+    printFlags logTrace
+    t <- round . (* 1000000) <$> getPOSIXTime
+    mapM_ (logInfo logTrace) $
         [ sformat ("System start time is " % shown) $ gdStartTime genesisData
         , sformat ("Current time is "%shown) (Timestamp t)
         , sformat ("Using configs and genesis:\n"%shown)
@@ -88,25 +90,25 @@ defaultLoggerConfig = productionB
 
 -- | Reads logger config from given path. By default returns
 -- 'defaultLoggerConfig'.
-readLoggerConfig :: MonadIO m => Maybe FilePath -> m LoggerConfig
+readLoggerConfig :: Maybe FilePath -> IO LoggerConfig
 readLoggerConfig = maybe (return defaultLoggerConfig) parseLoggerConfig
 
 -- | Dump our 'GenesisData' into a file.
 dumpGenesisData ::
-       (HasConfiguration, MonadIO m, WithLogger m) => Bool -> FilePath -> m ()
-dumpGenesisData canonical path = do
+       (HasConfiguration) => Trace IO LogItem -> Bool -> FilePath -> IO ()
+dumpGenesisData logTrace canonical path = do
     let (canonicalJsonBytes, jsonHash) = canonicalGenesisJson genesisData
     let prettyJsonStr = prettyGenesisJson genesisData
-    logInfo $ sformat ("Writing JSON with hash "%shown%" to "%shown) jsonHash path
+    logInfo logTrace $ sformat ("Writing JSON with hash "%shown%" to "%shown) jsonHash path
     liftIO $ case canonical of
         True  -> BSL.writeFile path canonicalJsonBytes
         False -> writeFile path (toText prettyJsonStr)
 
 -- | Dump our configuration into stdout and exit.
 dumpConfiguration
-    :: (HasConfigurations, MonadIO m)
+    :: (HasConfigurations)
     => NtpConfiguration
-    -> m ()
+    -> IO ()
 dumpConfiguration ntpConfig = do
     let conf =
             Configuration

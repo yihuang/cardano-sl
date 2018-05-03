@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE GADTs #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
@@ -13,11 +14,11 @@ module Pos.Util.JsonLog.Events
        , JLTimedEvent (..)
        , JsonLogConfig (..)
        , MemPoolModifyReason (..)
+       , JsonLogItem (..)
        , appendJL
        , jlAdoptedBlock
        , jlCreatedBlock
        , jsonLogConfigFromHandle
-       , jsonLogDefault
        , fromJLSlotId
        , fromJLSlotIdUnsafe
        ) where
@@ -25,19 +26,14 @@ module Pos.Util.JsonLog.Events
 import           Universum
 
 import           Control.Monad.Except (MonadError)
-import           Control.Monad.Trans.Identity (IdentityT (..))
 import           Data.Aeson (encode)
 import           Data.Aeson.TH (deriveJSON)
-import           Data.Aeson.Types (ToJSON)
+import           Data.Aeson.Types (ToJSON (..))
 import qualified Data.ByteString.Lazy as LBS
-import qualified Ether
+import           Data.Time.Clock.POSIX (getPOSIXTime)
 import           Formatting (sformat)
-import           JsonLog.CanJsonLog (CanJsonLog)
-import           JsonLog.JsonLogT (JsonLogConfig (..))
-import qualified JsonLog.JsonLogT as JL
-import           Mockable (realTime)
+import           JsonLog.Trace (JsonLogConfig (..))
 import           Serokell.Aeson.Options (defaultOptions)
-import           System.Wlog (WithLogger)
 
 import           Pos.Communication.Relay.Logic (InvReqDataFlowLog)
 import           Pos.Core (EpochIndex (..), HasConfiguration, HeaderHash, SlotId (..), gbHeader,
@@ -162,8 +158,9 @@ showHeaderHash = sformat headerHashF
 -- | Append event into log by given 'FilePath'.
 appendJL :: (MonadIO m) => FilePath -> JLEvent -> m ()
 appendJL path ev = liftIO $ do
-  time <- realTime -- TODO: Do we want to mock time in logs?
-  LBS.appendFile path . encode $ JLTimedEvent (fromIntegral time) ev
+  -- TODO: Do we want to mock time in logs?
+  time <- round . (* 1000000) <$> getPOSIXTime
+  LBS.appendFile path . encode $ JLTimedEvent time ev
 
 -- | Returns event of created 'Block'.
 jlAdoptedBlock :: Block -> JLEvent
@@ -177,16 +174,8 @@ jsonLogConfigFromHandle h = do
 class HasJsonLogConfig ctx where
     jsonLogConfig :: Lens' ctx JsonLogConfig
 
-jsonLogDefault
-    :: (ToJSON a, MonadReader ctx m, HasJsonLogConfig ctx, MonadCatch m,
-        MonadIO m, WithLogger m)
-    => a -> m ()
-jsonLogDefault x = do
-    jlc <- view jsonLogConfig
-    JL.jsonLogDefault jlc x
+data JsonLogItem where
+    JsonLogItem :: ToJSON x => x -> JsonLogItem
 
-deriving instance CanJsonLog (t m) => CanJsonLog (Ether.TaggedTrans tag t m)
-
--- Required for @Explorer@ @BListener@ and @ExtraContext@ redirect
-deriving instance CanJsonLog m => CanJsonLog (Ether.TaggedTrans tag IdentityT m)
-deriving instance CanJsonLog m => CanJsonLog (Ether.ReaderT tag r m)
+instance ToJSON JsonLogItem where
+    toJSON (JsonLogItem x) = toJSON x

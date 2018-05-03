@@ -26,7 +26,6 @@ import           Universum
 
 import           Control.Lens (makeLensesWith)
 import qualified Control.Monad.Reader as Mtl
-import           Mockable.Production (Production)
 
 import           Pos.Core (HasConfiguration, Timestamp)
 import           Pos.DB (NodeDBs)
@@ -59,9 +58,9 @@ data InitModeContext = InitModeContext
 
 makeLensesWith postfixLFields ''InitModeContext
 
-type InitMode = Mtl.ReaderT InitModeContext Production
+type InitMode = Mtl.ReaderT InitModeContext IO
 
-runInitMode :: InitModeContext -> InitMode a -> Production a
+runInitMode :: InitModeContext -> InitMode a -> IO a
 runInitMode = flip Mtl.runReaderT
 
 instance HasLens NodeDBs InitModeContext NodeDBs where

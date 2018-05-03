@@ -17,11 +17,11 @@ module Pos.Block.Logic.Util
 import           Universum
 
 import           Control.Lens (_Wrapped)
+import           Data.Functor.Contravariant (contramap)
 import           Data.List (findIndex)
 import           Data.List.NonEmpty ((<|))
 import qualified Data.List.NonEmpty as NE
 import           Formatting (int, sformat, (%))
-import           System.Wlog (WithLogger)
 
 import           Pos.Block.Configuration (HasBlockConfiguration, fixedTimeCQ)
 import           Pos.Block.Slog.Context (slogGetLastSlots)
@@ -37,6 +37,8 @@ import           Pos.GState.BlockExtra (isBlockInMainChain)
 import           Pos.Slotting (MonadSlots (..), getCurrentSlotFlat, slotFromTimestamp)
 import           Pos.Util (_neHead)
 import           Pos.Util.Chrono (NE, OldestFirst (..))
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
 
 -- | Find LCA of headers list and main chain, including oldest
 -- header's parent hash. Acts as it would iterate from newest to
@@ -99,20 +101,20 @@ calcChainQualityM ::
        , HasSlogGState ctx
        , MonadIO m
        , MonadThrow m
-       , WithLogger m
        , Fractional res
        , HasProtocolConstants
        )
-    => FlatSlotId
+    => Trace m LogItem
+    -> FlatSlotId
     -> m (Maybe res)
-calcChainQualityM newSlot = do
+calcChainQualityM logTrace newSlot = do
     OldestFirst lastSlots <- slogGetLastSlots
     let len = length lastSlots
     case nonEmpty lastSlots of
         Nothing -> return Nothing
         Just slotsNE
             | len > fromIntegral blkSecurityParam ->
-                reportFatalError $
+                reportFatalError (contramap publicPrivateLogItem logTrace) $
                 sformat ("number of last slots is greater than 'k': "%int) len
 
             | otherwise ->

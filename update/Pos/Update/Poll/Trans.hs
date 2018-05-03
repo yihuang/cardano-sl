@@ -18,7 +18,6 @@ import           Control.Monad.State (MonadState (..))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import qualified Ether
-import           System.Wlog (logWarning)
 
 import           Pos.Binary.Update ()
 import           Pos.Core (SoftwareVersion (..), addressHash)
@@ -129,8 +128,9 @@ instance (MonadPollRead m) =>
         bvs <- getBVState bv
         adoptedBVD <- getAdoptedBVData
         case bvs of
-            Nothing ->
-                logWarning $ "setAdoptedBV: unknown version " <> pretty bv -- can't happen actually
+            -- can't happen actually
+            -- FIXME above comment was here, but no explanation of why.
+            Nothing -> pure ()
             Just (bvsModifier -> bvm) ->
                 pmAdoptedBVFullL .= Just (bv, applyBVM bvm adoptedBVD)
     setLastConfirmedSV SoftwareVersion {..} = ether $

@@ -54,7 +54,8 @@ import           Pos.Communication.Relay.Util (expectData, expectInv)
 import           Pos.Communication.Types.Relay (DataMsg (..), InvMsg (..), InvOrData,
                                                 MempoolMsg (..), ReqMsg (..), ReqOrRes, ResMsg (..))
 import           Pos.Network.Types (Bucket)
-import           Pos.Util.Trace (Trace, Severity (..), traceWith)
+import           Pos.Util.Trace (Trace, traceWith)
+import           Pos.Util.Trace.Unstructured (Severity (..))
 
 data InvReqCommunicationException =
       UnexpectedRequest

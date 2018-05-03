@@ -9,10 +9,11 @@ module Pos.Logic.Full
 import           Universum
 
 import           Control.Lens (at, to)
+import           Data.Aeson (Value, toJSON)
+import           Data.Functor.Contravariant (contramap)
 import qualified Data.HashMap.Strict as HM
 import           Data.Tagged (Tagged (..), tagWith)
 import           Formatting (build, sformat, (%))
-import           System.Wlog (WithLogger, logDebug)
 
 import           Pos.Block.BlockWorkMode (BlockWorkMode)
 import           Pos.Block.Configuration (HasBlockConfiguration)
@@ -56,7 +57,10 @@ import qualified Pos.Update.Logic.Local as Update (getLocalProposalNVotes, getLo
 import           Pos.Update.Mode (UpdateMode)
 import qualified Pos.Update.Network.Listeners as Update (handleProposal, handleVote)
 import           Pos.Util.Chrono (NE, NewestFirst, OldestFirst)
-import           Pos.Util.JsonLog.Events (JLTxR)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, logDebug)
+-- FIXME no explicit wlog dependencies
+import           Pos.Util.Trace.Wlog (LogNamed, named)
 import           Pos.Util.Util (HasLens (..))
 
 -- The full logic layer uses existing pieces from the former monolithic
@@ -76,7 +80,6 @@ import           Pos.Util.Util (HasLens (..))
 type LogicWorkMode ctx m =
     ( HasConfiguration
     , HasBlockConfiguration
-    , WithLogger m
     , MonadReader ctx m
     , MonadMask m
     , MonadBlockDBRead m
@@ -98,10 +101,12 @@ logicFull
        ( LogicWorkMode ctx m )
     => StakeholderId
     -> SecurityParams
-    -> (JLTxR -> m ()) -- ^ JSON log callback. FIXME replace by structured logging solution
+    -> Trace m (LogNamed LogItem)
+    -> Trace m Value
     -> Logic m
-logicFull ourStakeholderId securityParams jsonLogTx =
-    let
+logicFull ourStakeholderId securityParams namedLogTrace jsonLogTrace =
+    let logTrace = named namedLogTrace
+
         getBlock :: HeaderHash -> m (Maybe Block)
         getBlock = DB.getBlock
 
@@ -132,29 +137,29 @@ logicFull ourStakeholderId securityParams jsonLogTx =
             -> NonEmpty HeaderHash
             -> Maybe HeaderHash
             -> m (Either Block.GetHeadersFromManyToError (NewestFirst NE BlockHeader))
-        getBlockHeaders = Block.getHeadersFromManyTo
+        getBlockHeaders = Block.getHeadersFromManyTo logTrace
 
         getLcaMainChain :: OldestFirst [] BlockHeader -> m (OldestFirst [] BlockHeader)
         getLcaMainChain = Block.lcaWithMainChainSuffix
 
         postBlockHeader :: BlockHeader -> NodeId -> m ()
-        postBlockHeader = Block.handleUnsolicitedHeader
+        postBlockHeader = Block.handleUnsolicitedHeader logTrace
 
         postPskHeavy :: ProxySKHeavy -> m Bool
-        postPskHeavy = Delegation.handlePsk
+        postPskHeavy = Delegation.handlePsk logTrace
 
         postTx = KeyVal
             { toKey = pure . Tagged . hash . taTx . getTxMsgContents
             , handleInv = \(Tagged txId) -> not . HM.member txId . _mpLocalTxs <$> withTxpLocalData getMemPool
             , handleReq = \(Tagged txId) -> fmap TxMsgContents . HM.lookup txId . _mpLocalTxs <$> withTxpLocalData getMemPool
-            , handleData = \(TxMsgContents txAux) -> Txp.handleTxDo jsonLogTx txAux
+            , handleData = \(TxMsgContents txAux) -> Txp.handleTxDo logTrace (contramap toJSON jsonLogTrace) txAux
             }
 
         postUpdate = KeyVal
             { toKey = \(up, _) -> pure . tag $ hash up
             , handleInv = Update.isProposalNeeded . unTagged
             , handleReq = Update.getLocalProposalNVotes . unTagged
-            , handleData = Update.handleProposal
+            , handleData = Update.handleProposal logTrace
             }
           where
             tag = tagWith (Proxy :: Proxy (UpdateProposal, [UpdateVote]))
@@ -163,7 +168,7 @@ logicFull ourStakeholderId securityParams jsonLogTx =
             { toKey = \UnsafeUpdateVote{..} -> pure $ tag (uvProposalId, uvKey, uvDecision)
             , handleInv = \(Tagged (id, pk, dec)) -> Update.isVoteNeeded id pk dec
             , handleReq = \(Tagged (id, pk, dec)) -> Update.getLocalVote id pk dec
-            , handleData = Update.handleVote
+            , handleData = Update.handleVote logTrace
             }
           where
             tag = tagWith (Proxy :: Proxy UpdateVote)
@@ -172,25 +177,25 @@ logicFull ourStakeholderId securityParams jsonLogTx =
             CommitmentMsg
             (\(MCCommitment (pk, _, _)) -> addressHash pk)
             (\id tm -> MCCommitment <$> tm ^. tmCommitments . to getCommitmentsMap . at id)
-            (\(MCCommitment comm) -> sscProcessCommitment comm)
+            (\(MCCommitment comm) -> sscProcessCommitment logTrace comm)
 
         postSscOpening = postSscCommon
             OpeningMsg
             (\(MCOpening key _) -> key)
             (\id tm -> MCOpening id <$> tm ^. tmOpenings . at id)
-            (\(MCOpening key open) -> sscProcessOpening key open)
+            (\(MCOpening key open) -> sscProcessOpening logTrace key open)
 
         postSscShares = postSscCommon
             SharesMsg
             (\(MCShares key _) -> key)
             (\id tm -> MCShares id <$> tm ^. tmShares . at id)
-            (\(MCShares key shares) -> sscProcessShares key shares)
+            (\(MCShares key shares) -> sscProcessShares logTrace key shares)
 
         postSscVssCert = postSscCommon
             VssCertificateMsg
             (\(MCVssCertificate vc) -> getCertId vc)
             (\id tm -> MCVssCertificate <$> lookupVss id (tm ^. tmCertificates))
-            (\(MCVssCertificate cert) -> sscProcessCertificate cert)
+            (\(MCVssCertificate cert) -> sscProcessCertificate logTrace cert)
 
         postSscCommon
             :: ( Buildable err, Buildable contents )
@@ -201,7 +206,7 @@ logicFull ourStakeholderId securityParams jsonLogTx =
             -> KeyVal (Tagged contents StakeholderId) contents m
         postSscCommon sscTag contentsToKey toContents processData = KeyVal
             { toKey = pure . tagWith contentsProxy . contentsToKey
-            , handleInv = sscIsDataUseful sscTag . unTagged
+            , handleInv = sscIsDataUseful logTrace sscTag . unTagged
             , handleReq = \(Tagged addr) -> toContents addr . view ldModifier <$> sscRunLocalQuery ask
             , handleData = \dat -> do
                   let addr = contentsToKey dat
@@ -216,11 +221,11 @@ logicFull ourStakeholderId securityParams jsonLogTx =
             ignoreFmt =
                 "Malicious emulation: data "%build%" for id "%build%" is ignored"
             handleDataDo dat id shouldIgnore
-                | shouldIgnore = False <$ logDebug (sformat ignoreFmt id dat)
+                | shouldIgnore = False <$ logDebug logTrace (sformat ignoreFmt id dat)
                 | otherwise = sscProcessMessage processData dat
             sscProcessMessage sscProcessMessageDo dat =
                 sscProcessMessageDo dat >>= \case
-                    Left err -> False <$ logDebug (sformat ("Data is rejected, reason: "%build) err)
+                    Left err -> False <$ logDebug logTrace (sformat ("Data is rejected, reason: "%build) err)
                     Right () -> return True
 
     in Logic {..}

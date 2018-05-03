@@ -9,11 +9,6 @@ module Pos.Launcher.Launcher
 
 import           Universum
 
--- FIXME we use Production in here only because it gives a 'HasLoggerName'
--- instance so that 'bracketNodeResources' can log.
--- Get rid of production and use a 'Trace IO' instead.
-import           Mockable.Production (Production (..))
-
 import           Pos.DB.DB (initNodeDBs)
 import           Pos.Diffusion.Types (Diffusion)
 import           Pos.Launcher.Configuration (HasConfigurations)
@@ -39,7 +34,7 @@ runNodeReal
     -> SscParams
     -> [Diffusion (RealMode EmptyMempoolExt) -> RealMode EmptyMempoolExt ()]
     -> IO ()
-runNodeReal np sscnp plugins = runProduction $
+runNodeReal np sscnp plugins =
     bracketNodeResources np sscnp txpGlobalSettings initNodeDBs (Production . action)
   where
     action :: NodeResources EmptyMempoolExt -> IO ()

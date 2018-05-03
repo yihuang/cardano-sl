@@ -14,6 +14,7 @@ import           Control.Concurrent
 import           Control.Exception (Exception, throwIO)
 import           Control.Monad
 import           Data.Function
+import           Data.Functor.Contravariant (contramap)
 import           Data.Set (Set)
 import qualified Data.Set as Set
 import           Data.String (fromString)
@@ -21,7 +22,8 @@ import           Data.Text (Text)
 import           Formatting (sformat, shown, (%))
 import           System.Wlog
 
-import           Pos.Util.Trace (wlogTrace)
+import           Pos.Util.Trace.Unstructured (publicPrivateLogItem)
+import           Pos.Util.Trace.Wlog (wlogTrace, setName, named)
 
 import           Network.Broadcast.OutboundQueue (OutboundQ)
 import qualified Network.Broadcast.OutboundQueue as OutQ
@@ -139,7 +141,8 @@ instance Eq Node where
 -- | Create a new node, and spawn dequeue worker and forwarding listener
 newNode :: NodeId_ -> NodeType -> CommsDelay -> IO Node
 newNode nodeId_ nodeType commsDelay = do
-    nodeOutQ     <- OutQ.new (wlogTrace (fromString (show nodeId_)))
+    let logTrace = contramap publicPrivateLogItem (named (setName (fromString (show nodeId_)) wlogTrace))
+    nodeOutQ     <- OutQ.new logTrace
                              demoEnqueuePolicy
                              demoDequeuePolicy
                              demoFailurePolicy

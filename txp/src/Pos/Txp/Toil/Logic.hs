@@ -21,8 +21,9 @@ import           Serokell.Data.Memory.Units (Byte)
 
 import           Pos.Binary.Class (biSize)
 import           Pos.Core (AddrAttributes (..), AddrStakeDistribution (..), Address,
-                           BlockVersionData (..), EpochIndex, addrAttributesUnwrapped,
-                           isBootstrapEraBVD, isRedeemAddress, HasProtocolMagic, HasGenesisData)
+                           BlockVersionData (..), EpochIndex, StakeholderId,
+                           addrAttributesUnwrapped, isBootstrapEraBVD, isRedeemAddress,
+                           HasProtocolMagic, HasGenesisData)
 import           Pos.Core.Common (integerToCoin)
 import qualified Pos.Core.Common as Fee (TxFeePolicy (..), calculateTxSizeLinear)
 import           Pos.Core.Txp (Tx (..), TxAux (..), TxId, TxOut (..), TxUndo, TxpUndo, checkTxAux,
@@ -65,17 +66,19 @@ verifyToil bvd curEpoch verifyAllIsKnown =
 
 -- | Apply transactions from one block. They must be valid (for
 -- example, it implies topological sort).
-applyToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM ()
-applyToil [] = pass
+applyToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM [StakeholderId]
+applyToil [] = pure []
 applyToil txun = do
-    applyTxsToStakes txun
+    sids <- applyTxsToStakes txun
     utxoMToGlobalToilM $ mapM_ (applyTxToUtxo' . withTxId . fst) txun
+    pure sids
 
 -- | Rollback transactions from one block.
-rollbackToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM ()
+rollbackToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM [StakeholderId]
 rollbackToil txun = do
-    rollbackTxsStakes txun
+    sids <- rollbackTxsStakes txun
     utxoMToGlobalToilM $ mapM_ Utxo.rollbackTxUtxo $ reverse txun
+    pure sids
 
 ----------------------------------------------------------------------------
 -- Local

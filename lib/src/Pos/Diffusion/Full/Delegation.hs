@@ -10,6 +10,7 @@ module Pos.Diffusion.Full.Delegation
 
 import           Universum
 
+import           Data.Functor.Contravariant (contramap)
 import qualified Network.Broadcast.OutboundQueue as OQ
 
 import           Pos.Binary ()
@@ -23,15 +24,20 @@ import           Pos.Communication.Relay (DataParams (..), Relay (..),
 import           Pos.Core       (ProxySKHeavy)
 import           Pos.Logic.Types (Logic (..))
 import           Pos.Network.Types (Bucket)
-import           Pos.Util.Trace (Trace, Severity)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
 
 delegationListeners
-    :: Trace IO (Severity, Text)
+    :: Trace IO LogItem
     -> Logic IO
     -> OQ.OutboundQ pack NodeId Bucket
     -> EnqueueMsg
     -> MkListeners
-delegationListeners logTrace logic oq enqueue = relayListeners logTrace oq enqueue (delegationRelays logic)
+delegationListeners logTrace logic oq enqueue = relayListeners
+    (contramap publicPrivateLogItem logTrace)
+    oq
+    enqueue
+    (delegationRelays logic)
 
 -- | Listeners for requests related to delegation processing.
 delegationRelays
@@ -58,8 +64,12 @@ pskHeavyRelay logic = Data $ DataParams
     (pure (mlProxySecretKey mlHeavyDlgIndex))
 
 sendPskHeavy
-    :: Trace IO (Severity, Text)
+    :: Trace IO LogItem
     -> EnqueueMsg
     -> ProxySKHeavy
     -> IO ()
-sendPskHeavy logTrace enqueue = dataFlow logTrace "pskHeavy" enqueue (MsgTransaction OQ.OriginSender)
+sendPskHeavy logTrace enqueue = dataFlow
+    (contramap publicPrivateLogItem logTrace)
+    "pskHeavy"
+    enqueue
+    (MsgTransaction OQ.OriginSender)

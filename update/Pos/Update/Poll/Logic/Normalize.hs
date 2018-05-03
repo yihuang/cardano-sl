@@ -14,7 +14,6 @@ import           Control.Lens (at, non)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Formatting (build, sformat, (%))
-import           System.Wlog (logWarning)
 
 import           Pos.Core (Coin, EpochIndex, SlotId (siEpoch), addressHash,
                            applyCoinPortionUp, mkCoin, unsafeAddCoin)
@@ -27,6 +26,8 @@ import           Pos.Update.Poll.Logic.Apply (verifyAndApplyProposal, verifyAndA
 import           Pos.Update.Poll.Types (DecidedProposalState (..), LocalVotes, ProposalState (..),
                                         UndecidedProposalState (..))
 import           Pos.Util.Util (getKeys, sortWithMDesc)
+import           Pos.Util.Trace (Trace, natTrace)
+import           Pos.Util.Trace.Unstructured (LogItem, logWarning)
 
 -- | Normalize given proposals and votes with respect to current Poll
 -- state, i. e. apply all valid data and discard invalid data.  This
@@ -34,24 +35,26 @@ import           Pos.Util.Util (getKeys, sortWithMDesc)
 -- proposal can be put into a block.
 normalizePoll
     :: (MonadPoll m)
-    => SlotId
+    => Trace m LogItem
+    -> SlotId
     -> UpdateProposals
     -> LocalVotes
     -> m (UpdateProposals, LocalVotes)
-normalizePoll slot proposals votes =
-    (,) <$> normalizeProposals slot (toList proposals) <*>
-    normalizeVotes (HM.toList votes)
+normalizePoll logTrace slot proposals votes =
+    (,) <$> normalizeProposals logTrace slot (toList proposals) <*>
+    normalizeVotes logTrace (HM.toList votes)
 
 -- | This function can be used to refresh mem pool consisting of given
 -- proposals and votes. It applies the most valuable data and discards
 -- everything else.
 refreshPoll
     :: (MonadPoll m)
-    => SlotId
+    => Trace m LogItem
+    -> SlotId
     -> UpdateProposals
     -> LocalVotes
     -> m (UpdateProposals, LocalVotes)
-refreshPoll slot proposals votes = do
+refreshPoll logTrace slot proposals votes = do
     proposalsSorted <- sortWithMDesc evaluatePropStake $ toList proposals
     -- When mempool is exhausted we leave only half of all proposals we have.
     -- We take proposals which have the greatest stake voted for it.
@@ -74,7 +77,7 @@ refreshPoll slot proposals votes = do
     let otherVotesNum = length otherVotes `div` 2
     let bestVotes =
             votesForBest <> groupVotes (take otherVotesNum otherVotesSorted)
-    (,) <$> normalizeProposals slot bestProposals <*> normalizeVotes bestVotes
+    (,) <$> normalizeProposals logTrace slot bestProposals <*> normalizeVotes logTrace bestVotes
   where
     evaluatePropStake up =
         case votes ^. at (hash up) of
@@ -100,27 +103,30 @@ refreshPoll slot proposals votes = do
 -- Disregard other proposals.
 normalizeProposals
     :: (MonadPoll m)
-    => SlotId -> [UpdateProposal] -> m UpdateProposals
-normalizeProposals slotId (toList -> proposals) =
+    => Trace m LogItem
+    -> SlotId
+    -> [UpdateProposal]
+    -> m UpdateProposals
+normalizeProposals logTrace slotId (toList -> proposals) =
     HM.fromList . map ((\x->(hash x, x)) . fst) . catRights proposals <$>
     -- Here we don't need to verify that attributes are known, because it
     -- must hold for all proposals in mempool anyway.
     forM proposals
-        (runExceptT . verifyAndApplyProposal False (Left slotId) [])
+        (runExceptT . verifyAndApplyProposal (natTrace lift logTrace) False (Left slotId) [])
 
 -- Apply votes which can be applied and put them in result.
 -- Disregard other votes.
 normalizeVotes
     :: forall m . (MonadPoll m)
-    => [(UpId, HashMap PublicKey UpdateVote)] -> m LocalVotes
-normalizeVotes votesGroups =
+    => Trace m LogItem -> [(UpId, HashMap PublicKey UpdateVote)] -> m LocalVotes
+normalizeVotes logTrace votesGroups =
     HM.fromList . catMaybes <$> mapM verifyNApplyVotesGroup votesGroups
   where
     verifyNApplyVotesGroup :: (UpId, HashMap PublicKey UpdateVote)
                            -> m (Maybe (UpId, HashMap PublicKey UpdateVote))
     verifyNApplyVotesGroup (upId, votesGroup) = getProposal upId >>= \case
         Nothing -> Nothing <$
-                   logWarning (
+                   (logWarning logTrace $
                        sformat ("Update Proposal with id "%build%
                                 " not found in normalizeVotes") upId)
         Just ps
@@ -129,7 +135,7 @@ normalizeVotes votesGroups =
                 let uvs = toList votesGroup
                 verifiedPKs <-
                   catRights pks <$>
-                  mapM (runExceptT . verifyAndApplyVoteDo Nothing ups) uvs
+                  mapM (runExceptT . verifyAndApplyVoteDo (natTrace lift logTrace) Nothing ups) uvs
                 if | null verifiedPKs -> pure Nothing
                    | otherwise  ->
                        pure $ Just ( upId
@@ -142,12 +148,12 @@ normalizeVotes votesGroups =
 -- read-only.
 filterProposalsByThd
     :: forall m . (MonadPollRead m)
-    => EpochIndex -> UpdateProposals -> m (UpdateProposals, HashSet UpId)
-filterProposalsByThd epoch proposalsHM = getEpochTotalStake epoch >>= \case
+    => Trace m LogItem -> EpochIndex -> UpdateProposals -> m (UpdateProposals, HashSet UpId)
+filterProposalsByThd logTrace epoch proposalsHM = getEpochTotalStake epoch >>= \case
     Nothing ->
         (mempty, getKeys proposalsHM) <$
-            logWarning
-                (sformat ("Couldn't get stake in filterProposalsByTxd for epoch "%build)
+            (logWarning logTrace $
+                sformat ("Couldn't get stake in filterProposalsByTxd for epoch "%build)
                          epoch)
     Just totalStake -> do
         thresholdPortion <- bvdUpdateProposalThd <$> getAdoptedBVData

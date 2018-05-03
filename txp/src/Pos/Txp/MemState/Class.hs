@@ -7,7 +7,6 @@ module Pos.Txp.MemState.Class
        ( MonadTxpMem
        , TxpHolderTag
        , withTxpLocalData
-       , withTxpLocalDataLog
        , getUtxoModifier
        , getLocalUndos
        , getMemPool
@@ -28,7 +27,6 @@ import           Universum
 import qualified Control.Concurrent.STM as STM
 import           Data.Default (Default (..))
 import qualified Data.HashMap.Strict as HM
-import           Mockable (CurrentTime, Mockable)
 import           Pos.Core (HeaderHash)
 import           Pos.Core.Txp (TxAux, TxId)
 import           Pos.DB.Class (MonadDBRead, MonadGState (..))
@@ -39,7 +37,6 @@ import           Pos.Txp.MemState.Types (GenericTxpLocalData (..))
 import           Pos.Txp.Toil.Failure (ToilVerFailure)
 import           Pos.Txp.Toil.Types (MemPool (..), UndoMap, UtxoModifier)
 import           Pos.Util.Util (HasLens (..))
-import           System.Wlog (NamedPureLogger, WithLogger, launchNamedPureLog)
 
 data TxpHolderTag
 
@@ -61,15 +58,6 @@ withTxpLocalData
     :: (MonadIO m, MonadTxpMem e ctx m)
     => (GenericTxpLocalData e -> STM.STM a) -> m a
 withTxpLocalData f = askTxpMem >>= \ld -> atomically (f ld)
-
--- | Operate with some of all of the TXP local data, allowing
---   logging.
-withTxpLocalDataLog
-    :: (MonadIO m, MonadTxpMem e ctx m, WithLogger m)
-    => (GenericTxpLocalData e -> NamedPureLogger STM.STM a)
-    -> m a
-withTxpLocalDataLog f = askTxpMem >>=
-    \ld -> launchNamedPureLog atomically $ f ld
 
 -- | Read the UTXO modifier from the local TXP data.
 getUtxoModifier
@@ -138,8 +126,6 @@ type TxpLocalWorkMode ctx m =
     , MonadGState m
     , MonadSlots ctx m
     , MonadTxpMem (MempoolExt m) ctx m
-    , WithLogger m
-    , Mockable CurrentTime m
     , MonadMask m
     , MonadReporting m
     , HasTxpConfiguration

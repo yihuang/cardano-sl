@@ -37,7 +37,8 @@ import           Pos.DHT.Model.Types (DHTData, DHTException (..), DHTKey, DHTNod
 import           Pos.DHT.Real.Param (KademliaParams (..))
 import           Pos.DHT.Real.Types (KademliaDHTInstance (..))
 import           Pos.Util.TimeWarp (NetworkAddress)
-import           Pos.Util.Trace (Trace, Severity (..), traceWith)
+import           Pos.Util.Trace (Trace, traceWith)
+import           Pos.Util.Trace.Unstructured (Severity (..))
 
 kademliaConfig :: K.KademliaConfig
 kademliaConfig = K.defaultConfig { K.k = 16 }

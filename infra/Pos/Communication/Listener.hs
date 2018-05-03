@@ -17,7 +17,8 @@ import           Pos.Communication.Protocol (ConversationActions, HandlerSpec (.
                                              VerInfo (..), checkProtocolMagic, checkingInSpecs,
                                              messageCode)
 import           Pos.Network.Types (Bucket)
-import           Pos.Util.Trace (Trace, Severity)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (Severity)
 
 -- TODO automatically provide a 'recvLimited' here by using the
 -- 'MessageLimited'?

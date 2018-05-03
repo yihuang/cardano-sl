@@ -10,8 +10,6 @@ module Pos.Block.BlockWorkMode
 import           Universum
 
 import           Data.Default (Default)
-import           Mockable (Delay, Mockables, SharedAtomic)
-import           System.Wlog (WithLogger)
 
 import           Pos.Binary.Class (Bi)
 import           Pos.Block.Configuration (HasBlockConfiguration)
@@ -30,7 +28,6 @@ import           Pos.StateLock (StateLock, StateLockMetrics)
 import           Pos.Txp (GenericTxpLocalData, MempoolExt, MonadTxpLocal, TxpHolderTag)
 import           Pos.Update.Context (UpdateContext)
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason)
-import           Pos.Util.TimeWarp (CanJsonLog)
 import           Pos.Util.Util (HasLens, HasLens')
 
 -- | These instances are implemented in @Pos.Binary.Communication@,
@@ -55,7 +52,6 @@ type BlockWorkMode ctx m =
     ( BlockInstancesConstraint
 
     , Default (MempoolExt m)
-    , Mockables m [Delay, SharedAtomic]
 
     , LrcModeFull ctx m
     , MonadRecoveryInfo m
@@ -73,9 +69,6 @@ type BlockWorkMode ctx m =
     , HasLens' ctx StateLock
     , HasLens' ctx (StateLockMetrics MemPoolModifyReason)
     , HasLens' ctx UpdateContext
-
-    , CanJsonLog m
-    , WithLogger m
 
     , HasBlockConfiguration
     )

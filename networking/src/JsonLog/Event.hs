@@ -34,16 +34,12 @@ module JsonLog.Event
     , JLTimedEvent (..)
     , toEvent
     , fromEvent
-    , timedIO
     , Handler (..)
     , handleEvent
     ) where
 
-import           Control.Monad.IO.Class (MonadIO)
 import           Data.Aeson
 import           Data.Time.Units (Microsecond)
-
-import           Mockable.CurrentTime (realTime)
 
 -- | A /typed/ JSON log events.
 data JLTimed a = JLTimed
@@ -99,11 +95,6 @@ fromEvent = f . runJLTimedEvent
     f e@(JLTimed ts v) = case fromJSON v of
         Error _   -> Left e
         Success x -> Right (JLTimed ts x)
-
--- | Creates a timed event, given some content,
--- by adding the current time as timestamp.
-timedIO :: MonadIO m => a -> m (JLTimed a)
-timedIO x = realTime >>= \ts -> return (JLTimed ts x)
 
 -- | A value of type @'Handler' a@ handles
 -- /typed/ events (of type @'JLTimed' b@ for /some/ @b@),

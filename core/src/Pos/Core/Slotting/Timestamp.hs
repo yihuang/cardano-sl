@@ -22,10 +22,10 @@ import           Universum
 import           Control.Lens (Iso', iso, makePrisms, from)
 import qualified Data.Text.Buildable as Buildable
 import           Data.Time (UTCTime, defaultTimeLocale, iso8601DateFormat, parseTimeM)
-import           Data.Time.Clock.POSIX (POSIXTime, posixSecondsToUTCTime, utcTimeToPOSIXSeconds)
-import           Data.Time.Units (Microsecond)
+import           Data.Time.Clock.POSIX (POSIXTime, getPOSIXTime, posixSecondsToUTCTime,
+                                        utcTimeToPOSIXSeconds)
+import           Data.Time.Units (Microsecond, fromMicroseconds)
 import           Formatting (Format, build)
-import           Mockable (CurrentTime, Mockable, currentTime)
 import           Numeric.Lens (dividing)
 import qualified Prelude
 
@@ -82,8 +82,8 @@ parseTimestamp t = utcTimeParser <|> timePosixParser
         <$> readMaybe @Double str
 
 -- Get the current time as a timestamp
-getCurrentTimestamp :: Mockable CurrentTime m => m Timestamp
-getCurrentTimestamp = Timestamp <$> currentTime
+getCurrentTimestamp :: IO Timestamp
+getCurrentTimestamp = Timestamp . fromMicroseconds . round . (* 1000000) <$> getPOSIXTime
 
 diffTimestamp :: Timestamp -> Timestamp -> Microsecond
 diffTimestamp t1 t2 = getTimestamp t1 - getTimestamp t2

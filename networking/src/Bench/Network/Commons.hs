@@ -36,7 +36,7 @@ import           Data.Int (Int64)
 import           Data.Monoid ((<>))
 import           Data.Text (Text)
 import           Data.Text.Buildable (Buildable (build))
-import           Data.Time.Units (toMicroseconds)
+import           Data.Time.Clock.POSIX (getPOSIXTime)
 
 import qualified Formatting as F
 import           GHC.Generics (Generic)
@@ -45,9 +45,10 @@ import           System.Wlog (LoggerConfig (..), errorPlus, fromScratch, infoPlu
                               lcTree, ltSeverity, maybeLogsDirB, parseLoggerConfig,
                               productionB, setupLogging, warningPlus, zoomLogger)
 
-import           Mockable.CurrentTime (realTime)
 import           Node (Message (..))
+
 import           Pos.Util.Trace (Trace, traceWith)
+import           Pos.Util.Trace.Unstructured (Severity (Info))
 
 -- * Transfered data types
 
@@ -79,10 +80,10 @@ instance Binary Payload where
 
 -- * Util
 
-logMeasure :: (MonadIO m) => Trace IO Text -> MeasureEvent -> MsgId -> Payload -> m ()
+logMeasure :: Trace IO (Severity, Text) -> MeasureEvent -> MsgId -> Payload -> IO ()
 logMeasure logTrace miEvent miId miPayload = do
-    miTime <- toMicroseconds <$> realTime
-    liftIO $ traceWith logTrace $ F.sformat F.build $ LogMessage MeasureInfo{..}
+    miTime <- round . (* 1000000) <$> getPOSIXTime
+    traceWith logTrace (Info, F.sformat F.build $ LogMessage MeasureInfo{..})
 
 defaultLogConfig :: LoggerConfig
 defaultLogConfig = fromScratch $ zoom lcTree $ do

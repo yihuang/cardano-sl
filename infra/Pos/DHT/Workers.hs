@@ -7,11 +7,10 @@ module Pos.DHT.Workers
 
 import           Universum
 
+import           Control.Monad.IO.Unlift (MonadUnliftIO)
 import qualified Data.ByteString.Lazy as BSL
 import           Formatting (sformat, (%))
-import           Mockable (Async, Delay, Mockable)
 import           Network.Kademlia (takeSnapshot)
-import           System.Wlog (WithLogger, logNotice)
 
 import           Pos.Binary.Class (serialize)
 import           Pos.Binary.Infra.DHTModel ()
@@ -23,16 +22,16 @@ import           Pos.Recovery.Info (MonadRecoveryInfo, recoveryCommGuard)
 import           Pos.Reporting (MonadReporting)
 import           Pos.Shutdown (HasShutdownContext)
 import           Pos.Slotting.Class (MonadSlots)
-import           Pos.Slotting.Util (defaultOnNewSlotParams, onNewSlot)
+import           Pos.Slotting.Util (defaultOnNewSlotParams, onNewSlotNoLogging)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, logNotice)
+import           Pos.Util.Trace.Wlog (LogNamed, named)
 import           Pos.Core (HasProtocolConstants)
 
 type DhtWorkMode ctx m =
-    ( WithLogger m
-    , MonadSlots ctx m
-    , MonadIO m
+    ( MonadSlots ctx m
+    , MonadUnliftIO m
     , MonadMask m
-    , Mockable Async m
-    , Mockable Delay m
     , MonadRecoveryInfo m
     , MonadReader ctx m
     , MonadReporting m
@@ -43,21 +42,23 @@ dhtWorkers
     :: ( DhtWorkMode ctx m
        , HasProtocolConstants
        )
-    => KademliaDHTInstance -> [Diffusion m -> m ()]
-dhtWorkers kademliaInst@KademliaDHTInstance {..} =
-    [ dumpKademliaStateWorker kademliaInst ]
+    => Trace m (LogNamed LogItem)
+    -> KademliaDHTInstance -> [Diffusion m -> m ()]
+dhtWorkers logTrace kademliaInst@KademliaDHTInstance {..} =
+    [ dumpKademliaStateWorker logTrace kademliaInst ]
 
 dumpKademliaStateWorker
     :: ( DhtWorkMode ctx m
        , HasProtocolConstants
        )
-    => KademliaDHTInstance
+    => Trace m (LogNamed LogItem)
+    -> KademliaDHTInstance
     -> Diffusion m
     -> m ()
-dumpKademliaStateWorker kademliaInst = \_ -> onNewSlot onsp $ \slotId ->
-    when (isTimeToDump slotId) $ recoveryCommGuard "dump kademlia state" $ do
+dumpKademliaStateWorker logTrace kademliaInst = \_ -> onNewSlotNoLogging onsp $ \slotId ->
+    when (isTimeToDump slotId) $ recoveryCommGuard (named logTrace) "dump kademlia state" $ do
         let dumpFile = kdiDumpPath kademliaInst
-        logNotice $ sformat ("Dumping kademlia snapshot on slot: "%slotIdF) slotId
+        logNotice (named logTrace) (sformat ("Dumping kademlia snapshot on slot: "%slotIdF) slotId)
         let inst = kdiHandle kademliaInst
         snapshot <- liftIO $ takeSnapshot inst
         case dumpFile of

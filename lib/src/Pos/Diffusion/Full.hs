@@ -69,7 +69,10 @@ import           Pos.Ssc.Message (MCOpening (..), MCShares (..), MCCommitment (.
 import           Pos.Util.Chrono (OldestFirst)
 import           Pos.Util.OutboundQueue (EnqueuedConversation (..))
 import           Pos.Util.Timer (Timer, newTimer)
-import           Pos.Util.Trace (Trace, Severity (Error))
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, Severity (Error), publicPrivateLogItem)
+-- FIXME no explicit wlog dependencies.
+import           Pos.Util.Trace.Wlog (LogNamed, appendName, named)
 
 {-# ANN module ("HLint: ignore Reduce duplication" :: Text) #-}
 {-# ANN module ("HLint: ignore Use whenJust" :: Text) #-}
@@ -81,7 +84,7 @@ data FullDiffusionConfiguration = FullDiffusionConfiguration
     , fdcRecoveryHeadersMessage :: !Word
     , fdcLastKnownBlockVersion  :: !BlockVersion
     , fdcConvEstablishTimeout   :: !Microsecond
-    , fdcTrace                  :: !(Trace IO (Severity, Text))
+    , fdcTrace                  :: !(Trace IO (LogNamed LogItem))
     }
 
 data RunFullDiffusionInternals = RunFullDiffusionInternals
@@ -112,10 +115,11 @@ diffusionLayerFull
     -> IO x
 diffusionLayerFull fdconf networkConfig mEkgNodeMetrics mkLogic k = do
     -- Make the outbound queue using network policies.
+    let oqLogTrace = contramap publicPrivateLogItem (named (appendName "outboundqueue" (fdcTrace fdconf)))
     oq :: OQ.OutboundQ EnqueuedConversation NodeId Bucket <-
         -- NB: <> it's not Text semigroup append, it's LoggerName append, which
         -- puts a "." in the middle.
-        initQueue networkConfig ("diffusion" <> "outboundqueue") (enmStore <$> mEkgNodeMetrics)
+        initQueue networkConfig oqLogTrace (enmStore <$> mEkgNodeMetrics)
     let topology = ncTopology networkConfig
         mSubscriptionWorker = topologySubscriptionWorker topology
         mSubscribers = topologySubscribers topology
@@ -124,9 +128,10 @@ diffusionLayerFull fdconf networkConfig mEkgNodeMetrics mkLogic k = do
         -- Transport needs a Trace IO Text. We re-use the 'Trace' given in
         -- the configuration at severity 'Error' (when transport has an
         -- exception trying to 'accept' a new connection).
-        logTrace :: Trace IO Text
-        logTrace = contramap ((,) Error) (fdcTrace fdconf)
-    bracketTransportTCP logTrace (fdcConvEstablishTimeout fdconf) (ncTcpAddr networkConfig) $ \transport -> do
+        transportLogTrace :: Trace IO Text
+        transportLogTrace = contramap (publicPrivateLogItem . (,) Error)
+                                      (named (appendName "transport" (fdcTrace fdconf)))
+    bracketTransportTCP transportLogTrace (fdcConvEstablishTimeout fdconf) (ncTcpAddr networkConfig) $ \transport -> do
         rec (fullDiffusion, internals) <-
                 diffusionLayerFullExposeInternals fdconf
                                                   transport
@@ -176,7 +181,8 @@ diffusionLayerFullExposeInternals fdconf
         protocolConstants = fdcProtocolConstants fdconf
         lastKnownBlockVersion = fdcLastKnownBlockVersion fdconf
         recoveryHeadersMessage = fdcRecoveryHeadersMessage fdconf
-        logTrace = fdcTrace fdconf
+        logTrace = named (fdcTrace fdconf)
+        logTrace' = contramap publicPrivateLogItem logTrace
 
     -- Subscription states.
     subscriptionStates <- emptySubscriptionStates
@@ -286,7 +292,7 @@ diffusionLayerFullExposeInternals fdconf
             , Diffusion.Delegation.delegationListeners logTrace logic oq enqueue
             , Diffusion.Ssc.sscListeners logTrace logic oq enqueue
             ] ++ [
-              subscriptionListeners logTrace oq subscriberNodeType
+              subscriptionListeners logTrace' oq subscriberNodeType
             | Just (subscriberNodeType, _) <- [mSubscribers]
             ]
 
@@ -300,7 +306,7 @@ diffusionLayerFullExposeInternals fdconf
         -- will be very involved. Should make it top-level I think.
         runDiffusionLayer :: forall y . (FullDiffusionInternals -> IO y) -> IO y
         runDiffusionLayer = runDiffusionLayerFull
-            logTrace
+            logTrace'
             transport
             oq
             (fdcConvEstablishTimeout fdconf)
@@ -315,7 +321,7 @@ diffusionLayerFullExposeInternals fdconf
             listeners
 
         enqueue :: EnqueueMsg
-        enqueue = makeEnqueueMsg logTrace ourVerInfo $ \msgType k -> do
+        enqueue = makeEnqueueMsg logTrace' ourVerInfo $ \msgType k -> do
             itList <- OQ.enqueue oq msgType (EnqueuedConversation (msgType, k))
             pure (M.fromList itList)
 
@@ -342,16 +348,16 @@ diffusionLayerFullExposeInternals fdconf
 
         -- TODO put these into a Pos.Diffusion.Full.Ssc module.
         sendSscCert :: VssCertificate -> IO ()
-        sendSscCert = void . invReqDataFlowTK logTrace "ssc" enqueue (MsgMPC OriginSender) (ourStakeholderId logic) . MCVssCertificate
+        sendSscCert = void . invReqDataFlowTK logTrace' "ssc" enqueue (MsgMPC OriginSender) (ourStakeholderId logic) . MCVssCertificate
 
         sendSscOpening :: Opening -> IO ()
-        sendSscOpening = void . invReqDataFlowTK logTrace "ssc" enqueue (MsgMPC OriginSender) (ourStakeholderId logic) . MCOpening (ourStakeholderId logic)
+        sendSscOpening = void . invReqDataFlowTK logTrace' "ssc" enqueue (MsgMPC OriginSender) (ourStakeholderId logic) . MCOpening (ourStakeholderId logic)
 
         sendSscShares :: InnerSharesMap -> IO ()
-        sendSscShares = void . invReqDataFlowTK logTrace "ssc" enqueue (MsgMPC OriginSender) (ourStakeholderId logic) . MCShares (ourStakeholderId logic)
+        sendSscShares = void . invReqDataFlowTK logTrace' "ssc" enqueue (MsgMPC OriginSender) (ourStakeholderId logic) . MCShares (ourStakeholderId logic)
 
         sendSscCommitment :: SignedCommitment -> IO ()
-        sendSscCommitment = void . invReqDataFlowTK logTrace "ssc" enqueue (MsgMPC OriginSender) (ourStakeholderId logic) . MCCommitment
+        sendSscCommitment = void . invReqDataFlowTK logTrace' "ssc" enqueue (MsgMPC OriginSender) (ourStakeholderId logic) . MCCommitment
 
         sendPskHeavy :: ProxySKHeavy -> IO ()
         sendPskHeavy = Diffusion.Delegation.sendPskHeavy logTrace enqueue

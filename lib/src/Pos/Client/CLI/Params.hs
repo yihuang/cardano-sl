@@ -1,8 +1,7 @@
 -- | Getter params from Args
 
 module Pos.Client.CLI.Params
-       ( loggingParams
-       , getBaseParams
+       ( wlogParams 
        , getKeyfilePath
        , getNodeParams
        , gtSscParams
@@ -11,8 +10,9 @@ module Pos.Client.CLI.Params
 import           Universum
 
 import           Data.Default (def)
+import           Data.Functor.Contravariant (contramap)
 import qualified Data.Yaml as Yaml
-import           System.Wlog (LoggerName, WithLogger)
+import           System.Wlog (LoggerName)
 
 import           Pos.Behavior (BehaviorConfig (..))
 import           Pos.Client.CLI.NodeOptions (CommonNodeArgs (..), NodeArgs (..))
@@ -20,25 +20,23 @@ import           Pos.Client.CLI.Options (CommonArgs (..))
 import           Pos.Client.CLI.Secrets (prepareUserSecret)
 import           Pos.Core.Configuration (HasConfiguration)
 import           Pos.Crypto (VssKeyPair)
-import           Pos.Launcher.Param (BaseParams (..), LoggingParams (..), NodeParams (..))
+import           Pos.Launcher.Param (WlogParams (..), NodeParams (..))
 import           Pos.Network.CLI (intNetworkConfigOpts)
 import           Pos.Ssc (SscParams (..))
 import           Pos.Update.Params (UpdateParams (..))
 import           Pos.Util.UserSecret (peekUserSecret)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, publicPrivateLogItem)
 import           Pos.Util.Util (eitherToThrow)
 
-loggingParams :: LoggerName -> CommonNodeArgs -> LoggingParams
-loggingParams defaultName CommonNodeArgs{..} =
-    LoggingParams
-    { lpHandlerPrefix = logPrefix commonArgs
-    , lpConfigPath    = logConfig commonArgs
-    , lpDefaultName   = defaultName
-    , lpConsoleLog    = Nothing -- no override by default
+wlogParams :: LoggerName -> CommonNodeArgs -> WlogParams
+wlogParams defaultName CommonNodeArgs{..} =
+    WlogParams
+    { wpHandlerPrefix = logPrefix commonArgs
+    , wpConfigPath    = logConfig commonArgs
+    , wpDefaultName   = defaultName
+    , wpConsoleLog    = Nothing -- no override by default
     }
-
-getBaseParams :: LoggerName -> CommonNodeArgs -> BaseParams
-getBaseParams defaultLoggerName args@CommonNodeArgs {..} =
-    BaseParams { bpLoggingParams = loggingParams defaultLoggerName args }
 
 gtSscParams :: CommonNodeArgs -> VssKeyPair -> BehaviorConfig -> SscParams
 gtSscParams CommonNodeArgs {..} vssSK BehaviorConfig{..} =
@@ -55,19 +53,16 @@ getKeyfilePath CommonNodeArgs {..}
           Just i  -> "node-" ++ show i ++ "." ++ keyfilePath
 
 getNodeParams ::
-       ( MonadIO m
-       , WithLogger m
-       , MonadCatch m
-       , HasConfiguration
+       ( HasConfiguration
        )
-    => LoggerName
+    => Trace IO LogItem
     -> CommonNodeArgs
     -> NodeArgs
-    -> m NodeParams
-getNodeParams defaultLoggerName cArgs@CommonNodeArgs{..} NodeArgs{..} = do
+    -> IO NodeParams
+getNodeParams logTrace cArgs@CommonNodeArgs{..} NodeArgs{..} = do
     (primarySK, userSecret) <-
-        prepareUserSecret cArgs =<< peekUserSecret (getKeyfilePath cArgs)
-    npNetworkConfig <- intNetworkConfigOpts networkConfigOpts
+        prepareUserSecret logTrace cArgs =<< peekUserSecret logTrace (getKeyfilePath cArgs)
+    npNetworkConfig <- intNetworkConfigOpts networkConfigOpts (contramap publicPrivateLogItem logTrace)
     npBehaviorConfig <- case behaviorConfigPath of
         Nothing -> pure def
         Just fp -> eitherToThrow =<< liftIO (Yaml.decodeFileEither fp)
@@ -76,7 +71,6 @@ getNodeParams defaultLoggerName cArgs@CommonNodeArgs{..} NodeArgs{..} = do
         , npRebuildDb = rebuildDB
         , npSecretKey = primarySK
         , npUserSecret = userSecret
-        , npBaseParams = getBaseParams defaultLoggerName cArgs
         , npJLFile = jlPath
         , npReportServers = reportServers commonArgs
         , npUpdateParams = UpdateParams

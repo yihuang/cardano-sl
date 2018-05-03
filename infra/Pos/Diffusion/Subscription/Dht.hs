@@ -15,7 +15,8 @@ import           Pos.DHT.Real.Real (kademliaGetKnownPeers)
 import           Pos.DHT.Real.Types (KademliaDHTInstance (..))
 import           Pos.Network.Types (Bucket (..), NodeType, choosePeers)
 import           Pos.Util.TimeWarp (addressToNodeId)
-import           Pos.Util.Trace (Trace, Severity (..), traceWith)
+import           Pos.Util.Trace (Trace, traceWith)
+import           Pos.Util.Trace.Unstructured (Severity (..))
 
 
 -- | This worker will update the known peers every time the Kademlia peers

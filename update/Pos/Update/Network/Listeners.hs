@@ -12,58 +12,66 @@ module Pos.Update.Network.Listeners
 import           Universum
 
 import           Formatting (build, sformat, (%))
-import           System.Wlog (WithLogger, logNotice, logWarning)
 
 import           Pos.Core.Update (UpdateProposal (..), UpdateVote (..))
 import           Pos.Update.Logic.Local (processProposal, processVote)
 import           Pos.Update.Mode (UpdateMode)
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, logNotice, logWarning)
 
 handleProposal
-    :: forall ctx m . UpdateMode ctx m
-    => (UpdateProposal, [UpdateVote])
+    :: forall ctx m .
+       ( UpdateMode ctx m
+       )
+    => Trace m LogItem
+    -> (UpdateProposal, [UpdateVote])
     -> m Bool
-handleProposal (proposal, votes) = do
-    res <- processProposal proposal
+handleProposal logTrace (proposal, votes) = do
+    res <- processProposal logTrace proposal
     logProp proposal res
     let processed = isRight res
     processed <$ when processed (mapM_ processVoteLog votes)
   where
     processVoteLog :: UpdateVote -> m ()
-    processVoteLog vote = processVote vote >>= logVote vote
+    processVoteLog vote = processVote logTrace vote >>= logVote vote
     logVote vote (Left cause) =
-        logWarning $ sformat ("Proposal is accepted but vote "%build%
-                              " is rejected, the reason is: "%build)
+        logWarning logTrace $
+            sformat ("Proposal is accepted but vote "%build%
+                     " is rejected, the reason is: "%build)
                      vote cause
-    logVote vote (Right _) = logVoteAccepted vote
+    logVote vote (Right _) = logVoteAccepted logTrace vote
 
     logProp prop (Left cause) =
-        logWarning $ sformat ("Processing of proposal "%build%
-                              " failed, the reason is: "%build)
-              prop cause
+        logWarning logTrace $
+            sformat ("Processing of proposal "%build%
+                     " failed, the reason is: "%build)
+                prop cause
     -- Update proposals are accepted rarely (at least before Shelley),
     -- so it deserves 'Notice' severity.
     logProp prop (Right _) =
-        logNotice $ sformat ("Processing of proposal "%build%" is successful")
-              prop
+        logNotice logTrace (sformat ("Processing of proposal "%build%" is successful") prop)
 
 ----------------------------------------------------------------------------
 -- UpdateVote
 ----------------------------------------------------------------------------
 
 handleVote
-    :: UpdateMode ctx m
-    => UpdateVote
+    :: forall ctx m .
+       ( UpdateMode ctx m
+       )
+    => Trace m LogItem
+    -> UpdateVote
     -> m Bool
-handleVote uv = do
-    res <- processVote uv
+handleVote logTrace uv = do
+    res <- processVote logTrace uv
     logProcess uv res
     pure $ isRight res
   where
     logProcess vote (Left cause) =
-        logWarning $ sformat ("Processing of vote "%build%
-                              "failed, the reason is: "%build)
+        logWarning logTrace $
+            sformat ("Processing of vote "%build%" failed, the reason is: "%build)
                      vote cause
-    logProcess vote (Right _) = logVoteAccepted vote
+    logProcess vote (Right _) = logVoteAccepted logTrace vote
 
 ----------------------------------------------------------------------------
 -- Helpers
@@ -71,6 +79,6 @@ handleVote uv = do
 
 -- Update votes are accepted rarely (at least before Shelley), so
 -- it deserves 'Notice' severity.
-logVoteAccepted :: WithLogger m => UpdateVote -> m ()
-logVoteAccepted =
-    logNotice . sformat ("Processing of vote "%build%"is successfull")
+logVoteAccepted :: Trace m LogItem -> UpdateVote -> m ()
+logVoteAccepted logTrace =
+    logNotice logTrace . sformat ("Processing of vote "%build%"is successfull")

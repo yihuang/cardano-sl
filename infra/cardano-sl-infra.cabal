@@ -142,6 +142,7 @@ library
                       , cardano-report-server >= 0.4.5
                       , conduit
                       , containers
+                      , contravariant
                       , directory
                       , dns
                       , ekg-core
@@ -181,6 +182,7 @@ library
                       , transformers
                       , network-transport
                       , universum
+                      , unliftio-core
                       , unordered-containers
                       , yaml
 

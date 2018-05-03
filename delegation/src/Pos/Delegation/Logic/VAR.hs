@@ -21,9 +21,7 @@ import qualified Data.HashSet as HS
 import           Data.List ((\\))
 import qualified Data.Text.Buildable as B
 import           Formatting (bprint, build, sformat, (%))
-import           Mockable (CurrentTime, Mockable)
 import           Serokell.Util (listJson, mapJson)
-import           System.Wlog (WithLogger, logDebug)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Core (ComponentBlock (..), EpochIndex (..),
@@ -50,6 +48,8 @@ import           Pos.Lrc.Context (HasLrcContext)
 import           Pos.Lrc.Types (RichmenSet)
 import           Pos.Util (getKeys, _neHead)
 import           Pos.Util.Chrono (NE, NewestFirst (..), OldestFirst (..))
+import           Pos.Util.Trace (Trace)
+import           Pos.Util.Trace.Unstructured (LogItem, logDebug)
 
 
 -- Copied from 'these' library.
@@ -76,9 +76,10 @@ type ReverseTrans = HashMap StakeholderId (HashSet StakeholderId, HashSet Stakeh
 -- eActions list passed must be effectively a set.
 calculateTransCorrections
     :: forall m.
-       (MonadUnliftIO m, MonadDBRead m, WithLogger m)
-    => [DlgEdgeAction] -> m SomeBatchOp
-calculateTransCorrections eActions = do
+       (MonadUnliftIO m, MonadDBRead m)
+    => Trace m LogItem
+    -> [DlgEdgeAction] -> m SomeBatchOp
+calculateTransCorrections logTrace eActions = do
     -- Get the changeset and convert it to transitive ops.
     changeset <- transChangeset
     let toTransOp iSId (This _)       = GS.DelTransitiveDlg iSId
@@ -89,7 +90,7 @@ calculateTransCorrections eActions = do
     -- Once we figure out this piece of code works like a charm we
     -- can delete this logging.
     unless (HM.null changeset) $
-        logDebug $ sformat ("Nonempty dlg trans changeset: "%mapJson) $
+        logDebug logTrace $ sformat ("Nonempty dlg trans changeset: "%mapJson) $
         HM.toList changeset
 
     -- Bulid reverse transitive set and convert it to reverseTransOps
@@ -407,11 +408,11 @@ dlgApplyBlocks ::
        ( MonadDelegation ctx m
        , MonadDBRead m
        , MonadUnliftIO m
-       , WithLogger m
        )
-    => OldestFirst NE DlgBlund
+    => Trace m LogItem
+    -> OldestFirst NE DlgBlund
     -> m (NonEmpty SomeBatchOp)
-dlgApplyBlocks dlgBlunds = do
+dlgApplyBlocks logTrace dlgBlunds = do
     tip <- GS.getTip
     let assumedTip = blocks ^. _Wrapped . _neHead . prevBlockL
     when (tip /= assumedTip) $ throwM $
@@ -432,7 +433,7 @@ dlgApplyBlocks dlgBlunds = do
         -- So we delete all these guys.
         let edgeActions = map (DlgEdgeDel . addressHash . pskIssuerPk) duPsks
         let edgeOp = SomeBatchOp $ map GS.PskFromEdgeAction edgeActions
-        transCorrections <- calculateTransCorrections edgeActions
+        transCorrections <- calculateTransCorrections logTrace edgeActions
         -- we also should delete all people who posted previous epoch
         let postedOp =
                 SomeBatchOp $ map GS.DelPostedThisEpoch $
@@ -446,7 +447,7 @@ dlgApplyBlocks dlgBlunds = do
             let issuers = map pskIssuerPk proxySKs
                 edgeActions = map pskToDlgEdgeAction proxySKs
                 postedThisEpoch = SomeBatchOp $ map (GS.AddPostedThisEpoch . addressHash) issuers
-            transCorrections <- calculateTransCorrections edgeActions
+            transCorrections <- calculateTransCorrections logTrace edgeActions
             let batchOps =
                     SomeBatchOp (map GS.PskFromEdgeAction edgeActions) <>
                     transCorrections <>
@@ -464,11 +465,11 @@ dlgRollbackBlocks
        ( MonadDelegation ctx m
        , MonadDBRead m
        , MonadUnliftIO m
-       , WithLogger m
        )
-    => NewestFirst NE DlgBlund
+    => Trace m LogItem
+    -> NewestFirst NE DlgBlund
     -> m (NonEmpty SomeBatchOp)
-dlgRollbackBlocks dlgBlunds = do
+dlgRollbackBlocks logTrace dlgBlunds = do
     getNewestFirst <$> mapM rollbackBlund dlgBlunds
   where
     rollbackBlund :: DlgBlund -> m SomeBatchOp
@@ -481,7 +482,7 @@ dlgRollbackBlocks dlgBlunds = do
             backDeleted = issuers \\ map pskIssuerPk duPsks
             edgeActions =
                 map (DlgEdgeDel . addressHash) backDeleted <> map DlgEdgeAdd duPsks
-        transCorrections <- calculateTransCorrections $ edgeActions
+        transCorrections <- calculateTransCorrections logTrace edgeActions
         let pskOp = SomeBatchOp (map GS.PskFromEdgeAction $ edgeActions) <> transCorrections
         -- we should also delete issuers from "posted this epoch already"
         let postedOp = SomeBatchOp $ map (GS.DelPostedThisEpoch . addressHash) $ toList issuers
@@ -495,8 +496,8 @@ dlgNormalizeOnRollback ::
        , MonadDBRead m
        , MonadUnliftIO m
        , DB.MonadGState m
+       , MonadMask m
        , HasLrcContext ctx
-       , Mockable CurrentTime m
        )
     => m ()
 dlgNormalizeOnRollback = do

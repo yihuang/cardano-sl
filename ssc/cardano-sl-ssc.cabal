@@ -69,6 +69,7 @@ library
                      , containers
                      , cryptonite
                      , data-default
+                     , deepseq
                      , ether
                      , exceptions
                      , formatting

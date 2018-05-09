@@ -14,7 +14,7 @@ import           Formatting (build, builder, int, sformat, (%))
 import           System.Wlog (logDebug, logInfo, logNotice)
 import           Universum
 
-import           Pos.Binary.Class (biSize)
+import           Pos.Binary.Class (Bi (encodedSize))
 import           Pos.Core (ChainDifficulty (..), Coin, EpochIndex, HeaderHash, IsMainHeader (..),
                            SlotId (siEpoch), SoftwareVersion (..), addressHash, applyCoinPortionUp,
                            blockVersionL, coinToInteger, difficultyL, epochIndexL, flattenSlotId,
@@ -106,7 +106,7 @@ verifyAndApplyUSPayload lastAdopted verifyAllIsKnown slotOrHeader upp@UpdatePayl
 
 -- Here we verify all US-related data from header.
 verifyHeader
-    :: (MonadError PollVerFailure m, MonadPoll m, IsMainHeader mainHeader)
+    :: (MonadError PollVerFailure m, MonadPollRead m, IsMainHeader mainHeader)
     => BlockVersion -> mainHeader -> m ()
 verifyHeader lastAdopted header = do
     let versionInHeader = header ^. blockVersionL
@@ -164,7 +164,7 @@ verifyAndApplyProposal verifyAllIsKnown slotOrHeader votes
     whenM (HS.member upFromId <$> getEpochProposers) $
         throwError $ PollMoreThanOneProposalPerEpoch upFromId upId
     let epoch = slotOrHeader ^. epochIndexL
-    let proposalSize = biSize up
+    let proposalSize = encodedSize up
     proposalSizeLimit <- bvdMaxProposalSize <$> getAdoptedBVData
     when (verifyAllIsKnown && not (areAttributesKnown upAttributes)) $
         throwError $

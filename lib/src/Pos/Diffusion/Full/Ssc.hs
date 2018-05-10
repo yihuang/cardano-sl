@@ -28,11 +28,16 @@ import           Pos.Communication.Relay (DataMsg, InvOrData, InvReqDataParams (
 import           Pos.Communication.Types.Protocol (MsgType (..), NodeId, EnqueueMsg,
                                                    MkListeners, OutSpecs)
 import           Pos.Core (StakeholderId)
+<<<<<<< HEAD
+=======
+import           Pos.Diffusion.Full.Types (DiffusionWorkMode)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Network.Types (Bucket)
 import           Pos.Logic.Types (Logic (..))
 import qualified Pos.Logic.Types as KV (KeyVal (..))
 import           Pos.Ssc.Message (MCCommitment (..), MCOpening (..), MCShares (..),
                                   MCVssCertificate (..), SscMessageConstraints)
+<<<<<<< HEAD
 import           Pos.Util.Trace (Trace, Severity)
 
 sscListeners
@@ -47,6 +52,24 @@ sscRelays
     :: ( SscMessageConstraints )
     => Logic IO
     -> [Relay]
+=======
+
+sscListeners
+    :: ( DiffusionWorkMode m
+       )
+    => Logic m
+    -> OQ.OutboundQ pack NodeId Bucket
+    -> EnqueueMsg m
+    -> MkListeners m
+sscListeners logic oq enqueue = relayListeners oq enqueue (sscRelays logic)
+
+sscRelays
+    :: ( DiffusionWorkMode m
+       , SscMessageConstraints
+       )
+    => Logic m
+    -> [Relay m]
+>>>>>>> CHW-82-84, orphan branch
 sscRelays logic =
     [ commitmentRelay logic (postSscCommitment logic)
     , openingRelay (postSscOpening logic)
@@ -57,6 +80,7 @@ sscRelays logic =
 -- | 'OutSpecs' for the tx relays, to keep up with the 'InSpecs'/'OutSpecs'
 -- motif required for communication.
 -- The 'Logic m' isn't *really* needed, it's just an artefact of the design.
+<<<<<<< HEAD
 sscOutSpecs :: Logic IO -> OutSpecs
 sscOutSpecs logic = relayPropagateOut (sscRelays logic)
 
@@ -71,10 +95,36 @@ openingRelay
     :: ( SscMessageConstraints )
     => KV.KeyVal (Tagged MCOpening StakeholderId) MCOpening IO
     -> Relay
+=======
+sscOutSpecs
+    :: forall m .
+       ( DiffusionWorkMode m
+       )
+    => Logic m
+    -> OutSpecs
+sscOutSpecs logic = relayPropagateOut (sscRelays logic)
+
+commitmentRelay
+    :: ( SscMessageConstraints
+       , DiffusionWorkMode m
+       )
+    => Logic m
+    -> KV.KeyVal (Tagged MCCommitment StakeholderId) MCCommitment m
+    -> Relay m
+commitmentRelay logic kv = sscRelay kv (mlMCCommitment <$> getAdoptedBVData logic)
+
+openingRelay
+    :: ( SscMessageConstraints
+       , DiffusionWorkMode m
+       )
+    => KV.KeyVal (Tagged MCOpening StakeholderId) MCOpening m
+    -> Relay m
+>>>>>>> CHW-82-84, orphan branch
 openingRelay kv = sscRelay kv (pure mlMCOpening)
 
 sharesRelay
     :: ( SscMessageConstraints
+<<<<<<< HEAD
        )
     => Logic IO
     -> KV.KeyVal (Tagged MCShares StakeholderId) MCShares IO
@@ -85,6 +135,21 @@ vssCertRelay
     :: ( SscMessageConstraints )
     => KV.KeyVal (Tagged MCVssCertificate StakeholderId) MCVssCertificate IO
     -> Relay
+=======
+       , DiffusionWorkMode m
+       )
+    => Logic m
+    -> KV.KeyVal (Tagged MCShares StakeholderId) MCShares m
+    -> Relay m
+sharesRelay logic kv = sscRelay kv (mlMCShares <$> getAdoptedBVData logic)
+
+vssCertRelay
+    :: ( SscMessageConstraints
+       , DiffusionWorkMode m
+       )
+    => KV.KeyVal (Tagged MCVssCertificate StakeholderId) MCVssCertificate m
+    -> Relay m
+>>>>>>> CHW-82-84, orphan branch
 vssCertRelay kv = sscRelay kv (pure mlMCVssCertificate)
 
 sscRelay
@@ -94,10 +159,18 @@ sscRelay
        , Message (InvOrData (Tagged contents StakeholderId) contents)
        , Message (ReqOrRes (Tagged contents StakeholderId))
        , Message (ReqMsg (Tagged contents StakeholderId))
+<<<<<<< HEAD
        )
     => KV.KeyVal (Tagged contents StakeholderId) contents IO
     -> IO (Limit contents)
     -> Relay
+=======
+       , DiffusionWorkMode m
+       )
+    => KV.KeyVal (Tagged contents StakeholderId) contents m
+    -> m (Limit contents)
+    -> Relay m
+>>>>>>> CHW-82-84, orphan branch
 sscRelay kv mkLimit =
     InvReqData NoMempool $
         InvReqDataParams

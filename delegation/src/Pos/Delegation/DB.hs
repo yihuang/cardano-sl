@@ -56,7 +56,11 @@ import qualified Database.RocksDB as Rocks
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Binary.Class (serialize')
+<<<<<<< HEAD
 import           Pos.Core (ProxySKHeavy, StakeholderId, addressHash, HasCoreConfiguration)
+=======
+import           Pos.Core (HasConfiguration, ProxySKHeavy, StakeholderId, addressHash)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Genesis (GenesisDelegation (..))
 import           Pos.Crypto (ProxySecretKey (..), PublicKey)
 import           Pos.DB (RocksBatchOp (..), dbSerializeValue, encodeWithKeyPrefix)
@@ -148,7 +152,11 @@ data DelegationOp
     -- ^ Remove stakeholderId from postedThisEpoch map.
     deriving (Show)
 
+<<<<<<< HEAD
 instance HasCoreConfiguration => RocksBatchOp DelegationOp where
+=======
+instance HasConfiguration => RocksBatchOp DelegationOp where
+>>>>>>> CHW-82-84, orphan branch
     toBatchOp (PskFromEdgeAction (DlgEdgeAdd psk))
         | isRevokePsk psk =
           error $ "RocksBatchOp DelegationOp: malformed " <>

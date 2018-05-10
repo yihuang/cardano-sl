@@ -120,11 +120,18 @@ verifyValidBlocks = do
 ----------------------------------------------------------------------------
 
 verifyAndApplyBlocksSpec
+<<<<<<< HEAD
     :: ( HasStaticConfigurations, HasCompileInfo ) => Spec
 verifyAndApplyBlocksSpec = do
     blockPropertySpec applyByOneOrAllAtOnceDesc (applyByOneOrAllAtOnce applier)
   where
     applier :: HasConfiguration => OldestFirst NE Blund -> BlockTestMode ()
+=======
+    :: (HasStaticConfigurations,HasCompileInfo) => Spec
+verifyAndApplyBlocksSpec = do
+    blockPropertySpec applyByOneOrAllAtOnceDesc (applyByOneOrAllAtOnce applier)
+  where
+>>>>>>> CHW-82-84, orphan branch
     applier blunds =
         let blocks = map fst blunds
         in satisfySlotCheck blocks $

@@ -5,8 +5,15 @@
 {-# LANGUAGE KindSignatures             #-}
 {-# LANGUAGE LambdaCase                 #-}
 {-# LANGUAGE OverloadedStrings          #-}
+<<<<<<< HEAD
 {-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE TemplateHaskell            #-}
+=======
+{-# LANGUAGE OverloadedLists            #-}
+{-# LANGUAGE PolyKinds                  #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE ViewPatterns               #-}
+>>>>>>> CHW-82-84, orphan branch
 
 -- The hlint parser fails on the `pattern` function, so we disable the
 -- language extension here.
@@ -33,15 +40,29 @@ module Cardano.Wallet.API.V1.Types (
   , WalletId (..)
   , WalletOperation (..)
   , SpendingPassword
+<<<<<<< HEAD
+=======
+  , ExternalWallet (..)
+  , NewExternalWallet (..)
+>>>>>>> CHW-82-84, orphan branch
   -- * Addresses
   , AddressValidity (..)
   -- * Accounts
   , Account (..)
+<<<<<<< HEAD
   , accountsHaveSameId
   , AccountIndex
   -- * Addresses
   , WalletAddress (..)
   , NewAddress (..)
+=======
+  , AccountIndex
+  , ExternalAccount (..)
+  -- * Addresses
+  , WalletAddress (..)
+  , NewAddress (..)
+  , AddressPath (..)
+>>>>>>> CHW-82-84, orphan branch
   -- * Payments
   , Payment (..)
   , PaymentSource (..)
@@ -51,6 +72,10 @@ module Cardano.Wallet.API.V1.Types (
   , TransactionDirection (..)
   , TransactionStatus(..)
   , EstimatedFees (..)
+<<<<<<< HEAD
+=======
+  , SignedTransaction (..)
+>>>>>>> CHW-82-84, orphan branch
   -- * Updates
   , WalletSoftwareUpdate (..)
   -- * Settings
@@ -71,7 +96,10 @@ module Cardano.Wallet.API.V1.Types (
   , mkSyncPercentage
   , NodeInfo (..)
   , TimeInfo(..)
+<<<<<<< HEAD
   , SubscriptionStatus(..)
+=======
+>>>>>>> CHW-82-84, orphan branch
   -- * Some types for the API
   , CaptureWalletId
   , CaptureAccountId
@@ -84,19 +112,29 @@ import           Universum
 import           Control.Lens (At, Index, IxValue, at, ix, makePrisms, to, (?~))
 import           Data.Aeson
 import           Data.Aeson.TH as A
+<<<<<<< HEAD
 import           Data.Aeson.Types (toJSONKeyText, typeMismatch)
+=======
+import           Data.Aeson.Types (typeMismatch)
+>>>>>>> CHW-82-84, orphan branch
 import qualified Data.Char as C
 import           Data.Swagger as S hiding (constructorTagModifier)
 import           Data.Swagger.Declare (Declare, look)
 import           Data.Swagger.Internal.Schema (GToSchema)
 import           Data.Text (Text, dropEnd, toLower)
+<<<<<<< HEAD
 import qualified Data.Text as T
+=======
+>>>>>>> CHW-82-84, orphan branch
 import qualified Data.Text.Buildable
 import           Data.Version (Version)
 import           Formatting (bprint, build, fconst, int, sformat, (%))
 import           GHC.Generics (Generic, Rep)
+<<<<<<< HEAD
 import           Network.Transport (EndPointAddress (..))
 import           Node (NodeId (..))
+=======
+>>>>>>> CHW-82-84, orphan branch
 import qualified Prelude
 import qualified Serokell.Aeson.Options as Serokell
 import           Serokell.Util (listJson)
@@ -118,7 +156,10 @@ import           Pos.Wallet.Web.ClientTypes.Instances ()
 import           Cardano.Wallet.Util (showApiUtcTime)
 import qualified Data.ByteArray as ByteArray
 import qualified Data.ByteString as BS
+<<<<<<< HEAD
 import qualified Data.Map.Strict as Map
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Data.Swagger.Internal.TypeShape (GenericHasSimpleShape, GenericShape)
 import           Pos.Aeson.Core ()
 import           Pos.Arbitrary.Core ()
@@ -127,13 +168,19 @@ import           Pos.Core (addressF)
 import qualified Pos.Core as Core
 import           Pos.Crypto (decodeHash, hashHexF)
 import qualified Pos.Crypto.Signing as Core
+<<<<<<< HEAD
 import           Pos.Diffusion.Types (SubscriptionStatus (..))
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.LogSafe (BuildableSafeGen (..), SecureLog (..), buildSafe, buildSafeList,
                                    buildSafeMaybe, deriveSafeBuildable, plainOrSecureF)
 import qualified Pos.Wallet.Web.State.Storage as OldStorage
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Declare generic schema, while documenting properties
 --   For instance:
 --
@@ -240,8 +287,11 @@ instance Buildable a => Buildable (V1 a) where
 instance Buildable (SecureLog a) => Buildable (SecureLog (V1 a)) where
     build (SecureLog (V1 x)) = bprint build (SecureLog x)
 
+<<<<<<< HEAD
 instance (Buildable a, Buildable b) => Buildable (a, b) where
     build (a, b) = bprint ("("%build%", "%build%")") a b
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 --
 -- Benign instances
@@ -426,8 +476,11 @@ deriveJSON Serokell.defaultOptions ''WalletId
 instance ToSchema WalletId where
   declareNamedSchema = genericDeclareNamedSchema defaultSchemaOptions
 
+<<<<<<< HEAD
 instance ToJSONKey WalletId
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 instance Arbitrary WalletId where
   arbitrary =
       let wid = "J7rQqaLLHBFPrgJXwpktaMB1B1kQBXAyc2uRSfRPzNVGiv6TdxBzkPNBUWysZZZdhFG9gRy3sQFfX5wfpLbi4XTFGFxTg"
@@ -498,6 +551,48 @@ instance ToSchema NewWallet where
       & ("operation"        --^ "Create a new wallet or Restore an existing one.")
     )
 
+<<<<<<< HEAD
+=======
+-- | A type modelling the request for a new 'ExternalWallet',
+-- on the mobile client or hardware wallet.
+data NewExternalWallet = NewExternalWallet
+    { newewalExtPubKey      :: !Text            -- ^ Base58-encoded extended public key.
+    , newewalAssuranceLevel :: !AssuranceLevel
+    , newewalName           :: !WalletName
+    , newewalOperation      :: !WalletOperation
+    } deriving (Eq, Show, Generic)
+
+deriveJSON Serokell.defaultOptions ''NewExternalWallet
+
+instance Arbitrary NewExternalWallet where
+  arbitrary = NewExternalWallet <$> arbitrary
+                                <*> arbitrary
+                                <*> pure "My external Wallet"
+                                <*> arbitrary
+
+instance ToSchema NewExternalWallet where
+  declareNamedSchema =
+    genericSchemaDroppingPrefix "newewal" (\(--^) props -> props
+      & ("extPubKey"      --^ "Base58-encoded extended public key used as external Wallet's id")
+      & ("assuranceLevel" --^ "Desired assurance level based on the number of confirmations counter of each transaction.")
+      & ("name"           --^ "External Wallet's name")
+      & ("operation"      --^ "Create a new external wallet or Restore an existing one")
+    )
+
+deriveSafeBuildable ''NewExternalWallet
+instance BuildableSafeGen NewExternalWallet where
+    buildSafeGen sl NewExternalWallet{..} = bprint ("{"
+        %" extPubKey="%buildSafe sl
+        %" assuranceLevel="%buildSafe sl
+        %" name="%buildSafe sl
+        %" operation"%buildSafe sl
+        %" }")
+        newewalExtPubKey
+        newewalAssuranceLevel
+        newewalName
+        newewalOperation
+
+>>>>>>> CHW-82-84, orphan branch
 
 deriveSafeBuildable ''NewWallet
 instance BuildableSafeGen NewWallet where
@@ -802,6 +897,31 @@ instance BuildableSafeGen Wallet where
 instance Buildable [Wallet] where
     build = bprint listJson
 
+<<<<<<< HEAD
+=======
+-- | An external wallet (mobile client or hardware wallet).
+data ExternalWallet = ExternalWallet
+    { ewalId      :: !WalletId
+    , ewalName    :: !WalletName
+    , ewalBalance :: !(V1 Core.Coin)
+    } deriving (Eq, Ord, Show, Generic)
+
+deriveJSON Serokell.defaultOptions ''ExternalWallet
+
+instance ToSchema ExternalWallet where
+  declareNamedSchema =
+    genericSchemaDroppingPrefix "ewal" (\(--^) props -> props
+      & ("id"      --^ "Unique wallet identifier")
+      & ("name"    --^ "Wallet's name")
+      & ("balance" --^ "Current balance, in ADA")
+    )
+
+instance Arbitrary ExternalWallet where
+  arbitrary = ExternalWallet <$> arbitrary
+                             <*> pure "My external wallet"
+                             <*> arbitrary
+
+>>>>>>> CHW-82-84, orphan branch
 --------------------------------------------------------------------------------
 -- Addresses
 --------------------------------------------------------------------------------
@@ -824,19 +944,32 @@ instance BuildableSafeGen AddressValidity where
         bprint ("{ valid="%build%" }") isValid
 
 --------------------------------------------------------------------------------
+<<<<<<< HEAD
 -- Accounts
+=======
+-- Addresses
+>>>>>>> CHW-82-84, orphan branch
 --------------------------------------------------------------------------------
 
 -- | Summary about single address.
 data WalletAddress = WalletAddress
+<<<<<<< HEAD
     { addrId            :: !(V1 Core.Address)
     , addrUsed          :: !Bool
     , addrChangeAddress :: !Bool
     } deriving (Show, Eq, Generic, Ord)
+=======
+  { addrId            :: !(V1 Core.Address)
+  , addrBalance       :: !(V1 Core.Coin)
+  , addrUsed          :: !Bool
+  , addrChangeAddress :: !Bool
+  } deriving (Show, Eq, Ord, Generic)
+>>>>>>> CHW-82-84, orphan branch
 
 deriveJSON Serokell.defaultOptions ''WalletAddress
 
 instance ToSchema WalletAddress where
+<<<<<<< HEAD
     declareNamedSchema =
         genericSchemaDroppingPrefix "addr" (\(--^) props -> props
             & ("id"            --^ "Actual address.")
@@ -848,6 +981,41 @@ instance Arbitrary WalletAddress where
     arbitrary = WalletAddress <$> arbitrary
                               <*> arbitrary
                               <*> arbitrary
+=======
+  declareNamedSchema =
+    genericSchemaDroppingPrefix "addr" (\(--^) props -> props
+      & ("id"            --^ "Actual address")
+      & ("balance"       --^ "Associated balance, in ADA")
+      & ("used"          --^ "True if this address has been used")
+      & ("changeAddress" --^ "True if this address stores change from a previous transaction")
+    )
+
+instance Arbitrary WalletAddress where
+  arbitrary = WalletAddress <$> arbitrary
+                            <*> arbitrary
+                            <*> arbitrary
+                            <*> arbitrary
+
+deriveSafeBuildable ''WalletAddress
+instance BuildableSafeGen WalletAddress where
+    buildSafeGen sl WalletAddress{..} = bprint ("{"
+        %" id="%buildSafe sl
+        %" balance="%buildSafe sl
+        %" used="%build
+        %" changeAddress="%build
+        %" }")
+        addrId
+        addrBalance
+        addrUsed
+        addrChangeAddress
+
+instance Buildable [WalletAddress] where
+    build = bprint listJson
+
+--------------------------------------------------------------------------------
+-- Accounts
+--------------------------------------------------------------------------------
+>>>>>>> CHW-82-84, orphan branch
 
 type AccountIndex = Word32
 
@@ -860,12 +1028,15 @@ data Account = Account
     , accWalletId  :: !WalletId
     } deriving (Show, Ord, Eq, Generic)
 
+<<<<<<< HEAD
 accountsHaveSameId :: Account -> Account -> Bool
 accountsHaveSameId a b =
     accWalletId a == accWalletId b
     &&
     accIndex a == accIndex b
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 deriveJSON Serokell.defaultOptions ''Account
 
 instance ToSchema Account where
@@ -903,6 +1074,37 @@ instance BuildableSafeGen Account where
 instance Buildable [Account] where
     build = bprint listJson
 
+<<<<<<< HEAD
+=======
+-- | An external wallet 'ExternalAccount'.
+data ExternalAccount = ExternalAccount
+  { accExtIndex     :: !AccountIndex
+  , accExtAddresses :: [V1 Core.Address]  -- should be WalletAddress
+  , accExtAmount    :: !(V1 Core.Coin)
+  , accExtName      :: !Text
+  , accExtWalletId  :: WalletId
+  } deriving (Show, Ord, Eq, Generic)
+
+deriveJSON Serokell.defaultOptions ''ExternalAccount
+
+instance ToSchema ExternalAccount where
+  declareNamedSchema =
+    genericSchemaDroppingPrefix "accExt" (\(--^) props -> props
+      & ("index"     --^ "Account's index in external wallet, starting at 0")
+      & ("addresses" --^ "Public addresses pointing to this account")
+      & ("amount"    --^ "Available funds, in ADA")
+      & ("name"      --^ "Account's name")
+      & ("walletId"  --^ "Id of external wallet this account belongs to")
+    )
+
+instance Arbitrary ExternalAccount where
+  arbitrary = ExternalAccount <$> arbitrary
+                              <*> arbitrary
+                              <*> arbitrary
+                              <*> pure "My external account"
+                              <*> arbitrary
+
+>>>>>>> CHW-82-84, orphan branch
 -- | Account Update
 data AccountUpdate = AccountUpdate {
     uaccName      :: !Text
@@ -953,6 +1155,7 @@ instance BuildableSafeGen NewAccount where
         naccSpendingPassword
         naccName
 
+<<<<<<< HEAD
 deriveSafeBuildable ''WalletAddress
 instance BuildableSafeGen WalletAddress where
     buildSafeGen sl WalletAddress{..} = bprint ("{"
@@ -968,6 +1171,8 @@ instance Buildable [WalletAddress] where
     build = bprint listJson
 
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Create a new Address
 data NewAddress = NewAddress
   { newaddrSpendingPassword :: !(Maybe SpendingPassword)
@@ -1001,6 +1206,33 @@ instance BuildableSafeGen NewAddress where
         newaddrAccountIndex
         newaddrWalletId
 
+<<<<<<< HEAD
+=======
+-- | BIP44 derivation path, for work with external wallets, for example:
+-- m / purpose' / coin_type' / account' / change / address_index
+-- m /      44' /         0' /       0' /      0 /             1
+data AddressPath = AddressPath
+  { addrLevels :: ![Word32]
+  } deriving (Show, Eq, Generic)
+
+deriveJSON Serokell.defaultOptions ''AddressPath
+
+instance ToSchema AddressPath where
+  declareNamedSchema =
+    genericSchemaDroppingPrefix "addr" (\(--^) props -> props
+      & ("levels" --^ "BIP44 derivation path's levels.")
+    )
+
+instance Arbitrary AddressPath where
+  arbitrary = AddressPath <$> arbitrary
+
+deriveSafeBuildable ''AddressPath
+instance BuildableSafeGen AddressPath where
+    buildSafeGen sl AddressPath{..} = bprint("{"
+        %" levels="%buildSafeList sl
+        %" }")
+        addrLevels
+>>>>>>> CHW-82-84, orphan branch
 
 -- | A type incapsulating a password update request.
 data PasswordUpdate = PasswordUpdate {
@@ -1059,8 +1291,13 @@ instance BuildableSafeGen EstimatedFees where
 -- | Maps an 'Address' to some 'Coin's, and it's
 -- typically used to specify where to send money during a 'Payment'.
 data PaymentDistribution = PaymentDistribution {
+<<<<<<< HEAD
       pdAddress :: !(V1 Core.Address)
     , pdAmount  :: !(V1 Core.Coin)
+=======
+      pdAddress :: V1 (Core.Address)
+    , pdAmount  :: V1 (Core.Coin)
+>>>>>>> CHW-82-84, orphan branch
     } deriving (Show, Ord, Eq, Generic)
 
 deriveJSON Serokell.defaultOptions ''PaymentDistribution
@@ -1397,6 +1634,38 @@ instance BuildableSafeGen Transaction where
 instance Buildable [Transaction] where
     build = bprint listJson
 
+<<<<<<< HEAD
+=======
+-- | A 'Wallet''s 'SignedTransaction'. It is assumed
+-- that this transaction was signed on the client-side
+-- (mobile client or hardware wallet).
+data SignedTransaction = SignedTransaction
+  { stxTransaction :: !Text  -- ^ Encoded transaction CBOR binary blob.
+  , stxSignature   :: !Text  -- ^ Encoded signature of this transaction (XSignature).
+  } deriving (Show, Ord, Eq, Generic)
+
+deriveJSON Serokell.defaultOptions ''SignedTransaction
+
+instance ToSchema SignedTransaction where
+  declareNamedSchema =
+    genericSchemaDroppingPrefix "stx" (\(--^) props -> props
+      & ("transaction" --^ "New transaction that wasn't published yet.")
+      & ("signature"   --^ "Signature of this transaction.")
+    )
+
+instance Arbitrary SignedTransaction where
+  arbitrary = SignedTransaction <$> arbitrary
+                                <*> arbitrary
+
+deriveSafeBuildable ''SignedTransaction
+instance BuildableSafeGen SignedTransaction where
+    buildSafeGen sl SignedTransaction{..} = bprint ("{"
+        %" transaction="%buildSafe sl
+        %" signature="%buildSafe sl
+        %" }")
+        stxTransaction
+        stxSignature
+>>>>>>> CHW-82-84, orphan branch
 
 -- | A type representing an upcoming wallet update.
 data WalletSoftwareUpdate = WalletSoftwareUpdate
@@ -1657,6 +1926,10 @@ instance Arbitrary TimeInfo where
     arbitrary = TimeInfo <$> arbitrary
 
 deriveSafeBuildable ''TimeInfo
+<<<<<<< HEAD
+=======
+
+>>>>>>> CHW-82-84, orphan branch
 instance BuildableSafeGen TimeInfo where
     buildSafeGen _ TimeInfo{..} = bprint ("{"
         %" differenceFromNtpServer="%build
@@ -1665,6 +1938,7 @@ instance BuildableSafeGen TimeInfo where
 
 deriveJSON Serokell.defaultOptions ''TimeInfo
 
+<<<<<<< HEAD
 
 availableSubscriptionStatus :: [SubscriptionStatus]
 availableSubscriptionStatus = [Subscribed, Subscribing]
@@ -1716,13 +1990,18 @@ instance Arbitrary NodeId where
         genIPv4  = T.intercalate "." <$> replicateM 4 (showT <$> choose (0, 255))
 
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | The @dynamic@ information for this node.
 data NodeInfo = NodeInfo {
      nfoSyncProgress          :: !SyncPercentage
    , nfoBlockchainHeight      :: !(Maybe BlockchainHeight)
    , nfoLocalBlockchainHeight :: !BlockchainHeight
    , nfoLocalTimeInformation  :: !TimeInfo
+<<<<<<< HEAD
    , nfoSubscriptionStatus    :: Map NodeId SubscriptionStatus
+=======
+>>>>>>> CHW-82-84, orphan branch
    } deriving (Show, Eq, Generic)
 
 deriveJSON Serokell.defaultOptions ''NodeInfo
@@ -1734,7 +2013,10 @@ instance ToSchema NodeInfo where
       & ("blockchainHeight"      --^ "If known, the current blockchain height, in number of blocks.")
       & ("localBlockchainHeight" --^ "Local blockchain height, in number of blocks.")
       & ("localTimeInformation"  --^ "Information about the clock on this node.")
+<<<<<<< HEAD
       & ("subscriptionStatus"    --^ "Is the node connected to the network?")
+=======
+>>>>>>> CHW-82-84, orphan branch
     )
 
 instance Arbitrary NodeInfo where
@@ -1742,7 +2024,10 @@ instance Arbitrary NodeInfo where
                          <*> arbitrary
                          <*> arbitrary
                          <*> arbitrary
+<<<<<<< HEAD
                          <*> arbitrary
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 deriveSafeBuildable ''NodeInfo
 instance BuildableSafeGen NodeInfo where
@@ -1751,13 +2036,19 @@ instance BuildableSafeGen NodeInfo where
         %" blockchainHeight="%build
         %" localBlockchainHeight="%build
         %" localTimeDifference="%build
+<<<<<<< HEAD
         %" subscriptionStatus="%listJson
+=======
+>>>>>>> CHW-82-84, orphan branch
         %" }")
         nfoSyncProgress
         nfoBlockchainHeight
         nfoLocalBlockchainHeight
         nfoLocalTimeInformation
+<<<<<<< HEAD
         (Map.toList nfoSubscriptionStatus)
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 
 --
@@ -1770,9 +2061,16 @@ type family Update (original :: *) :: * where
   Update WalletAddress = () -- read-only
 
 type family New (original :: *) :: * where
+<<<<<<< HEAD
   New Wallet  = NewWallet
   New Account = NewAccount
   New WalletAddress = NewAddress
+=======
+  New Wallet         = NewWallet
+  New Account        = NewAccount
+  New WalletAddress  = NewAddress
+  New ExternalWallet = NewExternalWallet
+>>>>>>> CHW-82-84, orphan branch
 
 type CaptureWalletId = Capture "walletId" WalletId
 

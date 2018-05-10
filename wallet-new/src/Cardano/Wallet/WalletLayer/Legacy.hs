@@ -13,10 +13,18 @@ import           Control.Monad.Catch (catchAll)
 import           Control.Monad.IO.Unlift (MonadUnliftIO)
 import           Data.Coerce (coerce)
 
+<<<<<<< HEAD
 import           Cardano.Wallet.WalletLayer.Error (WalletLayerError (..))
 import           Cardano.Wallet.WalletLayer.Types (ActiveWalletLayer (..), PassiveWalletLayer (..))
 
 import           Cardano.Wallet.Kernel.Diffusion (WalletDiffusion (..))
+=======
+import           Cardano.Wallet.WalletLayer.Types (ActiveWalletLayer (..), PassiveWalletLayer (..))
+import           Cardano.Wallet.WalletLayer.Error (WalletLayerError (..))
+
+import           Cardano.Wallet.Kernel.Diffusion (WalletDiffusion (..))
+
+>>>>>>> CHW-82-84, orphan branch
 import           Cardano.Wallet.API.V1.Migration (migrate)
 import           Cardano.Wallet.API.V1.Migration.Types ()
 import           Cardano.Wallet.API.V1.Types (Account, AccountIndex, AccountUpdate, Address,
@@ -24,6 +32,7 @@ import           Cardano.Wallet.API.V1.Types (Account, AccountIndex, AccountUpda
                                               WalletId, WalletOperation (..), WalletUpdate)
 
 import           Pos.Client.KeyStorage (MonadKeys)
+<<<<<<< HEAD
 import           Pos.Core (ChainDifficulty)
 import           Pos.Crypto (PassPhrase)
 
@@ -31,17 +40,29 @@ import           Pos.Util (HasLens', maybeThrow)
 import           Pos.Wallet.Web.Account (GenSeed (..))
 import           Pos.Wallet.Web.ClientTypes.Types (CWallet (..), CWalletInit (..), CWalletMeta (..))
 import qualified Pos.Wallet.Web.Error.Types as V0
+=======
+import           Pos.Crypto (PassPhrase)
+import           Pos.Core (ChainDifficulty)
+
+import           Pos.Wallet.Web.Tracking.Types (SyncQueue)
+import           Pos.Wallet.Web.Account (GenSeed (..))
+import           Pos.Wallet.Web.ClientTypes.Types (CWallet (..), CWalletInit (..), CWalletMeta (..))
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Wallet.Web.Methods.Logic (MonadWalletLogicRead)
 import qualified Pos.Wallet.Web.Methods.Logic as V0
 import           Pos.Wallet.Web.Methods.Restore (newWallet, restoreWalletFromSeed)
 import           Pos.Wallet.Web.State.State (WalletDbReader, askWalletDB, askWalletSnapshot,
                                              getWalletAddresses, setWalletMeta)
 import           Pos.Wallet.Web.State.Storage (getWalletInfo)
+<<<<<<< HEAD
 import           Pos.Wallet.Web.Tracking.Types (SyncQueue)
 
 import           Pos.Util.Chrono (NE, OldestFirst (..), NewestFirst (..))
 import           Pos.Block.Types (Blund)
 
+=======
+import           Pos.Util (HasLens', maybeThrow)
+>>>>>>> CHW-82-84, orphan branch
 
 -- | Let's unify all the requirements for the legacy wallet.
 type MonadLegacyWallet ctx m =
@@ -66,6 +87,7 @@ bracketPassiveWallet =
   where
     passiveWalletLayer :: PassiveWalletLayer m
     passiveWalletLayer = PassiveWalletLayer
+<<<<<<< HEAD
         { _pwlCreateWallet   = pwlCreateWallet
         , _pwlGetWalletIds   = pwlGetWalletIds
         , _pwlGetWallet      = pwlGetWallet
@@ -82,6 +104,21 @@ bracketPassiveWallet =
 
         , _pwlApplyBlocks    = pwlApplyBlocks
         , _pwlRollbackBlocks = pwlRollbackBlocks
+=======
+        { _pwlCreateWallet  = pwlCreateWallet
+        , _pwlGetWalletIds  = pwlGetWalletIds
+        , _pwlGetWallet     = pwlGetWallet
+        , _pwlUpdateWallet  = pwlUpdateWallet
+        , _pwlDeleteWallet  = pwlDeleteWallet
+
+        , _pwlCreateAccount = pwlCreateAccount
+        , _pwlGetAccounts   = pwlGetAccounts
+        , _pwlGetAccount    = pwlGetAccount
+        , _pwlUpdateAccount = pwlUpdateAccount
+        , _pwlDeleteAccount = pwlDeleteAccount
+
+        , _pwlGetAddresses  = pwlGetAddresses
+>>>>>>> CHW-82-84, orphan branch
         }
 
 
@@ -92,7 +129,11 @@ bracketActiveWallet
     => PassiveWalletLayer m
     -> WalletDiffusion
     -> (ActiveWalletLayer m -> n a) -> n a
+<<<<<<< HEAD
 bracketActiveWallet walletPassiveLayer _walletDiffusion =
+=======
+bracketActiveWallet walletPassiveLayer walletDiffusion =
+>>>>>>> CHW-82-84, orphan branch
     bracket
       (return ActiveWalletLayer{..})
       (\_ -> return ())
@@ -117,7 +158,10 @@ pwlCreateWallet NewWallet{..} = do
     let walletInit = CWalletInit initMeta backupPhrase
 
     wallet      <- newWalletHandler newwalOperation spendingPassword walletInit
+<<<<<<< HEAD
                        `catch` rethrowDuplicateMnemonic
+=======
+>>>>>>> CHW-82-84, orphan branch
     wId         <- migrate $ cwId wallet
 
     -- Get wallet or throw if missing.
@@ -127,6 +171,7 @@ pwlCreateWallet NewWallet{..} = do
     newWalletHandler :: WalletOperation -> PassPhrase -> CWalletInit -> m CWallet
     newWalletHandler CreateWallet  = newWallet
     newWalletHandler RestoreWallet = restoreWalletFromSeed
+<<<<<<< HEAD
     -- NOTE: this is temporary solution until we get rid of V0 error handling and/or we lift error handling into types:
     --   https://github.com/input-output-hk/cardano-sl/pull/2811#discussion_r183469153
     --   https://github.com/input-output-hk/cardano-sl/pull/2811#discussion_r183472103
@@ -134,6 +179,8 @@ pwlCreateWallet NewWallet{..} = do
         case e of
             V0.RequestError "Wallet with that mnemonics already exists" -> throwM WalletAlreadyExists
             _ -> throwM e
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 
 pwlGetWalletIds
@@ -253,6 +300,7 @@ pwlDeleteAccount wId accIdx = do
 pwlGetAddresses :: WalletId -> m [Address]
 pwlGetAddresses = error "Not implemented!"
 
+<<<<<<< HEAD
 ------------------------------------------------------------
 -- Apply Block
 ------------------------------------------------------------
@@ -266,3 +314,5 @@ pwlApplyBlocks = error "Not implemented!"
 
 pwlRollbackBlocks :: NewestFirst NE Blund -> m ()
 pwlRollbackBlocks = error "Not implemented!"
+=======
+>>>>>>> CHW-82-84, orphan branch

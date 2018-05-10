@@ -16,7 +16,11 @@ import qualified Data.Text.Buildable
 import           Formatting (bprint, build, sformat, stext, (%))
 import           System.Wlog (WithLogger, logDebug)
 
+<<<<<<< HEAD
 import           Pos.Core (SlotCount, SlotId, slotIdF, slotSecurityParam, HasProtocolConstants)
+=======
+import           Pos.Core (HasConfiguration, SlotCount, SlotId, slotIdF, slotSecurityParam)
+>>>>>>> CHW-82-84, orphan branch
 
 -- | An algebraic data type which represents how well we are
 -- synchronized with the network.
@@ -78,7 +82,11 @@ recoveryInProgress =
         _ -> False
 
 -- | Get sync status using K as lagBehind param.
+<<<<<<< HEAD
 getSyncStatusK :: (MonadRecoveryInfo m, HasProtocolConstants) => m SyncStatus
+=======
+getSyncStatusK :: (MonadRecoveryInfo m, HasConfiguration) => m SyncStatus
+>>>>>>> CHW-82-84, orphan branch
 getSyncStatusK = getSyncStatus lagBehindParam
   where
     -- It's actually questionable which value to use here. The less it
@@ -92,7 +100,11 @@ getSyncStatusK = getSyncStatus lagBehindParam
 -- kinda synchronized with the network.  It is useful for workers
 -- which shouldn't do anything while we are not synchronized.
 recoveryCommGuard
+<<<<<<< HEAD
     :: (MonadRecoveryInfo m, WithLogger m, HasProtocolConstants)
+=======
+    :: (MonadRecoveryInfo m, WithLogger m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => Text -> m () -> m ()
 recoveryCommGuard actionName action =
     getSyncStatusK >>= \case

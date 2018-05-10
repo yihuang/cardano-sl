@@ -26,8 +26,13 @@ import           Serokell.Util.Text (listJson)
 
 import           Pos.Binary.Class (serialize')
 import           Pos.Block.Slog.Types (LastBlkSlots, noLastBlkSlots)
+<<<<<<< HEAD
 import           Pos.Core (FlatSlotId, HasHeaderHash, HeaderHash, genesisHash, HasProtocolConstants,
                            headerHash, slotIdF, unflattenSlotId, HasGenesisHash, HasCoreConfiguration)
+=======
+import           Pos.Core (FlatSlotId, HasConfiguration, HasHeaderHash, HeaderHash, genesisHash,
+                           headerHash, slotIdF, unflattenSlotId)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (Block, BlockHeader)
 import           Pos.Crypto (shortHashF)
 import           Pos.DB (DBError (..), MonadDB, MonadDBRead (..), RocksBatchOp (..),
@@ -62,7 +67,11 @@ getLastSlots =
     gsGetBi lastSlotsKey
 
 -- | Retrieves first genesis block hash.
+<<<<<<< HEAD
 getFirstGenesisBlockHash :: (MonadDBRead m, MonadThrow m, HasGenesisHash) => m HeaderHash
+=======
+getFirstGenesisBlockHash :: (MonadDBRead m, MonadThrow m) => m HeaderHash
+>>>>>>> CHW-82-84, orphan branch
 getFirstGenesisBlockHash =
     resolveForwardLink (genesisHash :: HeaderHash) >>=
     maybeThrow (DBMalformed "Can't retrieve genesis block, maybe db is not initialized?")
@@ -84,7 +93,11 @@ data BlockExtraOp
       -- ^ Updates list of slots for last blocks.
     deriving (Show)
 
+<<<<<<< HEAD
 instance HasProtocolConstants => Buildable BlockExtraOp where
+=======
+instance HasConfiguration => Buildable BlockExtraOp where
+>>>>>>> CHW-82-84, orphan branch
     build (AddForwardLink from to) =
         bprint ("AddForwardLink from "%shortHashF%" to "%shortHashF) from to
     build (RemoveForwardLink from) =
@@ -95,7 +108,11 @@ instance HasProtocolConstants => Buildable BlockExtraOp where
         bprint ("SetLastSlots: "%listJson)
         (map (bprint slotIdF . unflattenSlotId) slots)
 
+<<<<<<< HEAD
 instance HasCoreConfiguration => RocksBatchOp BlockExtraOp where
+=======
+instance HasConfiguration => RocksBatchOp BlockExtraOp where
+>>>>>>> CHW-82-84, orphan branch
     toBatchOp (AddForwardLink from to) =
         [Rocks.Put (forwardLinkKey from) (dbSerializeValue to)]
     toBatchOp (RemoveForwardLink from) =
@@ -179,7 +196,11 @@ loadBlocksUpWhile = loadUpWhile getBlock
 -- Initialization
 ----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 initGStateBlockExtra :: (HasGenesisHash, MonadDB m) => HeaderHash -> m ()
+=======
+initGStateBlockExtra :: MonadDB m => HeaderHash -> m ()
+>>>>>>> CHW-82-84, orphan branch
 initGStateBlockExtra firstGenesisHash = do
     gsPutBi (mainChainKey firstGenesisHash) ()
     gsPutBi (forwardLinkKey genesisHash) firstGenesisHash

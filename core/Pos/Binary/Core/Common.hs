@@ -15,6 +15,13 @@ instance Bi (A.Attributes ()) where
     encode = A.encodeAttributes []
     decode = A.decodeAttributes () $ \_ _ _ -> pure Nothing
 
+<<<<<<< HEAD
+=======
+instance Bi T.CoinPortion where
+    encode = encode . T.getCoinPortion
+    decode = T.CoinPortion <$> decode
+
+>>>>>>> CHW-82-84, orphan branch
 instance Bi T.BlockCount where
     encode = encode . T.getBlockCount
     decode = T.BlockCount <$> decode

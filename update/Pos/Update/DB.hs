@@ -52,9 +52,14 @@ import           Pos.Binary.Class (serialize')
 import           Pos.Binary.Infra ()
 import           Pos.Binary.Update ()
 import           Pos.Core (ApplicationName, BlockVersion, ChainDifficulty, NumSoftwareVersion,
+<<<<<<< HEAD
                            SlotId, SoftwareVersion (..), StakeholderId, TimeDiff (..), epochSlots,
                            HasProtocolConstants, HasGenesisBlockVersionData, HasCoreConfiguration)
 import           Pos.Core.Configuration (genesisBlockVersionData)
+=======
+                           SlotId, SoftwareVersion (..), StakeholderId, TimeDiff (..), epochSlots)
+import           Pos.Core.Configuration (HasConfiguration, genesisBlockVersionData)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Update (BlockVersionData (..), UpId, UpdateProposal (..))
 import           Pos.Crypto (hash)
 import           Pos.DB (DBIteratorClass (..), DBTag (..), IterType, MonadDB, MonadDBRead (..),
@@ -98,7 +103,11 @@ getBVState :: MonadDBRead m => BlockVersion -> m (Maybe BlockVersionState)
 getBVState = gsGetBi . bvStateKey
 
 -- | Get state of UpdateProposal for given UpId
+<<<<<<< HEAD
 getProposalState :: (MonadDBRead m) => UpId -> m (Maybe ProposalState)
+=======
+getProposalState :: (HasConfiguration, MonadDBRead m) => UpId -> m (Maybe ProposalState)
+>>>>>>> CHW-82-84, orphan branch
 getProposalState = gsGetBi . proposalKey
 
 -- | Get last confirmed SoftwareVersion of given application.
@@ -135,7 +144,11 @@ data UpdateOp
     | PutSlottingData !SlottingData
     | PutEpochProposers !(HashSet StakeholderId)
 
+<<<<<<< HEAD
 instance HasCoreConfiguration => RocksBatchOp UpdateOp where
+=======
+instance HasConfiguration => RocksBatchOp UpdateOp where
+>>>>>>> CHW-82-84, orphan branch
     toBatchOp (PutProposal ps) =
         [ Rocks.Put (proposalKey upId) (dbSerializeValue ps)]
       where
@@ -166,7 +179,11 @@ instance HasCoreConfiguration => RocksBatchOp UpdateOp where
 -- Initialization
 ----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 initGStateUS :: (HasProtocolConstants, HasGenesisBlockVersionData, MonadDB m) => m ()
+=======
+initGStateUS :: (HasConfiguration, MonadDB m) => m ()
+>>>>>>> CHW-82-84, orphan branch
 initGStateUS = do
     writeBatchGState $
         PutSlottingData genesisSlottingData :
@@ -206,7 +223,11 @@ instance DBIteratorClass PropIter where
     iterKeyPrefix = iterationPrefix
 
 proposalSource ::
+<<<<<<< HEAD
        (MonadDBRead m)
+=======
+       (HasConfiguration, MonadDBRead m)
+>>>>>>> CHW-82-84, orphan branch
     => ConduitT () (IterType PropIter) (ResourceT m) ()
 proposalSource = dbIterSource GStateDB (Proxy @PropIter)
 
@@ -214,7 +235,11 @@ proposalSource = dbIterSource GStateDB (Proxy @PropIter)
 -- 'SlotId's, but I don't think it may be crucial.
 -- | Get all proposals which were issued no later than given slot.
 getOldProposals
+<<<<<<< HEAD
     :: (MonadDBRead m, MonadUnliftIO m)
+=======
+    :: (HasConfiguration, MonadDBRead m, MonadUnliftIO m)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId -> m [UndecidedProposalState]
 getOldProposals slotId =
     runConduitRes $ mapOutput snd proposalSource .| CL.mapMaybe isOld .| CL.consume
@@ -225,7 +250,11 @@ getOldProposals slotId =
 -- | Get all decided proposals which were accepted deeper than given
 -- difficulty.
 getDeepProposals
+<<<<<<< HEAD
     :: (MonadDBRead m, MonadUnliftIO m)
+=======
+    :: (HasConfiguration, MonadDBRead m, MonadUnliftIO m)
+>>>>>>> CHW-82-84, orphan branch
     => ChainDifficulty -> m [DecidedProposalState]
 getDeepProposals cd =
     runConduitRes $ mapOutput snd proposalSource .| CL.mapMaybe isDeep .| CL.consume
@@ -237,7 +266,11 @@ getDeepProposals cd =
 
 -- | Get states of all competing 'UpdateProposal's for given 'ApplicationName'.
 getProposalsByApp ::
+<<<<<<< HEAD
        (MonadDBRead m, MonadUnliftIO m)
+=======
+       (HasConfiguration, MonadDBRead m, MonadUnliftIO m)
+>>>>>>> CHW-82-84, orphan branch
     => ApplicationName
     -> m [ProposalState]
 getProposalsByApp appName =

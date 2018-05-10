@@ -1,6 +1,9 @@
 module Statistics.Chart
     ( chart
+<<<<<<< HEAD
     , getData
+=======
+>>>>>>> CHW-82-84, orphan branch
     ) where
 
 import           Data.Map.Strict (Map)

@@ -21,8 +21,13 @@ import           Formatting (sformat, (%))
 
 import           Pos.Binary.Core ()
 import           Pos.Block.Types (Blund)
+<<<<<<< HEAD
 import           Pos.Core (BlockCount, HasDifficulty (difficultyL),
                            HasPrevBlock (prevBlockL), HeaderHash, HasGenesisHash)
+=======
+import           Pos.Core (BlockCount, HasConfiguration, HasDifficulty (difficultyL),
+                           HasPrevBlock (prevBlockL), HeaderHash)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (Block, BlockHeader)
 import           Pos.Core.Configuration (genesisHash)
 import           Pos.Crypto (shortHashF)
@@ -35,7 +40,12 @@ import           Pos.Util.Chrono (NewestFirst (..))
 import           Pos.Util.Util (maybeThrow)
 
 type LoadHeadersMode m =
+<<<<<<< HEAD
     ( MonadDBRead m
+=======
+    ( HasConfiguration
+    , MonadDBRead m
+>>>>>>> CHW-82-84, orphan branch
     )
 
 ----------------------------------------------------------------------------
@@ -44,7 +54,11 @@ type LoadHeadersMode m =
 
 loadDataWhile
     :: forall m a .
+<<<<<<< HEAD
        (Monad m, HasPrevBlock a, HasGenesisHash)
+=======
+       (Monad m, HasPrevBlock a, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => (HeaderHash -> m a)
     -> (a -> Bool)
     -> HeaderHash
@@ -65,7 +79,11 @@ loadDataWhile getter predicate start = NewestFirst <$> doIt [] start
 -- (newest one) is assumed to have depth 0.
 loadDataByDepth
     :: forall m a .
+<<<<<<< HEAD
        (Monad m, HasPrevBlock a, HasDifficulty a, HasGenesisHash)
+=======
+       (Monad m, HasPrevBlock a, HasDifficulty a, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => (HeaderHash -> m a)
     -> (a -> Bool)
     -> BlockCount
@@ -97,28 +115,44 @@ loadDataByDepth getter extraPredicate depth h = do
 -- | Load blunds starting from block with header hash equal to given hash
 -- and while @predicate@ is true.
 loadBlundsWhile
+<<<<<<< HEAD
     :: (MonadDBRead m, HasGenesisHash)
+=======
+    :: MonadDBRead m
+>>>>>>> CHW-82-84, orphan branch
     => (Block -> Bool) -> HeaderHash -> m (NewestFirst [] Blund)
 loadBlundsWhile predicate = loadDataWhile getBlundThrow (predicate . fst)
 
 -- | Load blunds which have depth less than given (depth = number of
 -- blocks that will be returned).
 loadBlundsByDepth
+<<<<<<< HEAD
     :: (MonadDBRead m, HasGenesisHash)
+=======
+    :: MonadDBRead m
+>>>>>>> CHW-82-84, orphan branch
     => BlockCount -> HeaderHash -> m (NewestFirst [] Blund)
 loadBlundsByDepth = loadDataByDepth getBlundThrow (const True)
 
 -- | Load blocks starting from block with header hash equal to given hash
 -- and while @predicate@ is true.
 loadBlocksWhile
+<<<<<<< HEAD
     :: (MonadBlockDBRead m, HasGenesisHash)
+=======
+    :: MonadBlockDBRead m
+>>>>>>> CHW-82-84, orphan branch
     => (Block -> Bool) -> HeaderHash -> m (NewestFirst [] Block)
 loadBlocksWhile = loadDataWhile getBlockThrow
 
 -- | Load headers starting from block with header hash equal to given hash
 -- and while @predicate@ is true.
 loadHeadersWhile
+<<<<<<< HEAD
     :: ( LoadHeadersMode m, HasGenesisHash )
+=======
+    :: LoadHeadersMode m
+>>>>>>> CHW-82-84, orphan branch
     => (BlockHeader -> Bool)
     -> HeaderHash
     -> m (NewestFirst [] BlockHeader)
@@ -126,7 +160,11 @@ loadHeadersWhile = loadDataWhile getHeaderThrow
 
 -- | Load headers which have depth less than given.
 loadHeadersByDepth
+<<<<<<< HEAD
     :: ( LoadHeadersMode m, HasGenesisHash )
+=======
+    :: LoadHeadersMode m
+>>>>>>> CHW-82-84, orphan branch
     => BlockCount -> HeaderHash -> m (NewestFirst [] BlockHeader)
 loadHeadersByDepth = loadDataByDepth getHeaderThrow (const True)
 
@@ -137,14 +175,22 @@ loadHeadersByDepth = loadDataByDepth getHeaderThrow (const True)
 -- | Load blunds from BlockDB starting from tip and while the @condition@ is
 -- true.
 loadBlundsFromTipWhile
+<<<<<<< HEAD
     :: (MonadDBRead m, HasGenesisHash)
+=======
+    :: MonadDBRead m
+>>>>>>> CHW-82-84, orphan branch
     => (Block -> Bool) -> m (NewestFirst [] Blund)
 loadBlundsFromTipWhile condition = getTip >>= loadBlundsWhile condition
 
 -- | Load blunds from BlockDB starting from tip which have depth less than
 -- given.
 loadBlundsFromTipByDepth
+<<<<<<< HEAD
     :: (MonadDBRead m, HasGenesisHash)
+=======
+    :: MonadDBRead m
+>>>>>>> CHW-82-84, orphan branch
     => BlockCount -> m (NewestFirst [] Blund)
 loadBlundsFromTipByDepth d = getTip >>= loadBlundsByDepth d
 

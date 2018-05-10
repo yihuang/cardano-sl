@@ -24,7 +24,11 @@ import           Formatting (build, sformat, (%))
 
 import           Pos.Core.Block.Union (ComponentBlock (..))
 import           Pos.Core.Class (epochIndexL)
+<<<<<<< HEAD
 import           Pos.Core (HasCoreConfiguration, HasGenesisData, HasProtocolMagic)
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Txp (TxAux, TxUndo, TxpUndo)
 import           Pos.DB (SomeBatchOp (..))
 import           Pos.DB.Class (gsAdoptedBVData)
@@ -50,7 +54,11 @@ import qualified Pos.Util.Modifier as MM
 
 -- | Settings used for global transactions data processing used by a
 -- simple full node.
+<<<<<<< HEAD
 txpGlobalSettings :: (HasProtocolMagic, HasGenesisData) => TxpGlobalSettings
+=======
+txpGlobalSettings :: TxpGlobalSettings
+>>>>>>> CHW-82-84, orphan branch
 txpGlobalSettings =
     TxpGlobalSettings
     { tgsVerifyBlocks = verifyBlocks
@@ -63,7 +71,11 @@ txpGlobalSettings =
 ----------------------------------------------------------------------------
 
 verifyBlocks ::
+<<<<<<< HEAD
        forall m. (TxpGlobalVerifyMode m, HasProtocolMagic)
+=======
+       forall m. TxpGlobalVerifyMode m
+>>>>>>> CHW-82-84, orphan branch
     => Bool
     -> OldestFirst NE TxpBlock
     -> m $ Either ToilVerFailure $ OldestFirst NE TxpUndo
@@ -159,7 +171,11 @@ processBlunds ProcessBlundsSettings {..} blunds = do
 
 applyBlocksWith ::
        forall extraEnv extraState ctx m.
+<<<<<<< HEAD
        (TxpGlobalApplyMode ctx m, Default extraState, HasProtocolMagic)
+=======
+       (TxpGlobalApplyMode ctx m, Default extraState)
+>>>>>>> CHW-82-84, orphan branch
     => ProcessBlundsSettings extraEnv extraState m
     -> OldestFirst NE TxpBlund
     -> m SomeBatchOp
@@ -189,7 +205,11 @@ processBlundsSettings isRollback pureAction =
     processSingle = zoom _1 . magnify _1 . pureAction . blundToAuxNUndo
 
 rollbackBlocks ::
+<<<<<<< HEAD
        forall m. (TxpGlobalRollbackMode m, HasGenesisData)
+=======
+       forall m. TxpGlobalRollbackMode m
+>>>>>>> CHW-82-84, orphan branch
     => NewestFirst NE TxpBlund
     -> m SomeBatchOp
 rollbackBlocks (NewestFirst blunds) =
@@ -200,7 +220,11 @@ rollbackBlocks (NewestFirst blunds) =
 ----------------------------------------------------------------------------
 
 -- | Convert 'GlobalToilState' to batch of database operations.
+<<<<<<< HEAD
 globalToilStateToBatch :: HasCoreConfiguration => GlobalToilState -> SomeBatchOp
+=======
+globalToilStateToBatch :: HasConfiguration => GlobalToilState -> SomeBatchOp
+>>>>>>> CHW-82-84, orphan branch
 globalToilStateToBatch GlobalToilState {..} =
     SomeBatchOp [SomeBatchOp utxoOps, SomeBatchOp stakesOps]
   where

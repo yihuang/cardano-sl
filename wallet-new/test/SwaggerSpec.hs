@@ -1,6 +1,10 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE UndecidableInstances #-}
+<<<<<<< HEAD
 module SwaggerSpec (spec) where
+=======
+module SwaggerSpec where
+>>>>>>> CHW-82-84, orphan branch
 
 import           Universum
 

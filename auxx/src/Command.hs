@@ -1,5 +1,6 @@
 -- | Command.
 
+<<<<<<< HEAD
 module Command
        ( module Command.BlockGen
        , module Command.Help
@@ -17,3 +18,6 @@ import           Command.Rollback
 import           Command.Tx
 import           Command.TyProjection
 import           Command.Update
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

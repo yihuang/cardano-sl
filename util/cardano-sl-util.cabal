@@ -27,13 +27,17 @@ library
                        Pos.Util.Concurrent.PriorityLock
                        Pos.Util.Concurrent.RWLock
 
+<<<<<<< HEAD
                        Pos.Util.AssertMode
                        Pos.Util.Chrono
+=======
+>>>>>>> CHW-82-84, orphan branch
                        Pos.Util.Filesystem
                        Pos.Util.Future
                        Pos.Util.Justify
                        Pos.Util.Lens
                        Pos.Util.LoggerName
+<<<<<<< HEAD
                        Pos.Util.Limits
                        Pos.Util.LRU
                        Pos.Util.Modifier
@@ -43,21 +47,40 @@ library
                        Pos.Util.Some
                        Pos.Util.Timer
                        Pos.Util.Trace
+=======
+                       Pos.Util.LRU
+                       Pos.Util.Modifier
+                       Pos.Util.OptParse
+                       Pos.Util.Orphans
+                       Pos.Util.Queue
+                       Pos.Util.Some
+                       Pos.Util.Timer
+>>>>>>> CHW-82-84, orphan branch
                        Pos.Util.Util
 
   other-modules:
 
   build-depends:       QuickCheck
                      , aeson
+<<<<<<< HEAD
                      , base
                      , binary
                      , bytestring
                      , cardano-sl-binary
+=======
+                     , autoexporter
+                     , base
+                     , bytestring
+                     , cardano-sl-networking
+>>>>>>> CHW-82-84, orphan branch
                      , cborg
                      , cereal
                      , containers
                      , concurrent-extra
+<<<<<<< HEAD
                      , contravariant
+=======
+>>>>>>> CHW-82-84, orphan branch
                      , cryptonite
                      , data-default
                      , deepseq
@@ -72,6 +95,10 @@ library
                      , log-warper >= 1.0.3
                      , lrucache
                      , megaparsec
+<<<<<<< HEAD
+=======
+                     , mmorph
+>>>>>>> CHW-82-84, orphan branch
                      , mtl
                      , optparse-applicative
                      , parsec
@@ -132,6 +159,7 @@ library
 
   build-tools: cpphs >= 1.19
   ghc-options: -pgmP cpphs -optP --cpp
+<<<<<<< HEAD
 
 test-suite test
   main-is:             test.hs
@@ -197,3 +225,5 @@ test-suite test
 
   build-tools: cpphs >= 1.19
   ghc-options: -pgmP cpphs -optP --cpp
+=======
+>>>>>>> CHW-82-84, orphan branch

@@ -16,7 +16,11 @@ echo "Launch a single node and connect it to '${CLUSTER}' cluster..."
 
 readonly TOPOLOGY_YAML=docs/network/example-topologies/mainnet-staging.yaml
 
+<<<<<<< HEAD
 LANG=en_GB.UTF-8 LC_ALL=en_GB.UTF-8 stack exec -- cardano-node                                 \
+=======
+stack exec -- cardano-node                                 \
+>>>>>>> CHW-82-84, orphan branch
     --tlscert ./scripts/tls-files/server.crt               \
     --tlskey ./scripts/tls-files/server.key                \
     --tlsca ./scripts/tls-files/ca.crt                     \

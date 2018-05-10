@@ -1,5 +1,6 @@
 -- | Poll is an abstraction used for verifying data used in US.
 
+<<<<<<< HEAD
 module Pos.Update.Poll
        ( module Pos.Update.Poll.DBPoll
        , module Pos.Update.Poll.Class
@@ -23,3 +24,6 @@ import           Pos.Update.Poll.RollTrans
 import           Pos.Update.Poll.Trans
 import           Pos.Update.Poll.Types
 import           Pos.Update.Poll.Logic
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

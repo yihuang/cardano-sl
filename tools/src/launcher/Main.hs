@@ -20,9 +20,14 @@ import           Control.Concurrent.Async.Lifted.Safe (Async, async, cancel, pol
                                                        withAsync, withAsyncWithUnmask)
 import           Control.Exception.Safe (catchAny, handle, mask_, tryAny)
 import           Control.Lens (makeLensesWith)
+<<<<<<< HEAD
 import           Data.Aeson (FromJSON, Value (Array, Bool, Object), fromJSON, genericParseJSON,
                              withObject)
 import qualified Data.Aeson as AE
+=======
+import qualified Data.Aeson as AE
+import           Data.Aeson (FromJSON, Value (Array, Bool, Object), fromJSON, genericParseJSON, withObject)
+>>>>>>> CHW-82-84, orphan branch
 import qualified Data.ByteString.Lazy as BS.L
 import qualified Data.HashMap.Strict as HM
 import           Data.List (isSuffixOf)
@@ -38,6 +43,7 @@ import           Options.Applicative (Parser, ParserInfo, ParserResult (..), def
                                       header, help, helper, info, infoOption, long, metavar,
                                       progDesc, renderFailure, short, strOption)
 import           Serokell.Aeson.Options (defaultOptions)
+<<<<<<< HEAD
 import           System.Directory (createDirectoryIfMissing, doesFileExist, removeFile)
 import qualified System.Directory as Sys
 import           System.Environment (getExecutablePath, getProgName, setEnv)
@@ -45,6 +51,15 @@ import           System.Exit (ExitCode (..))
 import           System.FilePath (takeDirectory, (</>))
 import qualified System.Info as Sys
 import qualified System.IO as IO
+=======
+import qualified System.Directory as Sys
+import           System.Directory (createDirectoryIfMissing, doesFileExist, removeFile)
+import           System.Environment (getExecutablePath, getProgName, setEnv)
+import           System.Exit (ExitCode (..))
+import           System.FilePath (takeDirectory, (</>))
+import qualified System.IO as IO
+import qualified System.Info as Sys
+>>>>>>> CHW-82-84, orphan branch
 import qualified System.IO.Silently as Silently
 import           System.Process (ProcessHandle, waitForProcess)
 import qualified System.Process as Process
@@ -80,7 +95,11 @@ import           Pos.Util (HasLens (..), directory, logException, postfixLFields
 import           Pos.Util.CompileInfo (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
 
 import           Launcher.Environment (substituteEnvVarsValue)
+<<<<<<< HEAD
 import           Launcher.Logging (reportErrorDefault)
+=======
+import           Launcher.Logging     (reportErrorDefault)
+>>>>>>> CHW-82-84, orphan branch
 
 data LauncherOptions = LO
     { loNodePath            :: !FilePath
@@ -89,7 +108,10 @@ data LauncherOptions = LO
     , loNodeLogConfig       :: !(Maybe FilePath)
     , loNodeLogPath         :: !(Maybe FilePath)
     , loWalletPath          :: !(Maybe FilePath)
+<<<<<<< HEAD
     , loFrontendOnlyMode    :: !Bool
+=======
+>>>>>>> CHW-82-84, orphan branch
     , loWalletArgs          :: ![Text]
     , loWalletLogging       :: !Bool
     , loWalletLogPath       :: !(Maybe FilePath)
@@ -120,7 +142,10 @@ instance FromJSON LauncherOptions where
                 , ("nodeArgs",      Array mempty)
                 , ("walletArgs",    Array mempty)
                 , ("updaterArgs",   Array mempty)
+<<<<<<< HEAD
                 , ("frontendOnlyMode", Bool False)
+=======
+>>>>>>> CHW-82-84, orphan branch
                 ]
 
 -- | The concrete monad where everything happens
@@ -169,6 +194,7 @@ launcherArgsParser = do
 getLauncherOptions :: IO LauncherOptions
 getLauncherOptions = do
     LauncherArgs {..} <- either parseErrorHandler pure =<< execParserEither programInfo
+<<<<<<< HEAD
     daedalusDir <- takeDirectory <$> getExecutablePath
     case Sys.os of
       "mingw32" -> do
@@ -182,6 +208,15 @@ getLauncherOptions = do
     -- [CSL-2503] remove once cardano-node is capable of finding the file on its own and daedalus no longer needs it
     setEnv "LAUNCHER_CONFIG" configPath
 
+=======
+    case Sys.os of
+      "mingw32" -> do
+        daedalusDir <- takeDirectory <$> getExecutablePath
+        -- This is used by 'substituteEnvVars', later
+        setEnv "DAEDALUS_DIR" daedalusDir
+      _ -> pure ()
+    configPath <- maybe defaultConfigPath pure maybeConfigPath
+>>>>>>> CHW-82-84, orphan branch
     decoded <- Y.decodeFileEither configPath
     case decoded of
         Left err -> do
@@ -274,9 +309,12 @@ main =
     _ -> identity
   $ do
     Sys.getXdgDirectory Sys.XdgData "" >>= setEnv "XDG_DATA_HOME"
+<<<<<<< HEAD
     setEnv "LC_ALL" "en_GB.UTF-8"
     setEnv "LANG"   "en_GB.UTF-8"
 
+=======
+>>>>>>> CHW-82-84, orphan branch
     LO {..} <- getLauncherOptions
     -- Launcher logs should be in public directory
     let launcherLogsPrefix = (</> "pub") <$> loLogsPrefix
@@ -297,8 +335,13 @@ main =
                       set Log.ltSeverity (Just Log.debugPlus)
     logException loggerName . Log.usingLoggerName loggerName $
         withConfigurations loConfiguration $ \_ ->
+<<<<<<< HEAD
         case (loWalletPath, loFrontendOnlyMode) of
             (Nothing, _) -> do
+=======
+        case loWalletPath of
+            Nothing -> do
+>>>>>>> CHW-82-84, orphan branch
                 logNotice "LAUNCHER STARTED"
                 logInfo "Running in the server scenario"
                 serverScenario
@@ -310,6 +353,7 @@ main =
                         loUpdaterPath loUpdaterArgs loUpdateWindowsRunner loUpdateArchive)
                     loReportServer
                 logNotice "Finished serverScenario"
+<<<<<<< HEAD
             (Just wpath, True) -> do
                 frontendOnlyScenario
                     (NodeDbPath loNodeDbPath)
@@ -318,6 +362,9 @@ main =
                     (UpdaterData loUpdaterPath loUpdaterArgs loUpdateWindowsRunner loUpdateArchive)
                     loWalletLogging
             (Just wpath, False) -> do
+=======
+            Just wpath -> do
+>>>>>>> CHW-82-84, orphan branch
                 logNotice "LAUNCHER STARTED"
                 logInfo "Running in the client scenario"
                 clientScenario
@@ -470,6 +517,7 @@ clientScenario ndbp logPrefix logConf node wallet updater nodeTimeout report wal
             logWarning "The node didn't die after 'terminateProcess'"
             maybeTrySIGKILL nodeHandle
 
+<<<<<<< HEAD
 frontendOnlyScenario :: NodeDbPath -> NodeData -> NodeData -> UpdaterData -> Bool -> M ()
 frontendOnlyScenario ndbp node wallet updater walletLog = do
     runUpdater ndbp updater
@@ -484,6 +532,8 @@ frontendOnlyScenario ndbp node wallet updater walletLog = do
         else do
             logWarning $ sformat ("The wallet has exited with "%shown) exitCode
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | We run the updater and delete the update file if the update was
 -- successful.
 runUpdater :: NodeDbPath -> UpdaterData -> M ()
@@ -693,7 +743,11 @@ system'
     -> [Text]
     -- ^ Lines of standard input
     -> Executable
+<<<<<<< HEAD
     -- ^ executable to run
+=======
+    -- ^ node/wallet log output
+>>>>>>> CHW-82-84, orphan branch
     -> io ExitCode
     -- ^ Exit code
 system' phvar p sl nt = liftIO (do

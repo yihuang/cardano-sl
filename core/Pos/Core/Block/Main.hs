@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-dodgy-exports    #-}
 
@@ -15,3 +16,8 @@ import           Pos.Core.Block.Main.Types
 
 
 
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-dodgy-exports    #-}
+>>>>>>> CHW-82-84, orphan branch

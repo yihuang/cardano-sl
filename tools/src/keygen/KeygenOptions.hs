@@ -36,7 +36,12 @@ data KeygenCommand
     | ReadKey FilePath
     | DumpAvvmSeeds DumpAvvmSeedsOptions
     | GenerateKeysBySpec GenKeysOptions
+<<<<<<< HEAD
     | DumpGenesisData !FilePath !Bool
+=======
+    | DumpGenesisData { dgdPath      :: !FilePath
+                      , dgdCanonical :: !Bool }
+>>>>>>> CHW-82-84, orphan branch
     deriving (Show)
 
 data DumpAvvmSeedsOptions = DumpAvvmSeedsOptions
@@ -99,7 +104,11 @@ keygenCommandParser =
         dgdCanonical <- switch $
             long "canonical" <>
             help "Whether genesis data should be in canonical json"
+<<<<<<< HEAD
         pure $ DumpGenesisData dgdPath dgdCanonical
+=======
+        pure DumpGenesisData {..}
+>>>>>>> CHW-82-84, orphan branch
 
 dumpAvvmSeedsParser :: Parser DumpAvvmSeedsOptions
 dumpAvvmSeedsParser = do

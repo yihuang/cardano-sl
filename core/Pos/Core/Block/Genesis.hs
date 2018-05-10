@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-dodgy-exports    #-}
 
@@ -12,3 +13,8 @@ import           Pos.Core.Block.Genesis.Chain
 import           Pos.Core.Block.Genesis.Instances
 import           Pos.Core.Block.Genesis.Lens
 import           Pos.Core.Block.Genesis.Types
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-dodgy-exports    #-}
+>>>>>>> CHW-82-84, orphan branch

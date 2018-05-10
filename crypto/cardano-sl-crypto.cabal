@@ -43,6 +43,10 @@ library
                        Pos.Crypto.Signing.Types.Tag
 
   build-depends:       aeson
+<<<<<<< HEAD
+=======
+                     , autoexporter
+>>>>>>> CHW-82-84, orphan branch
                      , base
                      , binary
                      , bytestring
@@ -55,11 +59,19 @@ library
                      , data-default
                      , ed25519
                      , formatting
+<<<<<<< HEAD
+=======
+                     , generic-arbitrary
+>>>>>>> CHW-82-84, orphan branch
                      , hashable
                      , lens
                      , memory
                      , mtl
                      , pvss
+<<<<<<< HEAD
+=======
+                     , quickcheck-instances
+>>>>>>> CHW-82-84, orphan branch
                      , reflection
                      , safe-exceptions
                      , scrypt
@@ -101,6 +113,7 @@ library
 
   build-tools: cpphs >= 1.19
   ghc-options: -pgmP cpphs -optP --cpp
+<<<<<<< HEAD
 
 test-suite test
   main-is:             test.hs
@@ -187,3 +200,5 @@ test-suite test
   build-tools: cpphs >= 1.19
   ghc-options: -pgmP cpphs -optP --cpp
 
+=======
+>>>>>>> CHW-82-84, orphan branch

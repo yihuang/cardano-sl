@@ -1,5 +1,6 @@
 -- | Reexport of Pos.Client.Txp.* modules.
 
+<<<<<<< HEAD
 module Pos.Client.Txp
        ( module Pos.Client.Txp.Addresses
        , module Pos.Client.Txp.Balances
@@ -14,3 +15,6 @@ import            Pos.Client.Txp.History
 import            Pos.Client.Txp.Network
 import            Pos.Client.Txp.Util
 
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

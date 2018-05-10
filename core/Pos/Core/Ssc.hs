@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 module Pos.Core.Ssc
        ( module Pos.Core.Ssc.Types
        , module Pos.Core.Ssc.Util
@@ -6,3 +7,7 @@ module Pos.Core.Ssc
 import           Pos.Core.Ssc.Types
 import           Pos.Core.Ssc.Util
 import           Pos.Core.Ssc.Vss
+=======
+-- Pos.Core.Ssc
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

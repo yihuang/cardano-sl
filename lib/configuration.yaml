@@ -130,7 +130,11 @@ bench: &bench
         initializer:
           testBalance:
             poors:        50000
+<<<<<<< HEAD
             richmen:      7
+=======
+            richmen:      3
+>>>>>>> CHW-82-84, orphan branch
             richmenShare: 0.99
             useHDAddresses: False
             totalBalance: 6000000000

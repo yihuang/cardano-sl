@@ -13,7 +13,11 @@ module Pos.Lrc.DB.Seed
 import           Universum
 
 import           Pos.Binary.Class (serialize')
+<<<<<<< HEAD
 import           Pos.Core (EpochIndex (..), HasGenesisData, SharedSeed, gdFtsSeed, genesisData)
+=======
+import           Pos.Core (EpochIndex (..), HasConfiguration, SharedSeed, gdFtsSeed, genesisData)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (MonadDB, MonadDBRead)
 import           Pos.Lrc.DB.Common (getBi, putBi)
 
@@ -23,7 +27,11 @@ getSeed epoch = getBi (seedKey epoch)
 putSeed :: MonadDB m => EpochIndex -> SharedSeed -> m ()
 putSeed epoch = putBi (seedKey epoch)
 
+<<<<<<< HEAD
 prepareLrcSeed :: (HasGenesisData, MonadDB m) => m ()
+=======
+prepareLrcSeed :: (HasConfiguration, MonadDB m) => m ()
+>>>>>>> CHW-82-84, orphan branch
 prepareLrcSeed =
     unlessM isInitialized $ putSeed (EpochIndex 0) $ gdFtsSeed genesisData
 

@@ -19,7 +19,11 @@ import           System.Wlog (WithLogger, logDebug, logInfo)
 import           Universum
 
 import           Pos.Binary.Ssc ()
+<<<<<<< HEAD
 import           Pos.Core (EpochIndex (..), SlotId (..), VssCertificatesMap (..), HasGenesisData, HasProtocolConstants)
+=======
+import           Pos.Core (EpochIndex (..), HasConfiguration, SlotId (..), VssCertificatesMap (..))
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB (MonadDBRead)
 import           Pos.Ssc.Configuration (HasSscConfiguration)
 import qualified Pos.Ssc.DB as DB
@@ -43,7 +47,11 @@ getGlobalCerts sl =
 
 -- | Get stable VSS certificates for given epoch.
 getStableCerts
+<<<<<<< HEAD
     :: (HasSscConfiguration, MonadSscMem ctx m, MonadIO m, HasGenesisData, HasProtocolConstants)
+=======
+    :: (HasSscConfiguration, HasConfiguration, MonadSscMem ctx m, MonadIO m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> m VssCertificatesMap
 getStableCerts epoch =
     getStableCertsPure epoch <$> sscRunGlobalQuery (view sgsVssCertificates)
@@ -53,7 +61,11 @@ getStableCerts epoch =
 ----------------------------------------------------------------------------
 
 -- | Load global state from DB by recreating it from recent blocks.
+<<<<<<< HEAD
 sscLoadGlobalState :: (MonadDBRead m, WithLogger m) => m SscGlobalState
+=======
+sscLoadGlobalState :: (HasConfiguration, MonadDBRead m, WithLogger m) => m SscGlobalState
+>>>>>>> CHW-82-84, orphan branch
 sscLoadGlobalState = do
     logDebug "Loading SSC global state"
     gs <- DB.getSscGlobalState

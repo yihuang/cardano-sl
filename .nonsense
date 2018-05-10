@@ -1,3 +1,6 @@
 File with no meaning, just to trigger CI rebuild
+<<<<<<< HEAD
 trigger!
+=======
+>>>>>>> CHW-82-84, orphan branch
 

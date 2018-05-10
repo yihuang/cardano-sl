@@ -126,7 +126,11 @@ verifySums ::
 verifySums resolvedInputs outputs =
   case mTxFee of
       Nothing -> throwError $
+<<<<<<< HEAD
           ToilOutGreaterThanIn inpSum outSum
+=======
+          ToilOutGreaterThanIn {tInputSum = inpSum, tOutputSum = outSum}
+>>>>>>> CHW-82-84, orphan branch
       Just txFee ->
           return txFee
   where

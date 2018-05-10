@@ -31,11 +31,18 @@ import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Block.Logic.Integrity (VerifyHeaderParams (..), verifyHeader, verifyHeaders)
 import           Pos.Block.Logic.Util (lcaWithMainChain)
+<<<<<<< HEAD
 import           Pos.Core (BlockCount, EpochOrSlot (..), HeaderHash, SlotId (..), HasProtocolMagic,
                            blkSecurityParam, bvdMaxHeaderSize, difficultyL, epochIndexL,
                            epochOrSlotG, getChainDifficulty, getEpochOrSlot, headerHash,
                            headerHashG, headerSlotL, prevBlockL,
                            HasProtocolConstants, HasGenesisHash)
+=======
+import           Pos.Core (BlockCount, EpochOrSlot (..), HasConfiguration, HeaderHash, SlotId (..),
+                           blkSecurityParam, bvdMaxHeaderSize, difficultyL, epochIndexL,
+                           epochOrSlotG, getChainDifficulty, getEpochOrSlot, headerHash,
+                           headerHashG, headerSlotL, prevBlockL)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (BlockHeader (..))
 import           Pos.Crypto (hash)
 import           Pos.DB (MonadDBRead)
@@ -77,12 +84,20 @@ mkCHRinvalid = CHInvalid . T.intercalate "; "
 -- as ClassifyHeaderRes type.
 classifyNewHeader
     :: forall ctx m.
+<<<<<<< HEAD
     ( MonadSlots ctx m
+=======
+    ( HasConfiguration
+    , MonadSlots ctx m
+>>>>>>> CHW-82-84, orphan branch
     , MonadDBRead m
     , MonadUnliftIO m
     , MonadSlots ctx m
     , HasLrcContext ctx
+<<<<<<< HEAD
     , HasProtocolMagic
+=======
+>>>>>>> CHW-82-84, orphan branch
     )
     => BlockHeader -> m ClassifyHeaderRes
 -- Genesis headers seem useless, we can create them by ourselves.
@@ -173,8 +188,12 @@ classifyHeaders ::
        , HasLrcContext ctx
        , MonadSlots ctx m
        , WithLogger m
+<<<<<<< HEAD
        , HasProtocolConstants
        , HasProtocolMagic
+=======
+       , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
     => Bool -- recovery in progress?
     -> NewestFirst NE BlockHeader
@@ -262,6 +281,10 @@ data GetHeadersFromManyToError = GHFBadInput Text deriving (Show,Generic)
 getHeadersFromManyTo ::
        ( MonadDBRead m
        , WithLogger m
+<<<<<<< HEAD
+=======
+       , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
     => Maybe Word          -- ^ Optional limit on how many to bring in.
     -> NonEmpty HeaderHash -- ^ Checkpoints; not guaranteed to be
@@ -314,7 +337,11 @@ getHeadersFromManyTo mLimit checkpoints startM = runExceptT $ do
 -- it returns not more than 'blkSecurityParam' blocks distributed
 -- exponentially base 2 relatively to the depth in the blockchain.
 getHeadersOlderExp
+<<<<<<< HEAD
     :: ( MonadDBRead m, HasProtocolConstants, HasGenesisHash )
+=======
+    :: (HasConfiguration, MonadDBRead m)
+>>>>>>> CHW-82-84, orphan branch
     => Maybe HeaderHash -> m (OldestFirst NE HeaderHash)
 getHeadersOlderExp upto = do
     tip <- GS.getTip
@@ -376,7 +403,11 @@ throwGHR = throwError . GHRBadInput
 -- of headers in the chain (which should be returned) is more than
 -- @depthLimit@, error will be thrown.
 getHashesRange ::
+<<<<<<< HEAD
        forall m. (MonadDBRead m)
+=======
+       forall m. (HasConfiguration, MonadDBRead m)
+>>>>>>> CHW-82-84, orphan branch
     => Maybe Word
     -> HeaderHash
     -> HeaderHash

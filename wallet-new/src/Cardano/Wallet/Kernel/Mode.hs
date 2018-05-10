@@ -10,6 +10,10 @@ module Cardano.Wallet.Kernel.Mode
 
 import           Control.Lens (makeLensesWith)
 import qualified Control.Monad.Reader as Mtl
+<<<<<<< HEAD
+=======
+import           System.Wlog
+>>>>>>> CHW-82-84, orphan branch
 import           Universum
 
 import           Mockable
@@ -33,12 +37,20 @@ import           Pos.Txp.Logic
 import           Pos.Txp.MemState
 import           Pos.Util
 import           Pos.Util.Chrono
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events
 import           Pos.Util.TimeWarp (CanJsonLog (..))
 import           Pos.WorkMode
 
 import           Cardano.Wallet.WalletLayer (PassiveWalletLayer(..),
                                              applyBlocks, rollbackBlocks)
+=======
+import           Pos.Util.JsonLog
+import           Pos.Util.TimeWarp (CanJsonLog (..))
+import           Pos.WorkMode
+
+import           Cardano.Wallet.WalletLayer (PassiveWalletLayer)
+>>>>>>> CHW-82-84, orphan branch
 
 {-------------------------------------------------------------------------------
   The wallet context and monad
@@ -68,12 +80,22 @@ getWallet = view wcWallet_L
 --
 -- TODO: This should wrap the functionality in "Cardano.Wallet.Core" to
 -- wrap things in Cardano specific types.
+<<<<<<< HEAD
 walletApplyBlocks :: HasConfigurations
                   => PassiveWalletLayer Production
                   -> OldestFirst NE Blund
                   -> WalletMode SomeBatchOp
 walletApplyBlocks _w _bs = do
     lift $ applyBlocks _w _bs
+=======
+walletApplyBlocks :: PassiveWalletLayer Production
+                  -> OldestFirst NE Blund
+                  -> WalletMode SomeBatchOp
+walletApplyBlocks _w _bs = do
+    -- TODO: Call into the wallet. This should be an asynchronous operation
+    -- because 'onApplyBlocks' gets called with the block lock held.
+    logError "walletApplyBlocks not implemented"
+>>>>>>> CHW-82-84, orphan branch
 
     -- We don't make any changes to the DB so we always return 'mempty'.
     return mempty
@@ -86,12 +108,22 @@ walletRollbackBlocks :: PassiveWalletLayer Production
                      -> NewestFirst NE Blund
                      -> WalletMode SomeBatchOp
 walletRollbackBlocks _w _bs = do
+<<<<<<< HEAD
     lift $ rollbackBlocks _w _bs
+=======
+    -- TODO: Call into the wallet. This should be an asynchronous operation
+    -- because 'onRollbackBlocks' gets called with the block lock held.
+    logError "walletRollbackBlocks not implemented"
+>>>>>>> CHW-82-84, orphan branch
 
     -- We don't make any changes to the DB so we always return 'mempty'.
     return mempty
 
+<<<<<<< HEAD
 instance HasConfigurations => MonadBListener WalletMode where
+=======
+instance MonadBListener WalletMode where
+>>>>>>> CHW-82-84, orphan branch
   onApplyBlocks    bs = getWallet >>= (`walletApplyBlocks`    bs)
   onRollbackBlocks bs = getWallet >>= (`walletRollbackBlocks` bs)
 
@@ -112,6 +144,10 @@ runWalletMode nr wallet (action, outSpecs) =
     ekgNodeMetrics =
         EkgNodeMetrics
           (nrEkgStore nr)
+<<<<<<< HEAD
+=======
+          (runProduction . elimRealMode nr . walletModeToRealMode wallet)
+>>>>>>> CHW-82-84, orphan branch
 
     serverWalletMode :: WalletMode a
     serverWalletMode = runServer

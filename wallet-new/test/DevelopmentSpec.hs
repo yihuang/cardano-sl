@@ -12,7 +12,11 @@
 {-# LANGUAGE UndecidableInstances       #-}
 
 -- Spec for testing `development` endpoints
+<<<<<<< HEAD
 module DevelopmentSpec (spec) where
+=======
+module DevelopmentSpec where
+>>>>>>> CHW-82-84, orphan branch
 
 import           Universum
 

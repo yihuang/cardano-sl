@@ -1,5 +1,6 @@
 -- | Clients for Wallet Web API endpoints.
 
+<<<<<<< HEAD
 module Client.Cardano.Wallet.Web.Endpoint
     ( module Client.Cardano.Wallet.Web.Endpoint.GetAccounts
     , module Client.Cardano.Wallet.Web.Endpoint.GetHistory
@@ -21,3 +22,6 @@ import           Client.Cardano.Wallet.Web.Endpoint.NewAddress
 import           Client.Cardano.Wallet.Web.Endpoint.NewPayment
 import           Client.Cardano.Wallet.Web.Endpoint.NewWallet
 import           Client.Cardano.Wallet.Web.Endpoint.GetWallet
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

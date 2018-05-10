@@ -16,6 +16,10 @@ import qualified Ether
 import           Universum
 
 import           Pos.Binary.Update ()
+<<<<<<< HEAD
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Update (SoftwareVersion (..))
 import           Pos.Crypto (hash)
 import           Pos.Update.Poll.Class (MonadPoll (..), MonadPollRead (..))
@@ -32,7 +36,11 @@ type RollT m = Ether.LazyStateT' USUndo m
 --
 -- [WARNING] This transformer uses StateT and is intended for
 -- single-threaded usage only.
+<<<<<<< HEAD
 instance (MonadPoll m) => MonadPoll (RollT m) where
+=======
+instance (HasConfiguration, MonadPoll m) => MonadPoll (RollT m) where
+>>>>>>> CHW-82-84, orphan branch
     putBVState bv sv = ether $ do
         insertIfNotExist bv unChangedBVL getBVState
         putBVState bv sv

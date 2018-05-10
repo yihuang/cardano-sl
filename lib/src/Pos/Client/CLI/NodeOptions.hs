@@ -37,6 +37,10 @@ data CommonNodeArgs = CommonNodeArgs
     -- these two arguments are only used in development mode
     , devGenesisSecretI      :: !(Maybe Int)
     , keyfilePath            :: !FilePath
+<<<<<<< HEAD
+=======
+    , publicKeyfilePath      :: !FilePath
+>>>>>>> CHW-82-84, orphan branch
     , networkConfigOpts      :: !NetworkConfigOpts
       -- ^ Network configuration
     , jlPath                 :: !(Maybe FilePath)
@@ -72,6 +76,14 @@ commonNodeArgsParser = do
         metavar "FILEPATH" <>
         value   "secret.key" <>
         help    "Path to file with secret key (we use it for Daedalus)."
+<<<<<<< HEAD
+=======
+    publicKeyfilePath <- strOption $
+        long    "pubkeyfile" <>
+        metavar "FILEPATH" <>
+        value   "public.key" <>
+        help    "Path to file with public key (we use it for external wallets)."
+>>>>>>> CHW-82-84, orphan branch
     networkConfigOpts <- networkConfigOption
     jlPath <-
         optionalJSONPath

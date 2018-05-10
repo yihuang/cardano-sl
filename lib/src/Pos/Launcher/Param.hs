@@ -27,6 +27,10 @@ import           Pos.Update.Params (UpdateParams)
 import           Pos.Util.Lens (postfixLFields)
 import           Pos.Util.TimeWarp (NetworkAddress)
 import           Pos.Util.UserSecret (UserSecret)
+<<<<<<< HEAD
+=======
+import           Pos.Util.UserPublic (UserPublic)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Util (HasLens (..))
 
 -- | Contains all parameters required for hierarchical logger initialization.
@@ -53,6 +57,10 @@ data NodeParams = NodeParams
     , npRebuildDb      :: !Bool                 -- ^ @True@ if data-base should be rebuilt
     , npSecretKey      :: !SecretKey            -- ^ Primary secret key of node
     , npUserSecret     :: !UserSecret           -- ^ All node secret keys
+<<<<<<< HEAD
+=======
+    , npUserPublic     :: !UserPublic           -- ^ All node public keys (for external wallets)
+>>>>>>> CHW-82-84, orphan branch
     , npBaseParams     :: !BaseParams           -- ^ See 'BaseParams'
     , npJLFile         :: !(Maybe FilePath)     -- ^ File to use for JSON logging.
     , npReportServers  :: ![Text]               -- ^ List of report server URLs

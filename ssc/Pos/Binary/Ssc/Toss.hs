@@ -5,6 +5,10 @@ module Pos.Binary.Ssc.Toss
        ) where
 
 import           Pos.Binary.Class (Cons (..), Field (..), deriveSimpleBi, deriveSimpleBiCxt)
+<<<<<<< HEAD
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Ssc (CommitmentsMap, OpeningsMap, SharesMap, VssCertificatesMap)
 import           Pos.Ssc.Toss.Types (SscTag (..), TossModifier (..))
 import           Pos.Util.Util (cborError)
@@ -15,7 +19,11 @@ deriveSimpleBi ''SscTag [
     Cons 'SharesMsg [],
     Cons 'VssCertificateMsg []]
 
+<<<<<<< HEAD
 deriveSimpleBiCxt [t|()|] ''TossModifier [
+=======
+deriveSimpleBiCxt [t|HasConfiguration|] ''TossModifier [
+>>>>>>> CHW-82-84, orphan branch
     Cons 'TossModifier [
         Field [| _tmCommitments  :: CommitmentsMap     |],
         Field [| _tmOpenings     :: OpeningsMap        |],

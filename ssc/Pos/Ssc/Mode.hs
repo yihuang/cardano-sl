@@ -10,7 +10,11 @@ import qualified Crypto.Random as Rand
 import           Mockable (MonadMockable)
 import           System.Wlog (WithLogger)
 
+<<<<<<< HEAD
 import           Pos.Core (HasPrimaryKey)
+=======
+import           Pos.Core (HasConfiguration, HasPrimaryKey)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (MonadDB, MonadGState)
 import           Pos.Lrc.Context (HasLrcContext)
 import           Pos.Recovery.Info (MonadRecoveryInfo)
@@ -44,5 +48,9 @@ type SscMode ctx m
       , HasPrimaryKey ctx
       , HasLens SecurityParams ctx SecurityParams
       , HasLrcContext ctx
+<<<<<<< HEAD
+=======
+      , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
       , HasSscConfiguration
       )

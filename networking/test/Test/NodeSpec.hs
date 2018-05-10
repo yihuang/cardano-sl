@@ -12,35 +12,63 @@ module Test.NodeSpec
        ) where
 
 
+<<<<<<< HEAD
 import           Control.Concurrent.Async (wait, withAsync)
 import           Control.Concurrent.MVar (newEmptyMVar, putMVar, readMVar, takeMVar)
 import           Control.Concurrent.STM.TVar (TVar, newTVarIO)
 import           Control.Exception (catch, throwIO)
+=======
+import           Control.Concurrent.STM.TVar (TVar, newTVarIO)
+import           Control.Exception.Safe (catch, throwM)
+>>>>>>> CHW-82-84, orphan branch
 import           Control.Lens (sans, (%=), (&~), (.=))
 import           Control.Monad (forM_, when, unless)
 import           Control.Monad.IO.Class (liftIO)
 import qualified Data.Set as S
 import           Network.QDisc.Fair (fairQDisc)
+<<<<<<< HEAD
 import qualified Network.Transport as NT (Transport, address, closeEndPoint,
                                           closeTransport, newEndPoint, receive)
 import           Network.Transport.TCP (simpleOnePlaceQDisc, simpleUnboundedQDisc)
 import           System.Random (newStdGen)
 import           Test.Hspec (Spec, afterAll_, describe, runIO)
 import           Test.Hspec.Core.Spec (SpecM)
+=======
+import qualified Network.Transport as NT (Transport)
+import qualified Network.Transport.Abstract as NT (address, closeEndPoint, closeTransport,
+                                                   newEndPoint, receive)
+import           Network.Transport.Concrete (concrete)
+import           Network.Transport.TCP (simpleOnePlaceQDisc, simpleUnboundedQDisc)
+import           System.Random (newStdGen)
+import           Test.Hspec (Spec, afterAll_, describe, runIO)
+>>>>>>> CHW-82-84, orphan branch
 import           Test.Hspec.QuickCheck (modifyMaxSuccess, prop)
 import           Test.QuickCheck (Property, ioProperty)
 import           Test.QuickCheck.Modifiers (NonEmptyList (..), getNonEmpty)
 
+<<<<<<< HEAD
 import           Node
 import           Node.Message.Binary (binaryPacking)
 import           Pos.Util.Trace (wlogTrace)
 import           Test.Util (HeavyParcel (..), Parcel (..), Payload (..), TestState, deliveryTest,
                             expected, makeInMemoryTransport, makeTCPTransport, mkTestState,
                             modifyTestState, receiveAll, sendAll, timeout)
+=======
+import           Mockable.Concurrent (wait, withAsync)
+import           Mockable.Production (Production, runProduction)
+import           Mockable.SharedExclusive (newSharedExclusive, putSharedExclusive,
+                                           readSharedExclusive, takeSharedExclusive)
+import           Node
+import           Node.Message.Binary (binaryPacking)
+import           Test.Util (HeavyParcel (..), Parcel (..), Payload (..), TestState, deliveryTest,
+                            expected, makeInMemoryTransport, makeTCPTransport, mkTestState,
+                            modifyTestState, newWork, receiveAll, sendAll, timeout)
+>>>>>>> CHW-82-84, orphan branch
 
 spec :: Spec
 spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
 
+<<<<<<< HEAD
     let logTrace = wlogTrace ""
 
         -- Take at most 25000 bytes for each Received message.
@@ -81,6 +109,37 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
                 serverAddressVar <- newEmptyMVar
                 clientFinished <- newEmptyMVar
                 serverFinished <- newEmptyMVar
+=======
+    -- Take at most 25000 bytes for each Received message.
+    -- We want to ensure that the MTU works, but not make the tests too
+    -- painfully slow.
+    let mtu = 25000
+    let tcpTransportUnbounded = runIO $ makeTCPTransport "0.0.0.0" "127.0.0.1" "10342" simpleUnboundedQDisc mtu
+    let tcpTransportOnePlace = runIO $ makeTCPTransport "0.0.0.0" "127.0.0.1" "10343" simpleOnePlaceQDisc mtu
+    let tcpTransportFair = runIO $ makeTCPTransport "0.0.0.0" "127.0.0.1" "10345" (fairQDisc (const (return Nothing))) mtu
+    let memoryTransport = runIO $ makeInMemoryTransport
+    let transports = [
+              ("TCP unbounded queueing", tcpTransportUnbounded)
+            , ("TCP one-place queueing", tcpTransportOnePlace)
+            , ("TCP fair queueing", tcpTransportFair)
+            , ("In-memory", memoryTransport)
+            ]
+    let nodeEnv = defaultNodeEnvironment { nodeMtu = mtu }
+
+    forM_ transports $ \(name, mkTransport) -> do
+
+        transport_ <- mkTransport
+        let transport = concrete transport_
+
+        describe ("Using transport: " ++ name) $ afterAll_ (runProduction (NT.closeTransport transport)) $ do
+
+            prop "peer data" $ ioProperty . runProduction $ do
+                clientGen <- liftIO newStdGen
+                serverGen <- liftIO newStdGen
+                serverAddressVar <- newSharedExclusive
+                clientFinished <- newSharedExclusive
+                serverFinished <- newSharedExclusive
+>>>>>>> CHW-82-84, orphan branch
                 let attempts = 1
 
                 let listener = Listener $ \pd _ cactions -> do
@@ -92,6 +151,7 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
                                 _ <- timeout "server sending response" 30000000 (send cactions (Parcel i (Payload 32)))
                                 return ()
 
+<<<<<<< HEAD
                 let server = node logTrace (simpleNodeEndPoint transport) (const noReceiveDelay) (const noReceiveDelay) serverGen binaryPacking ("server" :: String, 42 :: Int) nodeEnv $ \_node ->
                         NodeAction (const [listener]) $ \_converse -> do
                             putMVar serverAddressVar (nodeId _node)
@@ -101,6 +161,17 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
                 let client = node logTrace (simpleNodeEndPoint transport) (const noReceiveDelay) (const noReceiveDelay) clientGen binaryPacking ("client" :: String, 24 :: Int) nodeEnv $ \_node ->
                         NodeAction (const [listener]) $ \converse -> do
                             serverAddress <- readMVar serverAddressVar
+=======
+                let server = node (simpleNodeEndPoint transport) (const noReceiveDelay) (const noReceiveDelay) serverGen binaryPacking ("server" :: String, 42 :: Int) nodeEnv $ \_node ->
+                        NodeAction (const [listener]) $ \_converse -> do
+                            putSharedExclusive serverAddressVar (nodeId _node)
+                            takeSharedExclusive clientFinished
+                            putSharedExclusive serverFinished ()
+
+                let client = node (simpleNodeEndPoint transport) (const noReceiveDelay) (const noReceiveDelay) clientGen binaryPacking ("client" :: String, 24 :: Int) nodeEnv $ \_node ->
+                        NodeAction (const [listener]) $ \converse -> do
+                            serverAddress <- readSharedExclusive serverAddressVar
+>>>>>>> CHW-82-84, orphan branch
                             forM_ [1..attempts] $ \i -> converseWith converse serverAddress $ \peerData -> Conversation $ \cactions -> do
                                 unless (peerData == ("server", 42)) (error "bad peer data")
                                 _ <- timeout "client sending" 30000000 (send cactions (Parcel i (Payload 32)))
@@ -110,8 +181,13 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
                                     Just (Parcel j (Payload _)) -> do
                                         when (j /= i) (error "parcel number mismatch")
                                         return ()
+<<<<<<< HEAD
                             putMVar clientFinished ()
                             takeMVar serverFinished
+=======
+                            putSharedExclusive clientFinished ()
+                            takeSharedExclusive serverFinished
+>>>>>>> CHW-82-84, orphan branch
 
                 withAsync server $ \serverPromise -> do
                     withAsync client $ \clientPromise -> do
@@ -122,7 +198,11 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
 
             -- Test where a node converses with itself. Fails only if an exception is
             -- thrown.
+<<<<<<< HEAD
             prop "self connection" $ ioProperty $ do
+=======
+            prop "self connection" $ ioProperty . runProduction $ do
+>>>>>>> CHW-82-84, orphan branch
                 gen <- liftIO newStdGen
                 -- Self-connections don't make TCP sockets so we can do an absurd amount
                 -- of attempts without taking too much time.
@@ -137,7 +217,11 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
                                 _ <- send cactions (Parcel i (Payload 32))
                                 return ()
 
+<<<<<<< HEAD
                 node logTrace (simpleNodeEndPoint transport) (const noReceiveDelay) (const noReceiveDelay) gen binaryPacking ("some string" :: String, 42 :: Int) nodeEnv $ \_node ->
+=======
+                node (simpleNodeEndPoint transport) (const noReceiveDelay) (const noReceiveDelay) gen binaryPacking ("some string" :: String, 42 :: Int) nodeEnv $ \_node ->
+>>>>>>> CHW-82-84, orphan branch
                     NodeAction (const [listener]) $ \converse -> do
                         forM_ [1..attempts] $ \i -> converseWith converse (nodeId _node) $ \peerData -> Conversation $ \cactions -> do
                             unless (peerData == ("some string", 42)) (error "bad peer data")
@@ -150,7 +234,11 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
                                     return ()
                 return True
 
+<<<<<<< HEAD
             prop "ack timeout" $ ioProperty $ do
+=======
+            prop "ack timeout" $ ioProperty . runProduction $ do
+>>>>>>> CHW-82-84, orphan branch
                 gen <- liftIO newStdGen
                 let env = nodeEnv {
                           -- 1/10 second.
@@ -158,7 +246,11 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
                         }
                 -- An endpoint to which the node will connect. It will never
                 -- respond to the node's SYN.
+<<<<<<< HEAD
                 ep <- NT.newEndPoint transport >>= either throwIO return
+=======
+                ep <- NT.newEndPoint transport >>= either throwM return
+>>>>>>> CHW-82-84, orphan branch
                 let peerAddr = NodeId (NT.address ep)
                 -- Must clear the endpoint's receive queue so that it's
                 -- never blocked on enqueue.
@@ -167,11 +259,19 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
                     -- delivered by withConnectionTo in case of an ACK timeout.
                     -- A ThreadKilled would come from the outer 'timeout', the
                     -- testing utility.
+<<<<<<< HEAD
                     let handleThreadKilled :: Timeout -> IO ()
                         handleThreadKilled Timeout = do
                             --liftIO . putStrLn $ "Thread killed successfully!"
                             return ()
                     node logTrace (simpleNodeEndPoint transport) (const noReceiveDelay) (const noReceiveDelay) gen binaryPacking () env $ \_node ->
+=======
+                    let handleThreadKilled :: Timeout -> Production ()
+                        handleThreadKilled Timeout = do
+                            --liftIO . putStrLn $ "Thread killed successfully!"
+                            return ()
+                    node (simpleNodeEndPoint transport) (const noReceiveDelay) (const noReceiveDelay) gen binaryPacking () env $ \_node ->
+>>>>>>> CHW-82-84, orphan branch
                         NodeAction (const []) $ \converse -> do
                             timeout "client waiting for ACK" 5000000 $
                                 flip catch handleThreadKilled $ converseWith converse peerAddr $ \_peerData -> Conversation $ \cactions -> do
@@ -186,9 +286,15 @@ spec = describe "Node" $ modifyMaxSuccess (const 50) $ do
             -- one sender, one receiver
             describe "delivery" $ do
                 prop "plain" $
+<<<<<<< HEAD
                     plainDeliveryTest transport nodeEnv
                 prop "heavy messages sent nicely" $
                     withHeavyParcels $ plainDeliveryTest transport nodeEnv
+=======
+                    plainDeliveryTest transport_ nodeEnv
+                prop "heavy messages sent nicely" $
+                    withHeavyParcels $ plainDeliveryTest transport_ nodeEnv
+>>>>>>> CHW-82-84, orphan branch
 
 prepareDeliveryTestState :: [Parcel] -> IO (TVar TestState)
 prepareDeliveryTestState expectedParcels =
@@ -197,6 +303,7 @@ prepareDeliveryTestState expectedParcels =
 
 plainDeliveryTest
     :: NT.Transport
+<<<<<<< HEAD
     -> NodeEnvironment
     -> NonEmptyList Parcel
     -> Property
@@ -205,11 +312,26 @@ plainDeliveryTest transport nodeEnv neparcels = ioProperty $ do
     testState <- prepareDeliveryTestState parcels
 
     let worker peerId converse = sendAll converse peerId parcels
+=======
+    -> NodeEnvironment Production
+    -> NonEmptyList Parcel
+    -> Property
+plainDeliveryTest transport_ nodeEnv neparcels = ioProperty $ do
+    let parcels = getNonEmpty neparcels
+    testState <- prepareDeliveryTestState parcels
+
+    let worker peerId converse = newWork testState "client" $
+            sendAll converse peerId parcels
+>>>>>>> CHW-82-84, orphan branch
 
         listener = receiveAll $
             \parcel -> modifyTestState testState $ expected %= sans parcel
 
+<<<<<<< HEAD
     deliveryTest transport nodeEnv testState [worker] [listener]
+=======
+    deliveryTest transport_ nodeEnv testState [worker] [listener]
+>>>>>>> CHW-82-84, orphan branch
 
 withHeavyParcels :: (NonEmptyList Parcel -> Property) -> NonEmptyList HeavyParcel -> Property
 withHeavyParcels testCase (NonEmpty megaParcels) = testCase (NonEmpty (getHeavyParcel <$> megaParcels))

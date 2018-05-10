@@ -21,6 +21,7 @@ import           System.Wlog (logDebug, logError, logInfo, logWarning)
 
 import           Pos.Block.BlockWorkMode (BlockWorkMode)
 import           Pos.Block.Logic (ClassifyHeaderRes (..), classifyNewHeader, getHeadersOlderExp)
+<<<<<<< HEAD
 import           Pos.Block.Network.Logic (BlockNetLogicException (..), handleBlocks,
                                           triggerRecovery)
 import           Pos.Block.RetrievalQueue (BlockRetrievalQueueTag, BlockRetrievalTask (..))
@@ -29,6 +30,15 @@ import           Pos.Communication.Protocol (NodeId, OutSpecs)
 import           Pos.Core (Block, HasGeneratedSecrets, HasGenesisBlockVersionData, HasGenesisData,
                            HasGenesisHash, HasHeaderHash (..), HasProtocolConstants, HeaderHash,
                            difficultyL, isMoreDifficult)
+=======
+import           Pos.Block.Network.Logic (BlockNetLogicException (DialogUnexpected), handleBlocks,
+                                          triggerRecovery)
+import           Pos.Block.Network.Types (MsgBlock (..), MsgGetBlocks (..))
+import           Pos.Block.RetrievalQueue (BlockRetrievalQueueTag, BlockRetrievalTask (..))
+import           Pos.Block.Types (RecoveryHeaderTag)
+import           Pos.Communication.Protocol (NodeId, OutSpecs, convH, toOutSpecs)
+import           Pos.Core (Block, HasHeaderHash (..), HeaderHash, difficultyL, isMoreDifficult)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (BlockHeader)
 import           Pos.Crypto (shortHashF)
 import qualified Pos.DB.BlockIndex as DB
@@ -40,6 +50,7 @@ import           Pos.Util.Util (HasLens (..))
 import           Pos.Worker.Types (WorkerSpec, worker)
 
 retrievalWorker
+<<<<<<< HEAD
     :: ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasGenesisHash
@@ -49,6 +60,16 @@ retrievalWorker
        )
     => (WorkerSpec m, OutSpecs)
 retrievalWorker = worker mempty retrievalWorkerImpl
+=======
+    :: forall ctx m.
+       (BlockWorkMode ctx m)
+    => (WorkerSpec m, OutSpecs)
+retrievalWorker = worker outs retrievalWorkerImpl
+  where
+    outs = toOutSpecs [convH (Proxy :: Proxy MsgGetBlocks)
+                             (Proxy :: Proxy MsgBlock)
+                      ]
+>>>>>>> CHW-82-84, orphan branch
 
 -- I really don't like join
 {-# ANN retrievalWorkerImpl ("HLint: ignore Use join" :: Text) #-}
@@ -65,6 +86,7 @@ retrievalWorker = worker mempty retrievalWorkerImpl
 --
 retrievalWorkerImpl
     :: forall ctx m.
+<<<<<<< HEAD
        ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasGenesisHash
@@ -72,6 +94,9 @@ retrievalWorkerImpl
        , HasGenesisBlockVersionData
        , HasGenesisData
        )
+=======
+       (BlockWorkMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => Diffusion m -> m ()
 retrievalWorkerImpl diffusion = do
     logInfo "Starting retrievalWorker loop"
@@ -125,7 +150,11 @@ retrievalWorkerImpl diffusion = do
         logDebug $ "handleContinues: " <> pretty hHash
         classifyNewHeader header >>= \case
             CHContinues ->
+<<<<<<< HEAD
                 void $ getProcessBlocks diffusion nodeId (headerHash header) [hHash]
+=======
+                void $ getProcessBlocks diffusion nodeId header [hHash]
+>>>>>>> CHW-82-84, orphan branch
             res -> logDebug $
                 "processContHeader: expected header to " <>
                 "be continuation, but it's " <> show res
@@ -181,7 +210,11 @@ retrievalWorkerImpl diffusion = do
                                         "already present in db"
         logDebug "handleRecovery: fetching blocks"
         checkpoints <- toList <$> getHeadersOlderExp Nothing
+<<<<<<< HEAD
         void $ getProcessBlocks diffusion nodeId (headerHash rHeader) checkpoints
+=======
+        void $ getProcessBlocks diffusion nodeId rHeader checkpoints
+>>>>>>> CHW-82-84, orphan branch
 
 ----------------------------------------------------------------------------
 -- Entering and exiting recovery mode
@@ -287,6 +320,7 @@ dropRecoveryHeaderAndRepeat diffusion nodeId = do
 -- processed. Throws exception if something goes wrong.
 getProcessBlocks
     :: forall ctx m.
+<<<<<<< HEAD
        ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasGenesisBlockVersionData
@@ -297,6 +331,12 @@ getProcessBlocks
     => Diffusion m
     -> NodeId
     -> HeaderHash
+=======
+       (BlockWorkMode ctx m)
+    => Diffusion m
+    -> NodeId
+    -> BlockHeader
+>>>>>>> CHW-82-84, orphan branch
     -> [HeaderHash]
     -> m ()
 getProcessBlocks diffusion nodeId desired checkpoints = do
@@ -305,14 +345,22 @@ getProcessBlocks diffusion nodeId desired checkpoints = do
       Nothing -> do
           let msg = sformat ("getProcessBlocks: diffusion returned []"%
                              " on request to fetch "%shortHashF%" from peer "%build)
+<<<<<<< HEAD
                             desired nodeId
+=======
+                            (headerHash desired) nodeId
+>>>>>>> CHW-82-84, orphan branch
           throwM $ DialogUnexpected msg
       Just (blocks :: OldestFirst NE Block) -> do
           recHeaderVar <- view (lensOf @RecoveryHeaderTag)
           logDebug $ sformat
               ("Retrieved "%int%" blocks")
               (blocks ^. _OldestFirst . to NE.length)
+<<<<<<< HEAD
           handleBlocks nodeId blocks diffusion
+=======
+          handleBlocks nodeId blocks diffusion 
+>>>>>>> CHW-82-84, orphan branch
           -- If we've downloaded any block with bigger
           -- difficulty than ncRecoveryHeader, we're
           -- gracefully exiting recovery mode.

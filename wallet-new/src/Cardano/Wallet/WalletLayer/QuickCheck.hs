@@ -25,6 +25,7 @@ bracketPassiveWallet =
   where
     passiveWalletLayer :: PassiveWalletLayer n
     passiveWalletLayer = PassiveWalletLayer
+<<<<<<< HEAD
         { _pwlCreateWallet   = \_     -> liftedGen
         , _pwlGetWalletIds   =           liftedGen
         , _pwlGetWallet      = \_     -> liftedGen
@@ -42,6 +43,22 @@ bracketPassiveWallet =
         , _pwlApplyBlocks    = \_     -> liftedGen
         , _pwlRollbackBlocks = \_     -> liftedGen
        }
+=======
+        { _pwlCreateWallet  = \_     -> liftedGen
+        , _pwlGetWalletIds  =           liftedGen
+        , _pwlGetWallet     = \_     -> liftedGen
+        , _pwlUpdateWallet  = \_ _   -> liftedGen
+        , _pwlDeleteWallet  = \_     -> liftedGen
+
+        , _pwlCreateAccount = \_ _   -> liftedGen
+        , _pwlGetAccounts   = \_     -> liftedGen
+        , _pwlGetAccount    = \_ _   -> liftedGen
+        , _pwlUpdateAccount = \_ _ _ -> liftedGen
+        , _pwlDeleteAccount = \_ _   -> liftedGen
+
+        , _pwlGetAddresses  = \_     -> liftedGen
+        }
+>>>>>>> CHW-82-84, orphan branch
 
     -- | A utility function.
     liftedGen :: forall b. (MonadIO n, Arbitrary b) => n b
@@ -54,7 +71,15 @@ bracketActiveWallet
     => PassiveWalletLayer n
     -> WalletDiffusion
     -> (ActiveWalletLayer n -> m a) -> m a
+<<<<<<< HEAD
 bracketActiveWallet walletPassiveLayer _walletDiffusion =
     bracket
       (return ActiveWalletLayer{..})
       (\_ -> return ())
+=======
+bracketActiveWallet walletPassiveLayer walletDiffusion =
+    bracket
+      (return ActiveWalletLayer{..})
+      (\_ -> return ())
+
+>>>>>>> CHW-82-84, orphan branch

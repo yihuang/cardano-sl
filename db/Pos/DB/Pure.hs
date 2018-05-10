@@ -48,7 +48,11 @@ import qualified Data.Set as S
 import qualified Database.RocksDB as Rocks
 
 import           Pos.Binary.Class (Bi)
+<<<<<<< HEAD
 import           Pos.Core (HeaderHash, HasCoreConfiguration)
+=======
+import           Pos.Core (HasConfiguration, HeaderHash)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (DBIteratorClass (..), DBTag (..), IterType, iterKeyPrefix)
 import           Pos.DB.Functions (processIterEntry)
 import           Pos.Util.Util (HasLens (..))
@@ -95,6 +99,10 @@ type MonadPureDB ctx m =
     , HasLens DBPureVar ctx DBPureVar
     , MonadMask m
     , MonadIO m
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     )
 
 dbPureDump :: MonadPureDB ctx m => m DBPure
@@ -118,8 +126,12 @@ dbIterSourcePureDefault ::
        , DBIteratorClass i
        , MonadResource m
        , Bi (IterKey i)
+<<<<<<< HEAD
        , Bi (IterValue i)
        , HasCoreConfiguration)
+=======
+       , Bi (IterValue i))
+>>>>>>> CHW-82-84, orphan branch
     => DBTag
     -> Proxy i
     -> ConduitT () (IterType i) m ()

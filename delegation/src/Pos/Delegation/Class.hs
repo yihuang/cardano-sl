@@ -27,6 +27,10 @@ import           Data.Time.Clock (UTCTime)
 import           Serokell.Data.Memory.Units (Byte)
 
 import           Pos.Core (HeaderHash, ProxySKHeavy, headerHash)
+<<<<<<< HEAD
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB (MonadBlockDBRead)
 import           Pos.DB.BlockIndex (getTipHeader)
 import           Pos.Delegation.Configuration (HasDlgConfiguration, dlgCacheParam)
@@ -70,7 +74,11 @@ type DelegationVar = TVar DelegationWrap
 -- * Sets '_dwEpochId' to epoch of tip.
 -- * Initializes mempools/LRU caches.
 mkDelegationVar ::
+<<<<<<< HEAD
        (MonadIO m, MonadBlockDBRead m, HasDlgConfiguration)
+=======
+       (MonadIO m, MonadBlockDBRead m, HasConfiguration, HasDlgConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => m DelegationVar
 mkDelegationVar = do
     tip <- getTipHeader
@@ -92,6 +100,10 @@ mkDelegationVar = do
 type MonadDelegation ctx m =
     ( MonadReader ctx m
     , HasLens DelegationVar ctx DelegationVar
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     )
 
 askDelegationState :: MonadDelegation ctx m => m DelegationVar

@@ -18,7 +18,11 @@ import           UnliftIO (MonadUnliftIO)
 import           Pos.Binary.Delegation ()
 import           Pos.Communication.Protocol (Message)
 import           Pos.Communication.Relay (DataMsg)
+<<<<<<< HEAD
 import           Pos.Core (ProxySKHeavy, HasGenesisBlockVersionData, HasProtocolMagic)
+=======
+import           Pos.Core (ProxySKHeavy)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (MonadBlockDBRead, MonadGState)
 import           Pos.Delegation.Class (MonadDelegation)
 import           Pos.Delegation.Configuration (HasDlgConfiguration)
@@ -49,7 +53,11 @@ type DlgListenerConstraint ctx m
        , HasDlgConfiguration
        )
 
+<<<<<<< HEAD
 handlePsk :: (HasProtocolMagic, HasGenesisBlockVersionData, DlgListenerConstraint ctx m) => ProxySKHeavy -> m Bool
+=======
+handlePsk :: DlgListenerConstraint ctx m => ProxySKHeavy -> m Bool
+>>>>>>> CHW-82-84, orphan branch
 handlePsk pSk = do
     logDebug $ sformat ("Got request to handle heavyweight psk: "%build) pSk
     verdict <- processProxySKHeavy pSk

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-dodgy-exports    #-}
 
@@ -11,3 +12,8 @@ import           Pos.Binary.Ssc.Relay
 import           Pos.Binary.Ssc.Toss
 import           Pos.Binary.Ssc.Types ()
 
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-dodgy-exports    #-}
+>>>>>>> CHW-82-84, orphan branch

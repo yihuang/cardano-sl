@@ -29,7 +29,11 @@ import           Pos.Network.Types (NetworkConfig (..), Topology (..), topologyD
                                     topologyEnqueuePolicy, topologyFailurePolicy)
 import           Pos.Txp (txpGlobalSettings)
 import           Pos.Util.CompileInfo (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (jsonLogConfigFromHandle)
+=======
+import           Pos.Util.JsonLog (jsonLogConfigFromHandle)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.UserSecret (usVss)
 import           Pos.Wallet.Web.Mode (WalletWebModeContext (..))
 import           Pos.Wallet.Web.State.Acidic (closeState, openState)
@@ -60,8 +64,14 @@ newRealModeContext
     => NodeDBs
     -> ConfigurationOptions
     -> FilePath
+<<<<<<< HEAD
     -> Production (RealModeContext ())
 newRealModeContext dbs confOpts secretKeyPath = do
+=======
+    -> FilePath
+    -> Production (RealModeContext ())
+newRealModeContext dbs confOpts secretKeyPath publicKeyPath = do
+>>>>>>> CHW-82-84, orphan branch
     let nodeArgs = NodeArgs {
       behaviorConfigPath = Nothing
     }
@@ -79,6 +89,10 @@ newRealModeContext dbs confOpts secretKeyPath = do
          , rebuildDB              = True
          , devGenesisSecretI      = Nothing
          , keyfilePath            = secretKeyPath
+<<<<<<< HEAD
+=======
+         , publicKeyfilePath      = publicKeyPath
+>>>>>>> CHW-82-84, orphan branch
          , networkConfigOpts      = networkOps
          , jlPath                 = Nothing
          , commonArgs             = CommonArgs {
@@ -117,6 +131,7 @@ walletRunner
     => ConfigurationOptions
     -> NodeDBs
     -> FilePath
+<<<<<<< HEAD
     -> WalletDB
     -> UberMonad a
     -> IO a
@@ -125,6 +140,17 @@ walletRunner confOpts dbs secretKeyPath ws act = runProduction $ do
                                  <*> newTVarIO def
                                  <*> liftIO newTQueueIO
                                  <*> newRealModeContext dbs confOpts secretKeyPath
+=======
+    -> FilePath
+    -> WalletDB
+    -> UberMonad a
+    -> IO a
+walletRunner confOpts dbs secretKeyPath publicKeyPath ws act = runProduction $ do
+    wwmc <- WalletWebModeContext <$> pure ws
+                                 <*> newTVarIO def
+                                 <*> liftIO newTQueueIO
+                                 <*> newRealModeContext dbs confOpts secretKeyPath publicKeyPath
+>>>>>>> CHW-82-84, orphan branch
     runReaderT act wwmc
 
 newWalletState :: (MonadIO m, HasConfigurations) => Bool -> FilePath -> m WalletDB
@@ -165,7 +191,11 @@ main = do
             ws   <- newWalletState (isJust addTo) walletPath -- Recreate or not
 
             let generatedWallet = generateWalletDB cli spec
+<<<<<<< HEAD
             walletRunner cfg dbs secretKeyPath ws generatedWallet
+=======
+            walletRunner cfg dbs secretKeyPath publicKeyPath ws generatedWallet
+>>>>>>> CHW-82-84, orphan branch
             closeState ws
 
             showStatsData "after" walletPath

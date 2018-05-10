@@ -33,11 +33,18 @@ import           Pos.Block.Slog (scCQFixedMonitorState, scCQOverallMonitorState,
                                  scEpochMonitorState, scGlobalSlotMonitorState,
                                  scLocalSlotMonitorState, slogGetLastSlots)
 import           Pos.Communication.Protocol (OutSpecs)
+<<<<<<< HEAD
 import           Pos.Core (BlockVersionData (..), ChainDifficulty, FlatSlotId, HasProtocolConstants,
                            SlotId (..), Timestamp (Timestamp), addressHash, blkSecurityParam,
                            difficultyL, epochOrSlotToSlot, epochSlots, flattenSlotId, gbHeader,
                            getEpochOrSlot, getOurPublicKey, getSlotIndex, slotIdF, unflattenSlotId,
                            HasGeneratedSecrets, HasGenesisData, HasGenesisHash, HasGenesisBlockVersionData)
+=======
+import           Pos.Core (BlockVersionData (..), ChainDifficulty, FlatSlotId, HasConfiguration,
+                           SlotId (..), Timestamp (Timestamp), addressHash, blkSecurityParam,
+                           difficultyL, epochOrSlotToSlot, epochSlots, flattenSlotId, gbHeader,
+                           getEpochOrSlot, getOurPublicKey, getSlotIndex, slotIdF, unflattenSlotId)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Crypto (ProxySecretKey (pskDelegatePk))
 import           Pos.DB (gsIsBootstrapEra)
 import qualified Pos.DB.BlockIndex as DB
@@ -56,7 +63,11 @@ import           Pos.Slotting (ActionTerminationPolicy (..), OnNewSlotParams (..
 import           Pos.Update.DB (getAdoptedBVData)
 import           Pos.Util (mconcatPair)
 import           Pos.Util.Chrono (OldestFirst (..))
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (jlCreatedBlock)
+=======
+import           Pos.Util.JsonLog (jlCreatedBlock)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.LogSafe (logDebugS, logInfoS, logWarningS)
 import           Pos.Util.TimeLimit (logWarningSWaitLinear)
 import           Pos.Util.TimeWarp (CanJsonLog (..))
@@ -68,6 +79,7 @@ import           Pos.Worker.Types (Worker, WorkerSpec, onNewSlotWorker, worker)
 
 -- | All workers specific to block processing.
 blkWorkers
+<<<<<<< HEAD
     :: ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasGenesisHash
@@ -75,6 +87,9 @@ blkWorkers
        , HasProtocolConstants
        , HasGenesisBlockVersionData
        )
+=======
+    :: BlockWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => ([WorkerSpec m], OutSpecs)
 blkWorkers =
     merge $ [ blkCreatorWorker
@@ -85,10 +100,14 @@ blkWorkers =
   where
     merge = mconcatPair . map (first pure)
 
+<<<<<<< HEAD
 informerWorker
     :: ( BlockWorkMode ctx m
        , HasProtocolConstants
     ) => (WorkerSpec m, OutSpecs)
+=======
+informerWorker :: BlockWorkMode ctx m => (WorkerSpec m, OutSpecs)
+>>>>>>> CHW-82-84, orphan branch
 informerWorker =
     onNewSlotWorker defaultOnNewSlotParams mempty $ \slotId _ ->
         recoveryCommGuard "onNewSlot worker, informerWorker" $ do
@@ -111,6 +130,7 @@ informerWorker =
 -- Block creation worker
 ----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 blkCreatorWorker
     :: ( BlockWorkMode ctx m
        , HasProtocolConstants
@@ -119,6 +139,9 @@ blkCreatorWorker
        , HasGenesisData
        , HasGenesisBlockVersionData
        ) => (WorkerSpec m, OutSpecs)
+=======
+blkCreatorWorker :: BlockWorkMode ctx m => (WorkerSpec m, OutSpecs)
+>>>>>>> CHW-82-84, orphan branch
 blkCreatorWorker =
     onNewSlotWorker onsp mempty $ \slotId diffusion ->
         recoveryCommGuard "onNewSlot worker, blkCreatorWorker" $
@@ -131,6 +154,7 @@ blkCreatorWorker =
         {onspTerminationPolicy = NewSlotTerminationPolicy "block creator"}
 
 blockCreator
+<<<<<<< HEAD
     :: ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasProtocolConstants
@@ -138,6 +162,9 @@ blockCreator
        , HasGenesisData
        , HasGenesisBlockVersionData
        )
+=======
+    :: BlockWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => SlotId -> Diffusion m -> m ()
 blockCreator (slotId@SlotId {..}) diffusion = do
 
@@ -201,6 +228,7 @@ blockCreator (slotId@SlotId {..}) diffusion = do
            | otherwise -> pass
 
 onNewSlotWhenLeader
+<<<<<<< HEAD
     :: ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasGenesisData
@@ -208,6 +236,9 @@ onNewSlotWhenLeader
        , HasGenesisBlockVersionData
        , HasProtocolConstants
        )
+=======
+    :: BlockWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => SlotId
     -> ProxySKBlockInfo
     -> Worker m
@@ -246,16 +277,24 @@ onNewSlotWhenLeader slotId pske diffusion = do
 ----------------------------------------------------------------------------
 
 recoveryTriggerWorker ::
+<<<<<<< HEAD
        forall ctx m. ( BlockWorkMode ctx m, HasProtocolConstants )
+=======
+       forall ctx m. (BlockWorkMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => (WorkerSpec m, OutSpecs)
 recoveryTriggerWorker =
     worker mempty recoveryTriggerWorkerImpl
 
 recoveryTriggerWorkerImpl
     :: forall ctx m.
+<<<<<<< HEAD
        ( BlockWorkMode ctx m
        , HasProtocolConstants
        )
+=======
+       (BlockWorkMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => Diffusion m -> m ()
 recoveryTriggerWorkerImpl diffusion = do
     -- Initial heuristic delay is needed (the system takes some time
@@ -312,7 +351,11 @@ recoveryTriggerWorkerImpl diffusion = do
 --
 -- Apart from chain quality check we also record some generally useful values.
 metricWorker
+<<<<<<< HEAD
     :: forall ctx m. ( BlockWorkMode ctx m, HasProtocolConstants )
+=======
+    :: forall ctx m. BlockWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => SlotId -> m ()
 metricWorker curSlot = do
     OldestFirst lastSlots <- slogGetLastSlots
@@ -347,7 +390,11 @@ difficultyMonitor ::
        MetricMonitorState ChainDifficulty -> MetricMonitor ChainDifficulty
 difficultyMonitor = noReportMonitor fromIntegral Nothing
 
+<<<<<<< HEAD
 reportSlottingData :: (HasProtocolConstants, BlockWorkMode ctx m) => SlotId -> m ()
+=======
+reportSlottingData :: BlockWorkMode ctx m => SlotId -> m ()
+>>>>>>> CHW-82-84, orphan branch
 reportSlottingData slotId = do
     -- epoch
     let epoch = siEpoch slotId
@@ -367,7 +414,11 @@ reportSlottingData slotId = do
         view scGlobalSlotMonitorState
     recordValue globalSlotMonitor globalSlot
 
+<<<<<<< HEAD
 reportCrucialValues :: (HasProtocolConstants, BlockWorkMode ctx m) => m ()
+=======
+reportCrucialValues :: BlockWorkMode ctx m => m ()
+>>>>>>> CHW-82-84, orphan branch
 reportCrucialValues = do
     label <- view scCrucialValuesLabel
     BlockVersionData {..} <- getAdoptedBVData
@@ -385,9 +436,13 @@ reportCrucialValues = do
 ----------------------------------------------------------------------------
 
 chainQualityChecker ::
+<<<<<<< HEAD
        ( BlockWorkMode ctx m
        , HasProtocolConstants
        )
+=======
+       forall ctx m. BlockWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => SlotId
     -> FlatSlotId
     -> m ()
@@ -407,7 +462,11 @@ chainQualityChecker curSlot kThSlot = do
 
 -- Monitor for chain quality for last k blocks.
 cqkMetricMonitor ::
+<<<<<<< HEAD
        ( HasBlockConfiguration, HasProtocolConstants )
+=======
+       (HasBlockConfiguration, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => MetricMonitorState Double
     -> Bool
     -> MetricMonitor Double

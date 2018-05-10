@@ -29,6 +29,10 @@ import qualified Control.Concurrent.STM as STM
 import           Data.Default (Default (..))
 import qualified Data.HashMap.Strict as HM
 import           Mockable (CurrentTime, Mockable)
+<<<<<<< HEAD
+=======
+import           Pos.Core (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Common (HeaderHash)
 import           Pos.Core.Txp (TxAux, TxId)
 import           Pos.DB.Class (MonadDBRead, MonadGState (..))
@@ -142,5 +146,9 @@ type TxpLocalWorkMode ctx m =
     , Mockable CurrentTime m
     , MonadMask m
     , MonadReporting ctx m
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     , HasTxpConfiguration
     )

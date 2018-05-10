@@ -1,5 +1,6 @@
 -- | Reexport module
 
+<<<<<<< HEAD
 module Pos.Delegation
        ( module Pos.Delegation.Worker
        , module Pos.Delegation.Types
@@ -23,3 +24,6 @@ import           Pos.Delegation.Class
 import           Pos.Delegation.Cede
 
 
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

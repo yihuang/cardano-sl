@@ -18,9 +18,14 @@ import           Pos.Binary.Class (biSize)
 import           Pos.Core (ChainDifficulty (..), Coin, EpochIndex, HeaderHash, IsMainHeader (..),
                            SlotId (siEpoch), SoftwareVersion (..), addressHash, applyCoinPortionUp,
                            blockVersionL, coinToInteger, difficultyL, epochIndexL, flattenSlotId,
+<<<<<<< HEAD
                            headerHashG, headerSlotL, sumCoins, unflattenSlotId, unsafeIntegerToCoin,
                            HasProtocolConstants, HasProtocolMagic)
 import           Pos.Core.Configuration (blkSecurityParam, protocolMagic)
+=======
+                           headerHashG, headerSlotL, sumCoins, unflattenSlotId, unsafeIntegerToCoin)
+import           Pos.Core.Configuration (HasConfiguration, blkSecurityParam, protocolMagic)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Update (BlockVersion, BlockVersionData (..), UpId, UpdatePayload (..),
                                   UpdateProposal (..), UpdateVote (..), bvdUpdateProposalThd,
                                   checkUpdatePayload)
@@ -41,6 +46,10 @@ import           Pos.Util.Some (Some (..))
 type ApplyMode m =
     ( MonadError PollVerFailure m
     , MonadPoll m
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     )
 
 -- | Verify UpdatePayload with respect to data provided by
@@ -58,7 +67,11 @@ type ApplyMode m =
 -- given header is applied and in this case threshold for update proposal is
 -- checked.
 verifyAndApplyUSPayload ::
+<<<<<<< HEAD
        (ApplyMode m, HasProtocolConstants, HasProtocolMagic)
+=======
+       ApplyMode m
+>>>>>>> CHW-82-84, orphan branch
     => BlockVersion
     -> Bool
     -> Either SlotId (Some IsMainHeader)
@@ -151,7 +164,11 @@ resolveVoteStake epoch totalStake vote = do
 -- If all checks pass, proposal is added. It can be in undecided or decided
 -- state (if it has enough voted stake at once).
 verifyAndApplyProposal
+<<<<<<< HEAD
     :: (MonadError PollVerFailure m, MonadPoll m)
+=======
+    :: (HasConfiguration, MonadError PollVerFailure m, MonadPoll m)
+>>>>>>> CHW-82-84, orphan branch
     => Bool
     -> Either SlotId (Some IsMainHeader)
     -> [UpdateVote]
@@ -281,7 +298,11 @@ verifyAndApplyVoteDo cd ups vote = do
 -- If proposal's total positive stake is bigger than negative, it's
 -- approved. Otherwise it's rejected.
 applyImplicitAgreement
+<<<<<<< HEAD
     :: (MonadPoll m, HasProtocolConstants)
+=======
+    :: (HasConfiguration, MonadPoll m)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId -> ChainDifficulty -> HeaderHash -> m ()
 applyImplicitAgreement (flattenSlotId -> slotId) cd hh = do
     BlockVersionData {..} <- getAdoptedBVData
@@ -312,7 +333,11 @@ applyImplicitAgreement (flattenSlotId -> slotId) cd hh = do
 -- confirmed or discarded (approved become confirmed, rejected become
 -- discarded).
 applyDepthCheck
+<<<<<<< HEAD
     :: forall m . (ApplyMode m, HasProtocolConstants)
+=======
+    :: forall m . ApplyMode m
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> HeaderHash -> ChainDifficulty -> m ()
 applyDepthCheck epoch hh (ChainDifficulty cd)
     | cd <= blkSecurityParam = pass

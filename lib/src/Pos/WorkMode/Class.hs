@@ -46,7 +46,10 @@ import           Pos.Update.Configuration (HasUpdateConfiguration)
 import           Pos.Update.Context (UpdateContext)
 import           Pos.Update.Params (UpdateParams)
 import           Pos.Util (HasLens, HasLens')
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason)
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.TimeWarp (CanJsonLog)
 
 -- | Bunch of constraints to perform work for real world distributed system.
@@ -71,7 +74,11 @@ type WorkMode ctx m
       , MonadReader ctx m
       , HasLens' ctx StartTime
       , HasLens' ctx StateLock
+<<<<<<< HEAD
       , HasLens' ctx (StateLockMetrics MemPoolModifyReason)
+=======
+      , HasLens' ctx StateLockMetrics
+>>>>>>> CHW-82-84, orphan branch
       , HasLens' ctx UpdateContext
       , HasLens' ctx UpdateParams
       , HasLens' ctx SecurityParams

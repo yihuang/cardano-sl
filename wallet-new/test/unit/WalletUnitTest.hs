@@ -1,35 +1,53 @@
 {-# LANGUAGE TupleSections #-}
+<<<<<<< HEAD
 {-# LANGUAGE LambdaCase    #-}
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 -- | Wallet unit tests
 --
 -- TODO: Take advantage of https://github.com/input-output-hk/cardano-sl/pull/2296 ?
 module Main (main) where
 
+<<<<<<< HEAD
 import           Universum
 
 import qualified Data.Map as Map
+=======
+>>>>>>> CHW-82-84, orphan branch
 import qualified Data.Set as Set
 import qualified Data.Text.Buildable
 import           Formatting (bprint, build, sformat, shown, (%))
 import           Serokell.Util (mapJson)
 import           Test.Hspec.QuickCheck
+<<<<<<< HEAD
 import           Test.QuickCheck (elements, frequency, arbitrary, listOf, suchThat)
 
 import qualified Pos.Block.Error as Cardano
 import           Pos.Core (HasConfiguration)
 import           Pos.Crypto (EncryptedSecretKey)
+=======
+import           Universum
+
+import qualified Pos.Block.Error as Cardano
+>>>>>>> CHW-82-84, orphan branch
 import qualified Pos.Txp.Toil as Cardano
 import           Pos.Util.Chrono
 
 import qualified Cardano.Wallet.Kernel as Kernel
+<<<<<<< HEAD
 import qualified Cardano.Wallet.Kernel.Actions as Actions
+=======
+>>>>>>> CHW-82-84, orphan branch
 import qualified Cardano.Wallet.Kernel.Diffusion as Kernel
 
 import           UTxO.BlockGen
 import           UTxO.Bootstrap
 import           UTxO.Context
+<<<<<<< HEAD
 import           UTxO.Crypto
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           UTxO.DSL
 import           UTxO.Interpreter
 import           UTxO.PreChain
@@ -39,12 +57,20 @@ import           Util.Buildable.Hspec
 import           Util.Buildable.QuickCheck
 import           Util.Validated
 import           Wallet.Abstract
+<<<<<<< HEAD
 import           Wallet.Abstract.Cardano
 import qualified Wallet.Basic as Base
 import qualified Wallet.Incremental as Incr
 import qualified Wallet.Prefiltered as Pref
 import qualified Wallet.Rollback.Basic as Roll
 import qualified Wallet.Rollback.Full as Full
+=======
+import qualified Wallet.Basic          as Base
+import qualified Wallet.Incremental    as Incr
+import qualified Wallet.Prefiltered    as Pref
+import qualified Wallet.Rollback.Basic as Roll
+import qualified Wallet.Rollback.Full  as Full
+>>>>>>> CHW-82-84, orphan branch
 
 {-------------------------------------------------------------------------------
   Main test driver
@@ -52,9 +78,14 @@ import qualified Wallet.Rollback.Full as Full
 
 main :: IO ()
 main = do
+<<<<<<< HEAD
 --   _showContext
     runTranslateNoErrors $ withConfig $
             return $ hspec tests
+=======
+--    _showContext
+    hspec tests
+>>>>>>> CHW-82-84, orphan branch
 
 -- | Debugging: show the translation context
 _showContext :: IO ()
@@ -70,12 +101,21 @@ _showContext = do
   Tests proper
 -------------------------------------------------------------------------------}
 
+<<<<<<< HEAD
 tests :: HasConfiguration =>Spec
 tests = describe "Wallet unit tests" $ do
     testTranslation
     testPureWallet
     testActiveWallet
     testWalletWorker
+=======
+tests :: Spec
+tests = describe "Wallet unit tests" $ do
+    testTranslation
+    testPureWallet
+    testPassiveWallet
+    testActiveWallet
+>>>>>>> CHW-82-84, orphan branch
 
 {-------------------------------------------------------------------------------
   UTxO->Cardano translation tests
@@ -132,7 +172,11 @@ testPureWallet = do
 
           w0, w1 :: Wallet GivenHash Addr
           w0 = walletBoot Full.walletEmpty ours fpcBoot
+<<<<<<< HEAD
           w1 = applyBlocks w0 fpcChain
+=======
+          w1 = applyBlocks w0 (chainBlocks fpcChain)
+>>>>>>> CHW-82-84, orphan branch
           w2 = rollback w1
 
       shouldNotBe (utxo w0) (utxo w1)
@@ -187,6 +231,7 @@ testPureWallet = do
     fullEmpty = walletBoot Full.walletEmpty . oursFromSet
 
 {-------------------------------------------------------------------------------
+<<<<<<< HEAD
   Inductive wallet tests, compares DSL vs Cardano Wallet API results at each
   inductive step.
 -------------------------------------------------------------------------------}
@@ -375,12 +420,23 @@ actionToStackOp = \case
 {-------------------------------------------------------------------------------
   Wallet resource management
 -------------------------------------------------------------------------------}
+=======
+  Passive wallet tests
+-------------------------------------------------------------------------------}
+
+testPassiveWallet  :: Spec
+testPassiveWallet = around bracketPassiveWallet $
+    describe "Passive wallet sanity checks" $ do
+      it "can be initialized" $ \w ->
+        Kernel.init w
+>>>>>>> CHW-82-84, orphan branch
 
 -- | Initialize passive wallet in a manner suitable for the unit tests
 bracketPassiveWallet :: (Kernel.PassiveWallet -> IO a) -> IO a
 bracketPassiveWallet = Kernel.bracketPassiveWallet logMessage
   where
    -- TODO: Decide what to do with logging
+<<<<<<< HEAD
     logMessage _sev txt = print txt
 
 -- | Initialize active wallet in a manner suitable for generator-based testing
@@ -395,6 +451,32 @@ diffusion :: Kernel.WalletDiffusion
 diffusion =  Kernel.WalletDiffusion {
     walletSendTx = \_tx -> return False
   }
+=======
+    logMessage _sev _txt = return ()
+
+{-------------------------------------------------------------------------------
+  Active wallet tests
+-------------------------------------------------------------------------------}
+
+testActiveWallet :: Spec
+testActiveWallet = around bracketWallet $
+    describe "Active wallet sanity checks" $ do
+      it "initially has no pending transactions" $ \w ->
+        Kernel.hasPending w `shouldReturn` False
+
+-- | Initialize active wallet in a manner suitable for unit testing
+bracketWallet :: (Kernel.ActiveWallet -> IO a) -> IO a
+bracketWallet test =
+    bracketPassiveWallet $ \passive ->
+      Kernel.bracketActiveWallet passive diffusion $ \active ->
+        test active
+  where
+    -- TODO: Decide what we want to do with submitted transactions
+    diffusion :: Kernel.WalletDiffusion
+    diffusion =  Kernel.WalletDiffusion {
+          walletSendTx = \_tx -> return False
+        }
+>>>>>>> CHW-82-84, orphan branch
 
 {-------------------------------------------------------------------------------
   Example hand-constructed chains
@@ -538,7 +620,11 @@ intAndVerifyChain pc = runTranslateT $ do
     FromPreChain{..} <- fromPreChain pc
     let dslIsValid = ledgerIsValid fpcLedger
         dslUtxo    = ledgerUtxo    fpcLedger
+<<<<<<< HEAD
     intResult <- catchTranslateErrors $ runIntBoot' fpcBoot $ int fpcChain
+=======
+    intResult <- catchTranslateErrors $ runIntBoot fpcBoot fpcChain
+>>>>>>> CHW-82-84, orphan branch
     case intResult of
       Left e ->
         case dslIsValid of
@@ -546,15 +632,23 @@ intAndVerifyChain pc = runTranslateT $ do
           Invalid _ e' -> return $ ExpectedInvalid' e' e
       Right (chain', ctxt) -> do
         let chain'' = fromMaybe (error "intAndVerify: Nothing")
+<<<<<<< HEAD
                     $ nonEmptyOldestFirst
                     $ map Right chain'
+=======
+                    $ nonEmptyOldestFirst chain'
+>>>>>>> CHW-82-84, orphan branch
         isCardanoValid <- verifyBlocksPrefix chain''
         case (dslIsValid, isCardanoValid) of
           (Invalid _ e' , Invalid _ e) -> return $ ExpectedInvalid e' e
           (Invalid _ e' , Valid     _) -> return $ Disagreement fpcLedger (UnexpectedValid e')
           (Valid     () , Invalid _ e) -> return $ Disagreement fpcLedger (UnexpectedInvalid e)
           (Valid     () , Valid (_undo, finalUtxo)) -> do
+<<<<<<< HEAD
             (finalUtxo', _) <- runIntT' ctxt $ int dslUtxo
+=======
+            (finalUtxo', _) <- runIntT ctxt dslUtxo
+>>>>>>> CHW-82-84, orphan branch
             if finalUtxo == finalUtxo'
               then return $ ExpectedValid
               else return $ Disagreement fpcLedger UnexpectedUtxo {
@@ -679,6 +773,9 @@ instance (Hash h a, Buildable a) => Buildable (Disagreement h a) where
       utxoDsl
       utxoCardano
       utxoInt
+<<<<<<< HEAD
 
 instance Buildable GenInductive where
     build (GenInductive ind _ _) = bprint ("GenInductive " % build) ind
+=======
+>>>>>>> CHW-82-84, orphan branch

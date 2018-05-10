@@ -8,13 +8,20 @@ import           Universum
 
 import qualified Data.ByteString.Lazy as LBS
 
+<<<<<<< HEAD
 import           Pos.Binary.Core.Common ()
 import           Pos.Binary.Core.Script ()
 import           Pos.Binary.Crypto ()
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), decodeKnownCborDataItem,
                                    decodeListLenCanonical, decodeUnknownCborDataItem,
                                    deriveSimpleBi, encodeKnownCborDataItem, encodeListLen,
                                    encodeUnknownCborDataItem, enforceSize, matchSize)
+<<<<<<< HEAD
+=======
+import           Pos.Binary.Core.Address ()
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Binary.Merkle ()
 import qualified Pos.Core.Common as Common
 import qualified Pos.Core.Txp as T

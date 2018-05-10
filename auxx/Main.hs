@@ -7,8 +7,13 @@ import           Unsafe (unsafeFromJust)
 
 import           Control.Exception.Safe (handle)
 import           Formatting (sformat, shown, (%))
+<<<<<<< HEAD
 import           JsonLog (jsonLog)
 import           Mockable (Production, runProduction)
+=======
+import           Mockable (Production, runProduction)
+import           JsonLog (jsonLog)
+>>>>>>> CHW-82-84, orphan branch
 import qualified Network.Transport.TCP as TCP (TCPAddr (..))
 import qualified System.IO.Temp as Temp
 import           System.Wlog (LoggerName, logInfo)
@@ -17,6 +22,7 @@ import           Pos.Block.Configuration (recoveryHeadersMessage)
 import qualified Pos.Client.CLI as CLI
 import           Pos.Communication (OutSpecs)
 import           Pos.Communication.Util (ActionSpec (..))
+<<<<<<< HEAD
 import           Pos.Configuration (networkConnectionTimeout)
 import           Pos.Core (ConfigurationError, protocolConstants, protocolMagic)
 import           Pos.DB.DB (initNodeDBs)
@@ -30,15 +36,36 @@ import           Pos.Logic.Types (LogicLayer (..), hoistLogic)
 import           Pos.Network.Types (NetworkConfig (..), Topology (..), topologyDequeuePolicy,
                                     topologyEnqueuePolicy, topologyFailurePolicy)
 import           Pos.Ntp.Configuration (NtpConfiguration)
+=======
+import           Pos.Core (ConfigurationError, protocolConstants, protocolMagic)
+import           Pos.Configuration (networkConnectionTimeout)
+import           Pos.DB.DB (initNodeDBs)
+import           Pos.Diffusion.Transport.TCP (bracketTransportTCP)
+import           Pos.Diffusion.Types (DiffusionLayer (..))
+import           Pos.Diffusion.Full (diffusionLayerFull)
+import           Pos.Logic.Full (logicLayerFull)
+import           Pos.Logic.Types (LogicLayer (..))
+import           Pos.Launcher (HasConfigurations, NodeParams (..), NodeResources,
+                               bracketNodeResources, loggerBracket, lpConsoleLog, runNode,
+                               elimRealMode, withConfigurations)
+import           Pos.Ntp.Configuration (NtpConfiguration)
+import           Pos.Network.Types (NetworkConfig (..), Topology (..), topologyDequeuePolicy,
+                                    topologyEnqueuePolicy, topologyFailurePolicy)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Txp (txpGlobalSettings)
 import           Pos.Update (lastKnownBlockVersion)
 import           Pos.Util (logException)
 import           Pos.Util.CompileInfo (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
 import           Pos.Util.Config (ConfigurationException (..))
 import           Pos.Util.UserSecret (usVss)
+<<<<<<< HEAD
 import           Pos.Util.Trace (wlogTrace)
 import           Pos.Worker.Types (WorkerSpec)
 import           Pos.WorkMode (EmptyMempoolExt, RealMode)
+=======
+import           Pos.WorkMode (EmptyMempoolExt, RealMode)
+import           Pos.Worker.Types (WorkerSpec)
+>>>>>>> CHW-82-84, orphan branch
 
 import           AuxxOptions (AuxxAction (..), AuxxOptions (..), AuxxStartMode (..), getAuxxOptions)
 import           Mode (AuxxContext (..), AuxxMode)
@@ -110,6 +137,7 @@ action opts@AuxxOptions {..} command = do
         CLI.printInfoOnStart aoCommonNodeArgs ntpConfig
         (nodeParams, tempDbUsed) <-
             correctNodeParams opts =<< CLI.getNodeParams loggerName cArgs nArgs
+<<<<<<< HEAD
 
         let fdconf = FullDiffusionConfiguration
                 { fdcProtocolMagic = protocolMagic
@@ -120,6 +148,9 @@ action opts@AuxxOptions {..} command = do
                 , fdcTrace = wlogTrace "auxx"
                 }
 
+=======
+        let
+>>>>>>> CHW-82-84, orphan branch
             toRealMode :: AuxxMode a -> RealMode EmptyMempoolExt a
             toRealMode auxxAction = do
                 realModeContext <- ask
@@ -130,6 +161,7 @@ action opts@AuxxOptions {..} command = do
                 lift $ runReaderT auxxAction auxxContext
         let vssSK = unsafeFromJust $ npUserSecret nodeParams ^. usVss
         let sscParams = CLI.gtSscParams cArgs vssSK (npBehaviorConfig nodeParams)
+<<<<<<< HEAD
         bracketNodeResources nodeParams sscParams txpGlobalSettings initNodeDBs $ \nr -> do
             let runIO = runProduction . elimRealMode nr . toRealMode
             -- Monad here needs to be 'Production' (bracketNodeResources) so
@@ -148,6 +180,18 @@ action opts@AuxxOptions {..} command = do
                         -- We're back in 'AuxxMode' again. We run the logic
                         -- layer using a hoisted diffusion layer (liftIO).
                         runLogicLayer logicLayer (liftIO (runDiffusionLayer diffusionLayer (runIO (auxxModeAction (hoistDiffusion liftIO (diffusion diffusionLayer))))))
+=======
+        bracketNodeResources nodeParams sscParams txpGlobalSettings initNodeDBs $ \nr ->
+            elimRealMode nr $ toRealMode $
+                logicLayerFull jsonLog $ \logicLayer ->
+                    bracketTransportTCP networkConnectionTimeout (ncTcpAddr (npNetworkConfig nodeParams)) $ \transport ->
+                        diffusionLayerFull (runProduction . elimRealMode nr . toRealMode) (npNetworkConfig nodeParams) lastKnownBlockVersion protocolMagic protocolConstants recoveryHeadersMessage transport Nothing $ \withLogic -> do
+                            diffusionLayer <- withLogic (logic logicLayer)
+                            let modifier = if aoStartMode == WithNode then runNodeWithSinglePlugin nr else identity
+                                (ActionSpec auxxModeAction, _) = modifier (auxxPlugin opts command)
+                            runLogicLayer logicLayer (runDiffusionLayer diffusionLayer (auxxModeAction (diffusion diffusionLayer)))
+
+>>>>>>> CHW-82-84, orphan branch
     cArgs@CLI.CommonNodeArgs {..} = aoCommonNodeArgs
     conf = CLI.configurationOptions (CLI.commonArgs cArgs)
     nArgs =

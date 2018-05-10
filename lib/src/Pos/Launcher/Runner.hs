@@ -23,22 +23,39 @@ import           JsonLog (jsonLog)
 import           Mockable (race)
 import           Mockable.Production (Production (..))
 import           System.Exit (ExitCode (..))
+<<<<<<< HEAD
 import           System.Wlog (askLoggerName)
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 import           Pos.Binary ()
 import           Pos.Block.Configuration (HasBlockConfiguration, recoveryHeadersMessage)
 import           Pos.Communication (ActionSpec (..), OutSpecs (..))
 import           Pos.Configuration (HasNodeConfiguration, networkConnectionTimeout)
+<<<<<<< HEAD
 import           Pos.Context.Context (NodeContext (..))
 import           Pos.Core.Configuration (HasProtocolConstants, protocolConstants)
 import           Pos.Crypto.Configuration (HasProtocolMagic, protocolMagic)
 import           Pos.Diffusion.Full (FullDiffusionConfiguration (..), diffusionLayerFull)
 import           Pos.Diffusion.Types (Diffusion (..), DiffusionLayer (..), hoistDiffusion)
+=======
+import           Pos.Core.Configuration (HasProtocolConstants, protocolConstants)
+import           Pos.Context.Context (NodeContext (..))
+import           Pos.Crypto.Configuration (HasProtocolMagic, protocolMagic)
+import           Pos.Diffusion.Full (diffusionLayerFull)
+import           Pos.Diffusion.Full.Types (DiffusionWorkMode)
+import           Pos.Diffusion.Transport.TCP (bracketTransportTCP)
+import           Pos.Diffusion.Types (Diffusion (..), DiffusionLayer (..))
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Launcher.Configuration (HasConfigurations)
 import           Pos.Launcher.Param (BaseParams (..), LoggingParams (..), NodeParams (..))
 import           Pos.Launcher.Resource (NodeResources (..))
 import           Pos.Logic.Full (LogicWorkMode, logicLayerFull)
+<<<<<<< HEAD
 import           Pos.Logic.Types (LogicLayer (..), hoistLogic)
+=======
+import           Pos.Logic.Types (LogicLayer (..))
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Network.Types (NetworkConfig (..), topologyRoute53HealthCheckEnabled)
 import           Pos.Recovery.Instance ()
 import           Pos.Reporting.Ekg (EkgNodeMetrics (..), registerEkgMetrics, withEkgServer)
@@ -47,11 +64,17 @@ import           Pos.Shutdown (HasShutdownContext, waitForShutdown)
 import           Pos.Txp (MonadTxpLocal)
 import           Pos.Update.Configuration (lastKnownBlockVersion)
 import           Pos.Util.CompileInfo (HasCompileInfo)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (JsonLogConfig (..),
                                           jsonLogConfigFromHandle)
 import           Pos.Web.Server (withRoute53HealthCheckApplication)
 import           Pos.WorkMode (RealMode, RealModeContext (..))
 import           Pos.Util.Trace (wlogTrace)
+=======
+import           Pos.Util.JsonLog (JsonLogConfig (..), jsonLogConfigFromHandle)
+import           Pos.Web.Server (withRoute53HealthCheckApplication)
+import           Pos.WorkMode (RealMode, RealModeContext (..))
+>>>>>>> CHW-82-84, orphan branch
 
 ----------------------------------------------------------------------------
 -- High level runners
@@ -76,7 +99,11 @@ runRealMode nr@NodeResources {..} (actionSpec, outSpecs) =
     elimRealMode nr $ runServer
         (runProduction . elimRealMode nr)
         ncNodeParams
+<<<<<<< HEAD
         (EkgNodeMetrics nrEkgStore)
+=======
+        (EkgNodeMetrics nrEkgStore (runProduction . elimRealMode nr))
+>>>>>>> CHW-82-84, orphan branch
         outSpecs
         actionSpec
   where
@@ -122,7 +149,12 @@ elimRealMode NodeResources {..} action = do
 -- number.
 runServer
     :: forall ctx m t .
+<<<<<<< HEAD
        ( LogicWorkMode ctx m
+=======
+       ( DiffusionWorkMode m
+       , LogicWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
        , HasShutdownContext ctx
        , MonadFix m
        , HasProtocolMagic
@@ -131,6 +163,7 @@ runServer
        , HasNodeConfiguration
        )
     => (forall y . m y -> IO y)
+<<<<<<< HEAD
        -- ^ MonadIO is up in that constraint somewhere. So basically your 'm'
        -- is a reader or IO itself.
     -> NodeParams
@@ -162,6 +195,30 @@ runServer runIO NodeParams {..} ekgNodeMetrics _ (ActionSpec act) = do
     exitOnShutdown action = do
         _ <- race waitForShutdown action
         exitWith (ExitFailure 20) -- special exit code to indicate an update
+=======
+    -> NodeParams
+    -> EkgNodeMetrics m
+    -> OutSpecs
+    -> ActionSpec m t
+    -> m t
+runServer runIO NodeParams {..} ekgNodeMetrics _ (ActionSpec act) =
+    exitOnShutdown . logicLayerFull jsonLog $ \logicLayer ->
+        bracketTransportTCP networkConnectionTimeout tcpAddr $ \transport ->
+            diffusionLayerFull runIO npNetworkConfig lastKnownBlockVersion protocolMagic protocolConstants recoveryHeadersMessage transport (Just ekgNodeMetrics) $ \withLogic -> do
+                diffusionLayer <- withLogic (logic logicLayer)
+                when npEnableMetrics (registerEkgMetrics ekgStore)
+                runLogicLayer logicLayer $
+                    runDiffusionLayer diffusionLayer $
+                    maybeWithRoute53 (enmElim ekgNodeMetrics (healthStatus (diffusion diffusionLayer))) $
+                    maybeWithEkg $
+                    maybeWithStatsd $
+                    act (diffusion diffusionLayer)
+  where
+    exitOnShutdown action = do
+        _ <- race waitForShutdown action
+        exitWith (ExitFailure 20) -- special exit code to indicate an update
+    tcpAddr = ncTcpAddr npNetworkConfig
+>>>>>>> CHW-82-84, orphan branch
     ekgStore = enmStore ekgNodeMetrics
     (hcHost, hcPort) = case npRoute53Params of
         Nothing         -> ("127.0.0.1", 3030)

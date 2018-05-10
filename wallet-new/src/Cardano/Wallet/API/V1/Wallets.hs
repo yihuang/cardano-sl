@@ -37,4 +37,16 @@ type API = Tags '["Wallets"] :>
                    :> Summary "Update the Wallet identified by the given walletId."
                    :> ReqBody '[ValidJSON] (Update Wallet)
                    :> Put '[ValidJSON] (WalletResponse Wallet)
+<<<<<<< HEAD
+=======
+    :<|> "external-wallets"
+                   :> Summary "Creates a new or restores an existing external wallet (mobile client or hardware wallet)."
+                   :> ReqBody '[ValidJSON] (New ExternalWallet)
+                   :> PostCreated '[ValidJSON] (WalletResponse Wallet)
+    :<|> "external-wallets"
+                   :> CaptureWalletId
+                   :> "address-path"
+                   :> Summary "Generates a new BIP44 derivation path for the given external wallet."
+                   :> PostCreated '[ValidJSON] (WalletResponse AddressPath)
+>>>>>>> CHW-82-84, orphan branch
     )

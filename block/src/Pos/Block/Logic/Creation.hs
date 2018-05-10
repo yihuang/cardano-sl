@@ -20,7 +20,10 @@ import           Control.Lens (uses, (-=), (.=), _Wrapped)
 import           Control.Monad.Except (MonadError (throwError), runExceptT)
 import           Data.Default (Default (def))
 import           Formatting (build, fixed, ords, sformat, stext, (%))
+<<<<<<< HEAD
 import           JsonLog (CanJsonLog (..))
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Serokell.Data.Memory.Units (Byte, memory)
 import           System.Wlog (WithLogger, logDebug)
 
@@ -30,11 +33,17 @@ import           Pos.Block.Logic.Internal (MonadBlockApply, applyBlocksUnsafe, n
 import           Pos.Block.Logic.Util (calcChainQualityM)
 import           Pos.Block.Logic.VAR (verifyBlocksPrefix)
 import           Pos.Block.Slog (HasSlogGState (..), ShouldCallBListener (..))
+<<<<<<< HEAD
 import           Pos.Core (Blockchain (..), EpochIndex, EpochOrSlot (..), HasGeneratedSecrets,
                            HasGenesisBlockVersionData, HasGenesisData, HasGenesisHash,
                            HasProtocolConstants, HasProtocolMagic, HeaderHash, SlotId (..),
                            chainQualityThreshold, epochIndexL, epochSlots, flattenSlotId,
                            getEpochOrSlot, headerHash, protocolMagic)
+=======
+import           Pos.Core (Blockchain (..), EpochIndex, EpochOrSlot (..), HasConfiguration,
+                           HeaderHash, SlotId (..), chainQualityThreshold, epochIndexL, epochSlots,
+                           flattenSlotId, getEpochOrSlot, headerHash, protocolMagic)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (BlockHeader (..), GenesisBlock, MainBlock, MainBlockchain)
 import qualified Pos.Core.Block as BC
 import           Pos.Core.Context (HasPrimaryKey, getOurSecretKey)
@@ -65,13 +74,21 @@ import           Pos.Update.Configuration (HasUpdateConfiguration, curSoftwareVe
 import qualified Pos.Update.DB as UDB
 import           Pos.Update.Logic (clearUSMemPool, usCanCreateBlock, usPreparePayload)
 import           Pos.Util (_neHead)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason (..))
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.LogSafe (logInfoS)
 import           Pos.Util.Util (HasLens (..), HasLens')
 
 -- | A set of constraints necessary to create a block from mempool.
 type MonadCreateBlock ctx m
+<<<<<<< HEAD
      = ( HasUpdateConfiguration
+=======
+     = ( HasConfiguration
+       , HasUpdateConfiguration
+>>>>>>> CHW-82-84, orphan branch
        , MonadReader ctx m
        , HasPrimaryKey ctx
        , HasSlogGState ctx -- to check chain quality
@@ -113,6 +130,7 @@ createGenesisBlockAndApply ::
        forall ctx m.
        ( MonadCreateBlock ctx m
        , MonadBlockApply ctx m
+<<<<<<< HEAD
        , CanJsonLog m
        , HasLens StateLock ctx StateLock
        , HasLens (StateLockMetrics MemPoolModifyReason) ctx (StateLockMetrics MemPoolModifyReason)
@@ -121,6 +139,10 @@ createGenesisBlockAndApply ::
        , HasGenesisData
        , HasGenesisHash
        , HasProtocolConstants
+=======
+       , HasLens StateLock ctx StateLock
+       , HasLens StateLockMetrics ctx StateLockMetrics
+>>>>>>> CHW-82-84, orphan branch
        )
     => EpochIndex
     -> m (Maybe GenesisBlock)
@@ -134,13 +156,18 @@ createGenesisBlockAndApply epoch = do
     if needGen
         then modifyStateLock
                  HighPriority
+<<<<<<< HEAD
                  ApplyBlock
+=======
+                 "createGenesisBlockAndApply"
+>>>>>>> CHW-82-84, orphan branch
                  (\_ -> createGenesisBlockDo epoch)
         else return Nothing
 
 createGenesisBlockDo
     :: forall ctx m.
        ( MonadCreateBlock ctx m
+<<<<<<< HEAD
        , MonadBlockApply ctx m
        , CanJsonLog m
        , HasGeneratedSecrets
@@ -149,6 +176,9 @@ createGenesisBlockDo
        , HasGenesisData
        , HasGenesisHash
        )
+=======
+       , MonadBlockApply ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex
     -> m (HeaderHash, Maybe GenesisBlock)
 createGenesisBlockDo epoch = do
@@ -185,7 +215,10 @@ createGenesisBlockDo epoch = do
 needCreateGenesisBlock ::
        ( MonadCreateBlock ctx m
        , MonadBlockApply ctx m
+<<<<<<< HEAD
        , HasProtocolConstants
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => EpochIndex
     -> BlockHeader
@@ -225,6 +258,7 @@ createMainBlockAndApply ::
        forall ctx m.
        ( MonadCreateBlock ctx m
        , MonadBlockApply ctx m
+<<<<<<< HEAD
        , CanJsonLog m
        , HasLens' ctx StateLock
        , HasLens' ctx (StateLockMetrics MemPoolModifyReason)
@@ -232,12 +266,20 @@ createMainBlockAndApply ::
        , HasGenesisData
        , HasGenesisBlockVersionData
        , HasProtocolConstants
+=======
+       , HasLens' ctx StateLock
+       , HasLens' ctx StateLockMetrics
+>>>>>>> CHW-82-84, orphan branch
        )
     => SlotId
     -> ProxySKBlockInfo
     -> m (Either Text MainBlock)
 createMainBlockAndApply sId pske =
+<<<<<<< HEAD
     modifyStateLock HighPriority ApplyBlock createAndApply
+=======
+    modifyStateLock HighPriority "createMainBlockAndApply" createAndApply
+>>>>>>> CHW-82-84, orphan branch
   where
     createAndApply tip =
         createMainBlockInternal sId pske >>= \case
@@ -255,7 +297,11 @@ createMainBlockAndApply sId pske =
 -- block. It only checks whether a block can be created (see
 -- 'createMainBlockAndApply') and creates it checks passes.
 createMainBlockInternal ::
+<<<<<<< HEAD
        forall ctx m. (MonadCreateBlock ctx m, HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+       forall ctx m. (MonadCreateBlock ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId
     -> ProxySKBlockInfo
     -> m (Either Text MainBlock)
@@ -281,7 +327,11 @@ createMainBlockInternal sId pske = do
         block <$ evaluateNF_ block
 
 canCreateBlock ::
+<<<<<<< HEAD
        forall ctx m. (MonadCreateBlock ctx m, HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+       forall ctx m. (MonadCreateBlock ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId
     -> BlockHeader
     -> m (Either Text ())
@@ -316,7 +366,11 @@ canCreateBlock sId tipHeader =
 
 createMainBlockPure
     :: forall m.
+<<<<<<< HEAD
        ( MonadError Text m, HasUpdateConfiguration, HasProtocolMagic, HasProtocolConstants )
+=======
+       (MonadError Text m, HasConfiguration, HasUpdateConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => Byte                   -- ^ Block size limit (real max.value)
     -> BlockHeader
     -> ProxySKBlockInfo
@@ -360,11 +414,14 @@ applyCreatedBlock ::
       forall ctx m.
     ( MonadBlockApply ctx m
     , MonadCreateBlock ctx m
+<<<<<<< HEAD
     , CanJsonLog m
     , HasProtocolConstants
     , HasGeneratedSecrets
     , HasGenesisData
     , HasGenesisBlockVersionData
+=======
+>>>>>>> CHW-82-84, orphan branch
     )
     => ProxySKBlockInfo
     -> MainBlock
@@ -422,7 +479,11 @@ data RawPayload = RawPayload
     }
 
 getRawPayload ::
+<<<<<<< HEAD
        forall ctx m. (MonadCreateBlock ctx m, HasGenesisBlockVersionData, HasProtocolConstants)
+=======
+       forall ctx m. (MonadCreateBlock ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => HeaderHash
     -> SlotId
     -> m RawPayload
@@ -447,7 +508,11 @@ getRawPayload tip slotId = do
 -- Given limit applies only to body, not to other data from block.
 createMainBody
     :: forall m .
+<<<<<<< HEAD
        ( MonadError Text m, HasProtocolConstants )
+=======
+       (MonadError Text m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => Byte  -- ^ Body limit
     -> SlotId
     -> RawPayload

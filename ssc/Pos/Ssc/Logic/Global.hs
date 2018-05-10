@@ -12,7 +12,11 @@ import           System.Wlog (WithLogger)
 import           Universum
 
 import           Pos.Binary.Ssc ()
+<<<<<<< HEAD
 import           Pos.Core (EpochIndex (..), SharedSeed, VssCertificatesMap (..), vcVssKey, HasGenesisBlockVersionData)
+=======
+import           Pos.Core (EpochIndex (..), SharedSeed, VssCertificatesMap (..), vcVssKey)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB (MonadDBRead)
 import           Pos.Lrc.Context (HasLrcContext)
 import           Pos.Lrc.Types (RichmenStakes)
@@ -35,9 +39,13 @@ sscCalculateSeed
        , MonadReader ctx m
        , HasLrcContext ctx
        , MonadIO m
+<<<<<<< HEAD
        , WithLogger m
        , HasGenesisBlockVersionData
        )
+=======
+       , WithLogger m )
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex
     -> m (Either SscSeedError SharedSeed)
 sscCalculateSeed epoch = do

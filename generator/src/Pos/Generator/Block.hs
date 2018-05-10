@@ -1,5 +1,6 @@
 -- | Arbitrary blockchain generation.
 
+<<<<<<< HEAD
 module Pos.Generator.Block
        ( module Pos.Generator.Block.Error
        , module Pos.Generator.Block.Logic
@@ -13,3 +14,6 @@ import           Pos.Generator.Block.Logic
 import           Pos.Generator.Block.Mode
 import           Pos.Generator.Block.Param
 import           Pos.Generator.Block.Payload
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

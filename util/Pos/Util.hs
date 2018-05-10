@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-dodgy-exports    #-}
 
@@ -40,3 +41,9 @@ import           Pos.Util.QuickCheck
 import           Pos.Util.Some
 import           Pos.Util.Timer
 import           Pos.Util.Util
+=======
+-- Pos.Util
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-dodgy-exports    #-}
+>>>>>>> CHW-82-84, orphan branch

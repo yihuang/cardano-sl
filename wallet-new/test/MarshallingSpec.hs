@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 module MarshallingSpec (spec) where
+=======
+module MarshallingSpec where
+>>>>>>> CHW-82-84, orphan branch
 
 import           Universum
 

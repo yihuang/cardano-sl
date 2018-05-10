@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 module Pos.Communication.Relay
        ( module Pos.Communication.Relay.Class
        , module Pos.Communication.Relay.Logic
@@ -9,3 +10,7 @@ import           Pos.Communication.Relay.Class
 import           Pos.Communication.Relay.Logic
 import           Pos.Communication.Relay.Types
 import           Pos.Communication.Relay.Util
+=======
+-- Pos.Communication.Relay
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

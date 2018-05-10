@@ -9,7 +9,11 @@ import           Universum
 
 import           Data.Time.Units (Microsecond, convertUnit)
 
+<<<<<<< HEAD
 import           Pos.Core.Configuration (epochSlots, HasProtocolConstants)
+=======
+import           Pos.Core.Configuration (HasConfiguration, epochSlots)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Slotting (EpochIndex, LocalSlotIndex, SlotId (..), Timestamp (..),
                                     addTimeDiffToTimestamp, flattenEpochIndex, mkLocalSlotIndex,
                                     unflattenSlotId)
@@ -22,7 +26,11 @@ import           Pos.Slotting.Types (EpochSlottingData (..), SlottingData, getAl
 
 -- | Approximate current slot using outdated slotting data.
 approxSlotUsingOutdated
+<<<<<<< HEAD
     :: (MonadSlotsData ctx m, HasProtocolConstants)
+=======
+    :: (MonadSlotsData ctx m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => Timestamp
     -> m SlotId
 approxSlotUsingOutdated t = do
@@ -58,7 +66,11 @@ approxSlotUsingOutdated t = do
 -- | Compute current slot from current timestamp based on data
 -- provided by 'MonadSlotsData'.
 slotFromTimestamp
+<<<<<<< HEAD
     :: (MonadSlotsData ctx m, HasProtocolConstants)
+=======
+    :: (MonadSlotsData ctx m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => Timestamp
     -> m (Maybe SlotId)
 slotFromTimestamp approxCurTime = do

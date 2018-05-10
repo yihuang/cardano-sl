@@ -27,9 +27,14 @@ import           System.Wlog (logDebug, logInfo, logWarning)
 import           Pos.Block.Logic.Internal (BypassSecurityCheck (..), MonadBlockApply,
                                            applyBlocksUnsafe, rollbackBlocksUnsafe)
 import           Pos.Block.Slog.Logic (ShouldCallBListener (..))
+<<<<<<< HEAD
 import           Pos.Core (Coin, EpochIndex, EpochOrSlot (..), SharedSeed, StakeholderId, HasProtocolConstants,
                            blkSecurityParam, crucialSlot, epochIndexL, getEpochOrSlot, HasGeneratedSecrets,
                            HasGenesisBlockVersionData, HasGenesisData, HasGenesisHash)
+=======
+import           Pos.Core (Coin, EpochIndex, EpochOrSlot (..), SharedSeed, StakeholderId,
+                           blkSecurityParam, crucialSlot, epochIndexL, getEpochOrSlot)
+>>>>>>> CHW-82-84, orphan branch
 import qualified Pos.DB.Block.Load as DB
 import qualified Pos.DB.GState.Stakes as GS (getRealStake, getRealTotalStake)
 import qualified Pos.GState.SanityCheck as DB (sanityCheckDB)
@@ -74,7 +79,11 @@ type LrcModeFull ctx m =
 -- block for this epoch is not known, LrcError will be thrown.
 -- It assumes that 'StateLock' is taken already.
 lrcSingleShot
+<<<<<<< HEAD
     :: forall ctx m. (LrcModeFull ctx m, HasGeneratedSecrets, HasGenesisBlockVersionData, HasProtocolConstants, HasGenesisData, HasGenesisHash)
+=======
+    :: forall ctx m. (LrcModeFull ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> m ()
 lrcSingleShot epoch = do
     lock <- views (lensOf @LrcContext) lcLrcSync
@@ -127,7 +136,11 @@ tryAcquireExclusiveLock epoch lock action =
 
 lrcDo
     :: forall ctx m.
+<<<<<<< HEAD
        (LrcModeFull ctx m, HasGeneratedSecrets, HasGenesisBlockVersionData, HasProtocolConstants, HasGenesisData, HasGenesisHash)
+=======
+       (LrcModeFull ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> [LrcConsumer m] -> m ()
 lrcDo epoch consumers = do
     blundsUpToGenesis <- DB.loadBlundsFromTipWhile upToGenesis
@@ -211,7 +224,11 @@ issuersComputationDo epochId = do
         Just stake -> pure $ HM.insert id stake hm
 
 leadersComputationDo ::
+<<<<<<< HEAD
        forall ctx m. (LrcMode ctx m, HasProtocolConstants)
+=======
+       forall ctx m. LrcMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex
     -> SharedSeed
     -> m ()

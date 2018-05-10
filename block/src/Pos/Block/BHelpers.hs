@@ -31,7 +31,11 @@ import           Pos.Core.Block.Main (Body (..), ConsensusData (..), MainBlockHe
                                       mainBlockEBDataProof)
 import           Pos.Core.Block.Union (BlockHeader (..), BlockSignature (..))
 import           Pos.Core.Class (IsMainHeader (..))
+<<<<<<< HEAD
 import           Pos.Core.Configuration (HasProtocolMagic, protocolMagic, HasProtocolConstants)
+=======
+import           Pos.Core.Configuration (HasConfiguration, protocolMagic)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Delegation (LightDlgIndices (..), checkDlgPayload)
 import           Pos.Core.Slotting (SlotId (..))
 import           Pos.Core.Ssc (checkSscPayload)
@@ -45,7 +49,11 @@ import           Pos.Util.Some (Some (Some))
 -- | Verify a BlockHeader in isolation. There is nothing to be done for
 -- genesis headers.
 verifyBlockHeader
+<<<<<<< HEAD
     :: ( MonadError Text m, Bi (BodyProof MainBlockchain), HasProtocolMagic )
+=======
+    :: (HasConfiguration, MonadError Text m, Bi (BodyProof MainBlockchain))
+>>>>>>> CHW-82-84, orphan branch
     => BlockHeader
     -> m ()
 verifyBlockHeader (BlockHeaderGenesis _) = pure ()
@@ -53,12 +61,20 @@ verifyBlockHeader (BlockHeaderMain bhm)  = verifyMainBlockHeader bhm
 
 -- | Verify a Block in isolation.
 verifyBlock
+<<<<<<< HEAD
     :: ( MonadError Text m
        , Bi BlockHeader
        , Bi (BodyProof MainBlockchain)
        , IsMainHeader MainBlockHeader
        , HasProtocolConstants
        , HasProtocolMagic
+=======
+    :: ( HasConfiguration
+       , MonadError Text m
+       , Bi BlockHeader
+       , Bi (BodyProof MainBlockchain)
+       , IsMainHeader MainBlockHeader
+>>>>>>> CHW-82-84, orphan branch
        )
     => Block
     -> m ()
@@ -73,12 +89,20 @@ verifyGenesisBlock UnsafeGenericBlock {..} =
     checkBodyProof _gbBody (_gbhBodyProof _gbHeader)
 
 verifyMainBlock
+<<<<<<< HEAD
     :: ( MonadError Text m
        , Bi BlockHeader
        , Bi (BodyProof MainBlockchain)
        , IsMainHeader MainBlockHeader
        , HasProtocolConstants
        , HasProtocolMagic
+=======
+    :: ( HasConfiguration
+       , MonadError Text m
+       , Bi BlockHeader
+       , Bi (BodyProof MainBlockchain)
+       , IsMainHeader MainBlockHeader
+>>>>>>> CHW-82-84, orphan branch
        )
     => GenericBlock MainBlockchain
     -> m ()
@@ -104,7 +128,11 @@ verifyMainBlock block@UnsafeGenericBlock {..} = do
 -- | Verify the body of a block. There are no internal consistency checks,
 -- it's just a verification of its sub-components (payloads).
 verifyMainBody
+<<<<<<< HEAD
     :: ( MonadError Text m, HasProtocolMagic )
+=======
+    :: ( HasConfiguration, MonadError Text m )
+>>>>>>> CHW-82-84, orphan branch
     => Body MainBlockchain
     -> m ()
 verifyMainBody MainBody {..} = do
@@ -115,7 +143,11 @@ verifyMainBody MainBody {..} = do
 
 -- | Verify a main block header in isolation.
 verifyMainBlockHeader
+<<<<<<< HEAD
     :: ( MonadError Text m, Bi (BodyProof MainBlockchain), HasProtocolMagic )
+=======
+    :: (HasConfiguration, MonadError Text m, Bi (BodyProof MainBlockchain))
+>>>>>>> CHW-82-84, orphan branch
     => GenericBlockHeader MainBlockchain
     -> m ()
 verifyMainBlockHeader UnsafeGenericBlockHeader {..} = do

@@ -3,6 +3,7 @@
     <https://hackage.haskell.org/package/kademlia>
 -}
 
+<<<<<<< HEAD
 module Pos.DHT.Real
        ( module Pos.DHT.Real.CLI
        , module Pos.DHT.Real.Param
@@ -15,3 +16,6 @@ import            Pos.DHT.Real.Param
 import            Pos.DHT.Real.Real
 import            Pos.DHT.Real.Types
 
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

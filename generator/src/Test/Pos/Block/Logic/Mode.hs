@@ -63,7 +63,11 @@ import           Pos.Block.Slog (HasSlogGState (..), mkSlogGState)
 import           Pos.Configuration (HasNodeConfiguration)
 import           Pos.Core (BlockVersionData, CoreConfiguration (..), GenesisConfiguration (..),
                            GenesisInitializer (..), GenesisSpec (..), HasConfiguration, SlotId,
+<<<<<<< HEAD
                            Timestamp (..), genesisSecretKeys, withGenesisSpec, HasProtocolConstants)
+=======
+                           Timestamp (..), genesisSecretKeys, withGenesisSpec)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Configuration (HasGenesisBlockVersionData, withGenesisBlockVersionData)
 import           Pos.DB (DBPure, MonadDB (..), MonadDBRead (..), MonadGState (..))
 import qualified Pos.DB as DB
@@ -462,6 +466,7 @@ testSlottingHelper targetF alternative = do
         Nothing   -> targetF btcSSlottingStateVar
         Just slot -> pure $ alternative slot
 
+<<<<<<< HEAD
 getCurrentSlotTestDefault :: (TestSlottingContext ctx m, HasProtocolConstants) => m (Maybe SlotId)
 getCurrentSlotTestDefault = testSlottingHelper getCurrentSlotSimple' Just
 
@@ -469,6 +474,15 @@ getCurrentSlotBlockingTestDefault :: (TestSlottingContext ctx m, HasProtocolCons
 getCurrentSlotBlockingTestDefault = testSlottingHelper getCurrentSlotBlockingSimple' identity
 
 getCurrentSlotInaccurateTestDefault :: (TestSlottingContext ctx m, HasProtocolConstants) => m SlotId
+=======
+getCurrentSlotTestDefault :: TestSlottingContext ctx m => m (Maybe SlotId)
+getCurrentSlotTestDefault = testSlottingHelper getCurrentSlotSimple' Just
+
+getCurrentSlotBlockingTestDefault :: TestSlottingContext ctx m => m SlotId
+getCurrentSlotBlockingTestDefault = testSlottingHelper getCurrentSlotBlockingSimple' identity
+
+getCurrentSlotInaccurateTestDefault :: TestSlottingContext ctx m => m SlotId
+>>>>>>> CHW-82-84, orphan branch
 getCurrentSlotInaccurateTestDefault = testSlottingHelper getCurrentSlotInaccurateSimple' identity
 
 currentTimeSlottingTestDefault :: SimpleSlottingMode ctx m => m Timestamp

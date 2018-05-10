@@ -20,8 +20,11 @@ import           Pos.Core
 import           Pos.Txp.Toil
 import           Pos.Util.Chrono
 
+<<<<<<< HEAD
 import           Cardano.Wallet.Kernel.Types (rawResolvedTx)
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Util.DepIndep
 import           UTxO.Bootstrap
 import           UTxO.Context
@@ -54,10 +57,17 @@ import           UTxO.Translate
 --
 -- It is still the responsibility of the 'PreChain' author to make sure that the
 -- structure of the blockchain does not depend on the fees that are passed.
+<<<<<<< HEAD
 type PreChain h m a = DepIndep (Transaction h Addr) [[Fee]] m (Chain h Addr, a)
 
 preChain :: Functor m
          => (Transaction h Addr -> m ([[Fee]] -> Chain h Addr))
+=======
+type PreChain h m a = DepIndep (Transaction h Addr) [[Fee]] m (Blocks h Addr, a)
+
+preChain :: Functor m
+         => (Transaction h Addr -> m ([[Fee]] -> Blocks h Addr))
+>>>>>>> CHW-82-84, orphan branch
          -> PreChain h m ()
 preChain = fmap (, ()) . DepIndep
 
@@ -85,7 +95,11 @@ fromPreChain :: (Hash h Addr, Monad m)
 fromPreChain pc = do
     fpcBoot <- asks bootstrapTransaction
     (txs, fpcExtra) <- calcFees fpcBoot =<< lift (runDepIndep pc fpcBoot)
+<<<<<<< HEAD
     let fpcChain  = txs -- doesn't include the boot transactions
+=======
+    let fpcChain  = Chain txs -- doesn't include the boot transactions
+>>>>>>> CHW-82-84, orphan branch
         fpcLedger = chainToLedger fpcBoot fpcChain
     return FromPreChain{..}
 
@@ -138,8 +152,13 @@ type Fee = Value
 -- the size of the fee might change the size of the the transaction.
 calcFees :: forall h m x. (Hash h Addr, Monad m)
          => Transaction h Addr
+<<<<<<< HEAD
          -> ([[Fee]] -> (Chain h Addr, x))
          -> TranslateT IntException m (Chain h Addr, x)
+=======
+         -> ([[Fee]] -> (Blocks h Addr, x))
+         -> TranslateT IntException m (Blocks h Addr, x)
+>>>>>>> CHW-82-84, orphan branch
 calcFees boot f = do
     TxFeePolicyTxSizeLinear policy <- bvdTxFeePolicy <$> gsAdoptedBVData
     let txToLinearFee' :: TxAux -> TranslateT IntException m Value
@@ -147,6 +166,7 @@ calcFees boot f = do
                        . fmap feeValue
                        . txToLinearFee policy
 
+<<<<<<< HEAD
     (txs, _) <- runIntBoot' boot $ int' $ fst (f (repeat (repeat 0)))
     fees     <- mapM (mapM txToLinearFee') txs
     return $ f (unmarkOldestFirst fees)
@@ -154,6 +174,12 @@ calcFees boot f = do
     int' :: Chain h Addr -> IntT h Void m (OldestFirst [] (OldestFirst [] TxAux))
     int' = mapM (mapM (fmap rawResolvedTx . int))
 
+=======
+    (txs, _) <- runIntBoot boot $ fst (f (repeat (repeat 0)))
+    fees     <- mapM (mapM txToLinearFee') txs
+    return $ f (unmarkOldestFirst fees)
+  where
+>>>>>>> CHW-82-84, orphan branch
     unmarkOldestFirst :: OldestFirst [] (OldestFirst [] a) -> [[a]]
     unmarkOldestFirst = map toList . toList
 

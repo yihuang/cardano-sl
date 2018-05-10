@@ -12,7 +12,11 @@ import           System.Wlog (WithLogger)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Binary.Update ()
+<<<<<<< HEAD
 import           Pos.Core.Configuration ()
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (MonadDB, MonadGState)
 import           Pos.Lrc.Context (HasLrcContext)
 import           Pos.Recovery.Info (MonadRecoveryInfo)
@@ -39,6 +43,10 @@ type UpdateMode ctx m
       , HasLens UpdateParams ctx UpdateParams
       , HasLens StateLock ctx StateLock
       , HasShutdownContext ctx
+<<<<<<< HEAD
+=======
+      , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
       , HasUpdateConfiguration
       , MonadReporting ctx m
       , MonadRecoveryInfo m

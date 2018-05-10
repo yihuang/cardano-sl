@@ -61,6 +61,10 @@ import           Crypto.Hash (Blake2b_224, Digest, SHA3_256)
 import qualified Crypto.Hash as CryptoHash
 import qualified Data.ByteString as BS
 import           Data.ByteString.Base58 (Alphabet (..), bitcoinAlphabet, decodeBase58, encodeBase58)
+<<<<<<< HEAD
+=======
+import           Data.Hashable (Hashable (..))
+>>>>>>> CHW-82-84, orphan branch
 import qualified Data.Text.Buildable as Buildable
 import           Formatting (Format, bprint, build, builder, int, later, (%))
 import           Serokell.Data.Memory.Units (Byte)
@@ -83,6 +87,12 @@ import           Pos.Crypto.Signing (EncryptedSecretKey, PassPhrase, PublicKey, 
                                      noPassEncrypt)
 import           Pos.Data.Attributes (attrData, mkAttributes)
 
+<<<<<<< HEAD
+=======
+instance Bi Address => Hashable Address where
+    hashWithSalt s = hashWithSalt s . Bi.serialize
+
+>>>>>>> CHW-82-84, orphan branch
 ----------------------------------------------------------------------------
 -- Formatting, pretty-printing
 ----------------------------------------------------------------------------
@@ -136,6 +146,7 @@ addressDetailedF =
 addrAlphabet :: Alphabet
 addrAlphabet = bitcoinAlphabet
 
+<<<<<<< HEAD
 addrToBase58 :: Address -> ByteString
 addrToBase58 = encodeBase58 addrAlphabet . Bi.serialize'
 
@@ -151,6 +162,23 @@ decodeTextAddress :: Text -> Either Text Address
 decodeTextAddress = decodeAddress . encodeUtf8
   where
     decodeAddress :: ByteString -> Either Text Address
+=======
+addrToBase58 :: Bi Address => Address -> ByteString
+addrToBase58 = encodeBase58 addrAlphabet . Bi.serialize'
+
+instance Bi Address => Buildable Address where
+    build = Buildable.build . decodeUtf8 @Text . addrToBase58
+
+-- | Specialized formatter for 'Address'.
+addressF :: Bi Address => Format r (Address -> r)
+addressF = build
+
+-- | A function which decodes base58-encoded 'Address'.
+decodeTextAddress :: Bi Address => Text -> Either Text Address
+decodeTextAddress = decodeAddress . encodeUtf8
+  where
+    decodeAddress :: Bi Address => ByteString -> Either Text Address
+>>>>>>> CHW-82-84, orphan branch
     decodeAddress bs = do
         let base58Err = "Invalid base58 representation of address"
         dbs <- maybeToRight base58Err $ decodeBase58 addrAlphabet bs
@@ -161,17 +189,30 @@ decodeTextAddress = decodeAddress . encodeUtf8
 ----------------------------------------------------------------------------
 
 -- | Make an 'Address' from spending data and attributes.
+<<<<<<< HEAD
 makeAddress :: AddrSpendingData -> AddrAttributes -> Address
+=======
+makeAddress :: Bi Address' => AddrSpendingData -> AddrAttributes -> Address
+>>>>>>> CHW-82-84, orphan branch
 makeAddress spendingData attributesUnwrapped =
     Address
     { addrRoot = addressHash address'
     , addrAttributes = attributes
+<<<<<<< HEAD
     , addrType = addrType'
     }
   where
     addrType' = addrSpendingDataToType spendingData
     attributes = mkAttributes attributesUnwrapped
     address' = Address' (addrType', spendingData, attributes)
+=======
+    , ..
+    }
+  where
+    addrType = addrSpendingDataToType spendingData
+    attributes = mkAttributes attributesUnwrapped
+    address' = Address' (addrType, spendingData, attributes)
+>>>>>>> CHW-82-84, orphan branch
 
 -- | This newtype exists for clarity. It is used to tell pubkey
 -- address creation functions whether an address is intended for
@@ -179,11 +220,19 @@ makeAddress spendingData attributesUnwrapped =
 newtype IsBootstrapEraAddr = IsBootstrapEraAddr Bool
 
 -- | A function for making an address from 'PublicKey'.
+<<<<<<< HEAD
 makePubKeyAddress :: IsBootstrapEraAddr -> PublicKey -> Address
 makePubKeyAddress = makePubKeyAddressImpl Nothing
 
 -- | A function for making an address from 'PublicKey' for bootstrap era.
 makePubKeyAddressBoot :: PublicKey -> Address
+=======
+makePubKeyAddress :: Bi Address' => IsBootstrapEraAddr -> PublicKey -> Address
+makePubKeyAddress = makePubKeyAddressImpl Nothing
+
+-- | A function for making an address from 'PublicKey' for bootstrap era.
+makePubKeyAddressBoot :: Bi Address' => PublicKey -> Address
+>>>>>>> CHW-82-84, orphan branch
 makePubKeyAddressBoot = makePubKeyAddress (IsBootstrapEraAddr True)
 
 -- | This function creates a root public key address. Stake
@@ -191,19 +240,33 @@ makePubKeyAddressBoot = makePubKeyAddress (IsBootstrapEraAddr True)
 -- nobody should even use these addresses as outputs, so we can put
 -- arbitrary distribution there. We use bootstrap era distribution
 -- because its representation is more compact.
+<<<<<<< HEAD
 makeRootPubKeyAddress :: PublicKey -> Address
+=======
+makeRootPubKeyAddress :: Bi Address' => PublicKey -> Address
+>>>>>>> CHW-82-84, orphan branch
 makeRootPubKeyAddress = makePubKeyAddressBoot
 
 -- | A function for making an HDW address.
 makePubKeyHdwAddress
+<<<<<<< HEAD
     :: IsBootstrapEraAddr
+=======
+    :: Bi Address'
+    => IsBootstrapEraAddr
+>>>>>>> CHW-82-84, orphan branch
     -> HDAddressPayload    -- ^ Derivation path
     -> PublicKey
     -> Address
 makePubKeyHdwAddress ibe path = makePubKeyAddressImpl (Just path) ibe
 
 makePubKeyAddressImpl
+<<<<<<< HEAD
     :: Maybe HDAddressPayload
+=======
+    :: Bi Address'
+    => Maybe HDAddressPayload
+>>>>>>> CHW-82-84, orphan branch
     -> IsBootstrapEraAddr
     -> PublicKey
     -> Address
@@ -221,7 +284,11 @@ makePubKeyAddressImpl path (IsBootstrapEraAddr isBootstrapEra) key =
 -- takes an optional 'StakeholderId'. If it's given, it will receive
 -- the stake sent to the resulting 'Address'. Otherwise it's assumed
 -- that an 'Address' is created for bootstrap era.
+<<<<<<< HEAD
 makeScriptAddress :: Maybe StakeholderId -> Script -> Address
+=======
+makeScriptAddress :: Bi Address' => Maybe StakeholderId -> Script -> Address
+>>>>>>> CHW-82-84, orphan branch
 makeScriptAddress stakeholder scr = makeAddress spendingData attrs
   where
     spendingData = ScriptASD scr
@@ -229,7 +296,11 @@ makeScriptAddress stakeholder scr = makeAddress spendingData attrs
     attrs = AddrAttributes {aaPkDerivationPath = Nothing, ..}
 
 -- | A function for making an address from 'RedeemPublicKey'.
+<<<<<<< HEAD
 makeRedeemAddress :: RedeemPublicKey -> Address
+=======
+makeRedeemAddress :: Bi Address' => RedeemPublicKey -> Address
+>>>>>>> CHW-82-84, orphan branch
 makeRedeemAddress key = makeAddress spendingData attrs
   where
     spendingData = RedeemASD key
@@ -239,7 +310,12 @@ makeRedeemAddress key = makeAddress spendingData attrs
 
 -- | Create address from secret key in hardened way.
 createHDAddressH
+<<<<<<< HEAD
     :: IsBootstrapEraAddr
+=======
+    :: Bi Address'
+    => IsBootstrapEraAddr
+>>>>>>> CHW-82-84, orphan branch
     -> ShouldCheckPassphrase
     -> PassPhrase
     -> HDPassphrase
@@ -255,7 +331,12 @@ createHDAddressH ibea scp passphrase hdPassphrase parent parentPath childIndex =
 
 -- | Create address from public key via non-hardened way.
 createHDAddressNH
+<<<<<<< HEAD
     :: IsBootstrapEraAddr
+=======
+    :: Bi Address'
+    => IsBootstrapEraAddr
+>>>>>>> CHW-82-84, orphan branch
     -> HDPassphrase
     -> PublicKey
     -> [Word32]
@@ -272,13 +353,18 @@ createHDAddressNH ibea passphrase parent parentPath childIndex = do
 
 -- | Check whether given 'AddrSpendingData' corresponds to given
 -- 'Address'.
+<<<<<<< HEAD
 checkAddrSpendingData :: AddrSpendingData -> Address -> Bool
+=======
+checkAddrSpendingData :: (Bi Address, Bi Address') => AddrSpendingData -> Address -> Bool
+>>>>>>> CHW-82-84, orphan branch
 checkAddrSpendingData asd Address {..} =
     addrRoot == addressHash address' && addrType == addrSpendingDataToType asd
   where
     address' = Address' (addrType, asd, addrAttributes)
 
 -- | Check if given 'Address' is created from given 'PublicKey'
+<<<<<<< HEAD
 checkPubKeyAddress :: PublicKey -> Address -> Bool
 checkPubKeyAddress pk = checkAddrSpendingData (PubKeyASD pk)
 
@@ -288,6 +374,17 @@ checkScriptAddress script = checkAddrSpendingData (ScriptASD script)
 
 -- | Check if given 'Address' is created from given 'RedeemPublicKey'
 checkRedeemAddress :: RedeemPublicKey -> Address -> Bool
+=======
+checkPubKeyAddress :: (Bi Address, Bi Address') => PublicKey -> Address -> Bool
+checkPubKeyAddress pk = checkAddrSpendingData (PubKeyASD pk)
+
+-- | Check if given 'Address' is created from given validation script
+checkScriptAddress :: (Bi Address, Bi Address') => Script -> Address -> Bool
+checkScriptAddress script = checkAddrSpendingData (ScriptASD script)
+
+-- | Check if given 'Address' is created from given 'RedeemPublicKey'
+checkRedeemAddress :: (Bi Address, Bi Address') => RedeemPublicKey -> Address -> Bool
+>>>>>>> CHW-82-84, orphan branch
 checkRedeemAddress rpk = checkAddrSpendingData (RedeemASD rpk)
 
 ----------------------------------------------------------------------------
@@ -324,7 +421,12 @@ addrAttributesUnwrapped = attrData . addrAttributes
 
 -- | Makes account secret key for given wallet set.
 deriveLvl2KeyPair
+<<<<<<< HEAD
     :: IsBootstrapEraAddr
+=======
+    :: Bi Address'
+    => IsBootstrapEraAddr
+>>>>>>> CHW-82-84, orphan branch
     -> ShouldCheckPassphrase
     -> PassPhrase
     -> EncryptedSecretKey -- ^ key of wallet
@@ -338,7 +440,12 @@ deriveLvl2KeyPair ibea scp passphrase wsKey accountIndex addressIndex = do
     createHDAddressH ibea (ShouldCheckPassphrase False) passphrase hdPass wKey [accountIndex] addressIndex
 
 deriveFirstHDAddress
+<<<<<<< HEAD
     :: IsBootstrapEraAddr
+=======
+    :: Bi Address'
+    => IsBootstrapEraAddr
+>>>>>>> CHW-82-84, orphan branch
     -> PassPhrase
     -> EncryptedSecretKey -- ^ key of wallet set
     -> Maybe (Address, EncryptedSecretKey)
@@ -376,30 +483,50 @@ isBootstrapEraDistrAddress (addrAttributesUnwrapped -> AddrAttributes {..}) =
 -- | Largest (considering size of serialized data) PubKey address with
 -- BootstrapEra distribution. Actual size depends on CRC32 value which
 -- is serialized using var-length encoding.
+<<<<<<< HEAD
 largestPubKeyAddressBoot :: Address
+=======
+largestPubKeyAddressBoot :: Bi Address' => Address
+>>>>>>> CHW-82-84, orphan branch
 largestPubKeyAddressBoot = makePubKeyAddressBoot goodPk
 
 -- | Maximal size of PubKey address with BootstrapEra
 -- distribution (43).
+<<<<<<< HEAD
 maxPubKeyAddressSizeBoot :: Byte
+=======
+maxPubKeyAddressSizeBoot :: (Bi Address, Bi Address') => Byte
+>>>>>>> CHW-82-84, orphan branch
 maxPubKeyAddressSizeBoot = biSize largestPubKeyAddressBoot
 
 -- | Largest (considering size of serialized data) PubKey address with
 -- SingleKey distribution. Actual size depends on CRC32 value which
 -- is serialized using var-length encoding.
+<<<<<<< HEAD
 largestPubKeyAddressSingleKey :: Address
+=======
+largestPubKeyAddressSingleKey :: Bi Address' => Address
+>>>>>>> CHW-82-84, orphan branch
 largestPubKeyAddressSingleKey =
     makePubKeyAddress (IsBootstrapEraAddr False) goodPk
 
 -- | Maximal size of PubKey address with SingleKey
 -- distribution (78).
+<<<<<<< HEAD
 maxPubKeyAddressSizeSingleKey :: Byte
+=======
+maxPubKeyAddressSizeSingleKey :: (Bi Address, Bi Address') => Byte
+>>>>>>> CHW-82-84, orphan branch
 maxPubKeyAddressSizeSingleKey = biSize largestPubKeyAddressSingleKey
 
 -- | Largest (considering size of serialized data) HD address with
 -- BootstrapEra distribution. Actual size depends on CRC32 value which
 -- is serialized using var-length encoding.
+<<<<<<< HEAD
 largestHDAddressBoot :: Address
+=======
+largestHDAddressBoot :: Bi Address' => Address
+>>>>>>> CHW-82-84, orphan branch
 largestHDAddressBoot =
     case deriveLvl2KeyPair
              (IsBootstrapEraAddr True)
@@ -415,7 +542,11 @@ largestHDAddressBoot =
 
 -- | Maximal size of HD address with BootstrapEra
 -- distribution (76).
+<<<<<<< HEAD
 maxHDAddressSizeBoot :: Byte
+=======
+maxHDAddressSizeBoot :: (Bi Address, Bi Address') => Byte
+>>>>>>> CHW-82-84, orphan branch
 maxHDAddressSizeBoot = biSize largestHDAddressBoot
 
 -- Public key and secret key for which we know that they produce

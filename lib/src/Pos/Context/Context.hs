@@ -46,9 +46,15 @@ import           Pos.Ssc.Types (HasSscContext (..), SscContext)
 import           Pos.StateLock (StateLock, StateLockMetrics)
 import           Pos.Txp.Settings (TxpGlobalSettings)
 import           Pos.Update.Context (UpdateContext)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason (..))
 import           Pos.Util.Lens (postfixLFields)
 import           Pos.Util.UserSecret (HasUserSecret (..), UserSecret)
+=======
+import           Pos.Util.Lens (postfixLFields)
+import           Pos.Util.UserSecret (HasUserSecret (..), UserSecret)
+import           Pos.Util.UserPublic (HasUserPublic (..), UserPublic)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Util (HasLens (..))
 
 ----------------------------------------------------------------------------
@@ -79,10 +85,19 @@ data NodeContext = NodeContext
     , ncStateLock           :: !StateLock
     -- ^ A lock which manages access to shared resources.
     -- Stored hash is a hash of last applied block.
+<<<<<<< HEAD
     , ncStateLockMetrics    :: !(StateLockMetrics MemPoolModifyReason)
     -- ^ A set of callbacks for 'StateLock'.
     , ncUserSecret          :: !(TVar UserSecret)
     -- ^ Secret keys (and path to file) which are used to send transactions
+=======
+    , ncStateLockMetrics    :: !StateLockMetrics
+    -- ^ A set of callbacks for 'StateLock'.
+    , ncUserSecret          :: !(TVar UserSecret)
+    -- ^ Secret keys (and path to file) which are used to send transactions
+    , ncUserPublic          :: !(TVar UserPublic)
+    -- ^ Public keys (and path to file) which are used to identify external wallets.
+>>>>>>> CHW-82-84, orphan branch
     , ncBlockRetrievalQueue :: !BlockRetrievalQueue
     -- ^ Concurrent queue that holds block headers that are to be
     -- downloaded.
@@ -139,7 +154,11 @@ instance HasLens SimpleSlottingStateVar NodeContext SimpleSlottingStateVar where
 instance HasLens StateLock NodeContext StateLock where
     lensOf = ncStateLock_L
 
+<<<<<<< HEAD
 instance HasLens (StateLockMetrics MemPoolModifyReason) NodeContext (StateLockMetrics MemPoolModifyReason) where
+=======
+instance HasLens StateLockMetrics NodeContext StateLockMetrics where
+>>>>>>> CHW-82-84, orphan branch
     lensOf = ncStateLockMetrics_L
 
 instance HasLens LastKnownHeaderTag NodeContext LastKnownHeader where
@@ -154,6 +173,12 @@ instance HasLens UpdateContext NodeContext UpdateContext where
 instance HasUserSecret NodeContext where
     userSecret = ncUserSecret_L
 
+<<<<<<< HEAD
+=======
+instance HasUserPublic NodeContext where
+    userPublic = ncUserPublic_L
+
+>>>>>>> CHW-82-84, orphan branch
 instance HasLens RecoveryHeaderTag NodeContext RecoveryHeader where
     lensOf = ncRecoveryHeader_L
 

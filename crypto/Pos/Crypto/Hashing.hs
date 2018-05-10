@@ -23,7 +23,10 @@ module Pos.Crypto.Hashing
        , Hash
        , AHash(..)
        , hashHexF
+<<<<<<< HEAD
        , mediumHashF
+=======
+>>>>>>> CHW-82-84, orphan branch
        , shortHashF
        , hash
        , hashRaw
@@ -104,7 +107,11 @@ instance Hashable (AbstractHash algo a) where
         !len = ByteArray.length h
 
 instance Buildable.Buildable (AbstractHash algo a) where
+<<<<<<< HEAD
     build = bprint mediumHashF
+=======
+    build = bprint shortHashF
+>>>>>>> CHW-82-84, orphan branch
 
 hashDigestSize' :: forall algo . HashAlgorithm algo => Int
 hashDigestSize' = hashDigestSize @algo
@@ -178,10 +185,13 @@ unsafeHash = unsafeAbstractHash
 hashHexF :: Format r (AbstractHash algo a -> r)
 hashHexF = later $ \(AbstractHash x) -> Buildable.build (show x :: Text)
 
+<<<<<<< HEAD
 -- | Smart formatter for 'Hash' to show only first @16@ characters of 'Hash'.
 mediumHashF :: Format r (AbstractHash algo a -> r)
 mediumHashF = fitLeft 16 %. hashHexF
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Smart formatter for 'Hash' to show only first @8@ characters of 'Hash'.
 shortHashF :: Format r (AbstractHash algo a -> r)
 shortHashF = fitLeft 8 %. hashHexF

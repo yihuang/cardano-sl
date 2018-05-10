@@ -15,8 +15,11 @@ module Cardano.Wallet.WalletLayer.Types
     , deleteAccount
 
     , getAddresses
+<<<<<<< HEAD
     , applyBlocks
     , rollbackBlocks
+=======
+>>>>>>> CHW-82-84, orphan branch
     ) where
 
 import           Universum
@@ -26,8 +29,12 @@ import           Control.Lens (makeLenses)
 import           Cardano.Wallet.API.V1.Types (Account, AccountIndex, AccountUpdate, Address,
                                               NewAccount, NewWallet, Wallet, WalletId, WalletUpdate)
 
+<<<<<<< HEAD
 import           Pos.Util.Chrono (NE, OldestFirst (..), NewestFirst (..))
 import           Pos.Block.Types (Blund)
+=======
+import           Cardano.Wallet.Kernel.Diffusion (WalletDiffusion (..))
+>>>>>>> CHW-82-84, orphan branch
 
 ------------------------------------------------------------
 -- Passive wallet layer
@@ -37,6 +44,7 @@ import           Pos.Block.Types (Blund)
 data PassiveWalletLayer m = PassiveWalletLayer
     {
     -- * wallets
+<<<<<<< HEAD
       _pwlCreateWallet   :: NewWallet -> m Wallet
     , _pwlGetWalletIds   :: m [WalletId]
     , _pwlGetWallet      :: WalletId -> m (Maybe Wallet)
@@ -53,6 +61,21 @@ data PassiveWalletLayer m = PassiveWalletLayer
     -- * core API
     , _pwlApplyBlocks    :: OldestFirst NE Blund -> m ()
     , _pwlRollbackBlocks :: NewestFirst NE Blund -> m ()
+=======
+      _pwlCreateWallet  :: NewWallet -> m Wallet
+    , _pwlGetWalletIds  :: m [WalletId]
+    , _pwlGetWallet     :: WalletId -> m (Maybe Wallet)
+    , _pwlUpdateWallet  :: WalletId -> WalletUpdate -> m Wallet
+    , _pwlDeleteWallet  :: WalletId -> m Bool
+    -- * accounts
+    , _pwlCreateAccount :: WalletId -> NewAccount -> m Account
+    , _pwlGetAccounts   :: WalletId -> m [Account]
+    , _pwlGetAccount    :: WalletId -> AccountIndex -> m (Maybe Account)
+    , _pwlUpdateAccount :: WalletId -> AccountIndex -> AccountUpdate -> m Account
+    , _pwlDeleteAccount :: WalletId -> AccountIndex -> m Bool
+    -- * addresses
+    , _pwlGetAddresses  :: WalletId -> m [Address]
+>>>>>>> CHW-82-84, orphan branch
     }
 
 makeLenses ''PassiveWalletLayer
@@ -96,6 +119,7 @@ deleteAccount pwl = pwl ^. pwlDeleteAccount
 getAddresses :: forall m. PassiveWalletLayer m -> WalletId -> m [Address]
 getAddresses pwl = pwl ^. pwlGetAddresses
 
+<<<<<<< HEAD
 
 applyBlocks :: forall m. PassiveWalletLayer m -> OldestFirst NE Blund -> m ()
 applyBlocks pwl = pwl ^. pwlApplyBlocks
@@ -103,6 +127,8 @@ applyBlocks pwl = pwl ^. pwlApplyBlocks
 rollbackBlocks :: forall m. PassiveWalletLayer m -> NewestFirst NE Blund -> m ()
 rollbackBlocks pwl = pwl ^. pwlRollbackBlocks
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 ------------------------------------------------------------
 -- Active wallet layer
 ------------------------------------------------------------
@@ -111,4 +137,12 @@ rollbackBlocks pwl = pwl ^. pwlRollbackBlocks
 data ActiveWalletLayer m = ActiveWalletLayer {
       -- | The underlying passive wallet layer
       walletPassiveLayer :: PassiveWalletLayer m
+<<<<<<< HEAD
     }
+=======
+
+      -- | The wallet diffusion layer
+    , walletDiffusion    :: WalletDiffusion
+    }
+
+>>>>>>> CHW-82-84, orphan branch

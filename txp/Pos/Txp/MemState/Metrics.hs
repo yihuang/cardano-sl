@@ -6,7 +6,10 @@ module Pos.Txp.MemState.Metrics
 
 import           Universum
 
+<<<<<<< HEAD
 import           Data.Aeson.Types (ToJSON (..))
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Formatting (sformat, shown, (%))
 import qualified System.Metrics as Metrics
 import qualified System.Metrics.Gauge as Metrics.Gauge
@@ -15,6 +18,7 @@ import           System.Wlog (logDebug)
 import           Pos.StateLock (StateLockMetrics (..))
 import           Pos.System.Metrics.Constants (withCardanoNamespace)
 import           Pos.Txp.Toil.Types (MemPool (_mpSize))
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (JLEvent (..), JLMemPool (..), MemPoolModifyReason (..))
 
 -- | 'StateLockMetrics' to record txp MemPool metrics.
@@ -36,6 +40,16 @@ recordTxpMetrics ekgStore memPoolVar = do
         Metrics.createGauge (withCardanoNamespace "MemPoolModifyTimeProcessTx_microseconds") ekgStore
     ekgMemPoolQueueLength <-
         Metrics.createGauge (withCardanoNamespace "MemPoolQueueLength") ekgStore
+=======
+
+-- | 'StateLockMetrics' to record txp MemPool metrics.
+recordTxpMetrics :: Metrics.Store -> TVar MemPool -> IO StateLockMetrics
+recordTxpMetrics ekgStore memPoolVar = do
+    ekgMemPoolSize        <- Metrics.createGauge (withCardanoNamespace "MemPoolSize") ekgStore
+    ekgMemPoolWaitTime    <- Metrics.createGauge (withCardanoNamespace "MemPoolWaitTime_microseconds") ekgStore
+    ekgMemPoolModifyTime  <- Metrics.createGauge (withCardanoNamespace "MemPoolModifyTime_microseconds") ekgStore
+    ekgMemPoolQueueLength <- Metrics.createGauge (withCardanoNamespace "MemPoolQueueLength") ekgStore
+>>>>>>> CHW-82-84, orphan branch
 
     -- An exponential moving average is used for the time gauges (wait
     -- and modify durations). The parameter alpha is chosen somewhat
@@ -57,10 +71,13 @@ recordTxpMetrics ekgStore memPoolVar = do
 
         , slmAcquire = \reason timeWaited -> do
               liftIO $ Metrics.Gauge.dec ekgMemPoolQueueLength
+<<<<<<< HEAD
               let ekgMemPoolWaitTime = case reason of
                       ApplyBlock             -> ekgMemPoolWaitTimeApplyBlock
                       ApplyBlockWithRollback -> ekgMemPoolWaitTimeApplyBlockWithRollback
                       ProcessTransaction     -> ekgMemPoolWaitTimeProcessTx
+=======
+>>>>>>> CHW-82-84, orphan branch
               timeWaited' <- liftIO $ Metrics.Gauge.read ekgMemPoolWaitTime
               -- Assume a 0-value estimate means we haven't taken
               -- any samples yet.
@@ -71,6 +88,7 @@ recordTxpMetrics ekgStore memPoolVar = do
               logDebug $ sformat ("MemPool metrics acquire: "%shown
                                   %" wait time was "%shown) reason timeWaited
 
+<<<<<<< HEAD
         , slmRelease = \reason timeWaited timeElapsed memAllocated -> do
               qlen <- liftIO $ Metrics.Gauge.read ekgMemPoolQueueLength
               oldMemPoolSize <- liftIO $ Metrics.Gauge.read ekgMemPoolSize
@@ -80,6 +98,11 @@ recordTxpMetrics ekgStore memPoolVar = do
                       ApplyBlock             -> ekgMemPoolModifyTimeApplyBlock
                       ApplyBlockWithRollback -> ekgMemPoolModifyTimeApplyBlockWithRollback
                       ProcessTransaction     -> ekgMemPoolModifyTimeProcessTx
+=======
+        , slmRelease = \reason timeElapsed -> do
+              newMemPoolSize <- _mpSize <$> readTVarIO memPoolVar
+              liftIO $ Metrics.Gauge.set ekgMemPoolSize (fromIntegral newMemPoolSize)
+>>>>>>> CHW-82-84, orphan branch
               timeElapsed' <- liftIO $ Metrics.Gauge.read ekgMemPoolModifyTime
               let new_ = if timeElapsed' == 0
                         then fromIntegral timeElapsed
@@ -88,6 +111,7 @@ recordTxpMetrics ekgStore memPoolVar = do
               logDebug $ sformat ("MemPool metrics release: "%shown
                                   %" modify time was "%shown%" size is "%shown)
                          reason timeElapsed newMemPoolSize
+<<<<<<< HEAD
               pure . toJSON . JLMemPoolEvent $ JLMemPool
                   reason
                   (fromIntegral timeWaited)
@@ -96,4 +120,6 @@ recordTxpMetrics ekgStore memPoolVar = do
                   (fromIntegral oldMemPoolSize)
                   (fromIntegral newMemPoolSize)
                   (fromIntegral memAllocated)
+=======
+>>>>>>> CHW-82-84, orphan branch
         }

@@ -13,17 +13,27 @@ module Pos.Web.Server
 
 import           Universum
 
+<<<<<<< HEAD
 import qualified Control.Concurrent.Async as Async
+=======
+>>>>>>> CHW-82-84, orphan branch
 import qualified Control.Exception.Safe as E
 import           Control.Monad.Except (MonadError (throwError))
 import qualified Control.Monad.Reader as Mtl
 import           Data.Aeson.TH (defaultOptions, deriveToJSON)
 import           Data.Default (Default)
+<<<<<<< HEAD
 import           Mockable (Production (runProduction))
 import           Network.Wai (Application)
 import           Network.Wai.Handler.Warp (Settings, defaultSettings, setHost, setPort, getHost, runSettingsSocket)
 import           Network.Wai.Handler.WarpTLS (TLSSettings, tlsSettingsChain, runTLSSocket)
 import           Data.Streaming.Network      (bindRandomPortTCP, bindPortTCP)
+=======
+import           Mockable (Async, Mockable, Production (runProduction), withAsync)
+import           Network.Wai (Application)
+import           Network.Wai.Handler.Warp (Settings, defaultSettings, runSettings, setHost, setPort)
+import           Network.Wai.Handler.WarpTLS (TLSSettings, runTLS, tlsSettingsChain)
+>>>>>>> CHW-82-84, orphan branch
 import           Servant.API ((:<|>) ((:<|>)), FromHttpApiData)
 import           Servant.Server (Handler, HasServer, ServantErr (errBody), Server, ServerT, err404,
                                  err503, hoistServer, serve)
@@ -44,7 +54,10 @@ import           Pos.Txp.MemState (GenericTxpLocalData, MempoolExt, getLocalTxs,
 import           Pos.Update.Configuration (HasUpdateConfiguration)
 import           Pos.Web.Mode (WebMode, WebModeContext (..))
 import           Pos.WorkMode.Class (WorkMode)
+<<<<<<< HEAD
 import           Network.Socket (close, Socket)
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 import           Pos.Web.Api (HealthCheckApi, NodeApi, healthCheckApi, nodeApi)
 import           Pos.Web.Types (CConfirmedProposalState (..), TlsParams (..))
@@ -60,6 +73,7 @@ type MyWorkMode ctx m =
     )
 
 withRoute53HealthCheckApplication
+<<<<<<< HEAD
     :: IO HealthStatus
     -> String
     -> Word16
@@ -68,6 +82,21 @@ withRoute53HealthCheckApplication
 withRoute53HealthCheckApplication mStatus host port act = Async.withAsync go (const act)
   where
     go = serveImpl (pure app) host port Nothing Nothing Nothing
+=======
+    :: ( Mockable Async m
+       , MonadMask m
+       , MonadIO m
+       , HasConfiguration
+       )
+    => IO HealthStatus
+    -> String
+    -> Word16
+    -> m x
+    -> m x
+withRoute53HealthCheckApplication mStatus host port act = withAsync go (const act)
+  where
+    go = serveImpl (pure app) host port Nothing Nothing
+>>>>>>> CHW-82-84, orphan branch
     app = route53HealthCheckApplication mStatus
 
 route53HealthCheckApplication :: IO HealthStatus -> Application
@@ -75,7 +104,11 @@ route53HealthCheckApplication mStatus =
     serve healthCheckApi (servantServerHealthCheck mStatus)
 
 serveWeb :: MyWorkMode ctx m => Word16 -> Maybe TlsParams -> m ()
+<<<<<<< HEAD
 serveWeb port mTlsParams = serveImpl application "127.0.0.1" port mTlsParams Nothing Nothing
+=======
+serveWeb port mTlsParams = serveImpl application "127.0.0.1" port mTlsParams Nothing
+>>>>>>> CHW-82-84, orphan branch
 
 application :: MyWorkMode ctx m => m Application
 application = do
@@ -83,6 +116,7 @@ application = do
     return $ serve nodeApi server
 
 serveImpl
+<<<<<<< HEAD
     :: (MonadIO m)
     => m Application
     -> String
@@ -121,6 +155,22 @@ serveImpl app host port mWalletTLSParams mSettings mPortCallback = do
                       setPort (fromIntegral port) $
                       fromMaybe defaultSettings mSettings
         mTlsConfig = tlsParamsToWai <$> mWalletTLSParams
+=======
+    :: (HasConfiguration, MonadIO m)
+    => m Application
+    -> String
+    -> Word16
+    -> Maybe TlsParams
+    -> Maybe Settings
+    -> m ()
+serveImpl app host port mWalletTLSParams mSettings =
+    liftIO . maybe runSettings runTLS mTlsConfig mySettings =<< app
+  where
+    mySettings = setHost (fromString host) $
+                 setPort (fromIntegral port) $
+                 fromMaybe defaultSettings mSettings
+    mTlsConfig = tlsParamsToWai <$> mWalletTLSParams
+>>>>>>> CHW-82-84, orphan branch
 
 tlsParamsToWai :: TlsParams -> TLSSettings
 tlsParamsToWai TlsParams{..} = tlsSettingsChain tpCertPath [tpCaPath] tpKeyPath

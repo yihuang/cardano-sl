@@ -7,6 +7,10 @@ module Pos.Client.Txp.Network
        ( TxMode
        , submitTx
        , prepareMTx
+<<<<<<< HEAD
+=======
+       , prepareUnsignedTx
+>>>>>>> CHW-82-84, orphan branch
        , prepareRedemptionTx
        , submitTxRaw
        , sendTxOuts
@@ -22,13 +26,21 @@ import           Pos.Client.Txp.Addresses (MonadAddresses (..))
 import           Pos.Client.Txp.Balances (MonadBalances (..), getOwnUtxo, getOwnUtxoForPk)
 import           Pos.Client.Txp.History (MonadTxHistory (..))
 import           Pos.Client.Txp.Util (InputSelectionPolicy, PendingAddresses (..), TxCreateMode,
+<<<<<<< HEAD
                                       TxError (..), createMTx, createRedemptionTx, createTx)
+=======
+                                      TxError (..), createMTx, createUnsignedTx ,createRedemptionTx, createTx)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Communication.Message ()
 import           Pos.Communication.Protocol (OutSpecs)
 import           Pos.Communication.Specs (createOutSpecs)
 import           Pos.Communication.Types (InvOrDataTK)
 import           Pos.Core (Address, Coin, makeRedeemAddress, mkCoin, unsafeAddCoin)
+<<<<<<< HEAD
 import           Pos.Core.Txp (TxAux (..), TxId, TxOut (..), TxOutAux (..), txaF)
+=======
+import           Pos.Core.Txp (TxAux (..), Tx (..), TxId, TxOut (..), TxOutAux (..), txaF)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Crypto (RedeemSecretKey, SafeSigner, hash, redeemToPublic, safeToPublic)
 import           Pos.DB.Class (MonadGState)
 import           Pos.Diffusion.Types (Diffusion (sendTx))
@@ -69,6 +81,22 @@ prepareMTx hdwSigners pendingAddrs inputSelectionPolicy addrs outputs addrData =
     utxo <- getOwnUtxos (toList addrs)
     eitherToThrow =<< createMTx pendingAddrs inputSelectionPolicy utxo hdwSigners outputs addrData
 
+<<<<<<< HEAD
+=======
+-- | Construct unsigned Tx
+prepareUnsignedTx
+    :: TxMode m
+    => PendingAddresses
+    -> InputSelectionPolicy
+    -> NonEmpty Address
+    -> NonEmpty TxOutAux
+    -> AddrData m
+    -> m (Tx, NonEmpty TxOut)
+prepareUnsignedTx pendingAddrs inputSelectionPolicy addrs outputs addrData = do
+    utxo <- getOwnUtxos (toList addrs)
+    eitherToThrow =<< createUnsignedTx pendingAddrs inputSelectionPolicy utxo outputs addrData
+
+>>>>>>> CHW-82-84, orphan branch
 -- | Construct redemption Tx using redemption secret key and a output address
 prepareRedemptionTx
     :: TxMode m

@@ -6,8 +6,12 @@ flags:
 
 extra-package-dbs: []
 
+<<<<<<< HEAD
 # util -> networking → binary →  crypto → core → db → [lrc, infra]
 #              → [ssc, txp, update, delegation] → block → lib → ...
+=======
+# networking → [util, binary] → crypto → core → db → [lrc, infra] → [ssc, txp, update, delegation] → block → lib → ...
+>>>>>>> CHW-82-84, orphan branch
 # Then we have two branches:
 # ... → client → generator → [auxx, explorer, wallet] → wallet-new
 # ... → [node, tools]
@@ -35,7 +39,10 @@ packages:
 - tools
 - wallet
 - wallet-new # The new (unreleased) version of the wallet
+<<<<<<< HEAD
 - node-ipc
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 - location:
     git: https://github.com/well-typed/cborg
@@ -128,8 +135,13 @@ packages:
     commit: e7de56b5f7c39f8dc473f1bbaf534bb7affc3cf4
   extra-dep: true
 - location:
+<<<<<<< HEAD
     git: https://github.com/input-output-hk/log-warper.git
     commit: b8c390357b27e7ae3b9b0c5309bf9d0bbbf09852
+=======
+    git: https://github.com/serokell/log-warper.git
+    commit: 7f95c6990ef93a289678755cb1db71c2a4ecdfb5
+>>>>>>> CHW-82-84, orphan branch
   extra-dep: true
 
 nix:

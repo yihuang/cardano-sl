@@ -15,10 +15,17 @@ import qualified Data.HashMap.Strict as HM
 import           System.Wlog (logError)
 import           Universum
 
+<<<<<<< HEAD
 import           Pos.Core (EpochIndex, EpochOrSlot (..), IsMainHeader, HasProtocolConstants,
                            LocalSlotIndex, SlotCount, SlotId (siSlot), StakeholderId,
                            VssCertificate, epochIndexL, epochOrSlot, getEpochOrSlot,
                            getVssCertificatesMap, headerSlotL, mkCoin, HasProtocolMagic,
+=======
+import           Pos.Core (EpochIndex, EpochOrSlot (..), HasConfiguration, IsMainHeader,
+                           LocalSlotIndex, SlotCount, SlotId (siSlot), StakeholderId,
+                           VssCertificate, epochIndexL, epochOrSlot, getEpochOrSlot,
+                           getVssCertificatesMap, headerSlotL, mkCoin,
+>>>>>>> CHW-82-84, orphan branch
                            mkVssCertificatesMapSingleton, slotSecurityParam)
 import           Pos.Core.Ssc (CommitmentsMap (..), InnerSharesMap, Opening, SignedCommitment,
                                SscPayload (..), getCommitmentsMap, mkCommitmentsMapUnsafe, spVss,
@@ -39,8 +46,13 @@ import           Pos.Util.Util (sortWithMDesc)
 -- MonadToss. If data is valid it is also applied.  Otherwise
 -- SscVerifyError is thrown using 'MonadError' type class.
 verifyAndApplySscPayload
+<<<<<<< HEAD
     :: (HasSscConfiguration, MonadToss m, MonadTossEnv m,
         MonadError SscVerifyError m, MonadRandom m, HasProtocolConstants, HasProtocolMagic)
+=======
+    :: (HasSscConfiguration, HasConfiguration, MonadToss m, MonadTossEnv m,
+        MonadError SscVerifyError m, MonadRandom m)
+>>>>>>> CHW-82-84, orphan branch
     => Either EpochIndex (Some IsMainHeader) -> SscPayload -> m ()
 verifyAndApplySscPayload eoh payload = do
     -- Check the payload for internal consistency.
@@ -94,7 +106,11 @@ applyGenesisBlock epoch = do
 
 -- | Rollback application of 'SscPayload's in 'Toss'. First argument is
 -- 'EpochOrSlot' of oldest block which is subject to rollback.
+<<<<<<< HEAD
 rollbackSsc :: (MonadToss m, HasProtocolConstants) =>
+=======
+rollbackSsc :: (HasConfiguration, MonadToss m) =>
+>>>>>>> CHW-82-84, orphan branch
     EpochOrSlot
     -> NewestFirst [] SscPayload
     -> m ()
@@ -116,7 +132,11 @@ rollbackSsc oldestEOS (NewestFirst payloads)
 
 -- | Apply as much data from given 'TossModifier' as possible.
 normalizeToss
+<<<<<<< HEAD
     :: (HasSscConfiguration, MonadToss m, MonadTossEnv m, MonadRandom m, HasProtocolConstants, HasProtocolMagic)
+=======
+    :: (HasSscConfiguration, HasConfiguration, MonadToss m, MonadTossEnv m, MonadRandom m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> TossModifier -> m ()
 normalizeToss epoch TossModifier {..} =
     normalizeTossDo
@@ -129,7 +149,11 @@ normalizeToss epoch TossModifier {..} =
 -- | Apply the most valuable from given 'TossModifier' and drop the
 -- rest. This function can be used if mempool is exhausted.
 refreshToss
+<<<<<<< HEAD
     :: (HasSscConfiguration, MonadToss m, MonadTossEnv m, MonadRandom m, HasProtocolConstants, HasProtocolMagic)
+=======
+    :: (HasSscConfiguration, HasConfiguration, MonadToss m, MonadTossEnv m, MonadRandom m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> TossModifier -> m ()
 refreshToss epoch TossModifier {..} = do
     comms <-
@@ -159,7 +183,11 @@ type TossModifierLists
 
 normalizeTossDo
     :: forall m.
+<<<<<<< HEAD
        (HasSscConfiguration, MonadToss m, MonadTossEnv m, MonadRandom m, HasProtocolConstants, HasProtocolMagic)
+=======
+       (HasSscConfiguration, HasConfiguration, MonadToss m, MonadTossEnv m, MonadRandom m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> TossModifierLists -> m ()
 normalizeTossDo epoch (comms, opens, shares, certs) = do
     putsUseful $

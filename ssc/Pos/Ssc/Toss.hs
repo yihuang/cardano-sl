@@ -1,4 +1,5 @@
 -- | Toss abstraction and logic.
+<<<<<<< HEAD
 module Pos.Ssc.Toss
        ( module Pos.Ssc.Toss.Base
        , module Pos.Ssc.Toss.Class
@@ -16,3 +17,9 @@ import           Pos.Ssc.Toss.Trans
 import           Pos.Ssc.Toss.Types
 import           Pos.Binary.Ssc.Toss ()
 
+=======
+
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+
+import           Pos.Binary.Ssc.Toss ()
+>>>>>>> CHW-82-84, orphan branch

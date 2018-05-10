@@ -39,7 +39,11 @@ import           Formatting (build, int, sformat, (%))
 import           System.Wlog (WithLogger, logDebug, logNotice)
 
 import           Pos.Binary.Update ()
+<<<<<<< HEAD
 import           Pos.Core (BlockVersion (..), Coin, EpochIndex, HeaderHash, HasProtocolConstants,
+=======
+import           Pos.Core (BlockVersion (..), Coin, EpochIndex, HasConfiguration, HeaderHash,
+>>>>>>> CHW-82-84, orphan branch
                            IsMainHeader (..), SlotId, SoftforkRule (..), TimeDiff (..), addressHash,
                            applyCoinPortionUp, coinPortionDenominator, coinToInteger, difficultyL,
                            epochSlots, getCoinPortion, headerHashG, isBootstrapEra, CoinPortion (..),
@@ -194,7 +198,11 @@ adoptBlockVersion winningBlk bv = do
 -- @SlottingData@ from the update. We can recieve updated epoch @SlottingData@
 -- and from it, changed epoch/slot times, which is important to keep track of.
 updateSlottingData
+<<<<<<< HEAD
     :: (HasProtocolConstants, MonadError PollVerFailure m, MonadPoll m)
+=======
+    :: (HasConfiguration, MonadError PollVerFailure m, MonadPoll m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex
     -> m ()
 updateSlottingData epochIndex = do
@@ -366,7 +374,11 @@ isDecided (TotalPositive totalPositive) (TotalNegative totalNegative) (TotalSum 
 -- | Apply vote to UndecidedProposalState, thus modifing mutable data,
 -- i. e. votes and stakes.
 voteToUProposalState
+<<<<<<< HEAD
     :: (MonadError PollVerFailure m, WithLogger m)
+=======
+    :: (HasConfiguration, MonadError PollVerFailure m, WithLogger m)
+>>>>>>> CHW-82-84, orphan branch
     => PublicKey
     -> Coin
     -> Bool

@@ -9,6 +9,7 @@ import (pkgs.path + "/nixos/tests/make-test.nix") ({ pkgs, ... }: {
   name = "cardano-node";
 
   nodes.server = { config, pkgs, ... }: {
+<<<<<<< HEAD
     virtualisation = {
       qemu.options = [
         "-cpu Haswell"
@@ -16,6 +17,12 @@ import (pkgs.path + "/nixos/tests/make-test.nix") ({ pkgs, ... }: {
       ];
       memorySize = 2048;
     };
+=======
+    virtualisation.qemu.options = [
+      "-cpu Haswell"
+      "-device virtio-rng-pci"
+    ];
+>>>>>>> CHW-82-84, orphan branch
     security.rngd.enable = pkgs.lib.mkForce true;
     systemd.services.cardano_node_default = {
       description = "Cardano Node";

@@ -49,12 +49,20 @@ import           Pos.Ssc.Types (SscState)
 import           Pos.Txp (GenericTxpLocalData, HasTxpConfiguration, MempoolExt, MonadTxpLocal (..),
                           TxpHolderTag, txNormalize, txProcessTransaction)
 import           Pos.Util.CompileInfo (HasCompileInfo)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (HasJsonLogConfig (..), JsonLogConfig, jsonLogDefault)
+=======
+import           Pos.Util.JsonLog (HasJsonLogConfig (..), JsonLogConfig, jsonLogDefault)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Lens (postfixLFields)
 import           Pos.Util.LoggerName (HasLoggerName' (..), askLoggerNameDefault,
                                       modifyLoggerNameDefault)
 import           Pos.Util.TimeWarp (CanJsonLog (..))
 import           Pos.Util.UserSecret (HasUserSecret (..))
+<<<<<<< HEAD
+=======
+import           Pos.Util.UserPublic (HasUserPublic (..))
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Util (HasLens (..))
 import           Pos.WorkMode.Class (MinWorkMode, WorkMode)
 
@@ -110,6 +118,12 @@ instance HasReportingContext (RealModeContext ext) where
 instance HasUserSecret (RealModeContext ext) where
     userSecret = rmcNodeContext_L . userSecret
 
+<<<<<<< HEAD
+=======
+instance HasUserPublic (RealModeContext ext) where
+    userPublic = rmcNodeContext_L . userPublic
+
+>>>>>>> CHW-82-84, orphan branch
 instance HasShutdownContext (RealModeContext ext) where
     shutdownContext = rmcNodeContext_L . shutdownContext
 

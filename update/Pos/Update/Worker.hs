@@ -13,7 +13,11 @@ import           Serokell.Util.Text (listJsonIndent)
 import           System.Wlog (logDebug, logInfo)
 
 import           Pos.Communication.Protocol (OutSpecs)
+<<<<<<< HEAD
 import           Pos.Core (SoftwareVersion (..), HasGeneratedSecrets, HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+import           Pos.Core (SoftwareVersion (..))
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Update (UpdateProposal (..))
 import           Pos.Recovery.Info (recoveryCommGuard)
 import           Pos.Shutdown (triggerShutdown)
@@ -30,7 +34,11 @@ import           Pos.Util.Util (lensOf)
 import           Pos.Worker.Types (WorkerSpec, localOnNewSlotWorker, worker)
 
 -- | Update System related workers.
+<<<<<<< HEAD
 usWorkers :: forall ctx m. (UpdateMode ctx m, HasGeneratedSecrets, HasProtocolConstants, HasGenesisBlockVersionData) => ([WorkerSpec m], OutSpecs)
+=======
+usWorkers :: forall ctx m. UpdateMode ctx m => ([WorkerSpec m], OutSpecs)
+>>>>>>> CHW-82-84, orphan branch
 usWorkers = (map fst [processNewSlotWorker, checkForUpdateWorker], mempty)
   where
     -- These are two separate workers. We want them to run in parallel

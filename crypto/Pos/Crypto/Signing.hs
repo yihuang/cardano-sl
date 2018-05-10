@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 module Pos.Crypto.Signing
       ( module Pos.Crypto.Signing.Check
       , module Pos.Crypto.Signing.Redeem
@@ -14,3 +15,6 @@ import           Pos.Crypto.Signing.Signing
 import           Pos.Crypto.Signing.Tag
 import           Pos.Crypto.Signing.Types
 
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

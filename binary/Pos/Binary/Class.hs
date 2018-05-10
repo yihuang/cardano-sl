@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-dodgy-exports    #-}
 
@@ -10,3 +11,9 @@ module Pos.Binary.Class
 import           Pos.Binary.Class.Core
 import           Pos.Binary.Class.Primitive
 import           Pos.Binary.Class.TH
+=======
+-- Pos.Binary.Class
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-dodgy-exports    #-}
+>>>>>>> CHW-82-84, orphan branch

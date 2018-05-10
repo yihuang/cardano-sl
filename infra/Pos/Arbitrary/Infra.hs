@@ -13,6 +13,10 @@ import           Pos.Arbitrary.Core ()
 import           Pos.Communication.Types.Protocol (HandlerSpec (..), VerInfo (..))
 import           Pos.Communication.Types.Relay (DataMsg (..), InvMsg (..), MempoolMsg (..),
                                                 ReqMsg (..))
+<<<<<<< HEAD
+=======
+--import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Crypto (HasProtocolMagic)
 import           Pos.Core.Delegation (ProxySKHeavy)
 import           Pos.DHT (DHTData (..), DHTKey (..))

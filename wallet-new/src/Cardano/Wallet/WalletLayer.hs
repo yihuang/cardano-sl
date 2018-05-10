@@ -22,22 +22,36 @@ import           Cardano.Wallet.Kernel.Diffusion (WalletDiffusion (..))
 import qualified Cardano.Wallet.WalletLayer.Kernel as Kernel
 import qualified Cardano.Wallet.WalletLayer.Legacy as Legacy
 import qualified Cardano.Wallet.WalletLayer.QuickCheck as QuickCheck
+<<<<<<< HEAD
 import           Cardano.Wallet.WalletLayer.Types (ActiveWalletLayer (..), PassiveWalletLayer (..),
                                                   applyBlocks, rollbackBlocks)
 
 import           Pos.Core (HasConfiguration)
+=======
+import           Cardano.Wallet.WalletLayer.Types (ActiveWalletLayer (..), PassiveWalletLayer (..))
+>>>>>>> CHW-82-84, orphan branch
 
 ------------------------------------------------------------
 -- Kernel
 ------------------------------------------------------------
+<<<<<<< HEAD
 bracketKernelPassiveWallet
     :: forall m n a. (HasConfiguration, MonadIO m, MonadIO n, MonadMask n, Monad m)
+=======
+
+bracketKernelPassiveWallet
+    :: forall m n a. (MonadMask n, Monad m)
+>>>>>>> CHW-82-84, orphan branch
     => (Severity -> Text -> IO ())
     -> (PassiveWalletLayer m -> n a) -> n a
 bracketKernelPassiveWallet = Kernel.bracketPassiveWallet
 
 bracketKernelActiveWallet
+<<<<<<< HEAD
     :: forall m n a. (MonadIO m, MonadIO n, MonadMask n, Monad m)
+=======
+    :: forall m n a. (MonadMask n, Monad m)
+>>>>>>> CHW-82-84, orphan branch
     => PassiveWalletLayer m -> WalletDiffusion -> (ActiveWalletLayer m -> n a) -> n a
 bracketKernelActiveWallet  = Kernel.bracketActiveWallet
 
@@ -68,3 +82,7 @@ bracketQuickCheckActiveWallet
     :: forall m n a. (MonadMask n, MonadIO m)
     => PassiveWalletLayer m -> WalletDiffusion -> (ActiveWalletLayer m -> n a) -> n a
 bracketQuickCheckActiveWallet  = QuickCheck.bracketActiveWallet
+<<<<<<< HEAD
+=======
+
+>>>>>>> CHW-82-84, orphan branch

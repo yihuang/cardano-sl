@@ -18,7 +18,10 @@ import           Pos.Communication.Protocol (LocalOnNewSlotComm, OnNewSlotComm)
 import           Pos.Communication.Types.Protocol (OutSpecs)
 import           Pos.Communication.Util (Action, ActionSpec (..), localSpecs, toAction)
 import           Pos.Slotting (OnNewSlotParams (..), SlotId, onNewSlot)
+<<<<<<< HEAD
 import           Pos.Core (HasProtocolConstants)
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 type Worker m = Action m ()
 type WorkerSpec m = ActionSpec m ()
@@ -34,7 +37,11 @@ worker' outSpecs h =
     (,outSpecs) $ ActionSpec $ h
 
 onNewSlot'
+<<<<<<< HEAD
     :: (OnNewSlotComm ctx m, HasProtocolConstants)
+=======
+    :: OnNewSlotComm ctx m
+>>>>>>> CHW-82-84, orphan branch
     => OnNewSlotParams -> (SlotId -> WorkerSpec m, outSpecs) -> (WorkerSpec m, outSpecs)
 onNewSlot' params (h, outs) =
     (,outs) . ActionSpec $ \sA ->
@@ -42,12 +49,20 @@ onNewSlot' params (h, outs) =
             \slotId -> let ActionSpec h' = h slotId
                         in h' sA
 onNewSlotWorker
+<<<<<<< HEAD
     :: (OnNewSlotComm ctx m, HasProtocolConstants)
+=======
+    :: OnNewSlotComm ctx m
+>>>>>>> CHW-82-84, orphan branch
     => OnNewSlotParams -> OutSpecs -> (SlotId -> Worker m) -> (WorkerSpec m, OutSpecs)
 onNewSlotWorker params outs = onNewSlot' params . workerHelper outs
 
 localOnNewSlotWorker
+<<<<<<< HEAD
     :: (LocalOnNewSlotComm ctx m, HasProtocolConstants)
+=======
+    :: LocalOnNewSlotComm ctx m
+>>>>>>> CHW-82-84, orphan branch
     => OnNewSlotParams -> (SlotId -> m ()) -> (WorkerSpec m, OutSpecs)
 localOnNewSlotWorker params h = (ActionSpec $ \__sA -> onNewSlot params h, mempty)
 

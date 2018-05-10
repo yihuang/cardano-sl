@@ -135,6 +135,10 @@ executable cardano-auxx
                      , cardano-sl-txp
                      , cardano-sl-util
                      , cardano-sl-update
+<<<<<<< HEAD
+=======
+                     , constraints
+>>>>>>> CHW-82-84, orphan branch
                      , log-warper
                      , temporary
                      , network-transport-tcp

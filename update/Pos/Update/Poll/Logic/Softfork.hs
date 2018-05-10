@@ -17,9 +17,15 @@ import           Formatting (build, sformat, (%))
 import           Serokell.Util.Text (listJson)
 import           System.Wlog (logInfo)
 
+<<<<<<< HEAD
 import           Pos.Core (BlockVersion, Coin, EpochIndex, HeaderHash,
                            SlotId (..), SoftforkRule (..), StakeholderId, crucialSlot, sumCoins,
                            unsafeIntegerToCoin, HasProtocolConstants)
+=======
+import           Pos.Core (BlockVersion, Coin, EpochIndex, HasConfiguration, HeaderHash,
+                           SlotId (..), SoftforkRule (..), StakeholderId, crucialSlot, sumCoins,
+                           unsafeIntegerToCoin)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Update (BlockVersionData (..))
 import           Pos.Update.Poll.Class (MonadPoll (..), MonadPollRead (..))
 import           Pos.Update.Poll.Failure (PollVerFailure (..))
@@ -32,7 +38,11 @@ import           Pos.Util.AssertMode (inAssertMode)
 -- | Record the fact that main block with given version and leader has
 -- been issued by for the given slot.
 recordBlockIssuance
+<<<<<<< HEAD
     :: (MonadError PollVerFailure m, MonadPoll m, HasProtocolConstants)
+=======
+    :: (HasConfiguration, MonadError PollVerFailure m, MonadPoll m)
+>>>>>>> CHW-82-84, orphan branch
     => StakeholderId -> BlockVersion -> SlotId -> HeaderHash -> m ()
 recordBlockIssuance id bv slot h = do
     -- Issuance is stable if it happens before crucial slot for next epoch.
@@ -71,7 +81,11 @@ recordBlockIssuance id bv slot h = do
 
 -- | Process creation of genesis block for given epoch.
 processGenesisBlock
+<<<<<<< HEAD
     :: forall m. (MonadError PollVerFailure m, MonadPoll m, HasProtocolConstants)
+=======
+    :: forall m. (HasConfiguration, MonadError PollVerFailure m, MonadPoll m)
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> m ()
 processGenesisBlock epoch = do
     -- First thing to do is to obtain values threshold for softfork

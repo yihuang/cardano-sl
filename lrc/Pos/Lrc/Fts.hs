@@ -17,7 +17,11 @@ import           Formatting (int, sformat, (%))
 
 import           Pos.Core.Common (Coin, SharedSeed (..), SlotLeaders, StakeholderId, coinToInteger,
                                   mkCoin, sumCoins, unsafeGetCoin)
+<<<<<<< HEAD
 import           Pos.Core.Configuration (HasGeneratedSecrets, epochSlots, HasProtocolConstants)
+=======
+import           Pos.Core.Configuration (HasConfiguration, epochSlots)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Slotting (LocalSlotIndex (..))
 import           Pos.Crypto (deterministic, randomNumber)
 
@@ -49,7 +53,11 @@ coinIndexOffset c = over _CoinIndex (+ unsafeGetCoin c)
 
 -- | Assign a local slot index to each value in a list, starting with
 -- @LocalSlotIndex 0@.
+<<<<<<< HEAD
 assignToSlots :: HasProtocolConstants => [a] -> [(LocalSlotIndex, a)]
+=======
+assignToSlots :: HasConfiguration => [a] -> [(LocalSlotIndex, a)]
+>>>>>>> CHW-82-84, orphan branch
 assignToSlots = zip [minBound..]
 
 -- | Sort values by their local slot indices, then strip the indices.
@@ -225,7 +233,11 @@ previous upper bound (and thus it's more or equal to the current lower bound).
 -- specifies which addresses should count as “owning” funds for the purposes
 -- of follow-the-satoshi.
 followTheSatoshiM
+<<<<<<< HEAD
     :: forall m . (Monad m, HasProtocolConstants)
+=======
+    :: forall m . (Monad m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => SharedSeed
     -> Coin
     -> ConduitT (StakeholderId, Coin) Void m SlotLeaders
@@ -271,11 +283,19 @@ followTheSatoshiM (SharedSeed seed) totalCoins = do
 
 -- | A pure version of `followTheSatoshiM` above.
 -- This pure version is used for testing and benchmarking. Its important to
+<<<<<<< HEAD
 -- note that since the ordering of the input stakes influences ths output,
 -- testing this pure version as a proxy for the one above is insufficient.
 -- The monadic version needs to be tested in conjunction with the same conduit
 -- source that will feed it values in the real system.
 followTheSatoshi :: (HasGeneratedSecrets, HasProtocolConstants) => SharedSeed -> [(StakeholderId, Coin)] -> SlotLeaders
+=======
+-- note that since the ordering if the input stakes influences ths output,
+-- testing this pure version as a proxy for the one above is insufficient.
+-- The monadic version needs to be tested in conjunction with the same conduit
+-- source that will feed it values in the real system.
+followTheSatoshi :: HasConfiguration => SharedSeed -> [(StakeholderId, Coin)] -> SlotLeaders
+>>>>>>> CHW-82-84, orphan branch
 followTheSatoshi seed stakes
     | totalCoins > coinToInteger maxBound =
         error $ sformat

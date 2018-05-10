@@ -7,6 +7,7 @@
 -- See https://eprint.iacr.org/2016/889.pdf (“A Provably Secure
 -- Proof-of-Stake Blockchain Protocol”), section 4 for more details.
 
+<<<<<<< HEAD
 module Pos.Ssc
        ( module Pos.Ssc.Error
        , module Pos.Ssc.Logic
@@ -46,4 +47,8 @@ import           Pos.Ssc.State
 import           Pos.Ssc.Types
 import           Pos.Ssc.VssCertData
 import           Pos.Ssc.Worker
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Binary.Ssc ()

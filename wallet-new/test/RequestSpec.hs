@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 module RequestSpec (spec) where
+=======
+module RequestSpec where
+>>>>>>> CHW-82-84, orphan branch
 
 import           Universum
 

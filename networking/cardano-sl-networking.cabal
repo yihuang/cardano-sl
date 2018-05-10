@@ -13,10 +13,19 @@ flag benchmarks
   manual:            True
 
 Library
+<<<<<<< HEAD
   exposed-modules:      Network.QDisc.Fair
 
                         Network.Discovery.Abstract
                         Network.Discovery.Transport.Kademlia
+=======
+  exposed-modules:      Network.Discovery.Abstract
+                        Network.Discovery.Transport.Kademlia
+                        Network.Transport.Abstract
+                        Network.Transport.Concrete
+                        Network.Transport.Concrete.TCP
+                        Network.QDisc.Fair
+>>>>>>> CHW-82-84, orphan branch
 
                         Network.Broadcast.OutboundQueue
                         Network.Broadcast.OutboundQueue.Types
@@ -62,12 +71,19 @@ Library
                       , async
                       , attoparsec
                       , base
+<<<<<<< HEAD
                       , cardano-sl-util
+=======
+>>>>>>> CHW-82-84, orphan branch
                       , containers
                       , contravariant
                       , cryptonite
                       , binary >= 0.8
                       , bytestring
+<<<<<<< HEAD
+=======
+                      , data-default
+>>>>>>> CHW-82-84, orphan branch
                       , exceptions
                       , formatting
                       , hashable
@@ -114,10 +130,14 @@ executable discovery
                       , binary
                       , bytestring
                       , cardano-sl-networking
+<<<<<<< HEAD
                       , cardano-sl-util
                       , containers
                       , contravariant
                       , network-transport
+=======
+                      , containers
+>>>>>>> CHW-82-84, orphan branch
                       , network-transport-tcp
                       , random
                       , safe-exceptions
@@ -136,6 +156,7 @@ executable discovery
 executable ping-pong
   main-is:             PingPong.hs
   build-depends:       base >= 4.8 && < 5
+<<<<<<< HEAD
                      , async
                      , binary
                      , bytestring
@@ -143,6 +164,11 @@ executable ping-pong
                      , cardano-sl-util
                      , contravariant
                      , network-transport
+=======
+                     , binary
+                     , bytestring
+                     , cardano-sl-networking
+>>>>>>> CHW-82-84, orphan branch
                      , network-transport-tcp
                      , random
                      , safe-exceptions
@@ -250,6 +276,7 @@ test-suite cardano-sl-networking-test
                        Test.Network.Broadcast.OutboundQueueSpec
                        Test.Util
   type:                exitcode-stdio-1.0
+<<<<<<< HEAD
   build-depends:       async
                      , base >= 4.8 && < 5
                      , binary
@@ -259,6 +286,14 @@ test-suite cardano-sl-networking-test
                      , containers >= 0.5.7
                      , hspec >= 2.1.10
                      , hspec-core
+=======
+  build-depends:       base >= 4.8 && < 5
+                     , binary
+                     , bytestring >= 0.10.8
+                     , cardano-sl-networking
+                     , containers >= 0.5.7
+                     , hspec >= 2.1.10
+>>>>>>> CHW-82-84, orphan branch
                      , lens >= 4.14
                      , log-warper
                      , mtl >= 2.2.1

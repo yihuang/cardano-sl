@@ -10,10 +10,16 @@ module Cardano.Wallet.Client.Http
 import           Universum
 
 import           Control.Lens (_Left)
+<<<<<<< HEAD
 import           Data.Aeson (decode)
 import           Network.HTTP.Client (Manager, defaultManagerSettings, newManager)
 import           Servant ((:<|>) (..), (:>))
 import           Servant.Client (BaseUrl (..), ClientEnv (..), Scheme (..), client, runClientM, ServantError(..))
+=======
+import           Network.HTTP.Client (Manager, defaultManagerSettings, newManager)
+import           Servant ((:<|>) (..), (:>))
+import           Servant.Client (BaseUrl (..), ClientEnv (..), Scheme (..), client, runClientM)
+>>>>>>> CHW-82-84, orphan branch
 
 import qualified Cardano.Wallet.API.V1 as V1
 import           Cardano.Wallet.Client
@@ -31,6 +37,11 @@ mkHttpClient baseUrl manager = WalletClient
         = run . postAddressR
     , getAddress
         = run . getAddressR
+<<<<<<< HEAD
+=======
+    , postExternalAddress
+        = run . postExternalAddressR
+>>>>>>> CHW-82-84, orphan branch
     -- wallets endpoints
     , postWallet
         = run . postWalletR
@@ -45,6 +56,13 @@ mkHttpClient baseUrl manager = WalletClient
         = run . getWalletR
     , updateWallet
         = \x -> run . updateWalletR x
+<<<<<<< HEAD
+=======
+    , postExternalWallet
+        = run . postExternalWalletR
+    , postAddressPath
+        = run . postAddressPathR
+>>>>>>> CHW-82-84, orphan branch
     -- account endpoints
     , deleteAccount
         = \x -> unNoContent . run . deleteAccountR x
@@ -56,6 +74,11 @@ mkHttpClient baseUrl manager = WalletClient
         = \w -> run . postAccountR w
     , updateAccount
         = \x y -> run . updateAccountR x y
+<<<<<<< HEAD
+=======
+    , postExternalAccount
+        = \w -> run . postExternalAccountR w
+>>>>>>> CHW-82-84, orphan branch
     -- transactions endpoints
     , postTransaction
         = run . postTransactionR
@@ -64,6 +87,13 @@ mkHttpClient baseUrl manager = WalletClient
              run . getTransactionIndexFilterSortsR walletId mAccountIndex mAddress mPage mpp filters
     , getTransactionFee
         = run . getTransactionFeeR
+<<<<<<< HEAD
+=======
+    , postUnsignedTransaction
+        = run . postUnsignedTransactionR
+    , postSignedTransaction
+        = run . postSignedTransactionR
+>>>>>>> CHW-82-84, orphan branch
     -- settings
     , getNodeSettings
         = run getNodeSettingsR
@@ -75,6 +105,7 @@ mkHttpClient baseUrl manager = WalletClient
   where
     unNoContent = map void
     clientEnv = ClientEnv manager baseUrl
+<<<<<<< HEAD
     parseJsendError servantErr =
         case servantErr of
             FailureResponse resp ->
@@ -86,6 +117,13 @@ mkHttpClient baseUrl manager = WalletClient
     getAddressIndexR
         :<|> postAddressR
         :<|> getAddressR
+=======
+    run       = fmap (over _Left ClientHttpError) . (`runClientM` clientEnv)
+    getAddressIndexR
+        :<|> postAddressR
+        :<|> getAddressR
+        :<|> postExternalAddressR
+>>>>>>> CHW-82-84, orphan branch
         = addressesAPI
 
     postWalletR
@@ -94,6 +132,11 @@ mkHttpClient baseUrl manager = WalletClient
         :<|> deleteWalletR
         :<|> getWalletR
         :<|> updateWalletR
+<<<<<<< HEAD
+=======
+        :<|> postExternalWalletR
+        :<|> postAddressPathR
+>>>>>>> CHW-82-84, orphan branch
         = walletsAPI
 
     deleteAccountR
@@ -101,11 +144,20 @@ mkHttpClient baseUrl manager = WalletClient
         :<|> getAccountIndexPagedR
         :<|> postAccountR
         :<|> updateAccountR
+<<<<<<< HEAD
+=======
+        :<|> postExternalAccountR
+>>>>>>> CHW-82-84, orphan branch
         = accountsAPI
 
     postTransactionR
         :<|> getTransactionIndexFilterSortsR
         :<|> getTransactionFeeR
+<<<<<<< HEAD
+=======
+        :<|> postUnsignedTransactionR
+        :<|> postSignedTransactionR
+>>>>>>> CHW-82-84, orphan branch
         = transactionsAPI
 
     addressesAPI

@@ -24,8 +24,13 @@ import           Test.QuickCheck.Monadic (PropertyM, pick)
 
 import           Pos.AllSecrets (AllSecrets, HasAllSecrets (..), allSecrets)
 import           Pos.Block.Types (Blund)
+<<<<<<< HEAD
 import           Pos.Core (BlockCount, GenesisData (..), HasGenesisData,
                            SlotId (..), epochIndexL, genesisData, HasProtocolMagic, HasProtocolConstants)
+=======
+import           Pos.Core (BlockCount, GenesisData (..), HasConfiguration, HasGenesisData,
+                           SlotId (..), epochIndexL, genesisData)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (Block)
 import           Pos.Generator.Block (BlockGenMode, BlockGenParams (..), MonadBlockGenInit,
                                       genBlocks, tgpTxCountRange)
@@ -48,7 +53,10 @@ genBlockGenParams
     :: ( HasGenesisData
        , HasAllSecrets ctx
        , MonadReader ctx m
+<<<<<<< HEAD
        , HasProtocolMagic
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => Maybe BlockCount
     -> EnableTxPayload
@@ -123,7 +131,11 @@ withCurrentSlot slot = local (set btcSlotIdL $ Just slot)
 -- future. This function pretends that current slot is after the last
 -- slot of the given blocks.
 satisfySlotCheck
+<<<<<<< HEAD
     :: ( HasProtocolConstants, MonadReader BlockTestContext m)
+=======
+    :: (HasConfiguration, MonadReader BlockTestContext m)
+>>>>>>> CHW-82-84, orphan branch
     => OldestFirst NE Block
     -> m a
     -> m a

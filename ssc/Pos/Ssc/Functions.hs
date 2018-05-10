@@ -23,9 +23,15 @@ import           Serokell.Util.Verify (isVerSuccess)
 
 import           Pos.Binary.Core ()
 import           Pos.Binary.Crypto ()
+<<<<<<< HEAD
 import           Pos.Core (EpochIndex (..), HasGenesisData, HasProtocolConstants,
                            IsMainHeader, SlotId (..), StakeholderId, VssCertificatesMap,
                            genesisVssCerts, headerSlotL, HasProtocolMagic)
+=======
+import           Pos.Core (EpochIndex (..), HasConfiguration, HasGenesisData, HasProtocolConstants,
+                           IsMainHeader, SlotId (..), StakeholderId, VssCertificatesMap,
+                           genesisVssCerts, headerSlotL)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Slotting (crucialSlot)
 import           Pos.Core.Ssc (CommitmentsMap (getCommitmentsMap), SscPayload (..))
 import           Pos.Ssc.Base (checkCertTTL, isCommitmentId, isOpeningId, isSharesId,
@@ -69,7 +75,11 @@ hasVssCertificate id = VCD.member id . _sgsVssCertificates
 --
 -- We also do some general sanity checks.
 verifySscPayload
+<<<<<<< HEAD
     :: (MonadError SscVerifyError m, HasProtocolConstants, HasProtocolMagic)
+=======
+    :: (HasConfiguration, MonadError SscVerifyError m)
+>>>>>>> CHW-82-84, orphan branch
     => Either EpochIndex (Some IsMainHeader) -> SscPayload -> m ()
 verifySscPayload eoh payload = case payload of
     CommitmentsPayload comms certs -> do

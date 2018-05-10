@@ -9,11 +9,14 @@ module UTxO.Translate (
   , withConfig
   , mapTranslateErrors
   , catchTranslateErrors
+<<<<<<< HEAD
   , catchSomeTranslateErrors
     -- * Convenience wrappers
   , translateFirstSlot
   , translateNextSlot
   , translateGenesisHeader
+=======
+>>>>>>> CHW-82-84, orphan branch
     -- * Interface to the verifier
   , verify
   , verifyBlocksPrefix
@@ -70,7 +73,10 @@ newtype TranslateT e m a = TranslateT {
            , Applicative
            , Monad
            , MonadError e
+<<<<<<< HEAD
            , MonadIO
+=======
+>>>>>>> CHW-82-84, orphan branch
            )
 
 instance MonadTrans (TranslateT e) where
@@ -135,6 +141,7 @@ catchTranslateErrors :: Functor m
 catchTranslateErrors (TranslateT (ExceptT (ReaderT ma))) =
     TranslateT $ ExceptT $ ReaderT $ \env -> fmap Right (ma env)
 
+<<<<<<< HEAD
 catchSomeTranslateErrors :: Monad m
                          => TranslateT (Either e e') m a
                          -> TranslateT e m (Either e' a)
@@ -167,6 +174,8 @@ translateNextSlot (SlotId epoch lsi) = withConfig $
 translateGenesisHeader :: Monad m => TranslateT e m GenesisBlockHeader
 translateGenesisHeader = view gbHeader <$> asks (ccBlock0 . tcCardano)
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 {-------------------------------------------------------------------------------
   Interface to the verifier
 -------------------------------------------------------------------------------}

@@ -10,7 +10,11 @@ fi
 # Make sure we're using proper version of tmux.
 tmux_actual_version=$(tmux -V | awk '{print $2}')
 # All tmux versions contain two numbers only.
+<<<<<<< HEAD
 tmux_proper_versions=("2.3" "2.4" "2.5" "2.6" "2.7" "master")
+=======
+tmux_proper_versions=("2.3" "2.4" "2.5" "2.6" "master")
+>>>>>>> CHW-82-84, orphan branch
 checker=""
 for version in "${tmux_proper_versions[@]}"; do
     if [ "${version}" == "${tmux_actual_version}" ]; then
@@ -56,7 +60,11 @@ if [[ $config_dir == "" ]]; then
   echo $(pwd)
   gen_kademlia_topology $n
 fi
+<<<<<<< HEAD
 run_dir=$config_dir
+=======
+
+>>>>>>> CHW-82-84, orphan branch
 
 # Stats are not mandatory either
 stats=$4
@@ -136,6 +144,7 @@ while [[ $i -lt $panesCnt ]]; do
       if [[ $WALLET_CONFIG != "" ]]; then
           conf_file=$WALLET_CONFIG
       fi
+<<<<<<< HEAD
       wallet_args=" --tlscert $config_dir/tls-files/server.crt --tlskey $config_dir/tls-files/server.key --tlsca $config_dir/tls-files/ca.crt $wallet_flush" # --wallet-rebuild-db'
       wallet_args="$WALLET_EXTRA_ARGS $wallet_args --wallet-address 127.0.0.1:8090"
       exec_name="$WALLET_EXE_NAME"
@@ -149,12 +158,17 @@ while [[ $i -lt $panesCnt ]]; do
       fi
       wallet_args=" --tlscert $base/../tls-files/server.crt --tlskey $base/../tls-files/server.key --tlsca $base/../tls-files/ca.crt $wallet_flush" # --wallet-rebuild-db'
       wallet_args="$WALLET_EXTRA_ARGS --new-wallet $wallet_args --wallet-address 127.0.0.1:8091"
+=======
+      wallet_args=" --tlscert $base/../tls-files/server.crt --tlskey $base/../tls-files/server.key --tlsca $base/../tls-files/ca.crt $wallet_flush" # --wallet-rebuild-db'
+      wallet_args="$WALLET_EXTRA_ARGS $wallet_args --wallet-address 127.0.0.1:8090"
+>>>>>>> CHW-82-84, orphan branch
       exec_name="$WALLET_EXE_NAME"
       if [[ $WALLET_DEBUG != "" ]]; then
           wallet_args="$wallet_args --wallet-debug"
       fi
   fi
   if [[ $i -lt $n ]]; then
+<<<<<<< HEAD
     node_args="$(node_cmd $i "$wallet_args" "$system_start" "$config_dir" "$conf_file" "$run_dir" "$run_dir/logs")"
     node_=$(find_binary $exec_name)
     if [[ $WALLET_TEST != "" ]] && [[ $i -ge $((n-2)) ]]; then
@@ -162,6 +176,15 @@ while [[ $i -lt $panesCnt ]]; do
         launcher_=$(find_binary cardano-launcher)
 
         ensure_run $run_dir
+=======
+    node_args="$(node_cmd $i "$stats" "$wallet_args" "$system_start" "$config_dir" "$conf_file")"
+    node_=$(find_binary $exec_name)
+    if [[ $WALLET_TEST != "" ]] && [[ $i == $((n-1)) ]]; then
+        updater_file="$config_dir/updater$i.sh"
+        launcher_=$(find_binary cardano-launcher)
+
+        ensure_run
+>>>>>>> CHW-82-84, orphan branch
 
         full_node_args="$node_args $reb $no_ntp $keys_args $rts_opts"
 

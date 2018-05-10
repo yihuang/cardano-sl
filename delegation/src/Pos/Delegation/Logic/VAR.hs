@@ -26,8 +26,13 @@ import           Serokell.Util (listJson, mapJson)
 import           System.Wlog (WithLogger, logDebug)
 import           UnliftIO (MonadUnliftIO)
 
+<<<<<<< HEAD
 import           Pos.Core (ComponentBlock (..), EpochIndex (..), HasGenesisBlockVersionData, StakeholderId,
                            addressHash, epochIndexL, gbHeader, headerHash, prevBlockL, siEpoch, HasProtocolMagic)
+=======
+import           Pos.Core (ComponentBlock (..), EpochIndex (..), HasConfiguration, StakeholderId,
+                           addressHash, epochIndexL, gbHeader, headerHash, prevBlockL, siEpoch)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (Block, mainBlockDlgPayload, mainBlockSlot)
 import           Pos.Crypto (ProxySecretKey (..), shortHashF)
 import           Pos.DB (DBError (DBMalformed), MonadDBRead, SomeBatchOp (..))
@@ -292,7 +297,10 @@ getNoLongerRichmen ::
        , MonadIO m
        , MonadReader ctx m
        , HasLrcContext ctx
+<<<<<<< HEAD
        , HasGenesisBlockVersionData
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => EpochIndex
     -> m (HashSet StakeholderId)
@@ -320,8 +328,12 @@ dlgVerifyBlocks ::
        , MonadUnliftIO m
        , MonadReader ctx m
        , HasLrcContext ctx
+<<<<<<< HEAD
        , HasProtocolMagic
        , HasGenesisBlockVersionData
+=======
+       , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
     => OldestFirst NE Block
     -> ExceptT Text m (OldestFirst NE DlgUndo)
@@ -413,6 +425,10 @@ dlgApplyBlocks ::
        , MonadUnliftIO m
        , WithLogger m
        , MonadMask m
+<<<<<<< HEAD
+=======
+       , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
     => OldestFirst NE DlgBlund
     -> m (NonEmpty SomeBatchOp)
@@ -504,8 +520,12 @@ dlgNormalizeOnRollback ::
        , MonadMask m
        , HasLrcContext ctx
        , Mockable CurrentTime m
+<<<<<<< HEAD
        , HasProtocolMagic
        , HasGenesisBlockVersionData
+=======
+       , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
     => m ()
 dlgNormalizeOnRollback = do

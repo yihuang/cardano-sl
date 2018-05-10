@@ -12,6 +12,10 @@ import           Mockable (Async, Concurrently, Delay, Mockables)
 import           System.Wlog (WithLogger)
 import           UnliftIO (MonadUnliftIO)
 
+<<<<<<< HEAD
+=======
+import           Pos.Core (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (MonadDB, MonadGState)
 import           Pos.Lrc.Context (HasLrcContext)
 
@@ -26,4 +30,8 @@ type LrcMode ctx m
        , Mockables m [Async, Concurrently, Delay]
        , MonadReader ctx m
        , HasLrcContext ctx
+<<<<<<< HEAD
+=======
+       , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )

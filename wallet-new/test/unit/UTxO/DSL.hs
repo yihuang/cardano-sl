@@ -65,7 +65,12 @@ module UTxO.DSL (
   , utxoAddressForInput
     -- ** Chain
   , Block
+<<<<<<< HEAD
   , Chain
+=======
+  , Blocks
+  , Chain(..)
+>>>>>>> CHW-82-84, orphan branch
   , chainToLedger
   , utxoApplyBlock
   ) where
@@ -496,14 +501,23 @@ utxoRemoveInputs inps (Utxo utxo) = Utxo (utxo `withoutKeys` inps)
   Additional: chain
 -------------------------------------------------------------------------------}
 
+<<<<<<< HEAD
 -- | Block of transactions
 type Block h a = OldestFirst [] (Transaction h a)
+=======
+type Block  h a = OldestFirst [] (Transaction h a)
+type Blocks h a = OldestFirst [] (Block h a)
+>>>>>>> CHW-82-84, orphan branch
 
 -- | A chain
 --
 -- A chain is just a series of blocks, here modelled simply as the transactions
 -- they contain, since the rest of the block information can then be inferred.
+<<<<<<< HEAD
 type Chain h a = OldestFirst [] (Block h a)
+=======
+data Chain h a = Chain { chainBlocks :: Blocks h a }
+>>>>>>> CHW-82-84, orphan branch
 
 chainToLedger :: Transaction h a -> Chain h a -> Ledger h a
 chainToLedger boot = Ledger
@@ -511,6 +525,10 @@ chainToLedger boot = Ledger
                    . reverse
                    . (boot :)
                    . concatMap toList . toList
+<<<<<<< HEAD
+=======
+                   . chainBlocks
+>>>>>>> CHW-82-84, orphan branch
 
 -- | Compute the UTxO after a block has been applied
 --
@@ -600,12 +618,20 @@ instance (Buildable a, Hash h a) => Buildable (Transaction h a) where
       trExtra
 
 instance (Buildable a, Hash h a) => Buildable (Chain h a) where
+<<<<<<< HEAD
   build blocks = bprint
+=======
+  build Chain{..} = bprint
+>>>>>>> CHW-82-84, orphan branch
       ( "Chain"
       % "{ blocks: " % listJson
       % "}"
       )
+<<<<<<< HEAD
       blocks
+=======
+      chainBlocks
+>>>>>>> CHW-82-84, orphan branch
 
 instance ( Buildable a, Hash h a, Foldable f) => Buildable (NewestFirst f (Transaction h a)) where
   build ts = bprint ("NewestFirst " % listJson) (toList ts)

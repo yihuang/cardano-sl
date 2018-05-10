@@ -272,6 +272,11 @@ allocateNodeContext ancd txpSettings ekgStore = do
     logDebug "Filled slotting future"
     ncUserSecret <- newTVarIO $ npUserSecret
     logDebug "Created UserSecret variable"
+<<<<<<< HEAD
+=======
+    ncUserPublic <- newTVarIO $ npUserPublic
+    logDebug "Created UserPublic variable"
+>>>>>>> CHW-82-84, orphan branch
     ncBlockRetrievalQueue <- liftIO $ newTBQueueIO blockRetrievalQueueSize
     ncRecoveryHeader <- liftIO newEmptyTMVarIO
     logDebug "Created block retrieval queue, recovery and progress headers"

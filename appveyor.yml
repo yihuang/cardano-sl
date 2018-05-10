@@ -62,7 +62,10 @@ before_test:
 
 test_script:
   - cd "%WORK_DIR%"
+<<<<<<< HEAD
   - stack exec -- ghc-pkg recache
+=======
+>>>>>>> CHW-82-84, orphan branch
   - stack --verbosity warn setup --no-reinstall > nul
   # Install happy separately: https://github.com/commercialhaskell/stack/issues/3151#issuecomment-310642487. Also install cpphs because it's a build-tool and Stack can't figure out by itself that it should be installed
   - scripts\ci\appveyor-retry call stack --verbosity warn install happy cpphs

@@ -28,7 +28,10 @@ module Wallet.Abstract (
     -- $generation
   , InductiveWithOurs(..)
   , genFromBlockchain
+<<<<<<< HEAD
   , genFromBlockchainWithOurs
+=======
+>>>>>>> CHW-82-84, orphan branch
   , genFromBlockchainPickingAccounts
     -- * Auxiliary operations
   , balance
@@ -118,7 +121,11 @@ data Wallet h a = Wallet {
     }
 
 -- | Apply multiple blocks
+<<<<<<< HEAD
 applyBlocks :: Wallet h a -> Chain h a -> Wallet h a
+=======
+applyBlocks :: Wallet h a -> Blocks h a -> Wallet h a
+>>>>>>> CHW-82-84, orphan branch
 applyBlocks w0 bs = foldl' applyBlock w0 bs
 
 -- | Type of a wallet constructor
@@ -592,6 +599,7 @@ data InductiveWithOurs h a = InductiveWithOurs {
     , inductiveWalletDef  :: Inductive h a
     }
 
+<<<<<<< HEAD
 ;
 -- | Given a predicate function that selects addresses that
 -- belong to the generated 'Inductive' wallet and the 'FromPreChain' value
@@ -617,6 +625,8 @@ genFromBlockchainWithOurs isOurs fpc = do
     InductiveWithOurs ourAddrs <$> genFromBlockchain ourAddrs fpc
 
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Selects a random subset of addresses to be considered from the
 -- blockchain in the amount given.
 genFromBlockchainPickingAccounts
@@ -657,7 +667,11 @@ genInductiveFor addrs = do
 -- | The first step in converting a 'Chain into an 'Inductive' wallet is
 -- to sequence the existing blocks using 'ApplyBlock' constructors.
 chainToApplyBlocks :: Chain h a -> [Action h a]
+<<<<<<< HEAD
 chainToApplyBlocks = toList . map ApplyBlock'
+=======
+chainToApplyBlocks = toList . map ApplyBlock' . chainBlocks
+>>>>>>> CHW-82-84, orphan branch
 
 -- | Once we've created our initial @['Action' h 'Addr']@, we want to
 -- insert some 'Transaction's in appropriate locations in the list. There
@@ -747,7 +761,11 @@ synthesizeTransactions
     -> InductiveGen h (IntMap [Action h Addr])
 synthesizeTransactions addrs alreadySpent = do
     boot   <- getBootTransaction
+<<<<<<< HEAD
     blocks <- toList <$> getBlockchain
+=======
+    blocks <- toList . chainBlocks <$> getBlockchain
+>>>>>>> CHW-82-84, orphan branch
     liftGen $ go IntMap.empty (trUtxo boot) alreadySpent 0 blocks
   where
     -- NOTE: We maintain a UTxO as we process the blocks. There are (at least)
@@ -819,7 +837,11 @@ findOurTransactions
     -> Chain h a
     -> [(Int, Transaction h a)]
 findOurTransactions addrs ledger =
+<<<<<<< HEAD
     concatMap k . zip [0..] . toList
+=======
+    concatMap k . zip [0..] . toList . chainBlocks
+>>>>>>> CHW-82-84, orphan branch
   where
     k (i, block) =
         map ((,) i)
@@ -834,7 +856,11 @@ findOurTransactions addrs ledger =
 -- a 'NewPending' transaction.
 blockReceivedIndex :: Hash h Addr => Input h Addr -> Chain h Addr -> Maybe Int
 blockReceivedIndex i =
+<<<<<<< HEAD
     List.findIndex (any ((inpTrans i ==) . hash)) . toList
+=======
+    List.findIndex (any ((inpTrans i ==) . hash)) . toList . chainBlocks
+>>>>>>> CHW-82-84, orphan branch
 
 -- | For each 'Input' in the 'Transaction' that belongs to one of the
 -- 'Addr'esses in the 'Set' provided, find the index of the block in the

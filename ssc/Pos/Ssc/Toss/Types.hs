@@ -16,7 +16,11 @@ import           Control.Lens (makeLenses)
 import qualified Data.Text.Buildable as Buildable
 import           Universum
 
+<<<<<<< HEAD
 import           Pos.Core (LocalSlotIndex, SlotId, VssCertificatesMap, HasProtocolConstants)
+=======
+import           Pos.Core (HasConfiguration, LocalSlotIndex, SlotId, VssCertificatesMap)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Ssc (CommitmentsMap, OpeningsMap, SharesMap)
 import           Pos.Ssc.Base (isCommitmentId, isCommitmentIdx, isOpeningId, isOpeningIdx,
                                isSharesId, isSharesIdx)
@@ -35,13 +39,21 @@ instance Buildable SscTag where
     build SharesMsg         = "shares"
     build VssCertificateMsg = "VSS certificate"
 
+<<<<<<< HEAD
 isGoodSlotForTag :: HasProtocolConstants => SscTag -> LocalSlotIndex -> Bool
+=======
+isGoodSlotForTag :: HasConfiguration => SscTag -> LocalSlotIndex -> Bool
+>>>>>>> CHW-82-84, orphan branch
 isGoodSlotForTag CommitmentMsg     = isCommitmentIdx
 isGoodSlotForTag OpeningMsg        = isOpeningIdx
 isGoodSlotForTag SharesMsg         = isSharesIdx
 isGoodSlotForTag VssCertificateMsg = const True
 
+<<<<<<< HEAD
 isGoodSlotIdForTag :: HasProtocolConstants => SscTag -> SlotId -> Bool
+=======
+isGoodSlotIdForTag :: HasConfiguration => SscTag -> SlotId -> Bool
+>>>>>>> CHW-82-84, orphan branch
 isGoodSlotIdForTag CommitmentMsg     = isCommitmentId
 isGoodSlotIdForTag OpeningMsg        = isOpeningId
 isGoodSlotIdForTag SharesMsg         = isSharesId

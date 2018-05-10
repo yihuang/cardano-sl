@@ -1,4 +1,5 @@
 -- | This module re-exports everything from 'Pos.Block.Logic.*'.
+<<<<<<< HEAD
 module Pos.Block.Logic
        ( module Pos.Block.Logic.VAR
        , module Pos.Block.Logic.Util
@@ -14,3 +15,7 @@ import           Pos.Block.Logic.Internal
 import           Pos.Block.Logic.Header
 import           Pos.Block.Logic.Creation
 import           Pos.Block.Logic.Integrity
+=======
+
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

@@ -1,5 +1,6 @@
 -- | Language.
 
+<<<<<<< HEAD
 module Lang
        ( module Lang.Value
        , module Lang.Argument
@@ -21,3 +22,6 @@ import           Lang.Lexer
 import           Lang.Name
 import           Lang.Parser
 import           Lang.Syntax
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

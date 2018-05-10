@@ -42,8 +42,14 @@ import           Serokell.Util (Color (Red), colorize)
 import           System.Wlog (WithLogger, logError)
 import           UnliftIO (MonadUnliftIO)
 
+<<<<<<< HEAD
 import           Pos.Core (Address, Coin, coinF, mkCoin, sumCoins, unsafeAddCoin,
                            unsafeIntegerToCoin, HasCoreConfiguration, HasGenesisData)
+=======
+import           Pos.Binary.Core ()
+import           Pos.Core (Address, Coin, HasConfiguration, coinF, mkCoin, sumCoins, unsafeAddCoin,
+                           unsafeIntegerToCoin)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Txp (TxIn (..), TxOutAux (toaOut))
 import           Pos.DB (DBError (..), DBIteratorClass (..), DBTag (GStateDB), IterType, MonadDB,
                          MonadDBRead, RocksBatchOp (..), dbIterSource, dbSerializeValue,
@@ -74,7 +80,11 @@ instance Buildable UtxoOp where
         bprint ("AddTxOut ("%build%", "%build%")")
         txIn txOutAux
 
+<<<<<<< HEAD
 instance HasCoreConfiguration => RocksBatchOp UtxoOp where
+=======
+instance HasConfiguration => RocksBatchOp UtxoOp where
+>>>>>>> CHW-82-84, orphan branch
     toBatchOp (AddTxOut txIn txOut) =
         [Rocks.Put (txInKey txIn) (dbSerializeValue txOut)]
     toBatchOp (DelTxIn txIn) = [Rocks.Del $ txInKey txIn]
@@ -133,7 +143,11 @@ getAllPotentiallyHugeUtxo = runConduitRes $ utxoSource .| utxoSink
 ----------------------------------------------------------------------------
 
 sanityCheckUtxo
+<<<<<<< HEAD
     :: (MonadDBRead m, WithLogger m, MonadUnliftIO m, HasGenesisData)
+=======
+    :: (MonadDBRead m, WithLogger m, MonadUnliftIO m)
+>>>>>>> CHW-82-84, orphan branch
     => Coin -> m ()
 sanityCheckUtxo expectedTotalStake = do
     let stakesSource =

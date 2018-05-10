@@ -7,7 +7,10 @@ module Pos.Block.Logic.Util
        (
          -- * Common/Utils
          lcaWithMainChain
+<<<<<<< HEAD
        , lcaWithMainChainSuffix
+=======
+>>>>>>> CHW-82-84, orphan branch
        , calcChainQuality
        , calcChainQualityM
        , calcOverallChainQuality
@@ -26,10 +29,17 @@ import           System.Wlog (WithLogger)
 import           Pos.Block.Configuration (HasBlockConfiguration, fixedTimeCQ)
 import           Pos.Block.Slog.Context (slogGetLastSlots)
 import           Pos.Block.Slog.Types (HasSlogGState)
+<<<<<<< HEAD
 import           Pos.Core (BlockCount, FlatSlotId, HasProtocolConstants, HeaderHash, Timestamp (..),
                            difficultyL, flattenSlotId, headerHash, prevBlockL)
 import           Pos.Core.Block (BlockHeader)
 import           Pos.Core.Configuration (blkSecurityParam)
+=======
+import           Pos.Core (BlockCount, FlatSlotId, HeaderHash, Timestamp (..), difficultyL,
+                           flattenSlotId, headerHash, prevBlockL)
+import           Pos.Core.Block (BlockHeader)
+import           Pos.Core.Configuration (HasConfiguration, blkSecurityParam)
+>>>>>>> CHW-82-84, orphan branch
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class (MonadBlockDBRead)
 import           Pos.Exception (reportFatalError)
@@ -46,7 +56,11 @@ import           Pos.Util.Chrono (NE, OldestFirst (..))
 -- Though, usually in this method oldest header is LCA, so it can be
 -- optimized by traversing from older to newer.
 lcaWithMainChain
+<<<<<<< HEAD
     :: ( MonadBlockDBRead m )
+=======
+    :: (HasConfiguration, MonadBlockDBRead m)
+>>>>>>> CHW-82-84, orphan branch
     => OldestFirst NE BlockHeader -> m (Maybe HeaderHash)
 lcaWithMainChain headers =
     lcaProceed Nothing $
@@ -61,6 +75,7 @@ lcaWithMainChain headers =
             ([], True)   -> pure $ Just h
             (x:xs, True) -> lcaProceed (Just h) (x :| xs)
 
+<<<<<<< HEAD
 -- | Basically drop the head of the list until a block not in the main chain
 -- is found. Uses the 'MonadBlockDBRead' constraint and there seems to be no
 -- consistency/locking control in view so I guess you don't get any
@@ -79,6 +94,8 @@ lcaWithMainChainSuffix headers = OldestFirst <$> go (getOldestFirst headers)
           False -> pure (bh : rest)
           True  -> go rest
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Calculate chain quality using slot of the block which has depth =
 -- 'blocksCount' and another slot after that one for which we
 -- want to know chain quality.
@@ -101,7 +118,11 @@ calcChainQualityM ::
        , MonadThrow m
        , WithLogger m
        , Fractional res
+<<<<<<< HEAD
        , HasProtocolConstants
+=======
+       , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
     => FlatSlotId
     -> m (Maybe res)
@@ -127,7 +148,11 @@ calcChainQualityM newSlot = do
 -- slot is unknown.
 calcOverallChainQuality ::
        forall ctx m res.
+<<<<<<< HEAD
        (Fractional res, MonadSlots ctx m, MonadBlockDBRead m, HasProtocolConstants)
+=======
+       (Fractional res, MonadSlots ctx m, MonadBlockDBRead m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => m (Maybe res)
 calcOverallChainQuality =
     getCurrentSlotFlat >>= \case
@@ -156,9 +181,15 @@ calcChainQualityFixedTime ::
        forall ctx m res.
        ( Fractional res
        , MonadSlots ctx m
+<<<<<<< HEAD
        , HasBlockConfiguration
        , HasSlogGState ctx
        , HasProtocolConstants
+=======
+       , HasConfiguration
+       , HasBlockConfiguration
+       , HasSlogGState ctx
+>>>>>>> CHW-82-84, orphan branch
        )
     => m (Maybe res)
 calcChainQualityFixedTime = do

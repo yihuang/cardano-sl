@@ -13,7 +13,10 @@
 , additionalNodeArgs ? ""
 , confKey ? null
 , relays ? null
+<<<<<<< HEAD
 , extraParams ? ""
+=======
+>>>>>>> CHW-82-84, orphan branch
 }:
 
 with localLib;
@@ -32,9 +35,12 @@ let
       relays = "relays.awstest.iohkdev.io";
       confKey = "mainnet_dryrun_full";
     };
+<<<<<<< HEAD
     demo = {
       confKey = "dev";
     };
+=======
+>>>>>>> CHW-82-84, orphan branch
     override = {
       inherit relays confKey;
     };
@@ -68,19 +74,25 @@ in pkgs.writeScript "${executable}-connect-to-${environment}" ''
     echo "Deleting ${stateDir} ... "
     rm -Rf ${stateDir}
   fi
+<<<<<<< HEAD
   if [[ "$2" == "--runtime-args" ]]; then
     RUNTIME_ARGS=$3
   else
     RUNTIME_ARGS=""
   fi
+=======
+>>>>>>> CHW-82-84, orphan branch
 
   echo "Keeping state in ${stateDir}"
   mkdir -p ${stateDir}/logs
 
   echo "Launching a node connected to '${environment}' ..."
   ${ifWallet ''
+<<<<<<< HEAD
   export LC_ALL=en_GB.UTF-8
   export LANG=en_GB.UTF-8
+=======
+>>>>>>> CHW-82-84, orphan branch
   if [ ! -d ${stateDir}/tls ]; then
     mkdir ${stateDir}/tls/
     ${pkgs.openssl}/bin/openssl req -x509 -newkey rsa:2048 -keyout ${stateDir}/tls/server.key -out ${stateDir}/tls/server.cert -days 3650 -nodes -subj "/CN=localhost"
@@ -97,12 +109,20 @@ in pkgs.writeScript "${executable}-connect-to-${environment}" ''
     --log-config ${configFiles}/log-config-connect-to-cluster.yaml \
     --topology "${configFiles}/topology.yaml"                      \
     --logs-prefix "${stateDir}/logs"                               \
+<<<<<<< HEAD
     --db-path "${stateDir}/db"   ${extraParams}                    \
+=======
+    --db-path "${stateDir}/db"                                     \
+>>>>>>> CHW-82-84, orphan branch
     ${ ifWallet "--wallet-db-path '${stateDir}/wallet-db'"}        \
     --keyfile ${stateDir}/secret.key                               \
     ${ ifWallet "--wallet-address ${walletListen}" }               \
     --ekg-server ${ekgListen} --metrics                            \
     +RTS ${ghcRuntimeArgs} -RTS                                    \
+<<<<<<< HEAD
     ${additionalNodeArgs}                                          \
     $RUNTIME_ARGS
+=======
+    ${additionalNodeArgs}
+>>>>>>> CHW-82-84, orphan branch
 ''

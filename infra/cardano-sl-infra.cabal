@@ -118,7 +118,10 @@ library
                         Pos.Binary.Infra.Relay
 
                         -- Pos.Util
+<<<<<<< HEAD
                         Pos.Util.JsonLog.Events
+=======
+>>>>>>> CHW-82-84, orphan branch
                         Pos.Util.LogSafe
                         Pos.Util.Monitor
                         Pos.Util.TimeLimit
@@ -130,7 +133,10 @@ library
   other-modules:        Paths_cardano_sl_infra
 
   build-depends:        aeson
+<<<<<<< HEAD
                       , async
+=======
+>>>>>>> CHW-82-84, orphan branch
                       , base
                       , parsec
                       , base64-bytestring

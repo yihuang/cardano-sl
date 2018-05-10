@@ -31,8 +31,12 @@ import           Pos.Block.Logic.Internal (BypassSecurityCheck (..), MonadBlockA
                                            toUpdateBlock)
 import           Pos.Block.Slog (ShouldCallBListener (..), mustDataBeKnown, slogVerifyBlocks)
 import           Pos.Block.Types (Blund, Undo (..))
+<<<<<<< HEAD
 import           Pos.Core (Block, HeaderHash, epochIndexL, headerHashG, prevBlockL, HasGeneratedSecrets,
                            HasGenesisData, HasProtocolConstants, HasGenesisBlockVersionData, HasGenesisHash)
+=======
+import           Pos.Core (Block, HeaderHash, epochIndexL, headerHashG, prevBlockL)
+>>>>>>> CHW-82-84, orphan branch
 import qualified Pos.DB.GState.Common as GS (getTip)
 import           Pos.Delegation.Logic (dlgVerifyBlocks)
 import           Pos.Lrc.Worker (LrcModeFull, lrcSingleShot)
@@ -66,7 +70,11 @@ import           Pos.Util.Util (HasLens (..))
 -- 4.  Return all undos.
 verifyBlocksPrefix
     :: forall ctx m.
+<<<<<<< HEAD
        (MonadBlockVerify ctx m, HasGenesisBlockVersionData, HasGenesisData, HasProtocolConstants)
+=======
+       (MonadBlockVerify ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => OldestFirst NE Block
     -> m (Either VerifyBlocksException (OldestFirst NE Undo, PollModifier))
 verifyBlocksPrefix blocks = runExceptT $ do
@@ -119,7 +127,12 @@ type BlockLrcMode ctx m = (MonadBlockApply ctx m, LrcModeFull ctx m)
 -- block cannot be applied, it will throw an exception, otherwise it will
 -- return the header hash of the new tip. It's up to the caller to log a
 -- warning that partial application has occurred.
+<<<<<<< HEAD
 verifyAndApplyBlocks :: forall ctx m. (BlockLrcMode ctx m, MonadMempoolNormalization ctx m, HasGeneratedSecrets, HasGenesisData, HasGenesisBlockVersionData, HasProtocolConstants, HasGenesisHash)
+=======
+verifyAndApplyBlocks
+    :: forall ctx m. (BlockLrcMode ctx m, MonadMempoolNormalization ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => Bool -> OldestFirst NE Block -> m (Either ApplyBlocksException HeaderHash)
 verifyAndApplyBlocks rollback blocks = runExceptT $ do
     tip <- lift GS.getTip
@@ -212,7 +225,11 @@ verifyAndApplyBlocks rollback blocks = runExceptT $ do
 -- per-epoch, calculating lrc when needed if flag is set.
 applyBlocks
     :: forall ctx m.
+<<<<<<< HEAD
        (BlockLrcMode ctx m, HasGeneratedSecrets, HasGenesisHash, HasGenesisData, HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+       (BlockLrcMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => Bool -> Maybe PollModifier -> OldestFirst NE Blund -> m ()
 applyBlocks calculateLrc pModifier blunds = do
     when (isLeft prefixHead && calculateLrc) $
@@ -237,7 +254,11 @@ applyBlocks calculateLrc pModifier blunds = do
 
 -- | Rollbacks blocks. Head must be the current tip.
 rollbackBlocks
+<<<<<<< HEAD
     :: (MonadBlockApply ctx m, HasGeneratedSecrets, HasGenesisBlockVersionData, HasProtocolConstants, HasGenesisData)
+=======
+    :: (MonadBlockApply ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => NewestFirst NE Blund -> m ()
 rollbackBlocks blunds = do
     tip <- GS.getTip
@@ -249,7 +270,11 @@ rollbackBlocks blunds = do
 -- | Rollbacks some blocks and then applies some blocks.
 applyWithRollback
     :: forall ctx m.
+<<<<<<< HEAD
     (BlockLrcMode ctx m, MonadMempoolNormalization ctx m, HasGeneratedSecrets, HasGenesisData, HasProtocolConstants, HasGenesisBlockVersionData, HasGenesisHash)
+=======
+    (BlockLrcMode ctx m, MonadMempoolNormalization ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => NewestFirst NE Blund        -- ^ Blocks to rollbck
     -> OldestFirst NE Block        -- ^ Blocks to apply
     -> m (Either ApplyBlocksException HeaderHash)

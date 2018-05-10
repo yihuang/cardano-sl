@@ -16,7 +16,11 @@ import qualified Data.HashSet as HS
 import           Formatting (build, sformat, (%))
 import           System.Wlog (logWarning)
 
+<<<<<<< HEAD
 import           Pos.Core (Coin, EpochIndex, SlotId (siEpoch), addressHash,
+=======
+import           Pos.Core (Coin, EpochIndex, HasConfiguration, SlotId (siEpoch), addressHash,
+>>>>>>> CHW-82-84, orphan branch
                            applyCoinPortionUp, mkCoin, unsafeAddCoin)
 import           Pos.Core.Update (UpId, UpdateProposal, UpdateProposals, UpdateVote (..),
                                   bvdUpdateProposalThd)
@@ -33,7 +37,11 @@ import           Pos.Util.Util (getKeys, sortWithMDesc)
 -- function doesn't consider threshold which determines whether a
 -- proposal can be put into a block.
 normalizePoll
+<<<<<<< HEAD
     :: (MonadPoll m)
+=======
+    :: (MonadPoll m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId
     -> UpdateProposals
     -> LocalVotes
@@ -46,7 +54,11 @@ normalizePoll slot proposals votes =
 -- proposals and votes. It applies the most valuable data and discards
 -- everything else.
 refreshPoll
+<<<<<<< HEAD
     :: (MonadPoll m)
+=======
+    :: (MonadPoll m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId
     -> UpdateProposals
     -> LocalVotes
@@ -99,7 +111,11 @@ refreshPoll slot proposals votes = do
 -- Apply proposals which can be applied and put them in result.
 -- Disregard other proposals.
 normalizeProposals
+<<<<<<< HEAD
     :: (MonadPoll m)
+=======
+    :: (MonadPoll m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId -> [UpdateProposal] -> m UpdateProposals
 normalizeProposals slotId (toList -> proposals) =
     HM.fromList . map ((\x->(hash x, x)) . fst) . catRights proposals <$>
@@ -111,7 +127,11 @@ normalizeProposals slotId (toList -> proposals) =
 -- Apply votes which can be applied and put them in result.
 -- Disregard other votes.
 normalizeVotes
+<<<<<<< HEAD
     :: forall m . (MonadPoll m)
+=======
+    :: forall m . (MonadPoll m, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => [(UpId, HashMap PublicKey UpdateVote)] -> m LocalVotes
 normalizeVotes votesGroups =
     HM.fromList . catMaybes <$> mapM verifyNApplyVotesGroup votesGroups

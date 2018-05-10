@@ -17,7 +17,11 @@ import           System.Wlog (WithLogger, logDebug)
 import           Pos.Block.BlockWorkMode (BlockWorkMode)
 import           Pos.Block.Configuration (HasBlockConfiguration)
 import qualified Pos.Block.Logic as Block
+<<<<<<< HEAD
 import qualified Pos.Block.Network as Block
+=======
+import qualified Pos.Block.Network.Logic as Block
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Block.Types (RecoveryHeader, RecoveryHeaderTag)
 import           Pos.Communication (NodeId)
 import           Pos.Core (Block, BlockHeader, BlockVersionData, HasConfiguration, HeaderHash,
@@ -48,7 +52,11 @@ import           Pos.Ssc.Toss (SscTag (..), TossModifier, tmCertificates, tmComm
                                tmShares)
 import           Pos.Ssc.Types (ldModifier)
 import           Pos.Txp (MemPool (..))
+<<<<<<< HEAD
 import           Pos.Txp.MemState (getMemPool, withTxpLocalData)
+=======
+import           Pos.Txp.MemState (JLTxR, getMemPool, withTxpLocalData)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Txp.Network.Listeners (TxpMode)
 import qualified Pos.Txp.Network.Listeners as Txp (handleTxDo)
 import           Pos.Txp.Network.Types (TxMsgContents (..))
@@ -57,7 +65,10 @@ import qualified Pos.Update.Logic.Local as Update (getLocalProposalNVotes, getLo
 import           Pos.Update.Mode (UpdateMode)
 import qualified Pos.Update.Network.Listeners as Update (handleProposal, handleVote)
 import           Pos.Util.Chrono (NE, NewestFirst, OldestFirst)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (JLTxR)
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Util (HasLens (..), lensOf)
 
 
@@ -131,8 +142,13 @@ logicLayerFull jsonLogTx k = do
             -> m (Either Block.GetHeadersFromManyToError (NewestFirst NE BlockHeader))
         getBlockHeaders = Block.getHeadersFromManyTo
 
+<<<<<<< HEAD
         getLcaMainChain :: OldestFirst [] BlockHeader -> m (OldestFirst [] BlockHeader)
         getLcaMainChain = Block.lcaWithMainChainSuffix
+=======
+        getLcaMainChain :: OldestFirst NE BlockHeader -> m (Maybe HeaderHash)
+        getLcaMainChain = Block.lcaWithMainChain
+>>>>>>> CHW-82-84, orphan branch
 
         postBlockHeader :: BlockHeader -> NodeId -> m ()
         postBlockHeader = Block.handleUnsolicitedHeader

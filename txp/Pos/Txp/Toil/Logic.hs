@@ -22,9 +22,16 @@ import           Serokell.Data.Memory.Units (Byte)
 import           Pos.Binary.Class (biSize)
 import           Pos.Core (AddrAttributes (..), AddrStakeDistribution (..), Address,
                            BlockVersionData (..), EpochIndex, addrAttributesUnwrapped,
+<<<<<<< HEAD
                            isBootstrapEraBVD, isRedeemAddress, HasProtocolMagic, HasGenesisData)
 import           Pos.Core.Common (integerToCoin)
 import qualified Pos.Core.Common as Fee (TxFeePolicy (..), calculateTxSizeLinear)
+=======
+                           isBootstrapEraBVD, isRedeemAddress)
+import           Pos.Core.Common (integerToCoin)
+import qualified Pos.Core.Common as Fee (TxFeePolicy (..), calculateTxSizeLinear)
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Txp (Tx (..), TxAux (..), TxId, TxOut (..), TxUndo, TxpUndo, checkTxAux,
                                toaOut, txOutAddress)
 import           Pos.Crypto (WithHash (..), hash)
@@ -54,7 +61,11 @@ import           Pos.Util (liftEither)
 -- witnesses, addresses, attributes) must be known. Otherwise unknown
 -- data is just ignored.
 verifyToil ::
+<<<<<<< HEAD
        (HasProtocolMagic)
+=======
+       (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => BlockVersionData
     -> EpochIndex
     -> Bool
@@ -65,14 +76,22 @@ verifyToil bvd curEpoch verifyAllIsKnown =
 
 -- | Apply transactions from one block. They must be valid (for
 -- example, it implies topological sort).
+<<<<<<< HEAD
 applyToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM ()
+=======
+applyToil :: HasConfiguration => [(TxAux, TxUndo)] -> GlobalToilM ()
+>>>>>>> CHW-82-84, orphan branch
 applyToil [] = pass
 applyToil txun = do
     applyTxsToStakes txun
     utxoMToGlobalToilM $ mapM_ (applyTxToUtxo' . withTxId . fst) txun
 
 -- | Rollback transactions from one block.
+<<<<<<< HEAD
 rollbackToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM ()
+=======
+rollbackToil :: HasConfiguration => [(TxAux, TxUndo)] -> GlobalToilM ()
+>>>>>>> CHW-82-84, orphan branch
 rollbackToil txun = do
     rollbackTxsStakes txun
     utxoMToGlobalToilM $ mapM_ Utxo.rollbackTxUtxo $ reverse txun
@@ -84,7 +103,11 @@ rollbackToil txun = do
 -- | Verify one transaction and also add it to mem pool and apply to utxo
 -- if transaction is valid.
 processTx ::
+<<<<<<< HEAD
        (HasTxpConfiguration, HasProtocolMagic)
+=======
+       (HasTxpConfiguration, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => BlockVersionData
     -> EpochIndex
     -> (TxId, TxAux)
@@ -99,7 +122,11 @@ processTx bvd curEpoch tx@(id, aux) = do
 -- | Get rid of invalid transactions.
 -- All valid transactions will be added to mem pool and applied to utxo.
 normalizeToil ::
+<<<<<<< HEAD
        (HasTxpConfiguration, HasProtocolMagic)
+=======
+       (HasTxpConfiguration, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => BlockVersionData
     -> EpochIndex
     -> [(TxId, TxAux)]
@@ -109,7 +136,11 @@ normalizeToil bvd curEpoch txs = mapM_ normalize ordered
     ordered = fromMaybe txs $ topsortTxs wHash txs
     wHash (i, txAux) = WithHash (taTx txAux) i
     normalize ::
+<<<<<<< HEAD
            (HasTxpConfiguration)
+=======
+           (HasTxpConfiguration, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
         => (TxId, TxAux)
         -> LocalToilM ()
     normalize = void . runExceptT . processTx bvd curEpoch
@@ -121,7 +152,11 @@ normalizeToil bvd curEpoch txs = mapM_ normalize ordered
 -- Note: it doesn't consider/affect stakes! That's because we don't
 -- care about stakes for local txp.
 verifyAndApplyTx ::
+<<<<<<< HEAD
        (HasProtocolMagic)
+=======
+       (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => BlockVersionData
     -> EpochIndex
     -> Bool
@@ -156,7 +191,11 @@ verifyGState bvd@BlockVersionData {..} curEpoch txAux vtur = do
     unless (isRedeemTx $ vturUndo vtur) $ whenJust txFeeMB $ \txFee ->
         verifyTxFeePolicy txFee bvdTxFeePolicy txSize
     when (txSize > limit) $
+<<<<<<< HEAD
         throwError $ ToilTooLargeTx txSize limit
+=======
+        throwError ToilTooLargeTx {ttltSize = txSize, ttltLimit = limit}
+>>>>>>> CHW-82-84, orphan branch
 
 verifyBootEra ::
        BlockVersionData -> EpochIndex -> TxAux -> Either ToilVerFailure ()
@@ -193,12 +232,26 @@ verifyTxFeePolicy (TxFee txFee) policy txSize = case policy of
         -- but in case the result of its evaluation is negative or exceeds
         -- maximum coin value, we throw an error.
         txMinFee <- case mTxMinFee of
+<<<<<<< HEAD
             Left reason -> throwError $
                 ToilInvalidMinFee policy reason txSize
             Right a -> return a
         unless (txMinFee <= txFee) $
             throwError $
                 ToilInsufficientFee policy (TxFee txFee) (TxFee txMinFee) txSize
+=======
+            Left reason -> throwError ToilInvalidMinFee
+                { timfPolicy = policy
+                , timfReason = reason
+                , timfSize = txSize }
+            Right a -> return a
+        unless (txMinFee <= txFee) $
+            throwError ToilInsufficientFee
+                { tifSize = txSize
+                , tifFee = TxFee txFee
+                , tifMinFee = TxFee txMinFee
+                , tifPolicy = policy }
+>>>>>>> CHW-82-84, orphan branch
     Fee.TxFeePolicyUnknown _ _ ->
         -- The minimal transaction fee policy exists, but the current
         -- version of the node doesn't know how to handle it. There are

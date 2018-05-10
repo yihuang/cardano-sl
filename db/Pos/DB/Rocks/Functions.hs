@@ -41,7 +41,11 @@ import           System.Directory (createDirectoryIfMissing, doesDirectoryExist,
 import           System.FilePath ((</>))
 
 import           Pos.Binary.Class (Bi)
+<<<<<<< HEAD
 import           Pos.Core.Configuration (HasCoreConfiguration)
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.BatchOp (rocksWriteBatch)
 import           Pos.DB.Class (DBIteratorClass (..), DBTag (..), IterType)
 import           Pos.DB.Functions (dbSerializeValue, processIterEntry)
@@ -139,7 +143,11 @@ rocksDelete k DB {..} = Rocks.delete rocksDB rocksWriteOpts k
 -- garbage, should be abstracted and hidden
 
 -- | Write serializable value to RocksDb for given key.
+<<<<<<< HEAD
 rocksPutBi :: (HasCoreConfiguration, Bi v, MonadIO m) => ByteString -> v -> DB -> m ()
+=======
+rocksPutBi :: (HasConfiguration, Bi v, MonadIO m) => ByteString -> v -> DB -> m ()
+>>>>>>> CHW-82-84, orphan branch
 rocksPutBi k v = rocksPutBytes k (dbSerializeValue v)
 
 ----------------------------------------------------------------------------
@@ -175,7 +183,10 @@ rocksIterSource ::
        , DBIteratorClass i
        , Bi (IterKey i)
        , Bi (IterValue i)
+<<<<<<< HEAD
        , HasCoreConfiguration
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => DBTag
     -> Proxy i
@@ -228,7 +239,10 @@ dbIterSourceDefault ::
        , DBIteratorClass i
        , Bi (IterKey i)
        , Bi (IterValue i)
+<<<<<<< HEAD
        , HasCoreConfiguration
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => DBTag
     -> Proxy i

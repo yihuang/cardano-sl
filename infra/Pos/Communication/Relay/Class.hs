@@ -22,7 +22,11 @@ import           Pos.Network.Types (Origin)
 
 -- | Data for general Inv/Req/Dat framework
 
+<<<<<<< HEAD
 data Relay where
+=======
+data Relay m where
+>>>>>>> CHW-82-84, orphan branch
   InvReqData ::
       ( Buildable contents
       , Buildable key
@@ -35,16 +39,27 @@ data Relay where
       , Message (ReqMsg key)
       , Message (ReqOrRes key)
       , Message (InvOrData key contents)
+<<<<<<< HEAD
       ) => MempoolParams -> InvReqDataParams key contents -> Relay
+=======
+      ) => MempoolParams m -> InvReqDataParams key contents m -> Relay m
+>>>>>>> CHW-82-84, orphan branch
   Data ::
       ( Buildable contents
       , Typeable contents
       , Bi (DataMsg contents)
       , Message (DataMsg contents)
+<<<<<<< HEAD
       ) => DataParams contents -> Relay
 
 data MempoolParams where
     NoMempool :: MempoolParams
+=======
+      ) => DataParams contents m -> Relay m
+
+data MempoolParams m where
+    NoMempool :: MempoolParams m
+>>>>>>> CHW-82-84, orphan branch
     -- `tag` is used only as type param, no actual param used
     KeyMempool ::
       ( Message (MempoolMsg tag)
@@ -54,6 +69,7 @@ data MempoolParams where
       , Buildable key
       , Typeable tag
       , Typeable key
+<<<<<<< HEAD
       ) => Proxy tag -> IO [key] -> MempoolParams
 
 data InvReqDataParams key contents = InvReqDataParams
@@ -74,4 +90,26 @@ data DataParams contents = DataParams
     , handleDataOnly :: EnqueueMsg -> NodeId -> contents -> IO Bool
       -- ^ Handle data msg and return True if message is to be propagated
     , dpMkLimit      :: IO (Limit contents)
+=======
+      ) => Proxy tag -> m [key] -> MempoolParams m
+
+data InvReqDataParams key contents m = InvReqDataParams
+    { invReqMsgType :: !(Origin NodeId -> Msg)
+    , contentsToKey :: contents -> m key
+      -- ^ Get key for given contents.
+    , handleInv     :: NodeId -> key -> m Bool
+      -- ^ Handle inv msg and return whether it's useful or not
+    , handleReq     :: NodeId -> key -> m (Maybe contents)
+      -- ^ Handle req msg and return (Just data) in case requested data can be provided
+    , handleData    :: NodeId -> contents -> m Bool
+      -- ^ Handle data msg and return True if message is to be propagated
+    , irdpMkLimit   :: m (Limit contents)
+    }
+
+data DataParams contents m = DataParams
+    { dataMsgType    :: !(Origin NodeId -> Msg)
+    , handleDataOnly :: EnqueueMsg m -> NodeId -> contents -> m Bool
+      -- ^ Handle data msg and return True if message is to be propagated
+    , dpMkLimit      :: m (Limit contents)
+>>>>>>> CHW-82-84, orphan branch
     }

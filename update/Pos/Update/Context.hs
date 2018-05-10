@@ -7,7 +7,11 @@ module Pos.Update.Context
 
 import           Universum
 
+<<<<<<< HEAD
 import           Pos.Core (HasProtocolConstants)
+=======
+import           Pos.Core (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (MonadDBRead)
 import           Pos.Slotting (MonadSlots)
 import           Pos.Update.MemState.Types (MemVar, newMemVar)
@@ -29,7 +33,11 @@ data UpdateContext = UpdateContext
 -- | Create initial 'UpdateContext'.
 mkUpdateContext
     :: forall ctx m.
+<<<<<<< HEAD
     ( HasProtocolConstants
+=======
+    ( HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     , MonadIO m
     , MonadDBRead m
     , MonadSlots ctx m

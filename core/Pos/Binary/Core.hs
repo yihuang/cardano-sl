@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-dodgy-exports    #-}
 
@@ -26,3 +27,9 @@ import           Pos.Binary.Core.Slotting
 import           Pos.Binary.Core.Ssc
 import           Pos.Binary.Core.Txp
 import           Pos.Binary.Core.Update
+=======
+-- Pos.Binary.Core
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-dodgy-exports    #-}
+>>>>>>> CHW-82-84, orphan branch

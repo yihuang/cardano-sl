@@ -10,7 +10,12 @@ import           Graphics.Rendering.Chart.Backend.Diagrams (renderableToFile)
 import           Graphics.Rendering.Chart.Easy
 import           Graphics.Rendering.Chart.Grid
 
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (JLMemPool (..), MemPoolModifyReason (..))
+=======
+import           Pos.Txp.MemState.Types (MemPoolModifyReason (..))
+import           Pos.Util.JsonLog (JLMemPool (..))
+>>>>>>> CHW-82-84, orphan branch
 import           Types
 import           Universum
 
@@ -18,8 +23,13 @@ throughput :: FilePath
            -> Double
            -> Double
            -> Int
+<<<<<<< HEAD
            -> [(NodeId, Timestamp, Int)]
            -> [(NodeId, Timestamp, JLMemPool)]
+=======
+           -> [(NodeIndex, Timestamp, Int)]
+           -> [(NodeIndex, Timestamp, JLMemPool)]
+>>>>>>> CHW-82-84, orphan branch
            -> IO ()
 throughput f txW waitW cnt xs ys =
     let xs'    = [(t, c) | (_, t, c) <- xs]
@@ -32,9 +42,15 @@ throughput f txW waitW cnt xs ys =
         ys''   = scaleShift tmin $ sliding waitW times' (lg 100 . average)                         ys'
     in grid f txW waitW xs'' ys''
   where
+<<<<<<< HEAD
     wait :: (NodeId, Timestamp, JLMemPool) -> Maybe (Timestamp, Integer)
     wait (_, t, JLMemPool{..}) = case jlmReason of
         ProcessTransaction -> Just (t, jlmWait)
+=======
+    wait :: (NodeIndex, Timestamp, JLMemPool) -> Maybe (Timestamp, Integer)
+    wait (_, t, JLMemPool{..}) = case jlmReason of
+        ProcessTransaction _ -> Just (t, jlmWait)
+>>>>>>> CHW-82-84, orphan branch
         _                    -> Nothing
 
     lg :: Double -> Double -> Double

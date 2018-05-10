@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {-# OPTIONS_GHC -Wno-unused-imports   #-}
 {-# OPTIONS_GHC -Wno-dodgy-exports    #-}
 -- | Arbitrary instances for Update System types.
@@ -13,3 +14,10 @@ import           Pos.Arbitrary.Update.Core
 import           Pos.Arbitrary.Update.MemState
 import           Pos.Arbitrary.Update.Network
 import           Pos.Arbitrary.Update.Poll
+=======
+-- | Arbitrary instances for Update System types.
+
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+{-# OPTIONS_GHC -Wno-unused-imports   #-}
+{-# OPTIONS_GHC -Wno-dodgy-exports    #-}
+>>>>>>> CHW-82-84, orphan branch

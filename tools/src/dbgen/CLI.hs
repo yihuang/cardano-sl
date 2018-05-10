@@ -20,6 +20,11 @@ data CLI = CLI
     -- ^ The path to a valid rocksdb database.
     , secretKeyPath     :: FilePath
     -- ^ The path to the secret key from the database.
+<<<<<<< HEAD
+=======
+    , publicKeyPath     :: FilePath
+    -- ^ The path to the file with public keys (for external wallets).
+>>>>>>> CHW-82-84, orphan branch
     , walletPath        :: FilePath
     -- ^ The path to a valid acid-state database.
     , configurationPath :: FilePath
@@ -50,6 +55,13 @@ instance ParseRecord CLI where
               <*> (strOption (long "secretKey" <> metavar "secret-key-path"
                              <> help "A path to a valid secreate key for the database."
                                       ))
+<<<<<<< HEAD
+=======
+              <*> (strOption (long "publicKey" <> metavar "public-key-path"
+                             <> help "A path to a a file with public keys (for external wallets)."
+                                      ))
+
+>>>>>>> CHW-82-84, orphan branch
               <*> (strOption (long "walletDB" <> metavar "acidstate-path"
                              <> help "A path to a valid acidstate database."
                                       ))

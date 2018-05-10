@@ -13,7 +13,11 @@ import           Control.Monad.Trans (MonadTrans)
 import           System.Wlog (WithLogger)
 
 import           Pos.Core (ApplicationName, BlockVersion, BlockVersionData, ChainDifficulty, Coin,
+<<<<<<< HEAD
                            EpochIndex, NumSoftwareVersion, SlotId,
+=======
+                           EpochIndex, HasConfiguration, NumSoftwareVersion, SlotId,
+>>>>>>> CHW-82-84, orphan branch
                            SoftwareVersion, StakeholderId)
 import           Pos.Core.Update (UpId)
 import           Pos.Slotting.Types (SlottingData)
@@ -26,7 +30,11 @@ import           Pos.Update.Poll.Types (BlockVersionState, ConfirmedProposalStat
 
 -- | Type class which provides function necessary for read-only
 -- verification of US data.
+<<<<<<< HEAD
 class (Monad m, WithLogger m) => MonadPollRead m where
+=======
+class (HasConfiguration, Monad m, WithLogger m) => MonadPollRead m where
+>>>>>>> CHW-82-84, orphan branch
     getBVState :: BlockVersion -> m (Maybe BlockVersionState)
     -- ^ Retrieve state of given block version.
     getProposedBVs :: m [BlockVersion]
@@ -71,7 +79,11 @@ class (Monad m, WithLogger m) => MonadPollRead m where
     getAdoptedBVData = snd <$> getAdoptedBVFull
 
 instance {-# OVERLAPPABLE #-}
+<<<<<<< HEAD
     (MonadPollRead m, MonadTrans t, Monad (t m), WithLogger (t m)) =>
+=======
+    (HasConfiguration, MonadPollRead m, MonadTrans t, Monad (t m), WithLogger (t m)) =>
+>>>>>>> CHW-82-84, orphan branch
         MonadPollRead (t m)
   where
     getBVState = lift . getBVState
@@ -122,7 +134,11 @@ class MonadPollRead m => MonadPoll m where
     -- ^ Set proposers.
 
 instance {-# OVERLAPPABLE #-}
+<<<<<<< HEAD
     (MonadPoll m, MonadTrans t, Monad (t m), WithLogger (t m)) =>
+=======
+    (HasConfiguration, MonadPoll m, MonadTrans t, Monad (t m), WithLogger (t m)) =>
+>>>>>>> CHW-82-84, orphan branch
         MonadPoll (t m)
   where
     putBVState pv = lift . putBVState pv

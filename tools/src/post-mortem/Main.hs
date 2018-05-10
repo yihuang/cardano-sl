@@ -2,8 +2,11 @@
 
 import           Universum
 
+<<<<<<< HEAD
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import           Data.Csv as C (encode)
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Data.List (last)
 import qualified Data.Map.Strict as M
 import           System.FilePath
@@ -24,10 +27,15 @@ main = parseOptions >>= \case
         err $ "sample probability: " ++ show sampleProb
         err ""
         xs <- forM logDirs $ flip processLogDirOverview sampleProb
+<<<<<<< HEAD
         chart xs "times.svg"
         err "wrote times chart"
         BSL.writeFile "times.csv" (C.encode $ foldl' (\ acc (_, m) -> getData m ++  acc) [] xs)
         err "wrote times csv"
+=======
+        chart xs "times.png"
+        err "wrote times chart"
+>>>>>>> CHW-82-84, orphan branch
     Focus txHash logDir         -> do
         err $ "transaction hash: " ++ show txHash
         err $ "logs directory: " ++ show logDir

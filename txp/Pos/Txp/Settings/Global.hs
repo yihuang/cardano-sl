@@ -18,7 +18,11 @@ import           Universum
 
 import           System.Wlog (WithLogger)
 
+<<<<<<< HEAD
 import           Pos.Core (ComponentBlock)
+=======
+import           Pos.Core (ComponentBlock, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Txp (TxPayload, TxpUndo)
 import           Pos.DB (MonadDBRead, MonadGState, SomeBatchOp)
 import           Pos.Slotting (MonadSlots)
@@ -29,6 +33,10 @@ type TxpCommonMode m =
     ( WithLogger m
     , MonadDBRead m
     , MonadGState m
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     )
 
 type TxpGlobalVerifyMode m =

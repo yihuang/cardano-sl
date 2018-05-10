@@ -1,18 +1,25 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Test.Network.Broadcast.OutboundQueueSpec
        ( spec
+<<<<<<< HEAD
        -- TODO define elsewhere.
        , arbitraryNodeType
        , arbitraryRoutes
        , arbitraryPeers
+=======
+>>>>>>> CHW-82-84, orphan branch
        ) where
 
 import           Control.Monad
 import           Data.List (delete)
+<<<<<<< HEAD
 import           Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import           Data.Semigroup ((<>))
 import           Data.Set (Set)
+=======
+import qualified Data.Map.Strict as M
+>>>>>>> CHW-82-84, orphan branch
 import qualified Data.Set as Set
 import qualified Network.Broadcast.OutboundQueue as OutQ
 import           Network.Broadcast.OutboundQueue.Demo
@@ -20,6 +27,7 @@ import           Network.Broadcast.OutboundQueue.Types hiding (simplePeers)
 import           System.Wlog
 import           Test.Hspec (Spec, describe, it)
 import           Test.Hspec.QuickCheck (modifyMaxSuccess)
+<<<<<<< HEAD
 import           Test.QuickCheck (Gen, Property, choose, forAll, ioProperty, property,
                                   suchThat, (===))
 import qualified Test.QuickCheck as QC
@@ -76,14 +84,25 @@ arbitraryPeers genNid genNodeType = do
 --
 -- Potentital confusion: in the text of this definition "node" really means
 -- "outbound queue".
+=======
+import           Test.QuickCheck (Arbitrary (..), Property, choose, forAll, ioProperty, property,
+                                  (===), (==>))
+
+-- disable logging
+>>>>>>> CHW-82-84, orphan branch
 testInFlight :: IO Bool
 testInFlight = do
     removeAllHandlers
 
     -- Set up some test nodes
     allNodes <- do
+<<<<<<< HEAD
       ns <- forM [1..4] $ \nodeIdx -> newNode (C nodeIdx) NodeCore (CommsDelay 0)
       forM_ ns $ \theNode -> setPeers theNode (delete theNode ns)
+=======
+      ns <- forM [1..4] $ \nodeIdx -> newNode (C nodeIdx) NodeCore  (CommsDelay 0)
+      forM_ ns $ \theNode -> setPeers theNode  (delete theNode ns)
+>>>>>>> CHW-82-84, orphan branch
       return ns
 
     runEnqueue $ do
@@ -110,13 +129,18 @@ spec = describe "OutBoundQ" $ do
     it "removePeer doesn't yield empty singletons" $ property prop_removePeer
     it "removePeer does preserve order" $ property prop_removePeer_ordering
 
+<<<<<<< HEAD
     -- This test takes quite a long time so we'll drop the max successes.
     modifyMaxSuccess (const 10) $ do
+=======
+    modifyMaxSuccess (const 100) $ do
+>>>>>>> CHW-82-84, orphan branch
       -- Simulate a multi-peer conversation and then check
       -- that after that we never have a negative count for
       -- the `qInFlight` field of a `OutBoundQ`.
       it "inflight conversations" $ ioProperty $ testInFlight
 
+<<<<<<< HEAD
 arbitraryFiniteInt :: Gen Int
 arbitraryFiniteInt = choose (0, 1024)
 
@@ -131,10 +155,29 @@ prop_removePeer = forAll (arbitraryPeers arbitraryFiniteInt arbitraryNodeType) $
             in and $ map checkProp [_routesCore peersRoutes, _routesEdge peersRoutes , _routesRelay peersRoutes]
   where
     checkProp = all (not . null)
+=======
+newtype FiniteInt = FI Int deriving (Show, Eq, Ord)
+
+instance Arbitrary FiniteInt where
+    arbitrary = FI <$> choose (0, 1024)
+
+finiteToList :: [FiniteInt] -> [Int]
+finiteToList = map (\(FI x) -> x)
+
+prop_removePeer :: Property
+prop_removePeer = forAll arbitrary $ \(peers :: Peers FiniteInt) ->
+    forAll arbitrary $ \(toRemove :: FiniteInt) ->
+       toRemove `Set.member` peersRouteSet peers ==>
+         let Peers{..} = removePeer toRemove peers
+         in and $ map checkProp [_routesCore peersRoutes, _routesEdge peersRoutes , _routesRelay peersRoutes]
+  where
+    checkProp = all (not . null . finiteToList)
+>>>>>>> CHW-82-84, orphan branch
 
 -- We purposefully try to remove something which is not there, to make sure
 -- removePeer doesn't alter the ordering of the forwading sets.
 prop_removePeer_ordering :: Property
+<<<<<<< HEAD
 prop_removePeer_ordering = forAll (arbitraryPeers arbitraryFiniteInt arbitraryNodeType) $
     \(peers :: Peers Int) ->
          let stripped = filterEmptySingletons peers
@@ -145,4 +188,15 @@ prop_removePeer_ordering = forAll (arbitraryPeers arbitraryFiniteInt arbitraryNo
       let newRoutes = Routes (filter (not . null) (_routesCore  . peersRoutes $ p))
                              (filter (not . null) (_routesRelay . peersRoutes $ p))
                              (filter (not . null) (_routesEdge  . peersRoutes $ p))
+=======
+prop_removePeer_ordering = forAll arbitrary $ \(peers :: Peers FiniteInt) ->
+         let stripped = filterEmptySingletons peers
+             peers' = removePeer (FI 2000) stripped
+         in  peers' === stripped
+  where
+    filterEmptySingletons p =
+      let newRoutes = Routes (filter (not . null) (_routesCore . peersRoutes $ p))
+                             (filter (not . null) (_routesRelay . peersRoutes $ p))
+                             (filter (not . null) (_routesEdge . peersRoutes $ p))
+>>>>>>> CHW-82-84, orphan branch
       in p { peersRoutes = newRoutes }

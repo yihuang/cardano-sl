@@ -12,14 +12,22 @@ import           Universum
 import           Data.ByteArray (convert)
 
 import qualified Database.RocksDB as Rocks
+<<<<<<< HEAD
 import           Pos.Core (BlockHeader, HeaderHash, headerHash)
+=======
+import           Pos.Core (BlockHeader, HasConfiguration, HeaderHash, headerHash)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (DBTag (BlockIndexDB), MonadBlockDBRead, MonadDB (..))
 import           Pos.DB.Functions (dbGetBi, dbSerializeValue)
 import           Pos.DB.GState.Common (getTipSomething)
 
 -- | Returns header of block that was requested from Block DB.
 getHeader
+<<<<<<< HEAD
     :: (MonadBlockDBRead m)
+=======
+    :: (HasConfiguration, MonadBlockDBRead m)
+>>>>>>> CHW-82-84, orphan branch
     => HeaderHash -> m (Maybe BlockHeader)
 getHeader = dbGetBi BlockIndexDB . blockIndexKey
 

@@ -21,7 +21,11 @@ import           Universum
 
 import           Mockable (CurrentTime, Mockable, currentTime)
 
+<<<<<<< HEAD
 import           Pos.Core.Configuration (HasProtocolConstants)
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Slotting (SlotId (..), Timestamp (..), unflattenSlotId)
 import           Pos.Slotting.Impl.Util (approxSlotUsingOutdated, slotFromTimestamp)
 import           Pos.Slotting.MemState (MonadSlotsData, getCurrentNextEpochIndexM,
@@ -36,6 +40,10 @@ type SimpleSlottingMode ctx m
     = ( Mockable CurrentTime m
       , MonadSlotsData ctx m
       , MonadIO m
+<<<<<<< HEAD
+=======
+      , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
       )
 
 type MonadSimpleSlotting ctx m
@@ -54,7 +62,11 @@ data SimpleSlottingState = SimpleSlottingState
 
 type SimpleSlottingStateVar = TVar SimpleSlottingState
 
+<<<<<<< HEAD
 mkSimpleSlottingStateVar :: (MonadIO m, HasProtocolConstants) => m SimpleSlottingStateVar
+=======
+mkSimpleSlottingStateVar :: (MonadIO m, HasConfiguration) => m SimpleSlottingStateVar
+>>>>>>> CHW-82-84, orphan branch
 mkSimpleSlottingStateVar = atomically $ newTVar $ SimpleSlottingState $ unflattenSlotId 0
 
 ----------------------------------------------------------------------------
@@ -62,7 +74,11 @@ mkSimpleSlottingStateVar = atomically $ newTVar $ SimpleSlottingState $ unflatte
 ----------------------------------------------------------------------------
 
 getCurrentSlotSimple'
+<<<<<<< HEAD
     :: (SimpleSlottingMode ctx m, HasProtocolConstants)
+=======
+    :: (SimpleSlottingMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => SimpleSlottingStateVar
     -> m (Maybe SlotId)
 getCurrentSlotSimple' var =
@@ -71,12 +87,20 @@ getCurrentSlotSimple' var =
     >>= traverse (updateLastSlot var)
 
 getCurrentSlotSimple
+<<<<<<< HEAD
     :: (MonadSimpleSlotting ctx m, HasProtocolConstants)
+=======
+    :: (MonadSimpleSlotting ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => m (Maybe SlotId)
 getCurrentSlotSimple = view (lensOf @SimpleSlottingStateVar) >>= getCurrentSlotSimple'
 
 getCurrentSlotBlockingSimple'
+<<<<<<< HEAD
     :: (SimpleSlottingMode ctx m, HasProtocolConstants)
+=======
+    :: (SimpleSlottingMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => SimpleSlottingStateVar
     -> m SlotId
 getCurrentSlotBlockingSimple' var = do
@@ -88,13 +112,21 @@ getCurrentSlotBlockingSimple' var = do
             getCurrentSlotBlockingSimple' var
 
 getCurrentSlotBlockingSimple
+<<<<<<< HEAD
     :: (MonadSimpleSlotting ctx m, HasProtocolConstants)
+=======
+    :: (MonadSimpleSlotting ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => m SlotId
 getCurrentSlotBlockingSimple =
     view (lensOf @SimpleSlottingStateVar) >>= getCurrentSlotBlockingSimple'
 
 getCurrentSlotInaccurateSimple'
+<<<<<<< HEAD
     :: (SimpleSlottingMode ctx m, HasProtocolConstants)
+=======
+    :: (SimpleSlottingMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => SimpleSlottingStateVar
     -> m SlotId
 getCurrentSlotInaccurateSimple' var =
@@ -106,7 +138,11 @@ getCurrentSlotInaccurateSimple' var =
                 approxSlotUsingOutdated)
 
 getCurrentSlotInaccurateSimple
+<<<<<<< HEAD
     :: (MonadSimpleSlotting ctx m, HasProtocolConstants)
+=======
+    :: (MonadSimpleSlotting ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => m SlotId
 getCurrentSlotInaccurateSimple =
     view (lensOf @SimpleSlottingStateVar) >>= getCurrentSlotInaccurateSimple'

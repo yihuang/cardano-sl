@@ -33,7 +33,10 @@ import           Control.Monad.Trans (MonadTrans)
 import qualified Data.Map.Strict as M (fromList, insert)
 import qualified Data.Text.Buildable
 import           Formatting (bprint, build, (%))
+<<<<<<< HEAD
 import           JsonLog (CanJsonLog (..))
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Mockable (CurrentTime, Mockable)
 import           Serokell.Util.Text (listJson)
 import           System.Wlog (WithLogger)
@@ -59,7 +62,10 @@ import           Pos.Txp (MempoolExt, MonadTxpLocal, MonadTxpMem, ToilVerFailure
                           txOutAddress, txpProcessTx, unGenesisUtxo, utxoGet, utxoToLookup,
                           withTxpLocalData)
 import           Pos.Util (eitherToThrow, maybeThrow)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason)
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Util (HasLens')
 
 ----------------------------------------------------------------------
@@ -192,12 +198,19 @@ type TxHistoryEnv ctx m =
     , MonadReader ctx m
     , MonadTxpMem (MempoolExt m) ctx m
     , HasLens' ctx StateLock
+<<<<<<< HEAD
     , HasLens' ctx (StateLockMetrics MemPoolModifyReason)
+=======
+    , HasLens' ctx StateLockMetrics
+>>>>>>> CHW-82-84, orphan branch
     , HasReportingContext ctx
     , Mockable CurrentTime m
     , MonadFormatPeers m
     , HasNodeType ctx
+<<<<<<< HEAD
     , CanJsonLog m
+=======
+>>>>>>> CHW-82-84, orphan branch
     )
 
 getBlockHistoryDefault

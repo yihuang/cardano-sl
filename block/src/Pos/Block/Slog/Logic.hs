@@ -37,9 +37,15 @@ import           Pos.Block.Logic.Integrity (verifyBlocks)
 import           Pos.Block.Slog.Context (slogGetLastSlots, slogPutLastSlots)
 import           Pos.Block.Slog.Types (HasSlogGState)
 import           Pos.Block.Types (Blund, SlogUndo (..), Undo (..))
+<<<<<<< HEAD
 import           Pos.Core (BlockVersion (..), FlatSlotId, blkSecurityParam, HasProtocolConstants,
                            difficultyL, epochIndexL, flattenSlotId, headerHash, headerHashG,
                            prevBlockL, HasProtocolMagic)
+=======
+import           Pos.Core (BlockVersion (..), FlatSlotId, HasConfiguration, blkSecurityParam,
+                           difficultyL, epochIndexL, flattenSlotId, headerHash, headerHashG,
+                           prevBlockL)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (Block, genBlockLeaders, mainBlockSlot)
 import           Pos.DB (SomeBatchOp (..))
 import           Pos.DB.Block (putBlunds)
@@ -105,6 +111,10 @@ type MonadSlogBase ctx m =
     , MonadIO m
     , MonadDBRead m
     , WithLogger m
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     , HasUpdateConfiguration
     )
 
@@ -127,8 +137,11 @@ type MonadSlogVerify ctx m =
 slogVerifyBlocks
     :: forall ctx m.
     ( MonadSlogVerify ctx m
+<<<<<<< HEAD
     , HasProtocolConstants
     , HasProtocolMagic
+=======
+>>>>>>> CHW-82-84, orphan branch
     )
     => OldestFirst NE Block
     -> m (Either Text (OldestFirst NE SlogUndo))
@@ -213,7 +226,11 @@ newtype ShouldCallBListener = ShouldCallBListener Bool
 --     5. Adding new forward links
 --     6. Setting @inMainChain@ flags
 slogApplyBlocks
+<<<<<<< HEAD
     :: forall ctx m. (MonadSlogApply ctx m, HasProtocolConstants)
+=======
+    :: forall ctx m. (MonadSlogApply ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => ShouldCallBListener
     -> OldestFirst NE Blund
     -> m SomeBatchOp
@@ -281,7 +298,11 @@ newtype BypassSecurityCheck = BypassSecurityCheck Bool
 --     4. Removing forward links
 --     5. Removing @inMainChain@ flags
 slogRollbackBlocks ::
+<<<<<<< HEAD
        forall ctx m. (MonadSlogApply ctx m, HasProtocolConstants)
+=======
+       forall ctx m. (MonadSlogApply ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => BypassSecurityCheck -- ^ is rollback for more than k blocks allowed?
     -> ShouldCallBListener
     -> NewestFirst NE Blund

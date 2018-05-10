@@ -26,8 +26,13 @@ import           Mockable (CurrentTime, Mockable, currentTime)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Binary.Class (biSize)
+<<<<<<< HEAD
 import           Pos.Core (ProxySKHeavy, addressHash, bvdMaxBlockSize, HasProtocolMagic,
                            epochIndexL, headerHash, HasGenesisBlockVersionData)
+=======
+import           Pos.Core (HasConfiguration, ProxySKHeavy, addressHash, bvdMaxBlockSize,
+                           epochIndexL, headerHash)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Crypto (ProxySecretKey (..), PublicKey)
 import           Pos.DB (MonadDBRead, MonadGState)
 import qualified Pos.DB as DB
@@ -67,12 +72,24 @@ clearDlgMemPoolAction = do
 -- Put value into Proxy SK Pool. Value must not exist in pool.
 -- Caller must ensure it.
 -- Caller must also ensure that size limit allows to put more data.
+<<<<<<< HEAD
 putToDlgMemPool :: PublicKey -> ProxySKHeavy -> DelegationStateAction ()
+=======
+putToDlgMemPool
+    :: HasConfiguration
+    => PublicKey -> ProxySKHeavy -> DelegationStateAction ()
+>>>>>>> CHW-82-84, orphan branch
 putToDlgMemPool pk psk = do
     dwProxySKPool . at pk .= Just psk
     dwPoolSize += biSize pk + biSize psk
 
+<<<<<<< HEAD
 deleteFromDlgMemPool :: PublicKey -> DelegationStateAction ()
+=======
+deleteFromDlgMemPool
+    :: HasConfiguration
+    => PublicKey -> DelegationStateAction ()
+>>>>>>> CHW-82-84, orphan branch
 deleteFromDlgMemPool pk =
     use (dwProxySKPool . at pk) >>= \case
         Nothing -> pass
@@ -82,7 +99,13 @@ deleteFromDlgMemPool pk =
 
 -- Caller must ensure that there won't be too much data (more than limit) as
 -- a result of transformation.
+<<<<<<< HEAD
 modifyDlgMemPool :: (DlgMemPool -> DlgMemPool) -> DelegationStateAction ()
+=======
+modifyDlgMemPool
+    :: HasConfiguration
+    => (DlgMemPool -> DlgMemPool) -> DelegationStateAction ()
+>>>>>>> CHW-82-84, orphan branch
 modifyDlgMemPool f = do
     memPool <- use dwProxySKPool
     let newPool = f memPool
@@ -115,6 +138,10 @@ type ProcessHeavyConstraint ctx m =
        , MonadReader ctx m
        , HasLrcContext ctx
        , Mockable CurrentTime m
+<<<<<<< HEAD
+=======
+       , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
 
 -- | Processes heavyweight psk. Puts it into the mempool
@@ -124,8 +151,11 @@ processProxySKHeavy
     :: forall ctx m.
        ( ProcessHeavyConstraint ctx m
        , HasLens' ctx StateLock
+<<<<<<< HEAD
        , HasGenesisBlockVersionData
        , HasProtocolMagic
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => ProxySKHeavy -> m PskHeavyVerdict
 processProxySKHeavy psk =
@@ -136,7 +166,11 @@ processProxySKHeavy psk =
 -- synchronization. Should be called __only__ if you are sure that
 -- 'StateLock' is taken already.
 processProxySKHeavyInternal ::
+<<<<<<< HEAD
        forall ctx m. (ProcessHeavyConstraint ctx m, HasGenesisBlockVersionData, HasProtocolMagic)
+=======
+       forall ctx m. (ProcessHeavyConstraint ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => ProxySKHeavy
     -> m PskHeavyVerdict
 processProxySKHeavyInternal psk = do

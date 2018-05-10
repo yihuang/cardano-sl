@@ -16,10 +16,16 @@ import           Data.Default (Default (def))
 import           System.Wlog (WithLogger, modifyLoggerName)
 import           UnliftIO (MonadUnliftIO)
 
+<<<<<<< HEAD
 import           Pos.Core (ApplicationName, BlockVersion, ComponentBlock (..), HasCoreConfiguration,
                            NumSoftwareVersion, SoftwareVersion (..), StakeholderId, addressHash, HasProtocolConstants,
                            blockVersionL, epochIndexL, headerHashG, headerLeaderKeyL, headerSlotL,
                            HasProtocolMagic, HasGenesisBlockVersionData)
+=======
+import           Pos.Core (ApplicationName, BlockVersion, ComponentBlock (..), HasConfiguration,
+                           NumSoftwareVersion, SoftwareVersion (..), StakeholderId, addressHash,
+                           blockVersionL, epochIndexL, headerHashG, headerLeaderKeyL, headerSlotL)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Update (BlockVersionData, UpId, UpdatePayload)
 import qualified Pos.DB.BatchOp as DB
 import qualified Pos.DB.Class as DB
@@ -54,6 +60,10 @@ type USGlobalVerifyMode ctx m =
     , MonadIO m
     , MonadReader ctx m
     , HasLrcContext ctx
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     , HasUpdateConfiguration
     )
 
@@ -88,7 +98,11 @@ withUSLogger = modifyLoggerName (<> "us")
 -- will never change. Also note that we store slotting data for all
 -- epochs in memory, so adding new one can't make anything worse.
 usApplyBlocks
+<<<<<<< HEAD
     :: (MonadThrow m, USGlobalApplyMode ctx m, HasGenesisBlockVersionData, HasProtocolConstants)
+=======
+    :: (MonadThrow m, USGlobalApplyMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => OldestFirst NE UpdateBlock
     -> Maybe PollModifier
     -> m [DB.SomeBatchOp]
@@ -116,7 +130,11 @@ usApplyBlocks blocks modifierMaybe =
 -- head.
 usRollbackBlocks
     :: forall ctx m.
+<<<<<<< HEAD
        (USGlobalApplyMode ctx m, HasGenesisBlockVersionData)
+=======
+       USGlobalApplyMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => NewestFirst NE (UpdateBlock, USUndo) -> m [DB.SomeBatchOp]
 usRollbackBlocks blunds =
     withUSLogger $
@@ -127,7 +145,11 @@ usRollbackBlocks blunds =
 -- blocks, updates in-memory slotting data and converts this modifier
 -- to '[SomeBatchOp]'.
 processModifier ::
+<<<<<<< HEAD
        forall ctx m. (MonadSlotsData ctx m, HasCoreConfiguration)
+=======
+       forall ctx m. (HasConfiguration, MonadSlotsData ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => PollModifier
     -> m [DB.SomeBatchOp]
 processModifier pm@PollModifier {pmSlottingData = newSlottingData} =
@@ -153,8 +175,11 @@ usVerifyBlocks ::
        , DB.MonadDBRead m
        , MonadUnliftIO m
        , MonadReporting ctx m
+<<<<<<< HEAD
        , HasProtocolConstants
        , HasGenesisBlockVersionData
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => Bool
     -> OldestFirst NE UpdateBlock
@@ -176,7 +201,11 @@ usVerifyBlocks verifyAllIsKnown blocks =
     processRes (Right undos, modifier) = Right (modifier, undos)
 
 verifyBlock
+<<<<<<< HEAD
     :: (USGlobalVerifyMode ctx m, MonadPoll m, MonadError PollVerFailure m, HasProtocolMagic, HasProtocolConstants)
+=======
+    :: (USGlobalVerifyMode ctx m, MonadPoll m, MonadError PollVerFailure m)
+>>>>>>> CHW-82-84, orphan branch
     => BlockVersion -> Bool -> UpdateBlock -> m USUndo
 verifyBlock _ _ (ComponentBlockGenesis genBlk) =
     execRollT $ processGenesisBlock (genBlk ^. epochIndexL)
@@ -207,8 +236,13 @@ usCanCreateBlock ::
        , DB.MonadDBRead m
        , MonadReader ctx m
        , HasLrcContext ctx
+<<<<<<< HEAD
        , HasUpdateConfiguration
        , HasGenesisBlockVersionData
+=======
+       , HasConfiguration
+       , HasUpdateConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
     => m Bool
 usCanCreateBlock =
@@ -220,7 +254,11 @@ usCanCreateBlock =
 -- Conversion to batch
 ----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 modifierToBatch :: HasCoreConfiguration => PollModifier -> [DB.SomeBatchOp]
+=======
+modifierToBatch :: HasConfiguration => PollModifier -> [DB.SomeBatchOp]
+>>>>>>> CHW-82-84, orphan branch
 modifierToBatch PollModifier {..} =
     concat $
     [ bvsModifierToBatch (MM.insertions pmBVs) (MM.deletions pmBVs)
@@ -239,7 +277,11 @@ modifierToBatch PollModifier {..} =
     ]
 
 bvsModifierToBatch
+<<<<<<< HEAD
     :: HasCoreConfiguration
+=======
+    :: HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     => [(BlockVersion, BlockVersionState)]
     -> [BlockVersion]
     -> [DB.SomeBatchOp]
@@ -248,12 +290,20 @@ bvsModifierToBatch added deleted = addOps ++ delOps
     addOps = map (DB.SomeBatchOp . uncurry SetBVState) added
     delOps = map (DB.SomeBatchOp . DelBV) deleted
 
+<<<<<<< HEAD
 lastAdoptedModifierToBatch :: HasCoreConfiguration => Maybe (BlockVersion, BlockVersionData) -> [DB.SomeBatchOp]
+=======
+lastAdoptedModifierToBatch :: HasConfiguration => Maybe (BlockVersion, BlockVersionData) -> [DB.SomeBatchOp]
+>>>>>>> CHW-82-84, orphan branch
 lastAdoptedModifierToBatch Nothing          = []
 lastAdoptedModifierToBatch (Just (bv, bvd)) = [DB.SomeBatchOp $ SetAdopted bv bvd]
 
 confirmedVerModifierToBatch
+<<<<<<< HEAD
     :: HasCoreConfiguration
+=======
+    :: HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     => [(ApplicationName, NumSoftwareVersion)]
     -> [ApplicationName]
     -> [DB.SomeBatchOp]
@@ -264,7 +314,11 @@ confirmedVerModifierToBatch added deleted =
     delOps = map (DB.SomeBatchOp . DelConfirmedVersion) deleted
 
 confirmedPropModifierToBatch
+<<<<<<< HEAD
     :: HasCoreConfiguration
+=======
+    :: HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     => [(SoftwareVersion, ConfirmedProposalState)]
     -> [SoftwareVersion]
     -> [DB.SomeBatchOp]
@@ -275,7 +329,11 @@ confirmedPropModifierToBatch (map snd -> confAdded) confDeleted =
     confDelOps = map (DB.SomeBatchOp . DelConfirmedProposal) confDeleted
 
 upModifierToBatch
+<<<<<<< HEAD
     :: HasCoreConfiguration
+=======
+    :: HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     => [(UpId, ProposalState)]
     -> [UpId]
     -> [DB.SomeBatchOp]
@@ -285,10 +343,18 @@ upModifierToBatch (map snd -> added) deleted
     addOps = map (DB.SomeBatchOp . PutProposal) added
     delOps = map (DB.SomeBatchOp . DeleteProposal) deleted
 
+<<<<<<< HEAD
 sdModifierToBatch :: HasCoreConfiguration => Maybe SlottingData -> [DB.SomeBatchOp]
 sdModifierToBatch Nothing   = []
 sdModifierToBatch (Just sd) = [DB.SomeBatchOp $ PutSlottingData sd]
 
 epModifierToBatch :: HasCoreConfiguration => Maybe (HashSet StakeholderId) -> [DB.SomeBatchOp]
+=======
+sdModifierToBatch :: HasConfiguration => Maybe SlottingData -> [DB.SomeBatchOp]
+sdModifierToBatch Nothing   = []
+sdModifierToBatch (Just sd) = [DB.SomeBatchOp $ PutSlottingData sd]
+
+epModifierToBatch :: HasConfiguration => Maybe (HashSet StakeholderId) -> [DB.SomeBatchOp]
+>>>>>>> CHW-82-84, orphan branch
 epModifierToBatch Nothing   = []
 epModifierToBatch (Just ep) = [DB.SomeBatchOp $ PutEpochProposers ep]

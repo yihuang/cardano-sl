@@ -24,7 +24,11 @@ module Types
 import           Universum
 
 import           Control.Lens (Getter, makeLenses, to)
+<<<<<<< HEAD
 import           Data.Aeson (ToJSON (..))
+=======
+import           Data.Aeson (ToJSON (..), ToJSONKey (..))
+>>>>>>> CHW-82-84, orphan branch
 
 import           Cardano.Wallet.API.V1.Types (Account, SpendingPassword, Transaction, Wallet (..),
                                               WalletAddress, WalletId (..))
@@ -108,5 +112,9 @@ type ActionWalletState = (WalletState, ActionProbabilities)
 -- JSON
 instance ToJSON Action
 
+<<<<<<< HEAD
+=======
+instance ToJSONKey WalletId
+>>>>>>> CHW-82-84, orphan branch
 instance ToJSON WalletState
 

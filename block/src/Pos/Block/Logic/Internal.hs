@@ -37,10 +37,16 @@ import           Pos.Block.BListener (MonadBListener)
 import           Pos.Block.Slog (BypassSecurityCheck (..), MonadSlogApply, MonadSlogBase,
                                  ShouldCallBListener, slogApplyBlocks, slogRollbackBlocks)
 import           Pos.Block.Types (Blund, Undo (undoDlg, undoTx, undoUS))
+<<<<<<< HEAD
 import           Pos.Core (ComponentBlock (..), IsGenesisHeader, epochIndexL, HasGeneratedSecrets,
                            gbHeader, headerHash, mainBlockDlgPayload, mainBlockSscPayload, HasGenesisData,
                            mainBlockTxPayload, mainBlockUpdatePayload, HasGenesisBlockVersionData,
                            HasGenesisData, HasProtocolConstants)
+=======
+import           Pos.Core (ComponentBlock (..), HasConfiguration, IsGenesisHeader, epochIndexL,
+                           gbHeader, headerHash, mainBlockDlgPayload, mainBlockSscPayload,
+                           mainBlockTxPayload, mainBlockUpdatePayload)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (Block, GenesisBlock, MainBlock)
 import           Pos.DB (MonadDB, MonadDBRead, MonadGState, SomeBatchOp (..))
 import qualified Pos.DB.GState.Common as GS (writeBatchGState)
@@ -124,12 +130,17 @@ type MonadMempoolNormalization ctx m
       )
 
 -- | Normalize mempool.
+<<<<<<< HEAD
 normalizeMempool :: (
       MonadMempoolNormalization ctx m
     , HasGenesisBlockVersionData
     , HasGenesisData
     , HasProtocolConstants
     )
+=======
+normalizeMempool
+    :: forall ctx m . (MonadMempoolNormalization ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => m ()
 normalizeMempool = do
     -- We normalize all mempools except the delegation one.
@@ -145,7 +156,11 @@ normalizeMempool = do
 --
 -- Invariant: all blocks have the same epoch.
 applyBlocksUnsafe
+<<<<<<< HEAD
     :: forall ctx m . (MonadBlockApply ctx m, HasGeneratedSecrets, HasGenesisData, HasGenesisBlockVersionData, HasProtocolConstants)
+=======
+    :: forall ctx m . (MonadBlockApply ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => ShouldCallBListener
     -> OldestFirst NE Blund
     -> Maybe PollModifier
@@ -176,7 +191,11 @@ applyBlocksUnsafe scb blunds pModifier = do
         spanSafe ((==) `on` view (_1 . epochIndexL)) $ getOldestFirst blunds
 
 applyBlocksDbUnsafeDo
+<<<<<<< HEAD
     :: forall ctx m . (MonadBlockApply ctx m, HasGeneratedSecrets, HasGenesisData, HasGenesisBlockVersionData, HasProtocolConstants)
+=======
+    :: forall ctx m . (MonadBlockApply ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => ShouldCallBListener
     -> OldestFirst NE Blund
     -> Maybe PollModifier
@@ -205,7 +224,11 @@ applyBlocksDbUnsafeDo scb blunds pModifier = do
 -- | Rollback sequence of blocks, head-newest order expected with head being
 -- current tip. It's also assumed that lock on block db is taken already.
 rollbackBlocksUnsafe
+<<<<<<< HEAD
     :: forall ctx m. (MonadBlockApply ctx m, HasGeneratedSecrets, HasGenesisData, HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+    :: forall ctx m. (MonadBlockApply ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => BypassSecurityCheck -- ^ is rollback for more than k blocks allowed?
     -> ShouldCallBListener
     -> NewestFirst NE Blund
@@ -236,11 +259,16 @@ rollbackBlocksUnsafe bsc scb toRollback = do
     sanityCheckDB
 
 
+<<<<<<< HEAD
 toComponentBlock :: (MainBlock -> payload) -> Block -> ComponentBlock payload
+=======
+toComponentBlock :: HasConfiguration => (MainBlock -> payload) -> Block -> ComponentBlock payload
+>>>>>>> CHW-82-84, orphan branch
 toComponentBlock fnc block = case block of
     Left genBlock   -> ComponentBlockGenesis (convertGenesis genBlock)
     Right mainBlock -> ComponentBlockMain (Some $ mainBlock ^. gbHeader) (fnc mainBlock)
 
+<<<<<<< HEAD
 toTxpBlock :: Block -> TxpBlock
 toTxpBlock = toComponentBlock (view mainBlockTxPayload)
 
@@ -260,4 +288,37 @@ toDlgBlund = bimap toDlgBlock undoDlg
     toDlgBlock = toComponentBlock (view mainBlockDlgPayload)
 
 convertGenesis :: GenesisBlock -> Some IsGenesisHeader
+=======
+toTxpBlock
+    :: HasConfiguration
+    => Block -> TxpBlock
+toTxpBlock = toComponentBlock (view mainBlockTxPayload)
+
+toUpdateBlock
+    :: HasConfiguration
+    => Block -> UpdateBlock
+toUpdateBlock = toComponentBlock (view mainBlockUpdatePayload)
+
+toTxpBlund
+    :: HasConfiguration
+    => Blund -> TxpBlund
+toTxpBlund = bimap toTxpBlock undoTx
+
+toSscBlock
+    :: HasConfiguration
+    => Block -> SscBlock
+toSscBlock = toComponentBlock (view mainBlockSscPayload)
+
+toDlgBlund
+    :: HasConfiguration
+    => Blund -> DlgBlund
+toDlgBlund = bimap toDlgBlock undoDlg
+  where
+    toDlgBlock
+        :: HasConfiguration
+        => Block -> DlgBlock
+    toDlgBlock = toComponentBlock (view mainBlockDlgPayload)
+
+convertGenesis :: HasConfiguration => GenesisBlock -> Some IsGenesisHeader
+>>>>>>> CHW-82-84, orphan branch
 convertGenesis = Some . view gbHeader

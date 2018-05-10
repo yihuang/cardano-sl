@@ -119,7 +119,11 @@ instance (MonadPollRead m) =>
 
 {-# ANN module ("HLint: ignore Reduce duplication" :: Text) #-}
 
+<<<<<<< HEAD
 instance (MonadPollRead m) =>
+=======
+instance MonadPollRead m =>
+>>>>>>> CHW-82-84, orphan branch
          MonadPoll (PollT m) where
     putBVState bv st = ether $ pmBVsL %= MM.insert bv st
     delBVState bv = ether $ pmBVsL %= MM.delete bv

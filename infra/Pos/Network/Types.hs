@@ -59,7 +59,11 @@ import qualified Network.Transport.TCP as TCP
 import           Node.Internal (NodeId (..))
 import qualified Prelude
 import qualified System.Metrics as Monitoring
+<<<<<<< HEAD
 import           System.Wlog (LoggerName (..))
+=======
+import           System.Wlog (LoggerName)
+>>>>>>> CHW-82-84, orphan branch
 
 import           Pos.Network.DnsDomains (DnsDomains (..), NodeAddr)
 import qualified Pos.Network.DnsDomains as DnsDomains
@@ -67,7 +71,10 @@ import qualified Pos.Network.Policy as Policy
 import           Pos.Reporting.Health.Types (HealthStatus (..))
 import           Pos.System.Metrics.Constants (cardanoNamespace)
 import           Pos.Util.TimeWarp (addressToNodeId)
+<<<<<<< HEAD
 import           Pos.Util.Trace (wlogTrace)
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Util (HasLens', lensOf)
 
 {-------------------------------------------------------------------------------
@@ -246,12 +253,21 @@ topologyUnknownNodeType topology = OQ.UnknownNodeType $ go topology
     go TopologyBehindNAT{}   = const NodeEdge   -- should never happen
     go TopologyAuxx{}        = const NodeEdge   -- should never happen
 
+<<<<<<< HEAD
 data SubscriptionWorker =
     SubscriptionWorkerBehindNAT (DnsDomains DNS.Domain)
   | SubscriptionWorkerKademlia NodeType Valency Fallbacks
 
 -- | What kind of subscription worker do we run?
 topologySubscriptionWorker :: Topology kademlia -> Maybe SubscriptionWorker
+=======
+data SubscriptionWorker kademlia =
+    SubscriptionWorkerBehindNAT (DnsDomains DNS.Domain)
+  | SubscriptionWorkerKademlia kademlia NodeType Valency Fallbacks
+
+-- | What kind of subscription worker do we run?
+topologySubscriptionWorker :: Topology kademlia -> Maybe (SubscriptionWorker kademlia)
+>>>>>>> CHW-82-84, orphan branch
 topologySubscriptionWorker = go
   where
     go TopologyCore{}          = Nothing
@@ -262,10 +278,18 @@ topologySubscriptionWorker = go
     go TopologyBehindNAT{..}   = Just $ SubscriptionWorkerBehindNAT
                                           topologyDnsDomains
     go TopologyP2P{..}         = Just $ SubscriptionWorkerKademlia
+<<<<<<< HEAD
+=======
+                                          topologyKademlia
+>>>>>>> CHW-82-84, orphan branch
                                           NodeRelay
                                           topologyValency
                                           topologyFallbacks
     go TopologyTraditional{..} = Just $ SubscriptionWorkerKademlia
+<<<<<<< HEAD
+=======
+                                          topologyKademlia
+>>>>>>> CHW-82-84, orphan branch
                                           NodeCore
                                           topologyValency
                                           topologyFallbacks
@@ -439,8 +463,13 @@ initQueue :: (MonadIO m, FormatMsg msg)
           -> Maybe Monitoring.Store -- ^ EKG store (if used)
           -> m (OutboundQ msg NodeId Bucket)
 initQueue NetworkConfig{..} loggerName mStore = liftIO $ do
+<<<<<<< HEAD
     let NodeName selfName = fromMaybe (NodeName "self") ncSelfName
         oqTrace           = wlogTrace (loggerName <> LoggerName selfName)
+=======
+    let selfName = maybe "self" toString ncSelfName
+        oqTrace  = OQ.wlogTrace loggerName selfName
+>>>>>>> CHW-82-84, orphan branch
     oq <- OQ.new oqTrace
                  ncEnqueuePolicy
                  ncDequeuePolicy
@@ -516,6 +545,7 @@ type Resolver = DNS.Domain -> IO (Either DNSError [IPv4])
 --
 -- This uses the network, and so may throw exceptions in case of, for instance,
 -- and unreachable network.
+<<<<<<< HEAD
 resolveDnsDomains :: Word16
                   -> [NodeAddr DNS.Domain]
                   -> IO [Either DNSError [NodeId]]
@@ -523,6 +553,15 @@ resolveDnsDomains defaultPort dnsDomains =
     initDnsOnUse $ \resolve -> (fmap . fmap . fmap . fmap) addressToNodeId $
         DnsDomains.resolveDnsDomains resolve
                                      defaultPort
+=======
+resolveDnsDomains :: NetworkConfig kademlia
+                  -> [NodeAddr DNS.Domain]
+                  -> IO [Either DNSError [NodeId]]
+resolveDnsDomains NetworkConfig{..} dnsDomains =
+    initDnsOnUse $ \resolve -> (fmap . fmap . fmap . fmap) addressToNodeId $
+        DnsDomains.resolveDnsDomains resolve
+                                     ncDefaultPort
+>>>>>>> CHW-82-84, orphan branch
                                      dnsDomains
 {-# ANN resolveDnsDomains ("HLint: ignore Use <$>" :: String) #-}
 

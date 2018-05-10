@@ -58,6 +58,13 @@ library
 
                        Pos.System.Metrics.Constants
 
+<<<<<<< HEAD
+=======
+                       Pos.Util.AssertMode
+                       Pos.Util.Chrono
+                       Pos.Util.Limits
+
+>>>>>>> CHW-82-84, orphan branch
   other-modules:
                        -- Binary
                        Pos.Binary.Core.Address
@@ -123,8 +130,15 @@ library
 
   build-depends:       aeson
                      , ansi-terminal
+<<<<<<< HEAD
                      , base
                      , base58-bytestring
+=======
+                     , autoexporter
+                     , base
+                     , base58-bytestring
+                     , binary
+>>>>>>> CHW-82-84, orphan branch
                      , bytestring
                      , Cabal
                      , canonical-json
@@ -203,6 +217,7 @@ library
   ghc-options: -pgmP cpphs -optP --cpp
   if flag(asserts)
     cpp-options: -DASSERTS_ON
+<<<<<<< HEAD
 
 test-suite test
   main-is:             test.hs
@@ -266,3 +281,5 @@ test-suite test
   build-tools: cpphs >= 1.19
   ghc-options: -pgmP cpphs -optP --cpp
 
+=======
+>>>>>>> CHW-82-84, orphan branch

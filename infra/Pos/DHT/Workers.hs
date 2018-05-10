@@ -16,6 +16,10 @@ import           System.Wlog (WithLogger, logNotice)
 import           Pos.Binary.Class (serialize)
 import           Pos.Binary.Infra.DHTModel ()
 import           Pos.Communication.Protocol (OutSpecs)
+<<<<<<< HEAD
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Slotting (flattenSlotId, slotIdF)
 import           Pos.DHT.Constants (kademliaDumpInterval)
 import           Pos.DHT.Real.Types (KademliaDHTInstance (..))
@@ -25,7 +29,10 @@ import           Pos.Shutdown (HasShutdownContext)
 import           Pos.Slotting.Class (MonadSlots)
 import           Pos.Slotting.Util (defaultOnNewSlotParams)
 import           Pos.Worker.Types (WorkerSpec, localOnNewSlotWorker)
+<<<<<<< HEAD
 import           Pos.Core (HasProtocolConstants)
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 type DhtWorkMode ctx m =
     ( WithLogger m
@@ -38,11 +45,18 @@ type DhtWorkMode ctx m =
     , MonadReader ctx m
     , MonadReporting ctx m
     , HasShutdownContext ctx
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     )
 
 dhtWorkers
     :: ( DhtWorkMode ctx m
+<<<<<<< HEAD
        , HasProtocolConstants
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => KademliaDHTInstance -> ([WorkerSpec m], OutSpecs)
 dhtWorkers kademliaInst@KademliaDHTInstance {..} = mconcat
@@ -50,7 +64,10 @@ dhtWorkers kademliaInst@KademliaDHTInstance {..} = mconcat
 
 dumpKademliaStateWorker
     :: ( DhtWorkMode ctx m
+<<<<<<< HEAD
        , HasProtocolConstants
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => KademliaDHTInstance
     -> (WorkerSpec m, OutSpecs)

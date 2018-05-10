@@ -26,6 +26,10 @@ import           Pos.Ssc (SscParams (..))
 import           Pos.Ssc.Configuration (HasSscConfiguration)
 import           Pos.Update.Params (UpdateParams (..))
 import           Pos.Util.UserSecret (peekUserSecret)
+<<<<<<< HEAD
+=======
+import           Pos.Util.UserPublic (peekUserPublic)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Util (eitherToThrow)
 
 loggingParams :: LoggerName -> CommonNodeArgs -> LoggingParams
@@ -69,6 +73,10 @@ getNodeParams ::
 getNodeParams defaultLoggerName cArgs@CommonNodeArgs{..} NodeArgs{..} = do
     (primarySK, userSecret) <-
         prepareUserSecret cArgs =<< peekUserSecret (getKeyfilePath cArgs)
+<<<<<<< HEAD
+=======
+    userPublic <- peekUserPublic publicKeyfilePath
+>>>>>>> CHW-82-84, orphan branch
     npNetworkConfig <- intNetworkConfigOpts networkConfigOpts
     npBehaviorConfig <- case behaviorConfigPath of
         Nothing -> pure def
@@ -78,6 +86,10 @@ getNodeParams defaultLoggerName cArgs@CommonNodeArgs{..} NodeArgs{..} = do
         , npRebuildDb = rebuildDB
         , npSecretKey = primarySK
         , npUserSecret = userSecret
+<<<<<<< HEAD
+=======
+        , npUserPublic = userPublic
+>>>>>>> CHW-82-84, orphan branch
         , npBaseParams = getBaseParams defaultLoggerName cArgs
         , npJLFile = jlPath
         , npReportServers = reportServers commonArgs

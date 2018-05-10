@@ -1,4 +1,5 @@
 -- | Re-exports of Pos.DB functionality.
+<<<<<<< HEAD
 module Pos.DB
        ( module Pos.DB.Sum
        , module Pos.DB.Rocks
@@ -25,3 +26,7 @@ import           Pos.DB.Misc.Common
 import           Pos.DB.GState.Common
 import           Pos.DB.GState.Stakes
 
+=======
+
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

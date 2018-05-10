@@ -17,7 +17,11 @@ module Pos.Delegation.Lrc
 
 import           Universum
 
+<<<<<<< HEAD
 import           Pos.Core (EpochIndex, bvdHeavyDelThd, genesisBlockVersionData, HasGenesisBlockVersionData)
+=======
+import           Pos.Core (EpochIndex, HasConfiguration, bvdHeavyDelThd, genesisBlockVersionData)
+>>>>>>> CHW-82-84, orphan branch
 import qualified Pos.DB as DB
 import qualified Pos.Lrc.Consumer as Lrc
 import qualified Pos.Lrc.Context as Lrc
@@ -32,7 +36,11 @@ import           Pos.Util.Util (getKeys)
 
 data RCDlg
 
+<<<<<<< HEAD
 instance (HasGenesisBlockVersionData) => RichmenComponent RCDlg where
+=======
+instance HasConfiguration => RichmenComponent RCDlg where
+>>>>>>> CHW-82-84, orphan branch
     type RichmenData RCDlg = Lrc.RichmenSet
     rcToData = getKeys . snd
     rcTag Proxy = "dlg"
@@ -44,7 +52,11 @@ instance (HasGenesisBlockVersionData) => RichmenComponent RCDlg where
 ----------------------------------------------------------------------------
 
 -- | Consumer will be called on every Richmen computation.
+<<<<<<< HEAD
 dlgLrcConsumer :: (HasGenesisBlockVersionData, DB.MonadGState m, DB.MonadDB m) => Lrc.LrcConsumer m
+=======
+dlgLrcConsumer :: (DB.MonadGState m, DB.MonadDB m) => Lrc.LrcConsumer m
+>>>>>>> CHW-82-84, orphan branch
 dlgLrcConsumer = Lrc.lrcConsumerFromComponentSimple @RCDlg bvdHeavyDelThd
 
 ----------------------------------------------------------------------------
@@ -54,7 +66,11 @@ dlgLrcConsumer = Lrc.lrcConsumerFromComponentSimple @RCDlg bvdHeavyDelThd
 -- | Wait for LRC results to become available and then get delegation ricmen
 -- data for the given epoch.
 getDlgRichmen
+<<<<<<< HEAD
     :: (MonadIO m, DB.MonadDBRead m, MonadReader ctx m, Lrc.HasLrcContext ctx, HasGenesisBlockVersionData)
+=======
+    :: (MonadIO m, DB.MonadDBRead m, MonadReader ctx m, Lrc.HasLrcContext ctx)
+>>>>>>> CHW-82-84, orphan branch
     => Text               -- ^ Function name (to include into error message)
     -> EpochIndex         -- ^ Epoch for which you want to know the richmen
     -> m Lrc.RichmenSet
@@ -68,6 +84,10 @@ getDlgRichmen fname epoch =
 --
 -- Returns a 'Maybe'.
 tryGetDlgRichmen
+<<<<<<< HEAD
     :: (HasGenesisBlockVersionData, DB.MonadDBRead m)
+=======
+    :: DB.MonadDBRead m
+>>>>>>> CHW-82-84, orphan branch
     => EpochIndex -> m (Maybe Lrc.RichmenSet)
 tryGetDlgRichmen = getRichmen @RCDlg

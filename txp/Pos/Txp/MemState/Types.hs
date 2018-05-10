@@ -1,12 +1,29 @@
+<<<<<<< HEAD
+=======
+{-# LANGUAGE TemplateHaskell #-}
+
+>>>>>>> CHW-82-84, orphan branch
 -- | Type stored in the Txp holder.
 
 module Pos.Txp.MemState.Types
        ( GenericTxpLocalData (..)
        , TxpLocalData
+<<<<<<< HEAD
+=======
+       , TransactionProvenance (..)
+       , MemPoolModifyReason (..)
+       , JLTxR (..)
+>>>>>>> CHW-82-84, orphan branch
        ) where
 
 import           Universum
 
+<<<<<<< HEAD
+=======
+import           Data.Aeson.TH (defaultOptions, deriveJSON)
+
+import           Pos.Communication.Types.Protocol (PeerId)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Common (HeaderHash)
 import           Pos.Txp.Toil.Types (MemPool, UndoMap, UtxoModifier)
 
@@ -31,3 +48,40 @@ data GenericTxpLocalData extra = TxpLocalData
 
 -- | Memory state of Txp. This version is used by actual Txp implementation.
 type TxpLocalData = GenericTxpLocalData ()
+<<<<<<< HEAD
+=======
+
+-- TODO COMMENT
+data TransactionProvenance
+    = FromPeer PeerId
+    | History
+    deriving (Show)
+
+$(deriveJSON defaultOptions ''TransactionProvenance)
+
+-- | Enumeration of all reasons for modifying the mempool.
+data MemPoolModifyReason =
+      -- | Apply a block created by someone else.
+      ApplyBlock
+      -- | Apply a block created by us.
+    | CreateBlock
+      -- | Include a transaction. It came from this peer.
+    | ProcessTransaction TransactionProvenance
+      -- TODO COMMENT
+    | Custom Text
+      -- TODO COMMENT
+    | Unknown
+    deriving Show
+
+$(deriveJSON defaultOptions ''MemPoolModifyReason)
+
+----------------------------------------------------------------------------
+-- Logging
+----------------------------------------------------------------------------
+
+-- | Json log of one transaction being received by a node.
+data JLTxR = JLTxR
+    { jlrTxId  :: Text
+    , jlrError :: Maybe Text
+    } deriving Show
+>>>>>>> CHW-82-84, orphan branch

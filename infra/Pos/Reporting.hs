@@ -1,5 +1,6 @@
 -- | Reexports of error reporting functionality
 
+<<<<<<< HEAD
 module Pos.Reporting
        ( module Pos.Reporting.Ekg
        , module Pos.Reporting.Exceptions
@@ -18,3 +19,6 @@ import           Pos.Reporting.Methods
 import           Pos.Reporting.Metrics
 import           Pos.Reporting.Statsd
 
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

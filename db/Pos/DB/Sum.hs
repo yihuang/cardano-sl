@@ -21,7 +21,11 @@ import           Data.Conduit (ConduitT, transPipe)
 
 import qualified Database.RocksDB as Rocks
 import           Pos.Binary.Class (Bi)
+<<<<<<< HEAD
 import           Pos.Core.Configuration (HasCoreConfiguration)
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.DB.Class (DBIteratorClass (..), DBTag, IterType)
 import           Pos.DB.Pure (DBPureVar)
 import qualified Pos.DB.Pure as DB
@@ -36,6 +40,10 @@ type MonadDBSum ctx m =
     , HasLens DBSum ctx DBSum
     , MonadMask m
     , MonadIO m
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     )
 
 eitherDB
@@ -57,7 +65,10 @@ dbIterSourceSumDefault
        , DBIteratorClass i
        , Bi (IterKey i)
        , Bi (IterValue i)
+<<<<<<< HEAD
        , HasCoreConfiguration
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => DBTag -> Proxy i -> ConduitT () (IterType i) m ()
 dbIterSourceSumDefault tag proxy = view (lensOf @DBSum) >>= \case
@@ -65,7 +76,11 @@ dbIterSourceSumDefault tag proxy = view (lensOf @DBSum) >>= \case
     PureDB pdb -> transPipe (flip runReaderT pdb) (DB.dbIterSourcePureDefault tag proxy)
 
 dbPutSumDefault
+<<<<<<< HEAD
     :: (MonadDBSum ctx m, HasCoreConfiguration)
+=======
+    :: MonadDBSum ctx m
+>>>>>>> CHW-82-84, orphan branch
     => DBTag -> ByteString -> ByteString -> m ()
 dbPutSumDefault tag k v = eitherDB (DB.dbPutDefault tag k v) (DB.dbPutPureDefault tag k v)
 

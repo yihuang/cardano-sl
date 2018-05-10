@@ -4,9 +4,13 @@
 module Pos.Logic.Types
     ( LogicLayer (..)
     , Logic (..)
+<<<<<<< HEAD
     , hoistLogic
     , KeyVal (..)
     , hoistKeyVal
+=======
+    , KeyVal (..)
+>>>>>>> CHW-82-84, orphan branch
     , dummyLogicLayer
     ) where
 
@@ -23,7 +27,11 @@ import           Pos.Core.Txp (TxId)
 import           Pos.Core.Update (BlockVersionData, UpId, UpdateProposal, UpdateVote, VoteId)
 import           Pos.Security.Params (SecurityParams (..))
 import           Pos.Ssc.Message (MCCommitment, MCOpening, MCShares, MCVssCertificate)
+<<<<<<< HEAD
 import           Pos.Util.Chrono (NE, NewestFirst, OldestFirst (..))
+=======
+import           Pos.Util.Chrono (NE, NewestFirst, OldestFirst)
+>>>>>>> CHW-82-84, orphan branch
 
 -- | The interface to a logic layer, i.e. some component which encapsulates
 -- blockchain / crypto logic.
@@ -48,11 +56,15 @@ data Logic m = Logic
                          -> Maybe HeaderHash
                          -> m (Either GetHeadersFromManyToError (NewestFirst NE BlockHeader))
       -- | Compute LCA with the main chain.
+<<<<<<< HEAD
       -- FIXME rename.
       -- In fact, it computes the suffix of the input list such that all of them
       -- are not in the current main chain (hazards w.r.t. DB consistency
       -- obviously in play depending on the implementation...).
     , getLcaMainChain    :: OldestFirst [] BlockHeader -> m (OldestFirst [] BlockHeader)
+=======
+    , getLcaMainChain    :: OldestFirst NE BlockHeader -> m (Maybe HeaderHash)
+>>>>>>> CHW-82-84, orphan branch
       -- | Get the current tip of chain.
     , getTip             :: m Block
       -- | Cheaper version of 'headerHash <$> getTip'.
@@ -95,6 +107,7 @@ data Logic m = Logic
     , securityParams     :: SecurityParams
     }
 
+<<<<<<< HEAD
 hoistLogic :: (forall x . m x -> n x) -> Logic m -> Logic n
 hoistLogic nat logic = logic
     { getBlock = nat . getBlock logic
@@ -117,6 +130,8 @@ hoistLogic nat logic = logic
     , recoveryInProgress = nat $ recoveryInProgress logic
     }
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | First iteration solution to the inv/req/data/mempool system.
 -- Diffusion layer will set up the relays, but it needs help from the logic
 -- layer in order to figure out what to request after an inv, what to relay
@@ -154,6 +169,7 @@ data KeyVal key val m = KeyVal
     , handleData :: val -> m Bool
     }
 
+<<<<<<< HEAD
 hoistKeyVal :: (forall x . m x -> n x) -> KeyVal key val m -> KeyVal key val n
 hoistKeyVal nat kv = kv
     { toKey = nat . toKey kv
@@ -162,6 +178,8 @@ hoistKeyVal nat kv = kv
     , handleData = nat . handleData kv
     }
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | A diffusion layer: its interface, and a way to run it.
 data LogicLayer m = LogicLayer
     { runLogicLayer :: forall x . m x -> m x
@@ -185,7 +203,11 @@ dummyLogicLayer = LogicLayer
         , getBlock           = \_ -> pure (error "dummy: can't get block")
         , getBlockHeader     = \_ -> pure (error "dummy: can't get header")
         , getBlockHeaders    = \_ _ _ -> pure (error "dummy: can't get block headers")
+<<<<<<< HEAD
         , getLcaMainChain    = \_ -> pure (OldestFirst [])
+=======
+        , getLcaMainChain    = \_ -> pure Nothing
+>>>>>>> CHW-82-84, orphan branch
         , getHashesRange     = \_ _ _ -> pure (error "dummy: can't get hashes range")
         , getTip             = pure (error "dummy: can't get tip")
         , getTipHeader       = pure (error "dummy: can't get tip header")

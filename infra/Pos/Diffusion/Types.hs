@@ -1,15 +1,24 @@
+<<<<<<< HEAD
 {-# LANGUAGE RankNTypes         #-}
 {-# LANGUAGE StandaloneDeriving #-}
+=======
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE RankNTypes #-}
+>>>>>>> CHW-82-84, orphan branch
 
 module Pos.Diffusion.Types
     ( DiffusionLayer (..)
     , Diffusion (..)
     , SubscriptionStatus (..)
+<<<<<<< HEAD
     , hoistDiffusion
+=======
+>>>>>>> CHW-82-84, orphan branch
     , dummyDiffusionLayer
     ) where
 
 import           Universum
+<<<<<<< HEAD
 
 import           Data.Map.Strict (Map)
 import           Formatting (Format)
@@ -26,13 +35,31 @@ import           Pos.Util.Chrono (OldestFirst (..))
 
 import qualified Data.Map.Strict as Map
 
+=======
+import           Data.Map.Strict                  (Map)
+import qualified Data.Map.Strict                  as Map
+import           Formatting                       (Format)
+import           Pos.Communication.Types.Protocol (NodeId)
+import           Pos.Core.Block                   (Block, BlockHeader, MainBlockHeader)
+import           Pos.Core                         (HeaderHash, ProxySKHeavy)
+import           Pos.Core.Txp                     (TxAux)
+import           Pos.Core.Update                  (UpId, UpdateVote, UpdateProposal)
+import           Pos.Reporting.Health.Types       (HealthStatus (..))
+import           Pos.Core.Ssc                     (Opening, InnerSharesMap, SignedCommitment,
+                                                   VssCertificate)
+import           Pos.Util.Chrono                  (OldestFirst (..))
+>>>>>>> CHW-82-84, orphan branch
 
 data SubscriptionStatus =
     -- | Established a subscription to a node
     Subscribed
     -- | Establishing a TCP connection to a node
   | Subscribing
+<<<<<<< HEAD
   deriving (Eq, Ord, Show, Generic)
+=======
+  deriving (Eq, Ord, Show)
+>>>>>>> CHW-82-84, orphan branch
 
 instance Semigroup SubscriptionStatus where
     Subscribed <> _     = Subscribed
@@ -45,12 +72,23 @@ data Diffusion m = Diffusion
       -- The blocks come in oldest first, and form a chain (prev header of
       -- {n}'th is the header of {n-1}th.
       getBlocks          :: NodeId
+<<<<<<< HEAD
                          -> HeaderHash
+=======
+                         -> BlockHeader
+>>>>>>> CHW-82-84, orphan branch
                          -> [HeaderHash]
                          -> m (OldestFirst [] Block)
       -- | This is needed because there's a security worker which will request
       -- tip-of-chain from the network if it determines it's very far behind.
+<<<<<<< HEAD
     , requestTip          :: m (Map NodeId (m BlockHeader))
+=======
+      -- This type is chosen so that it fits with the current implementation:
+      -- for each header received, dump it into the block retrieval queue and
+      -- let the retrieval worker figure out all the recovery mode business.
+    , requestTip         :: forall t . (BlockHeader -> NodeId -> m t) -> m (Map NodeId (m t))
+>>>>>>> CHW-82-84, orphan branch
       -- | Announce a block header.
     , announceBlockHeader :: MainBlockHeader -> m ()
       -- | Returns a Bool iff at least one peer accepted the transaction.
@@ -96,6 +134,7 @@ data DiffusionLayer m = DiffusionLayer
     , diffusion         :: Diffusion m
     }
 
+<<<<<<< HEAD
 hoistDiffusion :: Functor m => (forall t . m t -> n t) -> Diffusion m -> Diffusion n
 hoistDiffusion nat orig = Diffusion
     { getBlocks = \nid bh hs -> nat $ getBlocks orig nid bh hs
@@ -118,6 +157,12 @@ hoistDiffusion nat orig = Diffusion
 dummyDiffusionLayer :: (Monad m, MonadIO m, Applicative d) => m (DiffusionLayer d)
 dummyDiffusionLayer = do
     ss <- newTVarIO Map.empty
+=======
+-- | A diffusion layer that does nothing.
+dummyDiffusionLayer :: (Monad m, MonadIO m, Applicative d) => m (DiffusionLayer d)
+dummyDiffusionLayer = do
+    ss <- newTVarIO Map.empty 
+>>>>>>> CHW-82-84, orphan branch
     return DiffusionLayer
         { runDiffusionLayer = identity
         , diffusion         = dummyDiffusion ss
@@ -126,7 +171,11 @@ dummyDiffusionLayer = do
     dummyDiffusion :: Applicative m => TVar (Map NodeId SubscriptionStatus) -> Diffusion m
     dummyDiffusion subscriptionStatus = Diffusion
         { getBlocks          = \_ _ _ -> pure (OldestFirst [])
+<<<<<<< HEAD
         , requestTip         = pure mempty
+=======
+        , requestTip         = \_ -> pure mempty
+>>>>>>> CHW-82-84, orphan branch
         , announceBlockHeader = \_ -> pure ()
         , sendTx             = \_ -> pure True
         , sendUpdateProposal = \_ _ _ -> pure ()

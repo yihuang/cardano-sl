@@ -49,6 +49,12 @@ library
                         Pos.Binary.Block.Types
                         Pos.Binary.Block.Network
 
+<<<<<<< HEAD
+=======
+                        -- Utilities
+                        Pos.Util.JsonLog
+
+>>>>>>> CHW-82-84, orphan branch
                         -- Exposed for tests
                         Pos.Block.Logic.VAR
                         Pos.Block.Logic.Integrity
@@ -165,6 +171,13 @@ Benchmark bench-block
                    , cardano-sl-block
                    , cardano-sl-crypto
                    , cardano-sl-core
+<<<<<<< HEAD
+=======
+                   , cardano-sl-txp
+                   , cardano-sl-update
+                   , cardano-sl-ssc
+                   , cardano-sl-delegation
+>>>>>>> CHW-82-84, orphan branch
                    , formatting
                    , universum
                    , deepseq

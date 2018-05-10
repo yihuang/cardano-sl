@@ -1,4 +1,8 @@
 -- | Common core types essential for multiple components.
+<<<<<<< HEAD
+=======
+
+>>>>>>> CHW-82-84, orphan branch
 module Pos.Core.Common.Types
        (
        -- * Address and StakeholderId
@@ -56,12 +60,19 @@ module Pos.Core.Common.Types
 import           Universum
 
 import           Control.Exception.Safe (Exception (displayException))
+<<<<<<< HEAD
 import           Control.Lens (makePrisms, _Left)
+=======
+import           Control.Lens (makePrisms)
+>>>>>>> CHW-82-84, orphan branch
 import           Control.Monad.Except (MonadError (throwError))
 import           Crypto.Hash (Blake2b_224)
 import qualified Data.ByteString as BS (pack, zipWith)
 import qualified Data.ByteString.Char8 as BSC (pack)
+<<<<<<< HEAD
 import qualified Data.ByteString.Lazy as LBS
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Data.Data (Data)
 import           Data.Hashable (Hashable (..))
 import qualified Data.Semigroup (Semigroup (..))
@@ -72,14 +83,21 @@ import           Serokell.Util (enumerate, listChunkedJson, pairBuilder)
 import           Serokell.Util.Base16 (formatBase16)
 import           System.Random (Random (..))
 
+<<<<<<< HEAD
 import           Pos.Binary.Class (Bi, decode, encode)
 import qualified Pos.Binary.Class as Bi
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Constants (sharedSeedLength)
 import           Pos.Crypto.Hashing (AbstractHash, Hash)
 import           Pos.Crypto.HD (HDAddressPayload)
 import           Pos.Crypto.Signing (PublicKey, RedeemPublicKey)
+<<<<<<< HEAD
 import           Pos.Data.Attributes (Attributes (..), decodeAttributes, encodeAttributes)
 import           Pos.Util.Util (cborError, toCborError)
+=======
+import           Pos.Data.Attributes (Attributes)
+>>>>>>> CHW-82-84, orphan branch
 
 ----------------------------------------------------------------------------
 -- Address, StakeholderId
@@ -115,6 +133,7 @@ data AddrSpendingData
     -- spending data via softfork.
     deriving (Eq, Generic, Typeable, Show)
 
+<<<<<<< HEAD
 {- NOTE: Address spending data serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -160,6 +179,8 @@ instance Bi AddrSpendingData where
             2 -> RedeemASD <$> decode
             tag -> UnknownASD tag <$> Bi.decodeUnknownCborDataItem
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Type of an address. It corresponds to constructors of
 -- 'AddrSpendingData'. It's separated, because 'Address' doesn't store
 -- 'AddrSpendingData', but we want to know its type.
@@ -170,6 +191,7 @@ data AddrType
     | ATUnknown !Word8
     deriving (Eq, Ord, Generic, Typeable, Show)
 
+<<<<<<< HEAD
 instance Bi AddrType where
     encode =
         encode @Word8 . \case
@@ -184,6 +206,8 @@ instance Bi AddrType where
             2 -> ATRedeem
             tag -> ATUnknown tag
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Stake distribution associated with an address.
 data AddrStakeDistribution
     = BootstrapEraDistr
@@ -202,6 +226,7 @@ data AddrStakeDistribution
     -- 'SingleKeyDistr' can be used instead (which is smaller).
     deriving (Eq, Ord, Show, Generic, Typeable)
 
+<<<<<<< HEAD
 instance Bi AddrStakeDistribution where
     encode =
         \case
@@ -223,6 +248,8 @@ instance Bi AddrStakeDistribution where
                 "decode @AddrStakeDistribution: unexpected length " <> pretty len
 
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 data MultiKeyDistrError
     = MkdMapIsEmpty
     | MkdMapIsSingleton
@@ -265,6 +292,7 @@ data AddrAttributes = AddrAttributes
     , aaStakeDistribution :: !AddrStakeDistribution
     } deriving (Eq, Ord, Show, Generic, Typeable)
 
+<<<<<<< HEAD
 {- NOTE: Address attributes serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -317,10 +345,13 @@ instance Bi (Attributes AddrAttributes) where
                 1 -> (\deriv -> Just $ acc {aaPkDerivationPath = Just deriv }) <$> Bi.deserialize v
                 _ -> pure Nothing
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Hash of this data is stored in 'Address'. This type exists mostly
 -- for internal usage.
 newtype Address' = Address'
     { unAddress' :: (AddrType, AddrSpendingData, Attributes AddrAttributes)
+<<<<<<< HEAD
     } deriving (Eq, Show, Generic, Typeable, Bi)
     -- TODO: We are deriving 'Bi' via 'GeneralizedNewtypeDeriving'. This is
     -- enabled in the Cabal file. It would be *very bad* if we switched to
@@ -332,6 +363,9 @@ newtype Address' = Address'
     --     deriving stock (Eq, Show, Generic, Typeable)
     --     deriving newtype (Bi)
     -- @
+=======
+    } deriving (Eq, Show, Generic, Typeable)
+>>>>>>> CHW-82-84, orphan branch
 
 -- | 'Address' is where you can send coins.
 data Address = Address
@@ -351,6 +385,7 @@ instance NFData AddrAttributes
 instance NFData AddrStakeDistribution
 instance NFData Address
 
+<<<<<<< HEAD
 instance Bi Address where
     encode Address{..} =
         Bi.encodeCrcProtected (addrRoot, addrAttributes, addrType)
@@ -362,6 +397,8 @@ instance Bi Address where
 instance Hashable Address where
     hashWithSalt s = hashWithSalt s . Bi.serialize
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 ----------------------------------------------------------------------------
 -- ChainDifficulty
 ----------------------------------------------------------------------------
@@ -492,10 +529,13 @@ newtype CoinPortion = CoinPortion
     { getCoinPortion :: Word64
     } deriving (Show, Ord, Eq, Generic, Typeable, NFData, Hashable)
 
+<<<<<<< HEAD
 instance Bi CoinPortion where
     encode = encode . getCoinPortion
     decode = CoinPortion <$> decode
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 -- | Denominator used by 'CoinPortion'.
 coinPortionDenominator :: Word64
 coinPortionDenominator = (10 :: Word64) ^ (15 :: Word64)
@@ -566,9 +606,12 @@ newtype BlockCount = BlockCount {getBlockCount :: Word64}
 ----------------------------------------------------------------------------
 
 makePrisms ''Address
+<<<<<<< HEAD
 
 Bi.deriveSimpleBi ''Script [
     Bi.Cons 'Script [
         Bi.Field [| scrVersion :: ScriptVersion |],
         Bi.Field [| scrScript  :: ByteString   |]
     ]]
+=======
+>>>>>>> CHW-82-84, orphan branch

@@ -103,7 +103,11 @@ explorerServeImpl
     => m Application
     -> Word16
     -> m ()
+<<<<<<< HEAD
 explorerServeImpl app port = serveImpl loggingApp "*" port Nothing Nothing Nothing
+=======
+explorerServeImpl app port = serveImpl loggingApp "*" port Nothing Nothing
+>>>>>>> CHW-82-84, orphan branch
   where
     loggingApp = logStdoutDev <$> app
 

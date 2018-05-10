@@ -58,7 +58,11 @@ import           Serokell.Data.Memory.Units (Byte)
 
 import           Pos.Binary.Class (Bi, decodeFull')
 import           Pos.Binary.Core ()
+<<<<<<< HEAD
 import           Pos.Core (Block, BlockVersionData (..), EpochIndex, HasCoreConfiguration, HeaderHash,
+=======
+import           Pos.Core (Block, BlockVersionData (..), EpochIndex, HasConfiguration, HeaderHash,
+>>>>>>> CHW-82-84, orphan branch
                            isBootstrapEra)
 import           Pos.DB.Error (DBError (DBMalformed))
 import           Pos.Util.Util (eitherToThrow)
@@ -95,7 +99,11 @@ type SerializedBlock = Serialized SerBlock
 type SerializedUndo = Serialized SerUndo
 
 -- | Pure read-only interface to the database.
+<<<<<<< HEAD
 class (HasCoreConfiguration, MonadThrow m) => MonadDBRead m where
+=======
+class (HasConfiguration, MonadThrow m) => MonadDBRead m where
+>>>>>>> CHW-82-84, orphan branch
     -- | This function takes tag and key and reads value associated
     -- with given key from DB corresponding to given tag.
     dbGet :: DBTag -> ByteString -> m (Maybe ByteString)

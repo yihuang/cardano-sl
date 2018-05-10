@@ -34,7 +34,11 @@ explorerTxpGlobalSettings =
     }
 
 applySettings ::
+<<<<<<< HEAD
        (TxpGlobalApplyMode ctx m, HasConfiguration)
+=======
+       TxpGlobalApplyMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => ProcessBlundsSettings ExplorerExtraLookup ExplorerExtraModifier m
 applySettings =
     ProcessBlundsSettings
@@ -45,7 +49,11 @@ applySettings =
         }
 
 rollbackSettings ::
+<<<<<<< HEAD
        (TxpGlobalRollbackMode m, HasConfiguration)
+=======
+       TxpGlobalRollbackMode m
+>>>>>>> CHW-82-84, orphan branch
     => ProcessBlundsSettings ExplorerExtraLookup ExplorerExtraModifier m
 rollbackSettings =
     ProcessBlundsSettings

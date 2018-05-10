@@ -32,16 +32,29 @@ import           System.Wlog (HasLoggerName (..))
 
 import           Pos.Block.BListener (MonadBListener (..))
 import           Pos.Block.Slog (HasSlogContext (..), HasSlogGState (..))
+<<<<<<< HEAD
 import           Pos.Client.KeyStorage (MonadKeys (..), MonadKeysRead (..), getSecretDefault,
                                         modifySecretDefault)
 import           Pos.Client.Txp.Addresses (MonadAddresses (..))
 import           Pos.Client.Txp.Balances (MonadBalances (..), getBalanceFromUtxo,
+=======
+import           Pos.Client.KeyStorage (MonadKeys (..), MonadKeysRead (..),
+                                        getSecretDefault, getPublicDefault,
+                                        modifySecretDefault, modifyPublicDefault)
+import           Pos.Client.Txp.Addresses (MonadAddresses (..))
+import           Pos.Client.Txp.Balances (MonadBalances(..), getBalanceFromUtxo,
+>>>>>>> CHW-82-84, orphan branch
                                           getOwnUtxosGenesis)
 import           Pos.Client.Txp.History (MonadTxHistory (..), getBlockHistoryDefault,
                                          getLocalHistoryDefault, saveTxDefault)
 import           Pos.Context (HasNodeContext (..))
+<<<<<<< HEAD
 import           Pos.Core (Address, HasConfiguration, HasPrimaryKey (..), IsBootstrapEraAddr (..),
                            deriveFirstHDAddress, largestPubKeyAddressBoot,
+=======
+import           Pos.Core (Address, HasConfiguration, HasPrimaryKey (..),
+                           IsBootstrapEraAddr (..), deriveFirstHDAddress, largestPubKeyAddressBoot,
+>>>>>>> CHW-82-84, orphan branch
                            largestPubKeyAddressSingleKey, makePubKeyAddress, siEpoch)
 import           Pos.Crypto (EncryptedSecretKey, PublicKey, emptyPassphrase)
 import           Pos.DB (DBSum (..), MonadGState (..), NodeDBs, gsIsBootstrapEra)
@@ -62,10 +75,18 @@ import           Pos.Txp (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..), t
 import           Pos.Txp.DB.Utxo (getFilteredUtxo)
 import           Pos.Util (HasLens (..), postfixLFields)
 import           Pos.Util.CompileInfo (HasCompileInfo, withCompileInfo)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (HasJsonLogConfig (..))
 import           Pos.Util.LoggerName (HasLoggerName' (..))
 import           Pos.Util.TimeWarp (CanJsonLog (..))
 import           Pos.Util.UserSecret (HasUserSecret (..))
+=======
+import           Pos.Util.JsonLog (HasJsonLogConfig (..))
+import           Pos.Util.LoggerName (HasLoggerName' (..))
+import           Pos.Util.TimeWarp (CanJsonLog (..))
+import           Pos.Util.UserSecret (HasUserSecret (..))
+import           Pos.Util.UserPublic (HasUserPublic (..))
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.WorkMode (EmptyMempoolExt, RealMode, RealModeContext (..))
 
 type AuxxMode = ReaderT AuxxContext Production
@@ -118,6 +139,12 @@ instance HasReportingContext AuxxContext  where
 instance HasUserSecret AuxxContext where
     userSecret = acRealModeContext_L . userSecret
 
+<<<<<<< HEAD
+=======
+instance HasUserPublic AuxxContext where
+    userPublic = acRealModeContext_L . userPublic
+
+>>>>>>> CHW-82-84, orphan branch
 instance HasShutdownContext AuxxContext where
     shutdownContext = acRealModeContext_L . shutdownContext
 
@@ -217,9 +244,17 @@ instance (HasConfigurations, HasCompileInfo) =>
 
 instance MonadKeysRead AuxxMode where
     getSecret = getSecretDefault
+<<<<<<< HEAD
 
 instance MonadKeys AuxxMode where
     modifySecret = modifySecretDefault
+=======
+    getPublic = getPublicDefault
+
+instance MonadKeys AuxxMode where
+    modifySecret = modifySecretDefault
+    modifyPublic = modifyPublicDefault
+>>>>>>> CHW-82-84, orphan branch
 
 type instance MempoolExt AuxxMode = EmptyMempoolExt
 

@@ -1,5 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
+<<<<<<< HEAD
 {-# LANGUAGE ScopedTypeVariables #-}
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 module Ntp.Util
     ( ntpPort
@@ -14,7 +17,11 @@ module Ntp.Util
     , withSocketsDoLifted
     ) where
 
+<<<<<<< HEAD
 import           Control.Exception (IOException, catch)
+=======
+import           Control.Exception.Safe (catchAny)
+>>>>>>> CHW-82-84, orphan branch
 import           Control.Monad.Trans (MonadIO (..))
 import           Control.Monad.Trans.Control (MonadBaseControl (..))
 import           Data.List (find, sortOn)
@@ -36,9 +43,14 @@ resolveHost host (hasIPv4, hasIPv6) = do
             { addrSocketType = Datagram
             , addrFlags = [AI_ADDRCONFIG]  -- since we use AF_INET family
             }
+<<<<<<< HEAD
     -- TBD why catch here? Why not let 'resolveHost' throw the exception?
     addrInfos <- getAddrInfo (Just hints) (Just host) Nothing
                     `catch` (\(_ :: IOException) -> return [])
+=======
+    addrInfos <- getAddrInfo (Just hints) (Just host) Nothing
+                    `catchAny` \_ -> return []
+>>>>>>> CHW-82-84, orphan branch
 
     -- one address is enough
     pure $

@@ -8,6 +8,10 @@ module Pos.Block.Network.Logic
        (
          BlockNetLogicException (..)
        , triggerRecovery
+<<<<<<< HEAD
+=======
+
+>>>>>>> CHW-82-84, orphan branch
        , handleBlocks
 
        , handleUnsolicitedHeader
@@ -17,12 +21,18 @@ import           Universum
 
 import           Control.Concurrent.STM (isFullTBQueue, readTVar, writeTBQueue, writeTVar)
 import           Control.Exception.Safe (Exception (..))
+<<<<<<< HEAD
 import           Control.Exception (IOException)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as M
 import qualified Data.Text.Buildable as B
 import           Formatting (bprint, build, sformat, shown, stext, (%))
 import           Mockable (forConcurrently)
+=======
+import qualified Data.List.NonEmpty as NE
+import qualified Data.Text.Buildable as B
+import           Formatting (bprint, build, sformat, shown, stext, (%))
+>>>>>>> CHW-82-84, orphan branch
 import           Serokell.Util.Text (listJson)
 import qualified System.Metrics.Gauge as Metrics
 import           System.Wlog (logDebug, logInfo, logWarning)
@@ -39,8 +49,12 @@ import           Pos.Block.RetrievalQueue (BlockRetrievalQueue, BlockRetrievalQu
 import           Pos.Block.Types (Blund, LastKnownHeaderTag)
 import           Pos.Communication.Protocol (NodeId)
 import           Pos.Core (HasHeaderHash (..), HeaderHash, gbHeader, headerHashG, isMoreDifficult,
+<<<<<<< HEAD
                            prevBlockL, HasGeneratedSecrets, HasGenesisHash, HasProtocolConstants,
                            HasGenesisBlockVersionData, HasGenesisData)
+=======
+                           prevBlockL)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Block (Block, BlockHeader, blockHeader)
 import           Pos.Crypto (shortHashF)
 import qualified Pos.DB.Block.Load as DB
@@ -55,7 +69,11 @@ import           Pos.Util (buildListBounds, multilineBounds, _neLast)
 import           Pos.Util.AssertMode (inAssertMode)
 import           Pos.Util.Chrono (NE, NewestFirst (..), OldestFirst (..), _NewestFirst,
                                   _OldestFirst)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason (..), jlAdoptedBlock)
+=======
+import           Pos.Util.JsonLog (jlAdoptedBlock)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.TimeWarp (CanJsonLog (..))
 import           Pos.Util.Util (lensOf)
 
@@ -63,9 +81,12 @@ import           Pos.Util.Util (lensOf)
 -- Exceptions
 ----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 -- FIXME this same thing is defined in full diffusion layer.
 -- Must finish the proper factoring. There should be no 'Block.Network'
 -- in cardano-sl-block; it should just use the Diffusion and Logic interfaces.
+=======
+>>>>>>> CHW-82-84, orphan branch
 data BlockNetLogicException
     = DialogUnexpected Text
       -- ^ Node's response in any network/block related logic was
@@ -101,14 +122,20 @@ triggerRecovery
     => Diffusion m -> m ()
 triggerRecovery diffusion = unlessM recoveryInProgress $ do
     logDebug "Recovery triggered, requesting tips from neighbors"
+<<<<<<< HEAD
     -- The 'catch' here is for an exception when trying to enqueue the request.
     -- In 'requestTipsAndProcess', IO exceptions are caught, for each
     -- individual request per-peer. Those are not re-thrown.
     void requestTipsAndProcess `catch`
+=======
+    -- I know, it's not unsolicited. TODO rename.
+    void (Diffusion.requestTip diffusion $ handleUnsolicitedHeader) `catch`
+>>>>>>> CHW-82-84, orphan branch
         \(e :: SomeException) -> do
            logDebug ("Error happened in triggerRecovery: " <> show e)
            throwM e
     logDebug "Finished requesting tips for recovery"
+<<<<<<< HEAD
   where
     requestTipsAndProcess = do
         requestsMap <- Diffusion.requestTip diffusion
@@ -123,6 +150,8 @@ triggerRecovery diffusion = unlessM recoveryInProgress $ do
         bh <- mbh 
         -- I know, it's not unsolicited. TODO rename.
         handleUnsolicitedHeader bh nodeId
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 ----------------------------------------------------------------------------
 -- Headers processing
@@ -217,6 +246,7 @@ updateLastKnownHeader lastKnownH header = do
 
 -- | Carefully apply blocks that came from the network.
 handleBlocks
+<<<<<<< HEAD
     :: forall ctx m . ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasGenesisData
@@ -224,6 +254,9 @@ handleBlocks
        , HasProtocolConstants
        , HasGenesisBlockVersionData
        )
+=======
+    :: forall ctx m. BlockWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => NodeId
     -> OldestFirst NE Block
     -> Diffusion m
@@ -252,6 +285,7 @@ handleBlocks nodeId blocks diffusion = do
 
 applyWithoutRollback
     :: forall ctx m.
+<<<<<<< HEAD
        ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasGenesisHash
@@ -259,13 +293,20 @@ applyWithoutRollback
        , HasProtocolConstants
        , HasGenesisBlockVersionData
        )
+=======
+       BlockWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => Diffusion m
     -> OldestFirst NE Block
     -> m ()
 applyWithoutRollback diffusion blocks = do
     logInfo . sformat ("Trying to apply blocks w/o rollback. " % multilineBounds 6)
        . getOldestFirst . map (view blockHeader) $ blocks
+<<<<<<< HEAD
     modifyStateLock HighPriority ApplyBlock applyWithoutRollbackDo >>= \case
+=======
+    modifyStateLock HighPriority "applyWithoutRollback" applyWithoutRollbackDo >>= \case
+>>>>>>> CHW-82-84, orphan branch
         Left (pretty -> err) ->
             onFailedVerifyBlocks (getOldestFirst blocks) err
         Right newTip -> do
@@ -297,6 +338,7 @@ applyWithoutRollback diffusion blocks = do
         pure (newTip, res)
 
 applyWithRollback
+<<<<<<< HEAD
     :: ( BlockWorkMode ctx m
        , HasGeneratedSecrets
        , HasGenesisData
@@ -304,6 +346,9 @@ applyWithRollback
        , HasProtocolConstants
        , HasGenesisBlockVersionData
        )
+=======
+    :: BlockWorkMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => NodeId
     -> Diffusion m
     -> OldestFirst NE Block
@@ -314,7 +359,11 @@ applyWithRollback nodeId diffusion toApply lca toRollback = do
     logInfo . sformat ("Trying to apply blocks w/o rollback. " % multilineBounds 6)
        . getOldestFirst . map (view blockHeader) $ toApply
     logInfo $ sformat ("Blocks to rollback "%listJson) toRollbackHashes
+<<<<<<< HEAD
     res <- modifyStateLock HighPriority ApplyBlockWithRollback $ \curTip -> do
+=======
+    res <- modifyStateLock HighPriority "applyWithRollback" $ \curTip -> do
+>>>>>>> CHW-82-84, orphan branch
         res <- L.applyWithRollback toRollback toApplyAfterLca
         pure (either (const curTip) identity res, res)
     case res of

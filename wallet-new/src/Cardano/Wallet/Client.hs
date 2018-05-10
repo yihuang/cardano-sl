@@ -16,7 +16,11 @@ module Cardano.Wallet.Client
     , liftClient
     -- * The type of errors that the client might return
     , ClientError(..)
+<<<<<<< HEAD
     , V1Errors.WalletError(..)
+=======
+    , WalletError(..)
+>>>>>>> CHW-82-84, orphan branch
     , ServantError(..)
     , Response(..)
     -- * Reexports
@@ -39,7 +43,11 @@ import           Cardano.Wallet.API.Request.Filter
 import           Cardano.Wallet.API.Request.Pagination
 import           Cardano.Wallet.API.Request.Sort
 import           Cardano.Wallet.API.Response
+<<<<<<< HEAD
 import qualified Cardano.Wallet.API.V1.Errors as V1Errors
+=======
+import           Cardano.Wallet.API.V1.Errors
+>>>>>>> CHW-82-84, orphan branch
 import           Cardano.Wallet.API.V1.Parameters
 import           Cardano.Wallet.API.V1.Types
 import qualified Pos.Core as Core
@@ -70,6 +78,11 @@ data WalletClient m
          :: NewAddress -> Resp m WalletAddress
     , getAddress
          :: Text -> Resp m WalletAddress
+<<<<<<< HEAD
+=======
+    , postExternalAddress
+         :: NewAddress -> Resp m WalletAddress
+>>>>>>> CHW-82-84, orphan branch
     -- wallets endpoints
     , postWallet
          :: New Wallet -> Resp m Wallet
@@ -84,9 +97,19 @@ data WalletClient m
     , deleteWallet
          :: WalletId -> m (Either ClientError ())
     , getWallet
+<<<<<<< HEAD
         :: WalletId -> Resp m Wallet
     , updateWallet
          :: WalletId -> Update Wallet -> Resp m Wallet
+=======
+         :: WalletId -> Resp m Wallet
+    , updateWallet
+         :: WalletId -> Update Wallet -> Resp m Wallet
+    , postExternalWallet
+         :: New ExternalWallet -> Resp m Wallet
+    , postAddressPath
+        :: WalletId -> Resp m AddressPath
+>>>>>>> CHW-82-84, orphan branch
     -- account endpoints
     , deleteAccount
          :: WalletId -> AccountIndex -> m (Either ClientError ())
@@ -98,6 +121,11 @@ data WalletClient m
         :: WalletId -> New Account -> Resp m Account
     , updateAccount
          :: WalletId -> AccountIndex -> Update Account -> Resp m Account
+<<<<<<< HEAD
+=======
+    , postExternalAccount
+        :: WalletId -> New Account -> Resp m Account
+>>>>>>> CHW-82-84, orphan branch
     -- transactions endpoints
     , postTransaction
          :: Payment -> Resp m Transaction
@@ -112,6 +140,13 @@ data WalletClient m
          -> Resp m [Transaction]
     , getTransactionFee
          :: Payment -> Resp m EstimatedFees
+<<<<<<< HEAD
+=======
+    , postUnsignedTransaction
+         :: Payment -> Resp m Transaction
+    , postSignedTransaction
+         :: SignedTransaction -> Resp m Transaction
+>>>>>>> CHW-82-84, orphan branch
     -- settings
     , getNodeSettings
          :: Resp m NodeSettings
@@ -187,6 +222,11 @@ hoistClient phi wc = WalletClient
          phi . postAddress wc
     , getAddress =
          phi . getAddress wc
+<<<<<<< HEAD
+=======
+    , postExternalAddress =
+         phi . postExternalAddress wc
+>>>>>>> CHW-82-84, orphan branch
     , postWallet =
          phi . postWallet wc
     , getWalletIndexFilterSorts =
@@ -199,6 +239,13 @@ hoistClient phi wc = WalletClient
          phi . getWallet wc
     , updateWallet =
          \x -> phi . updateWallet wc x
+<<<<<<< HEAD
+=======
+    , postExternalWallet =
+         phi . postExternalWallet wc
+    , postAddressPath =
+         phi . postAddressPath wc
+>>>>>>> CHW-82-84, orphan branch
     , deleteAccount =
          \x -> phi . deleteAccount wc x
     , getAccount =
@@ -209,6 +256,11 @@ hoistClient phi wc = WalletClient
          \x -> phi . postAccount wc x
     , updateAccount =
          \x y -> phi . updateAccount wc x y
+<<<<<<< HEAD
+=======
+    , postExternalAccount =
+         \x -> phi . postExternalAccount wc x
+>>>>>>> CHW-82-84, orphan branch
     , postTransaction =
          phi . postTransaction wc
     , getTransactionIndexFilterSorts =
@@ -216,6 +268,13 @@ hoistClient phi wc = WalletClient
              phi . getTransactionIndexFilterSorts wc wid maid maddr mp mpp f
     , getTransactionFee =
          phi . getTransactionFee wc
+<<<<<<< HEAD
+=======
+    , postUnsignedTransaction =
+         phi . postUnsignedTransaction wc
+    , postSignedTransaction =
+         phi . postSignedTransaction wc
+>>>>>>> CHW-82-84, orphan branch
     , getNodeSettings =
          phi (getNodeSettings wc)
     , getNodeInfo =
@@ -237,7 +296,11 @@ type Resp m a = m (Either ClientError (WalletResponse a))
 
 -- | The type of errors that the wallet might return.
 data ClientError
+<<<<<<< HEAD
     = ClientWalletError V1Errors.WalletError
+=======
+    = ClientWalletError WalletError
+>>>>>>> CHW-82-84, orphan branch
     -- ^ The 'WalletError' type represents known failures that the API
     -- might return.
     | ClientHttpError ServantError

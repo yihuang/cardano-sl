@@ -13,7 +13,10 @@ import           Pos.DB.Class (MonadDBRead)
 import           Pos.DB.GState.Stakes (getRealTotalStake)
 import           Pos.Txp.DB (sanityCheckStakes, sanityCheckUtxo)
 import           Pos.Util.AssertMode (inAssertMode)
+<<<<<<< HEAD
 import           Pos.Core (HasGenesisData)
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 sanityCheckDB ::
        ( MonadMask m
@@ -21,7 +24,10 @@ sanityCheckDB ::
        , MonadDBRead m
        , MonadUnliftIO m
        , MonadReader ctx m
+<<<<<<< HEAD
        , HasGenesisData
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => m ()
 sanityCheckDB = inAssertMode sanityCheckGStateDB
@@ -34,7 +40,10 @@ sanityCheckGStateDB ::
        , MonadMask m
        , WithLogger m
        , MonadReader ctx m
+<<<<<<< HEAD
        , HasGenesisData
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => m ()
 sanityCheckGStateDB = do

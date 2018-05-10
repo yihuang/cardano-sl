@@ -37,7 +37,10 @@ import qualified Pos.Slotting as Slot
 import           Pos.Txp (GenericTxpLocalData (..), MempoolExt, MonadTxpMem, TxpHolderTag,
                           mkTxpLocalData)
 import           Pos.Util (postfixLFields)
+<<<<<<< HEAD
 import           Pos.Util.Mockable () -- need this for orphan instances :\
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.Util (HasLens (..))
 
 import           Pos.Explorer.ExtraContext (ExtraContext, ExtraContextT, HasExplorerCSLInterface,
@@ -49,7 +52,11 @@ import           Pos.Explorer.Txp (ExplorerExtraModifier (..))
 -- Need Emulation because it has instance Mockable CurrentTime
 import           Mockable (Production, currentTime, runProduction)
 import           Pos.Launcher.Configuration (HasConfigurations)
+<<<<<<< HEAD
 import           Pos.Util.JsonLog.Events (HasJsonLogConfig (..), jsonLogDefault)
+=======
+import           Pos.Util.JsonLog (HasJsonLogConfig (..), jsonLogDefault)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Util.LoggerName (HasLoggerName' (..), askLoggerNameDefault,
                                       modifyLoggerNameDefault)
 import           Pos.Util.TimeWarp (CanJsonLog (..))

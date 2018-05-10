@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 {-# LANGUAGE GADTs          #-}
+=======
+>>>>>>> CHW-82-84, orphan branch
 {-# LANGUAGE NamedFieldPuns #-}
 
 -- | Tx sending functionality in Auxx.
@@ -28,7 +31,10 @@ import           Formatting (build, int, sformat, shown, stext, (%))
 import           Mockable (Mockable, SharedAtomic, SharedAtomicT, concurrently, currentTime, delay,
                            forConcurrently, modifySharedAtomic, newSharedAtomic)
 import           Serokell.Util (ms, sec)
+<<<<<<< HEAD
 import           System.Environment (lookupEnv)
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           System.IO (BufferMode (LineBuffering), hClose, hSetBuffering)
 import           System.Wlog (logError, logInfo)
 
@@ -55,6 +61,7 @@ import           Mode (MonadAuxxMode, makePubKeyAddressAuxx)
 
 -- | Parameters for 'SendToAllGenesis' command.
 data SendToAllGenesisParams = SendToAllGenesisParams
+<<<<<<< HEAD
     { stagpTxsPerThread :: !Int
     , stagpConc         :: !Int
     , stagpDelay        :: !Int
@@ -62,28 +69,59 @@ data SendToAllGenesisParams = SendToAllGenesisParams
     } deriving (Show)
 
 -- | Count submitted transactions.
+=======
+    { stagpDuration    :: !Int
+    , stagpConc        :: !Int
+    , stagpDelay       :: !Int
+    , stagpTpsSentFile :: !FilePath
+    } deriving (Show)
+
+-- | Count submitted and failed transactions.
+>>>>>>> CHW-82-84, orphan branch
 --
 -- This is used in the benchmarks using send-to-all-genesis
 data TxCount = TxCount
     { _txcSubmitted :: !Int
+<<<<<<< HEAD
+=======
+    , _txcFailed    :: !Int
+>>>>>>> CHW-82-84, orphan branch
       -- How many threads are still sending transactions.
     , _txcThreads   :: !Int }
 
 addTxSubmit :: Mockable SharedAtomic m => SharedAtomicT m TxCount -> m ()
 addTxSubmit =
     flip modifySharedAtomic
+<<<<<<< HEAD
         (\(TxCount submitted sending) ->
              pure (TxCount (submitted + 1) sending, ()))
+=======
+        (\(TxCount submitted failed sending) ->
+             pure (TxCount (submitted + 1) failed sending, ()))
+
+addTxFailed :: Mockable SharedAtomic m => SharedAtomicT m TxCount -> m ()
+addTxFailed =
+    flip modifySharedAtomic
+        (\(TxCount submitted failed sending) ->
+             pure (TxCount submitted (failed + 1) sending, ()))
+>>>>>>> CHW-82-84, orphan branch
 
 sendToAllGenesis
     :: forall m. MonadAuxxMode m
     => Diffusion m
     -> SendToAllGenesisParams
     -> m ()
+<<<<<<< HEAD
 sendToAllGenesis diffusion (SendToAllGenesisParams txsPerThread conc delay_ tpsSentFile) = do
     let genesisSlotDuration = fromIntegral (toMicroseconds $ bvdSlotDuration genesisBlockVersionData) `div` 1000000 :: Int
         keysToSend  = fromMaybe (error "Genesis secret keys are unknown") genesisSecretKeys
     tpsMVar <- newSharedAtomic $ TxCount 0 conc
+=======
+sendToAllGenesis diffusion (SendToAllGenesisParams duration conc delay_ tpsSentFile) = do
+    let genesisSlotDuration = fromIntegral (toMicroseconds $ bvdSlotDuration genesisBlockVersionData) `div` 1000000 :: Int
+        keysToSend  = fromMaybe (error "Genesis secret keys are unknown") genesisSecretKeys
+    tpsMVar <- newSharedAtomic $ TxCount 0 0 conc
+>>>>>>> CHW-82-84, orphan branch
     startTime <- show . toInteger . getTimestamp . Timestamp <$> currentTime
     bracket (openFile tpsSentFile WriteMode) (liftIO . hClose) $ \h -> do
         liftIO $ hSetBuffering h LineBuffering
@@ -95,6 +133,7 @@ sendToAllGenesis diffusion (SendToAllGenesisParams txsPerThread conc delay_ tpsS
         txQueue <- atomically $ newTQueue
         -- prepare a queue with all transactions
         logInfo $ sformat ("Found "%shown%" keys in the genesis block.") (length keysToSend)
+<<<<<<< HEAD
         startAtTxt <- liftIO $ lookupEnv "AUXX_START_AT"
         let startAt = fromMaybe 0 . readMaybe . fromMaybe "" $ startAtTxt :: Int
         -- construct transaction output
@@ -115,10 +154,24 @@ sendToAllGenesis diffusion (SendToAllGenesisParams txsPerThread conc delay_ tpsS
             allTrans = take nTrans (drop startAt keysToSend)
             (firstBatch, secondBatch) = splitAt ((2 * nTrans) `div` 3) allTrans
             -- every <slotDuration> seconds, write the number of sent transactions to a CSV file.
+=======
+        forM_ keysToSend $ \secretKey -> do
+            outAddr <- makePubKeyAddressAuxx (toPublic secretKey)
+            let val1 = mkCoin 1
+                txOut1 = TxOut {
+                    txOutAddress = outAddr,
+                    txOutValue = val1
+                    }
+                txOuts = TxOutAux txOut1 :| []
+            atomically $ writeTQueue txQueue (secretKey, txOuts)
+
+            -- every <slotDuration> seconds, write the number of sent and failed transactions to a CSV file.
+>>>>>>> CHW-82-84, orphan branch
         let writeTPS :: m ()
             writeTPS = do
                 delay (sec genesisSlotDuration)
                 curTime <- show . toInteger . getTimestamp . Timestamp <$> currentTime
+<<<<<<< HEAD
                 finished <- modifySharedAtomic tpsMVar $ \(TxCount submitted sending) -> do
                     -- CSV is formatted like this:
                     -- time,txCount,txType
@@ -127,12 +180,24 @@ sendToAllGenesis diffusion (SendToAllGenesisParams txsPerThread conc delay_ tpsS
                 if finished
                     then logInfo "Finished writing TPS samples."
                     else writeTPS
+=======
+                finished <- modifySharedAtomic tpsMVar $ \(TxCount submitted failed sending) -> do
+                    -- CSV is formatted like this:
+                    -- time,txCount,txType
+                    liftIO $ T.hPutStrLn h $ T.intercalate "," [curTime, show $ submitted, "submitted"]
+                    liftIO $ T.hPutStrLn h $ T.intercalate "," [curTime, show $ failed, "failed"]
+                    return (TxCount 0 0 sending, sending <= 0)
+                if finished
+                then logInfo "Finished writing TPS samples."
+                else writeTPS
+>>>>>>> CHW-82-84, orphan branch
             -- Repeatedly take transactions from the queue and send them.
             -- Do this n times.
             sendTxs :: Int -> m ()
             sendTxs n
                 | n <= 0 = do
                       logInfo "All done sending transactions on this thread."
+<<<<<<< HEAD
                       modifySharedAtomic tpsMVar $ \(TxCount submitted sending) ->
                           return (TxCount submitted (sending - 1), ())
                 | otherwise = (atomically $ tryReadTQueue txQueue) >>= \case
@@ -155,16 +220,43 @@ sendToAllGenesis diffusion (SendToAllGenesisParams txsPerThread conc delay_ tpsS
         -- rates. If we pre construct all the transactions, the
         -- startup time will be quite long.
         forM_  firstBatch addTx
+=======
+                      modifySharedAtomic tpsMVar $ \(TxCount submitted failed sending) ->
+                          return (TxCount submitted failed (sending - 1), ())
+                | otherwise = (atomically $ tryReadTQueue txQueue) >>= \case
+                      Just (key, txOuts) -> do
+                          utxo <- getOwnUtxoForPk $ safeToPublic (fakeSigner key)
+                          etx <- createTx mempty utxo (fakeSigner key) txOuts (toPublic key)
+                          case etx of
+                              Left err -> do
+                                  addTxFailed tpsMVar
+                                  logError (sformat ("Error: "%build%" while trying to send") err)
+                              Right (tx, _) -> do
+                                  res <- submitTxRaw diffusion tx
+                                  addTxSubmit tpsMVar
+                                  logInfo $ if res
+                                      then sformat ("Submitted transaction: "%txaF) tx
+                                      else sformat ("Applied transaction "%txaF%", however no neighbour applied it") tx
+                          delay $ ms delay_
+                          logInfo "Continuing to send transactions."
+                          sendTxs (n - 1)
+                      Nothing -> logInfo "No more transactions in the queue."
+            sendTxsConcurrently n = void $ forConcurrently [1..conc] (const (sendTxs n))
+>>>>>>> CHW-82-84, orphan branch
         -- Send transactions while concurrently writing the TPS numbers every
         -- slot duration. The 'writeTPS' action takes care to *always* write
         -- after every slot duration, even if it is killed, so as to
         -- guarantee that we don't miss any numbers.
+<<<<<<< HEAD
         --
         -- While we're sending, we're constructing the second batch of
         -- transactions.
         void $
             concurrently (forM_ secondBatch addTx) $
             concurrently writeTPS (sendTxsConcurrently txsPerThread)
+=======
+        void $ concurrently writeTPS (sendTxsConcurrently duration)
+>>>>>>> CHW-82-84, orphan branch
 
 ----------------------------------------------------------------------------
 -- Casual sending

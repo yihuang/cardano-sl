@@ -35,7 +35,11 @@ import           Pos.Binary.Class (Bi)
 import           Pos.Binary.Core ()
 import           Pos.Binary.Crypto ()
 import           Pos.Core.Common (ChainDifficulty, HeaderHash)
+<<<<<<< HEAD
 import           Pos.Core.Configuration (HasCoreConfiguration)
+=======
+import           Pos.Core.Configuration (HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Crypto (shortHashF)
 import           Pos.DB.BatchOp (RocksBatchOp (..), dbWriteBatch')
 import           Pos.DB.Class (DBTag (GStateDB), MonadDB (dbDelete), MonadDBRead (..))
@@ -99,7 +103,11 @@ instance Buildable CommonOp where
     build (PutMaxSeenDifficulty d) =
         bprint ("PutMaxSeenDifficulty ("%int%")") d
 
+<<<<<<< HEAD
 instance HasCoreConfiguration => RocksBatchOp CommonOp where
+=======
+instance HasConfiguration => RocksBatchOp CommonOp where
+>>>>>>> CHW-82-84, orphan branch
     toBatchOp (PutTip h) =
         [Rocks.Put tipKey (dbSerializeValue h)]
     toBatchOp (PutMaxSeenDifficulty h) =

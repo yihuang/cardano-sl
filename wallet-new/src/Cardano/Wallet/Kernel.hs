@@ -9,6 +9,7 @@
 module Cardano.Wallet.Kernel (
     -- * Passive wallet
     PassiveWallet -- opaque
+<<<<<<< HEAD
   , WalletId
   , walletLogMessage
   , walletPassive
@@ -23,6 +24,10 @@ module Cardano.Wallet.Kernel (
   , totalBalance
   , stateUtxo
   , stateUtxoBalance
+=======
+  , bracketPassiveWallet
+  , init
+>>>>>>> CHW-82-84, orphan branch
     -- * Active wallet
   , ActiveWallet -- opaque
   , bracketActiveWallet
@@ -30,6 +35,7 @@ module Cardano.Wallet.Kernel (
   , hasPending
   ) where
 
+<<<<<<< HEAD
 import           Universum hiding (State)
 
 import           Control.Lens.TH
@@ -112,6 +118,14 @@ type Wallets = Map WalletId Wallet
 
 makeLenses ''Wallet
 makeLenses ''State
+=======
+import Universum
+import System.Wlog (Severity(..))
+
+import Cardano.Wallet.Kernel.Diffusion (WalletDiffusion(..))
+
+import Pos.Core (TxAux)
+>>>>>>> CHW-82-84, orphan branch
 
 {-------------------------------------------------------------------------------
   Passive wallet
@@ -122,6 +136,7 @@ makeLenses ''State
 -- A passive wallet can receive and process blocks, keeping track of state,
 -- but cannot send new transactions.
 --
+<<<<<<< HEAD
 data PassiveWallet = PassiveWallet {
       -- | Send log message
       _walletLogMessage :: Severity -> Text -> IO ()
@@ -244,10 +259,35 @@ newWalletHdRnd pw@PassiveWallet{..} esk utxo = do
     return wid
 
 -- | Initialize the Passive wallet (specified by the ESK) with the given Utxo
+=======
+-- TODO: This is just a placeholder for now, we'll want all kinds of state
+-- in here.
+data PassiveWallet = PassiveWallet {
+      -- | Send log message
+      walletLogMessage :: Severity -> Text -> IO ()
+    }
+
+-- | Allocate wallet resources
+--
+-- NOTE: See also 'init'.
+--
+-- TODO: Here and elsewhere we'll want some constraints on this monad here, but
+-- it shouldn't be too specific.
+bracketPassiveWallet :: MonadMask m
+                     => (Severity -> Text -> IO ())
+                     -> (PassiveWallet -> m a) -> m a
+bracketPassiveWallet walletLogMessage =
+    bracket
+      (return PassiveWallet{..})
+      (\_ -> return ())
+
+-- | Initialize the wallet
+>>>>>>> CHW-82-84, orphan branch
 --
 -- This is separate from allocating the wallet resources, and will only be
 -- called when the node is initialized (when run in the node proper).
 init :: PassiveWallet -> IO ()
+<<<<<<< HEAD
 init PassiveWallet{..} = _walletLogMessage Info "Passive Wallet kernel initialized"
 
 {-------------------------------------------------------------------------------
@@ -363,6 +403,10 @@ totalBalance pw wid = do
     availableBalance' <- availableBalance pw wid
     changeBalance' <- balance <$> change pw wid
     return $ availableBalance' + changeBalance'
+=======
+init PassiveWallet{..} = do
+    walletLogMessage Info "Wallet kernel initialized"
+>>>>>>> CHW-82-84, orphan branch
 
 {-------------------------------------------------------------------------------
   Active wallet
@@ -390,6 +434,7 @@ bracketActiveWallet walletPassive walletDiffusion =
       (return ActiveWallet{..})
       (\_ -> return ())
 
+<<<<<<< HEAD
 {-------------------------------------------------------------------------------
   Active wallet API implementation
 -------------------------------------------------------------------------------}
@@ -408,3 +453,15 @@ newPending activeWallet@ActiveWallet{..} wid tx = do
     let isValid = txAuxInputSet tx `Set.isSubsetOf` availableInputs
     when isValid $ insertWalletPending activeWallet wid tx
     return isValid
+=======
+-- | Submit a new pending transaction
+newPending :: ActiveWallet -> TxAux -> IO ()
+newPending ActiveWallet{..} _tx = do
+    walletLogMessage Error "TODO: Cardano.Wallet.Kernel.newPending"
+  where
+    PassiveWallet{..} = walletPassive
+
+-- | Return True if there are pending transactions
+hasPending :: ActiveWallet -> IO Bool
+hasPending _ = return False
+>>>>>>> CHW-82-84, orphan branch

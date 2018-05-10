@@ -53,7 +53,12 @@ module Mockable.Concurrent (
 
 import           Universum
 
+<<<<<<< HEAD
 import           Control.Exception (Exception, AsyncException (..))
+=======
+import           Control.Exception (AsyncException (..))
+import           Control.Exception.Safe (Exception)
+>>>>>>> CHW-82-84, orphan branch
 import           Data.Time.Units (TimeUnit)
 import           Mockable.Class
 

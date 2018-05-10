@@ -162,5 +162,9 @@ main = do
             ReadKey path            -> readKey path
             DumpAvvmSeeds opts      -> dumpAvvmSeeds opts
             GenerateKeysBySpec gkbg -> generateKeysByGenesis gkbg
+<<<<<<< HEAD
             DumpGenesisData dgdPath dgdCanonical
                                     -> CLI.dumpGenesisData dgdCanonical dgdPath
+=======
+            DumpGenesisData {..}    -> CLI.dumpGenesisData dgdCanonical dgdPath
+>>>>>>> CHW-82-84, orphan branch

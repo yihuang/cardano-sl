@@ -6,10 +6,14 @@
 {-# LANGUAGE TupleSections              #-}
 {-# LANGUAGE TypeApplications           #-}
 
+<<<<<<< HEAD
 module Functions
     ( runActionCheck
     , printT
     ) where
+=======
+module Functions where
+>>>>>>> CHW-82-84, orphan branch
 
 import           Universum hiding (log)
 
@@ -24,6 +28,7 @@ import           Test.QuickCheck
 import           Text.Show.Pretty (ppShow)
 
 import           Cardano.Wallet.API.Response (WalletResponse (..))
+<<<<<<< HEAD
 import           Cardano.Wallet.API.V1.Migration.Types (migrate)
 import           Cardano.Wallet.API.V1.Types
 import           Cardano.Wallet.Client (ClientError (..), Response (..), ServantError (..),
@@ -32,6 +37,23 @@ import           Cardano.Wallet.Client (ClientError (..), Response (..), Servant
                                         hoistClient)
 
 import           Pos.Core (getCoin, mkCoin, unsafeAddCoin, unsafeSubCoin)
+=======
+import           Cardano.Wallet.API.V1.Types (Account (..), AccountIndex, AccountUpdate (..),
+                                              AssuranceLevel (..), EstimatedFees (..),
+                                              NewAccount (..), NewAddress (..), NewWallet (..),
+                                              PasswordUpdate (..), Payment (..),
+                                              PaymentDistribution (..), PaymentSource (..),
+                                              SpendingPassword, Transaction (..), V1 (..),
+                                              Wallet (..), WalletAddress (..), WalletId,
+                                              WalletOperation (..), WalletUpdate (..), unV1)
+
+import           Cardano.Wallet.API.V1.Migration.Types (migrate)
+import           Cardano.Wallet.Client (ClientError (..), Response (..), ServantError (..),
+                                        WalletClient (..), getAccounts, getAddressIndex,
+                                        getTransactionIndex, getWallets, hoistClient)
+
+import           Pos.Core (getCoin, mkCoin)
+>>>>>>> CHW-82-84, orphan branch
 import qualified Pos.Wallet.Web.ClientTypes.Types as V0
 
 import           Error
@@ -69,7 +91,11 @@ runActionCheck
     -> ActionProbabilities
     -> m WalletState
 runActionCheck walletClient walletState actionProb = do
+<<<<<<< HEAD
     actions <- chooseActions 50 actionProb
+=======
+    actions <- chooseActions 10 actionProb
+>>>>>>> CHW-82-84, orphan branch
     log $ "Test will run these actions: " <> show (toList actions)
     let client' = hoistClient lift walletClient
     ws <- execRefT (tryAll (map (runAction client') actions) <|> pure ()) walletState
@@ -134,7 +160,10 @@ runAction wc action = do
     acts <- use actionsNum
     succs <- length <$> use successActions
     log $ "Actions:\t" <> show acts <> "\t\tSuccesses:\t" <> show succs
+<<<<<<< HEAD
 
+=======
+>>>>>>> CHW-82-84, orphan branch
     case action of
         PostWallet -> do
             newPassword <- freshPassword
@@ -412,6 +441,13 @@ runAction wc action = do
             log $ "Posting address: " <> ppShowT newAddress
             result  <-  respToRes $ postAddress wc newAddress
 
+<<<<<<< HEAD
+=======
+            checkInvariant
+                (addrBalance result == minBound)
+                (AddressBalanceNotZero result)
+
+>>>>>>> CHW-82-84, orphan branch
             -- Modify wallet state accordingly.
             addresses  <>= [result]
             accounts . traverse . filtered (== account) %= \acct ->
@@ -443,6 +479,10 @@ runAction wc action = do
         -- Transactions
         PostTransaction -> do
             localAccounts  <- use accounts
+<<<<<<< HEAD
+=======
+            localAddresses <- use addresses
+>>>>>>> CHW-82-84, orphan branch
 
             -- Some min amount of money so we can send a transaction?
             -- https://github.com/input-output-hk/cardano-sl/blob/develop/lib/configuration.yaml#L228
@@ -451,12 +491,18 @@ runAction wc action = do
 
             -- From which source to pay.
             accountSource <- pickRandomElement localAccsWithMoney
+<<<<<<< HEAD
             accountDestination <- pickRandomElement
                 (filter (not . accountsHaveSameId accountSource) localAccounts)
             log $ "From account: " <> show (accIndex accountSource)  <> "\t\t" <> show (accWalletId accountSource)
             log $ "To account  : " <> show (accIndex accountDestination) <> "\t\t" <> show (accWalletId accountDestination)
 
             let accountSourceMoney = accAmount accountSource
+=======
+
+            let accountSourceMoney = accAmount accountSource
+                withoutSourceAddresses = filter (`notElem` accAddresses accountSource) localAddresses
+>>>>>>> CHW-82-84, orphan branch
                 reasonableFee = 100
 
             -- We should probably have a sensible minimum value.
@@ -473,7 +519,11 @@ runAction wc action = do
                         , psAccountIndex = accIndex    accountSource
                         }
 
+<<<<<<< HEAD
             addressDestination <- pickRandomElement $ accAddresses accountDestination
+=======
+            addressDestination <- pickRandomElement withoutSourceAddresses
+>>>>>>> CHW-82-84, orphan branch
 
             let paymentDestinations =
                     PaymentDistribution
@@ -494,7 +544,12 @@ runAction wc action = do
 
             txFees <- case etxFees of
                 Right a -> pure a
+<<<<<<< HEAD
                 Left (ClientWalletError (NotEnoughMoney _)) -> do
+=======
+                Left (ClientHttpError (FailureResponse (Response {..})))
+                    | "not enough money" `isInfixOf` show responseBody -> do
+>>>>>>> CHW-82-84, orphan branch
                         log "Not enough money to do the transaction."
                         empty
                 Left err -> throwM err
@@ -506,9 +561,13 @@ runAction wc action = do
 
             -- Check the transaction.
             log $ "postTransaction: " <> ppShowT newPayment
+<<<<<<< HEAD
             addressesBeforeTransaction <- respToRes $ getAddressIndex wc
             newTx  <-  respToRes $ postTransaction wc newPayment
             addressesAfterTransaction <- respToRes $ getAddressIndex wc
+=======
+            newTx  <-  respToRes $ postTransaction wc newPayment
+>>>>>>> CHW-82-84, orphan branch
 
             let sumCoins f =
                     sum . map (getCoin . unV1 . pdAmount) . toList $ f newTx
@@ -523,6 +582,7 @@ runAction wc action = do
             let actualFees = V1 . mkCoin $ inputSum - outputSum
 
             -- Estimated fees should correspond to actual fees
+<<<<<<< HEAD
             checkInvariant
                 (feeEstimatedAmount txFees == actualFees)
                 (InvalidTransactionFee txFees)
@@ -579,6 +639,27 @@ runAction wc action = do
             --        (accAmount accountDestination)
             --        expectedDestinationBalance
             --    )
+=======
+            -- TODO(akegalj): add custom error type
+            checkInvariant
+                (feeEstimatedAmount txFees == actualFees)
+                (InvalidTransactionState newTx)
+
+            let changeAddress = toList (txOutputs newTx) \\ toList paymentDestinations
+                -- NOTE: instead of this manual conversion we could filter WalletAddress from getAddressIndex
+                pdToChangeAddress PaymentDistribution{..} = WalletAddress pdAddress pdAmount True True
+
+            -- We expect at most one extra PaymentDestination which should be a change address
+            -- TODO(akegalj): add custom error type
+            checkInvariant
+                (length changeAddress <= 1)
+                (InvalidTransactionState newTx)
+
+            -- TODO(akegalj): add invariant that checks is there paymentDestinations distributions in newTx
+            -- TODO(akegalj): add invariant that checks is paymentSource the only source of newTx
+            -- TODO(akegalj): add invariant that checks did accounts of all payment destinations increase by expected amount
+            -- TODO(akegalj): add invariant that checks did accounts of all payment sources decrease by expected amount
+>>>>>>> CHW-82-84, orphan branch
 
             -- Modify wallet state accordingly.
             transactions  <>= [(accountSource, newTx)]
@@ -641,6 +722,7 @@ runAction wc action = do
 
 
 -- | Generate action randomly, depending on the action distribution.
+<<<<<<< HEAD
 -- chooseActionGen
 --     :: ActionProbabilities
 --     -> Gen Action
@@ -654,6 +736,21 @@ runAction wc action = do
 --     => ActionProbabilities
 --     -> m Action
 -- chooseAction = liftIO . generate . chooseActionGen
+=======
+chooseActionGen
+    :: ActionProbabilities
+    -> Gen Action
+chooseActionGen =
+    frequency . map (\(a, p) -> (getWeight p, pure a)) . toList
+
+
+-- | Generate action from the generator.
+chooseAction
+    :: (WalletTestMode m)
+    => ActionProbabilities
+    -> m Action
+chooseAction = liftIO . generate . chooseActionGen
+>>>>>>> CHW-82-84, orphan branch
 
 -- | Generate a random sequence of actions with the given size.
 chooseActions

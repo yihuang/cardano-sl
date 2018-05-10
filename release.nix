@@ -17,8 +17,12 @@ with (import (fixedNixpkgs + "/pkgs/top-level/release-lib.nix") {
 
 let
   iohkPkgs = import ./. { gitrev = cardano.rev; };
+<<<<<<< HEAD
   pkgs = import fixedNixpkgs { config = {}; };
   stagingWalletdockerImage = pkgs.runCommand "${iohkPkgs.dockerImages.stagingWallet.name}-hydra" {} ''
+=======
+  stagingWalletdockerImage = (import fixedNixpkgs { config = {}; }).runCommand "${iohkPkgs.dockerImages.stagingWallet.name}-hydra" {} ''
+>>>>>>> CHW-82-84, orphan branch
     mkdir -pv $out/nix-support/
     cat <<EOF > $out/nix-support/hydra-build-products
     file dockerimage ${iohkPkgs.dockerImages.stagingWallet}
@@ -42,6 +46,7 @@ let
     daedalus-bridge = supportedSystems;
   };
   nixosTests = import ./nixos-tests;
+<<<<<<< HEAD
   walletIntegrationTests = iohkPkgs.buildWalletIntegrationTests;
 in (mapTestOn platforms) // {
   inherit stagingWalletdockerImage walletIntegrationTests;
@@ -50,4 +55,9 @@ in (mapTestOn platforms) // {
       ln -sv ${fixedNixpkgs} $out
     '';
   in if 0 <= builtins.compareVersions builtins.nixVersion "1.12" then wrapped else fixedNixpkgs;
+=======
+in (mapTestOn platforms) // {
+  inherit stagingWalletdockerImage nixosTests;
+  nixpkgs = fixedNixpkgs;
+>>>>>>> CHW-82-84, orphan branch
 }

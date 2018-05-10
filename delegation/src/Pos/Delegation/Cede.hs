@@ -1,5 +1,6 @@
 -- | Re-exports of everything from 'Pos.Delegation.Cede*'.
 
+<<<<<<< HEAD
 module Pos.Delegation.Cede
        ( module Pos.Delegation.Cede.Class
        , module Pos.Delegation.Cede.Holders
@@ -13,3 +14,6 @@ import           Pos.Delegation.Cede.Logic
 import           Pos.Delegation.Cede.Types
 
 
+=======
+{-# OPTIONS_GHC -F -pgmF autoexporter #-}
+>>>>>>> CHW-82-84, orphan branch

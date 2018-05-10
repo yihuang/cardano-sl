@@ -21,8 +21,11 @@ import           Data.Text (Text)
 import           Formatting (sformat, shown, (%))
 import           System.Wlog
 
+<<<<<<< HEAD
 import           Pos.Util.Trace (wlogTrace)
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 import           Network.Broadcast.OutboundQueue (OutboundQ)
 import qualified Network.Broadcast.OutboundQueue as OutQ
 import           Network.Broadcast.OutboundQueue.Types hiding (simplePeers)
@@ -139,7 +142,11 @@ instance Eq Node where
 -- | Create a new node, and spawn dequeue worker and forwarding listener
 newNode :: NodeId_ -> NodeType -> CommsDelay -> IO Node
 newNode nodeId_ nodeType commsDelay = do
+<<<<<<< HEAD
     nodeOutQ     <- OutQ.new (wlogTrace (fromString (show nodeId_)))
+=======
+    nodeOutQ     <- OutQ.new (OutQ.wlogTrace "demo" (show nodeId_))
+>>>>>>> CHW-82-84, orphan branch
                              demoEnqueuePolicy
                              demoDequeuePolicy
                              demoFailurePolicy

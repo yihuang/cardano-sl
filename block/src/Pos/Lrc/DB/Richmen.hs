@@ -30,9 +30,14 @@ import           Universum
 import qualified Data.HashMap.Strict as HM
 
 import           Pos.Binary.Core ()
+<<<<<<< HEAD
 import           Pos.Core (Coin, ProxySKHeavy, StakeholderId, addressHash,
                            gdHeavyDelegation, genesisData, unGenesisDelegation, HasGenesisBlockVersionData,
                            HasGenesisData)
+=======
+import           Pos.Core (Coin, HasConfiguration, ProxySKHeavy, StakeholderId, addressHash,
+                           gdHeavyDelegation, genesisData, unGenesisDelegation)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Crypto (pskDelegatePk)
 import           Pos.DB.Class (MonadDB)
 import           Pos.Delegation.Lrc (RCDlg, tryGetDlgRichmen)
@@ -50,8 +55,12 @@ import           Pos.Update.Lrc (RCUs, tryGetUSRichmen)
 ----------------------------------------------------------------------------
 
 prepareLrcRichmen ::
+<<<<<<< HEAD
        ( HasGenesisBlockVersionData
        , HasGenesisData
+=======
+       ( HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
        , MonadDB m
        )
     => m ()
@@ -93,7 +102,11 @@ computeInitial initialDistr initialDeleg proxy =
 -- Instances. They are here, because we want to have a DB schema in Pos.DB
 ----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 richmenComponents :: HasGenesisBlockVersionData => [SomeRichmenComponent]
+=======
+richmenComponents :: HasConfiguration => [SomeRichmenComponent]
+>>>>>>> CHW-82-84, orphan branch
 richmenComponents =
     [ someRichmenComponent @RCSsc
     , someRichmenComponent @RCUs

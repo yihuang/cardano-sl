@@ -29,10 +29,16 @@ import           System.Wlog (WithLogger, launchNamedPureLog, logWarning)
 
 import           Pos.Binary.Class (biSize)
 import           Pos.Binary.Ssc ()
+<<<<<<< HEAD
 import           Pos.Core (BlockVersionData (..), EpochIndex, SlotId (..),
                            StakeholderId, VssCertificate, epochIndexL, HasProtocolMagic,
                            mkVssCertificatesMapSingleton, HasGenesisData,
                            HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+import           Pos.Core (BlockVersionData (..), EpochIndex, HasConfiguration, SlotId (..),
+                           StakeholderId, VssCertificate, epochIndexL,
+                           mkVssCertificatesMapSingleton)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Ssc (InnerSharesMap, Opening, SignedCommitment, SscPayload (..),
                                mkCommitmentsMap)
 import           Pos.DB (MonadBlockDBRead, MonadDBRead, MonadGState (gsAdoptedBVData))
@@ -59,12 +65,20 @@ import           Pos.Ssc.Types (SscGlobalState, SscLocalData (..), ldEpoch, ldMo
 -- empty payload can be returned.
 sscGetLocalPayload
     :: forall ctx m.
+<<<<<<< HEAD
        (MonadIO m, MonadSscMem ctx m, WithLogger m, HasProtocolConstants)
+=======
+       (HasConfiguration, MonadIO m, MonadSscMem ctx m, WithLogger m)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId -> m SscPayload
 sscGetLocalPayload = sscRunLocalQuery . sscGetLocalPayloadQ
 
 sscGetLocalPayloadQ
+<<<<<<< HEAD
   :: (HasProtocolConstants)
+=======
+  :: HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
   => SlotId -> SscLocalQuery SscPayload
 sscGetLocalPayloadQ SlotId {..} = do
     expectedEpoch <- view ldEpoch
@@ -100,10 +114,13 @@ sscNormalize
        , MonadIO m
        , Rand.MonadRandom m
        , HasSscConfiguration
+<<<<<<< HEAD
        , HasProtocolConstants
        , HasGenesisData
        , HasProtocolMagic
        , HasGenesisBlockVersionData
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => m ()
 sscNormalize = do
@@ -124,7 +141,11 @@ sscNormalize = do
     executeMonadBaseRandom seed = hoist $ hoist (pure . fst . Rand.withDRG seed)
 
 sscNormalizeU
+<<<<<<< HEAD
     :: (HasSscConfiguration, HasProtocolConstants, HasGenesisData, HasProtocolMagic)
+=======
+    :: (HasSscConfiguration, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
     => (EpochIndex, RichmenStakes)
     -> BlockVersionData
     -> SscGlobalState
@@ -151,9 +172,14 @@ sscIsDataUseful
        , MonadSlots ctx m
        , MonadSscMem ctx m
        , Rand.MonadRandom m
+<<<<<<< HEAD
        , HasSscConfiguration
        , HasGenesisData
        , HasProtocolConstants
+=======
+       , HasConfiguration
+       , HasSscConfiguration
+>>>>>>> CHW-82-84, orphan branch
        )
     => SscTag -> StakeholderId -> m Bool
 sscIsDataUseful tag id =
@@ -191,6 +217,10 @@ type SscDataProcessingMode ctx m =
     , MonadGState m       -- to get block size limit
     , MonadSlots ctx m
     , MonadSscMem ctx m
+<<<<<<< HEAD
+=======
+    , HasConfiguration
+>>>>>>> CHW-82-84, orphan branch
     , HasSscConfiguration
     )
 
@@ -198,7 +228,11 @@ type SscDataProcessingMode ctx m =
 -- current state (global + local) and adding to local state if it's valid.
 sscProcessCommitment
     :: forall ctx m.
+<<<<<<< HEAD
        (SscDataProcessingMode ctx m, HasProtocolConstants, HasProtocolMagic, HasGenesisData, HasGenesisBlockVersionData)
+=======
+       SscDataProcessingMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => SignedCommitment -> m (Either SscVerifyError ())
 sscProcessCommitment comm =
     sscProcessData CommitmentMsg $
@@ -207,7 +241,11 @@ sscProcessCommitment comm =
 -- | Process 'Opening' received from network, checking it against
 -- current state (global + local) and adding to local state if it's valid.
 sscProcessOpening
+<<<<<<< HEAD
     :: (SscDataProcessingMode ctx m, HasProtocolConstants, HasProtocolMagic, HasGenesisData, HasGenesisBlockVersionData)
+=======
+    :: SscDataProcessingMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => StakeholderId -> Opening -> m (Either SscVerifyError ())
 sscProcessOpening id opening =
     sscProcessData OpeningMsg $
@@ -216,7 +254,11 @@ sscProcessOpening id opening =
 -- | Process 'InnerSharesMap' received from network, checking it against
 -- current state (global + local) and adding to local state if it's valid.
 sscProcessShares
+<<<<<<< HEAD
     :: (SscDataProcessingMode ctx m, HasGenesisBlockVersionData, HasGenesisData, HasProtocolMagic, HasProtocolConstants)
+=======
+    :: SscDataProcessingMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => StakeholderId -> InnerSharesMap -> m (Either SscVerifyError ())
 sscProcessShares id shares =
     sscProcessData SharesMsg $ SharesPayload (HM.fromList [(id, shares)]) mempty
@@ -224,7 +266,11 @@ sscProcessShares id shares =
 -- | Process 'VssCertificate' received from network, checking it against
 -- current state (global + local) and adding to local state if it's valid.
 sscProcessCertificate
+<<<<<<< HEAD
     :: (SscDataProcessingMode ctx m, HasGenesisBlockVersionData, HasGenesisData, HasProtocolMagic, HasProtocolConstants)
+=======
+    :: SscDataProcessingMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => VssCertificate -> m (Either SscVerifyError ())
 sscProcessCertificate cert =
     sscProcessData VssCertificateMsg $
@@ -232,7 +278,11 @@ sscProcessCertificate cert =
 
 sscProcessData
     :: forall ctx m.
+<<<<<<< HEAD
        (SscDataProcessingMode ctx m, HasProtocolConstants, HasProtocolMagic, HasGenesisData, HasGenesisBlockVersionData)
+=======
+       SscDataProcessingMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => SscTag -> SscPayload -> m (Either SscVerifyError ())
 sscProcessData tag payload =
     runExceptT $ do
@@ -261,9 +311,14 @@ sscProcessData tag payload =
     executeMonadBaseRandom seed = hoist $ hoist (pure . fst . Rand.withDRG seed)
 
 sscProcessDataDo
+<<<<<<< HEAD
     :: (HasSscConfiguration, MonadState SscLocalData m, HasGenesisData
       , WithLogger m, Rand.MonadRandom m, HasProtocolConstants
       , HasProtocolMagic)
+=======
+    :: (HasSscConfiguration, HasConfiguration, MonadState SscLocalData m,
+        WithLogger m, Rand.MonadRandom m)
+>>>>>>> CHW-82-84, orphan branch
     => (EpochIndex, RichmenStakes)
     -> BlockVersionData
     -> SscGlobalState

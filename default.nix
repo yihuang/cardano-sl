@@ -89,11 +89,14 @@ let
       mkDerivation = args: super.mkDerivation (args // {
         enableLibraryProfiling = enableProfiling;
         enableExecutableProfiling = enableProfiling;
+<<<<<<< HEAD
         # Static linking for everything to work around
         # https://ghc.haskell.org/trac/ghc/ticket/14444
         # This will be the default in nixpkgs since
         # https://github.com/NixOS/nixpkgs/issues/29011
         enableSharedExecutables = false;
+=======
+>>>>>>> CHW-82-84, orphan branch
       } // optionalAttrs enableDebugging {
         # TODO: DEVOPS-355
         dontStrip = true;
@@ -109,9 +112,12 @@ let
     in
       args: pkgs.callPackage ./scripts/launch/connect-to-cluster (args // { inherit gitrev; } // walletConfig );
   other = rec {
+<<<<<<< HEAD
     demoCluster = pkgs.callPackage ./scripts/launch/demo-cluster { inherit gitrev; };
     walletIntegrationTests = pkgs.callPackage ./scripts/test/wallet/integration { inherit gitrev; };
     buildWalletIntegrationTests = pkgs.callPackage ./scripts/test/wallet/integration/build-test.nix { inherit walletIntegrationTests pkgs; };
+=======
+>>>>>>> CHW-82-84, orphan branch
     cardano-sl-explorer-frontend = (import ./explorer/frontend {
       inherit system config gitrev pkgs;
       cardano-sl-explorer = cardanoPkgs.cardano-sl-explorer-static;
@@ -128,7 +134,10 @@ let
       mainnetWallet = connect {};
       mainnetExplorer = connect { executable = "explorer"; };
       stagingWallet = connect { environment = "mainnet-staging"; };
+<<<<<<< HEAD
       demoWallet = connect { environment = "demo"; };
+=======
+>>>>>>> CHW-82-84, orphan branch
       stagingExplorer = connect { executable = "explorer"; environment = "mainnet-staging"; };
     };
     dockerImages = {

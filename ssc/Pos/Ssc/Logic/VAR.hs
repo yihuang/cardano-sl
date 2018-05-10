@@ -21,9 +21,14 @@ import           System.Wlog (WithLogger, logDebug)
 import           Universum
 
 import           Pos.Binary.Ssc ()
+<<<<<<< HEAD
 import           Pos.Core (BlockVersionData, ComponentBlock (..), HeaderHash, HasProtocolMagic,
                            epochIndexL, epochOrSlotG, headerHash, HasGeneratedSecrets, HasGenesisBlockVersionData,
                            HasCoreConfiguration, HasProtocolConstants, HasGenesisData)
+=======
+import           Pos.Core (BlockVersionData, ComponentBlock (..), HasConfiguration, HeaderHash,
+                           epochIndexL, epochOrSlotG, headerHash)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Ssc (SscPayload (..))
 import           Pos.DB (MonadDBRead, MonadGState, SomeBatchOp (..), gsAdoptedBVData)
 import           Pos.Exception (assertionFailed)
@@ -73,7 +78,11 @@ type SscGlobalApplyMode ctx m = SscGlobalVerifyMode ctx m
 -- this function will return 'Left' with appropriate error.
 -- All blocks must be from the same epoch.
 sscVerifyBlocks ::
+<<<<<<< HEAD
        (SscGlobalVerifyMode ctx m, HasGenesisData, HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+       forall ctx m. SscGlobalVerifyMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => OldestFirst NE SscBlock
     -> m (Either SscVerifyError SscGlobalState)
 sscVerifyBlocks blocks = do
@@ -108,7 +117,12 @@ sscVerifyBlocks blocks = do
 -- result of application of these blocks can be optionally passed as
 -- argument (it can be calculated in advance using 'sscVerifyBlocks').
 sscApplyBlocks
+<<<<<<< HEAD
     :: (SscGlobalApplyMode ctx m, HasGeneratedSecrets, HasGenesisData, HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+    :: forall ctx m.
+       SscGlobalApplyMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => OldestFirst NE SscBlock
     -> Maybe SscGlobalState
     -> m [SomeBatchOp]
@@ -123,7 +137,11 @@ sscApplyBlocks blocks Nothing =
     sscApplyBlocksFinish =<< sscVerifyValidBlocks blocks
 
 sscApplyBlocksFinish
+<<<<<<< HEAD
     :: (SscGlobalApplyMode ctx m, HasGeneratedSecrets)
+=======
+    :: forall ctx m . SscGlobalApplyMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => SscGlobalState -> m [SomeBatchOp]
 sscApplyBlocksFinish gs = do
     sscRunGlobalUpdate (put gs)
@@ -133,7 +151,12 @@ sscApplyBlocksFinish gs = do
     pure $ sscGlobalStateToBatch gs
 
 sscVerifyValidBlocks
+<<<<<<< HEAD
     :: (SscGlobalApplyMode ctx m, HasGenesisData, HasProtocolConstants, HasGenesisBlockVersionData)
+=======
+    :: forall ctx m.
+       SscGlobalApplyMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => OldestFirst NE SscBlock -> m SscGlobalState
 sscVerifyValidBlocks blocks =
     sscVerifyBlocks blocks >>= \case
@@ -170,7 +193,11 @@ onVerifyFailedInApply hashes e = assertionFailed msg
 -- | Verify SSC-related part of given blocks with respect to current GState
 -- and apply them on success. Blocks must be from the same epoch.
 sscVerifyAndApplyBlocks
+<<<<<<< HEAD
     :: (HasSscConfiguration, SscVerifyMode m, HasProtocolConstants, HasProtocolMagic, HasGenesisData)
+=======
+    :: (HasSscConfiguration, HasConfiguration, SscVerifyMode m)
+>>>>>>> CHW-82-84, orphan branch
     => RichmenStakes
     -> BlockVersionData
     -> OldestFirst NE SscBlock
@@ -182,7 +209,11 @@ sscVerifyAndApplyBlocks richmenStake bvd blocks =
     richmenData = HM.fromList [(epoch, richmenStake)]
 
 verifyAndApplyMultiRichmen
+<<<<<<< HEAD
     :: (HasSscConfiguration, SscVerifyMode m, HasProtocolConstants, HasProtocolMagic, HasGenesisData)
+=======
+    :: (HasSscConfiguration, HasConfiguration, SscVerifyMode m)
+>>>>>>> CHW-82-84, orphan branch
     => Bool
     -> (MultiRichmenStakes, BlockVersionData)
     -> OldestFirst NE SscBlock
@@ -211,14 +242,23 @@ verifyAndApplyMultiRichmen onlyCerts env =
 -- | Rollback application of given sequence of blocks. Bad things can
 -- happen if these blocks haven't been applied before.
 sscRollbackBlocks
+<<<<<<< HEAD
     :: (SscGlobalApplyMode ctx m, HasGeneratedSecrets, HasGenesisData, HasProtocolConstants)
+=======
+    :: forall ctx m.
+       SscGlobalApplyMode ctx m
+>>>>>>> CHW-82-84, orphan branch
     => NewestFirst NE SscBlock -> m [SomeBatchOp]
 sscRollbackBlocks blocks = sscRunGlobalUpdate $ do
     sscRollbackU blocks
     sscGlobalStateToBatch <$> get
 
 sscRollbackU
+<<<<<<< HEAD
   :: (HasSscConfiguration, HasProtocolConstants, HasGenesisData)
+=======
+  :: (HasSscConfiguration, HasConfiguration)
+>>>>>>> CHW-82-84, orphan branch
   => NewestFirst NE SscBlock -> SscGlobalUpdate ()
 sscRollbackU blocks = tossToUpdate $ rollbackSsc oldestEOS payloads
   where
@@ -250,5 +290,9 @@ tossToVerifier action = do
         Right res -> (identity .= newState) $> res
 
 -- | Dump global state to DB.
+<<<<<<< HEAD
 sscGlobalStateToBatch :: (HasGeneratedSecrets, HasProtocolMagic, HasCoreConfiguration) => SscGlobalState -> [SomeBatchOp]
+=======
+sscGlobalStateToBatch :: HasConfiguration => SscGlobalState -> [SomeBatchOp]
+>>>>>>> CHW-82-84, orphan branch
 sscGlobalStateToBatch = one . SomeBatchOp . DB.sscGlobalStateToBatch

@@ -12,7 +12,13 @@ import qualified Utils.ABT as ABT
 import qualified Utils.Names as Names
 import qualified Utils.Vars as Vars
 
+<<<<<<< HEAD
 import           Pos.Binary.Class (Bi (..), genericDecode, genericEncode, serialize')
+=======
+import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), deriveSimpleBi, genericDecode,
+                                   genericEncode, serialize')
+import           Pos.Core.Common (Script (..), ScriptVersion)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Script ()
 
 
@@ -76,6 +82,15 @@ instance Bi PLCore.Program where
     encode = genericEncode
     decode = genericDecode
 
+<<<<<<< HEAD
+=======
+deriveSimpleBi ''Script [
+    Cons 'Script [
+        Field [| scrVersion :: ScriptVersion |],
+        Field [| scrScript  :: ByteString   |]
+    ]]
+
+>>>>>>> CHW-82-84, orphan branch
 instance Hashable PLCore.Term where
     hashWithSalt s = hashWithSalt s . serialize'
 

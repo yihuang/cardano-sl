@@ -17,7 +17,10 @@ import qualified DevelopmentSpec as Dev
 import qualified MarshallingSpec as Marshalling
 import qualified RequestSpec as ReqSpec
 import qualified SwaggerSpec as Swagger
+<<<<<<< HEAD
 import qualified WalletHandlersSpec as WalletHandlers
+=======
+>>>>>>> CHW-82-84, orphan branch
 
 -- | Tests whether or not some instances (JSON, Bi, etc) roundtrips.
 main :: IO ()
@@ -33,8 +36,11 @@ main = hspec $ do
     eqProps @Wallet
     eqProps @Transaction
 
+<<<<<<< HEAD
     WalletHandlers.spec
 
+=======
+>>>>>>> CHW-82-84, orphan branch
 eqProps :: forall a. (Typeable a, Eq a, Arbitrary a, Show a) => Spec
 eqProps = do
     describe ("Equality for " ++ show (typeRep (Proxy @a))) $ do

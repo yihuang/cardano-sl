@@ -470,7 +470,11 @@ txShouldFailWithWitnessMismatch = \case
 -- | Transaction should fail with a Plutus error.
 txShouldFailWithPlutus :: Either ToilVerFailure () -> PlutusError -> Expectation
 txShouldFailWithPlutus res err = case res of
+<<<<<<< HEAD
     Left (ToilInvalidWitness _ _ tiwReason)
+=======
+    Left ToilInvalidWitness{..}
+>>>>>>> CHW-82-84, orphan branch
         | tiwReason == WitnessScriptError err -> pass
         | otherwise -> expectationFailure $
               "expected: " <> show (WitnessScriptError err) <> "\n" <>

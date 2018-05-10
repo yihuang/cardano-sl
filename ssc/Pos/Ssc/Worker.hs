@@ -24,11 +24,19 @@ import           Pos.Binary.Class (AsBinary, Bi, asBinary, fromBinary)
 import           Pos.Binary.Infra ()
 import           Pos.Binary.Ssc ()
 import           Pos.Communication.Protocol (OutSpecs)
+<<<<<<< HEAD
 import           Pos.Core (EpochIndex, SlotId (..), StakeholderId, Timestamp (..),
                            VssCertificate (..), VssCertificatesMap (..), blkSecurityParam,
                            bvdMpcThd, getOurSecretKey, getOurStakeholderId, getSlotIndex, lookupVss,
                            memberVss, mkLocalSlotIndex, mkVssCertificate, slotSecurityParam,
                            vssMaxTTL, HasProtocolConstants, HasGenesisData, HasGenesisBlockVersionData)
+=======
+import           Pos.Core (EpochIndex, HasConfiguration, SlotId (..), StakeholderId, Timestamp (..),
+                           VssCertificate (..), VssCertificatesMap (..), blkSecurityParam,
+                           bvdMpcThd, getOurSecretKey, getOurStakeholderId, getSlotIndex, lookupVss,
+                           memberVss, mkLocalSlotIndex, mkVssCertificate, slotSecurityParam,
+                           vssMaxTTL)
+>>>>>>> CHW-82-84, orphan branch
 import           Pos.Core.Ssc (Commitment (..), InnerSharesMap, Opening, SignedCommitment,
                                getCommitmentsMap)
 import           Pos.Crypto (SecretKey, VssKeyPair, VssPublicKey, randomNumber, runSecureRandom)
@@ -65,13 +73,21 @@ import           Pos.Util.Util (getKeys, leftToPanic)
 import           Pos.Worker.Types (WorkerSpec, localWorker, onNewSlotWorker)
 
 sscWorkers
+<<<<<<< HEAD
   :: (SscMode ctx m, HasGenesisBlockVersionData, HasGenesisData, HasProtocolConstants)
+=======
+  :: (SscMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
   => ([WorkerSpec m], OutSpecs)
 sscWorkers = merge [onNewSlotSsc, checkForIgnoredCommitmentsWorker]
   where
     merge = mconcat . map (first pure)
 
+<<<<<<< HEAD
 shouldParticipate :: (SscMode ctx m, HasGenesisBlockVersionData) => EpochIndex -> m Bool
+=======
+shouldParticipate :: (SscMode ctx m) => EpochIndex -> m Bool
+>>>>>>> CHW-82-84, orphan branch
 shouldParticipate epoch = do
     richmen <- getSscRichmen "shouldParticipate" epoch
     participationEnabled <- view sscContext >>=
@@ -85,7 +101,11 @@ shouldParticipate epoch = do
 -- CHECK: @onNewSlotSsc
 -- #checkNSendOurCert
 onNewSlotSsc
+<<<<<<< HEAD
     :: (SscMode ctx m, HasGenesisBlockVersionData, HasGenesisData, HasProtocolConstants)
+=======
+    :: (SscMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => (WorkerSpec m, OutSpecs)
 onNewSlotSsc = onNewSlotWorker defaultOnNewSlotParams mempty $ \slotId diffusion ->
     recoveryCommGuard "onNewSlot worker in SSC" $ do
@@ -102,7 +122,11 @@ onNewSlotSsc = onNewSlotWorker defaultOnNewSlotParams mempty $ \slotId diffusion
 -- Checks whether 'our' VSS certificate has been announced
 checkNSendOurCert
     :: forall ctx m.
+<<<<<<< HEAD
        (SscMode ctx m, HasProtocolConstants, HasGenesisBlockVersionData, HasGenesisData)
+=======
+       (SscMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => (VssCertificate -> m ())
     -> m ()
 checkNSendOurCert sendCert = do
@@ -157,7 +181,11 @@ getOurVssKeyPair = views sscContext scVssKeyPair
 
 -- Commitments-related part of new slot processing
 onNewSlotCommitment
+<<<<<<< HEAD
     :: (SscMode ctx m, HasGenesisBlockVersionData, HasGenesisData, HasProtocolConstants)
+=======
+    :: (SscMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => SlotId
     -> (SignedCommitment -> m ())
     -> m ()
@@ -195,7 +223,11 @@ onNewSlotCommitment slotId@SlotId {..} sendCommitment
 
 -- Openings-related part of new slot processing
 onNewSlotOpening
+<<<<<<< HEAD
     :: (SscMode ctx m, HasGenesisBlockVersionData, HasGenesisData, HasProtocolConstants)
+=======
+    :: (SscMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => SscOpeningParams
     -> SlotId
     -> (Opening -> m ())
@@ -228,7 +260,11 @@ onNewSlotOpening params SlotId {..} sendOpening
 
 -- Shares-related part of new slot processing
 onNewSlotShares
+<<<<<<< HEAD
     :: (SscMode ctx m, HasProtocolConstants, HasGenesisData, HasGenesisBlockVersionData)
+=======
+    :: (SscMode ctx m)
+>>>>>>> CHW-82-84, orphan branch
     => SscSharesParams
     -> SlotId
     -> (InnerSharesMap -> m ())
@@ -272,7 +308,10 @@ sscProcessOurMessage action =
 sendOurData ::
     ( SscMode ctx m
     , HasSscConfiguration
+<<<<<<< HEAD
     , HasProtocolConstants
+=======
+>>>>>>> CHW-82-84, orphan branch
     )
     => (contents -> m ())
     -> SscTag
@@ -297,7 +336,11 @@ sendOurData sendIt msgTag dt epoch slMultiplier = do
 -- synchronized).
 generateAndSetNewSecret
     :: forall ctx m.
+<<<<<<< HEAD
        (HasSscConfiguration, SscMode ctx m, Bi Commitment, HasProtocolConstants, HasGenesisData, HasGenesisBlockVersionData)
+=======
+       (HasSscConfiguration, HasConfiguration, SscMode ctx m, Bi Commitment)
+>>>>>>> CHW-82-84, orphan branch
     => SecretKey
     -> SlotId -- ^ Current slot
     -> m (Maybe SignedCommitment)
@@ -360,7 +403,10 @@ randomTimeInInterval interval =
 waitUntilSend
     :: ( HasSscConfiguration
        , SscMode ctx m
+<<<<<<< HEAD
        , HasProtocolConstants
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => SscTag -> EpochIndex -> Word16 -> m ()
 waitUntilSend msgTag epoch slMultiplier = do
@@ -393,8 +439,11 @@ checkForIgnoredCommitmentsWorker
     :: forall ctx m.
        ( HasSscConfiguration
        , SscMode ctx m
+<<<<<<< HEAD
        , HasProtocolConstants
        , HasGenesisBlockVersionData
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => (WorkerSpec m, OutSpecs)
 checkForIgnoredCommitmentsWorker = localWorker $ do
@@ -414,8 +463,11 @@ checkForIgnoredCommitmentsWorkerImpl
     :: forall ctx m.
        ( HasSscConfiguration
        , SscMode ctx m
+<<<<<<< HEAD
        , HasProtocolConstants
        , HasGenesisBlockVersionData
+=======
+>>>>>>> CHW-82-84, orphan branch
        )
     => TVar Word -> SlotId -> m ()
 checkForIgnoredCommitmentsWorkerImpl counter SlotId {..}

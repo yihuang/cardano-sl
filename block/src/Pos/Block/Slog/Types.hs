@@ -20,7 +20,11 @@ import qualified Data.Text.Buildable
 import           Formatting (bprint)
 import           System.Metrics.Label (Label)
 
+<<<<<<< HEAD
 import           Pos.Core (ChainDifficulty, EpochIndex, FlatSlotId, HasProtocolConstants,
+=======
+import           Pos.Core (ChainDifficulty, EpochIndex, FlatSlotId, HasConfiguration,
+>>>>>>> CHW-82-84, orphan branch
                            LocalSlotIndex, slotIdF, unflattenSlotId)
 import           Pos.Reporting.Metrics (MetricMonitorState)
 import           Pos.Util.Chrono (OldestFirst (..))
@@ -90,7 +94,11 @@ newtype SlogUndo = SlogUndo
     { getSlogUndo :: Maybe FlatSlotId
     } deriving (Eq, Show, NFData, Generic)
 
+<<<<<<< HEAD
 instance HasProtocolConstants => Buildable SlogUndo where
+=======
+instance HasConfiguration => Buildable SlogUndo where
+>>>>>>> CHW-82-84, orphan branch
     build (SlogUndo oldSlot) =
         "SlogUndo: " <>
         maybe "<nothing>" (bprint slotIdF . unflattenSlotId) oldSlot

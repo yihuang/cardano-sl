@@ -26,6 +26,10 @@ library
                        Pos.Binary.Class.TH
 
   build-depends:       QuickCheck
+<<<<<<< HEAD
+=======
+                     , autoexporter
+>>>>>>> CHW-82-84, orphan branch
                      , base
                      , binary
                      , bytestring

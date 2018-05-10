@@ -30,6 +30,10 @@ keys
 tmp-secrets/
 
 # Node runtime data
+<<<<<<< HEAD
+=======
+*.log
+>>>>>>> CHW-82-84, orphan branch
 logs
 run
 
@@ -66,8 +70,12 @@ scripts/haskell/dependencies
 
 # 'pkgs/stack2nix' is a symlink into the nix store, it can safely be ignored
 pkgs/stack2nix
+<<<<<<< HEAD
 # in case generate.sh clones nixpkgs in here
 nixpkgs
+=======
+nixpkgs # in case generate.sh clones nixpkgs in here
+>>>>>>> CHW-82-84, orphan branch
 pkgs/result
 
 # explorer
@@ -99,4 +107,7 @@ exchange-topology.yaml
 # launch scripts
 launch_*
 result*
+<<<<<<< HEAD
 *.patch
+=======
+>>>>>>> CHW-82-84, orphan branch

@@ -24,7 +24,6 @@ module Cardano.Wallet.API.V1.Types (
   , PasswordUpdate (..)
   , AccountUpdate (..)
   , NewAccount (..)
-  , NewExternalAccount (..)
   , Update
   , New
   -- * Domain-specific types

@@ -270,9 +270,6 @@ createNewUnsignedTransaction passphrase moneySource dstDistr policy = do
         { errReasonPhrase = "Transaction creation is disabled by configuration!"
         }
     let srcWallet = getMoneySourceWallet moneySource
-    rootSk <- getSKById srcWallet
-    checkPassMatches passphrase rootSk `whenNothing`
-        throwM (RequestError "Passphrase doesn't match")
 
     addrMetas' <- getMoneySourceAddresses ws moneySource
     addrMetas <- nonEmpty addrMetas' `whenNothing`

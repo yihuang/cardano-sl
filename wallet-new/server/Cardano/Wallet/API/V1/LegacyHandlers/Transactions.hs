@@ -17,13 +17,11 @@ import           Pos.Core (TxAux)
 import qualified Pos.Core as Core
 import           Pos.Util (eitherToThrow)
 import qualified Pos.Util.Servant as V0
-import qualified Pos.Wallet.WalletMode as V0
 import qualified Pos.Wallet.Web.ClientTypes.Types as V0
 import qualified Pos.Wallet.Web.Methods.History as V0
 import qualified Pos.Wallet.Web.Methods.Payment as V0
 import qualified Pos.Wallet.Web.Methods.Txp as V0
 import qualified Pos.Wallet.Web.State as V0
-import           Pos.Wallet.Web.State.Storage (WalletInfo (_wiSyncStatistics))
 import qualified Pos.Wallet.Web.Util as V0
 import           Servant
 import           Test.QuickCheck (arbitrary, generate)

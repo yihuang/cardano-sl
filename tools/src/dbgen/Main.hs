@@ -62,8 +62,9 @@ newRealModeContext
     => NodeDBs
     -> ConfigurationOptions
     -> FilePath
+    -> FilePath
     -> Production (RealModeContext ())
-newRealModeContext dbs confOpts secretKeyPath = do
+newRealModeContext dbs confOpts secretKeyPath publicKeyPath = do
     let nodeArgs = NodeArgs {
       behaviorConfigPath = Nothing
     }
@@ -81,6 +82,7 @@ newRealModeContext dbs confOpts secretKeyPath = do
          , rebuildDB              = True
          , devGenesisSecretI      = Nothing
          , keyfilePath            = secretKeyPath
+         , publicKeyfilePath      = publicKeyPath
          , networkConfigOpts      = networkOps
          , jlPath                 = Nothing
          , commonArgs             = CommonArgs {
@@ -120,14 +122,15 @@ walletRunner
     => ConfigurationOptions
     -> NodeDBs
     -> FilePath
+    -> FilePath
     -> WalletDB
     -> UberMonad a
     -> IO a
-walletRunner confOpts dbs secretKeyPath ws act = runProduction $ do
+walletRunner confOpts dbs secretKeyPath publicKeyPath ws act = runProduction $ do
     wwmc <- WalletWebModeContext <$> pure ws
                                  <*> newTVarIO def
                                  <*> liftIO newTQueueIO
-                                 <*> newRealModeContext dbs confOpts secretKeyPath
+                                 <*> newRealModeContext dbs confOpts secretKeyPath publicKeyPath
     runReaderT act wwmc
 
 newWalletState :: MonadIO m => Bool -> FilePath -> m WalletDB
@@ -167,7 +170,7 @@ main = do
         ws   <- newWalletState (isJust addTo) walletPath -- Recreate or not
 
         let generatedWallet = generateWalletDB cli spec
-        walletRunner cfg dbs secretKeyPath ws generatedWallet
+        walletRunner cfg dbs secretKeyPath publicKeyPath ws generatedWallet
         closeState ws
 
         showStatsData "after" walletPath

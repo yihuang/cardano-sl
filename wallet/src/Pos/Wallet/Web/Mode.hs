@@ -33,8 +33,9 @@ import           System.Wlog (HasLoggerName (..))
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Block.Slog (HasSlogContext (..), HasSlogGState (..))
-import           Pos.Client.KeyStorage (MonadKeys (..), MonadKeysRead (..), getSecretDefault,
-                                        modifySecretDefault)
+import           Pos.Client.KeyStorage (MonadKeys (..), MonadKeysRead (..),
+                                        getSecretDefault, getPublicDefault,
+                                        modifySecretDefault, modifyPublicDefault)
 import           Pos.Client.Txp.Addresses (MonadAddresses (..))
 import           Pos.Client.Txp.Balances (MonadBalances (..))
 import           Pos.Client.Txp.History (MonadTxHistory (..), getBlockHistoryDefault,
@@ -77,6 +78,7 @@ import           Pos.Util.LoggerName (HasLoggerName' (..), askLoggerNameDefault,
 import qualified Pos.Util.Modifier as MM
 import           Pos.Util.TimeWarp (CanJsonLog (..))
 import           Pos.Util.UserSecret (HasUserSecret (..))
+import           Pos.Util.UserPublic (HasUserPublic (..))
 import           Pos.Util.Util (HasLens (..))
 import           Pos.WorkMode (MinWorkMode, RealMode, RealModeContext (..))
 
@@ -132,6 +134,9 @@ instance HasReportingContext WalletWebModeContext  where
 
 instance HasUserSecret WalletWebModeContext where
     userSecret = wwmcRealModeContext_L . userSecret
+
+instance HasUserPublic WalletWebModeContext where
+    userPublic = wwmcRealModeContext_L . userPublic
 
 instance HasShutdownContext WalletWebModeContext where
     shutdownContext = wwmcRealModeContext_L . shutdownContext
@@ -319,16 +324,20 @@ instance MonadFormatPeers WalletWebMode where
 
 type instance MempoolExt WalletWebMode = WalletMempoolExt
 
-instance (HasConfiguration, HasTxpConfiguration, HasCompileInfo) =>
-         MonadTxpLocal WalletWebMode where
+instance ( HasConfiguration
+         , HasTxpConfiguration
+         , HasCompileInfo
+         ) => MonadTxpLocal WalletWebMode where
     txpNormalize = txpNormalizeWebWallet
     txpProcessTx = txpProcessTxWebWallet
 
 instance MonadKeysRead WalletWebMode where
     getSecret = getSecretDefault
+    getPublic = getPublicDefault
 
 instance MonadKeys WalletWebMode where
     modifySecret = modifySecretDefault
+    modifyPublic = modifyPublicDefault
 
 getNewAddressWebWallet
     :: MonadWalletLogic ctx m

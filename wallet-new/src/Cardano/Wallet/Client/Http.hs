@@ -60,8 +60,6 @@ mkHttpClient baseUrl manager = WalletClient
         = \w -> run . postAccountR w
     , updateAccount
         = \x y -> run . updateAccountR x y
-    , postExternalAccount
-        = \w -> run . postExternalAccountR w
     -- transactions endpoints
     , postTransaction
         = run . postTransactionR
@@ -113,7 +111,6 @@ mkHttpClient baseUrl manager = WalletClient
         :<|> getAccountIndexPagedR
         :<|> postAccountR
         :<|> updateAccountR
-        :<|> postExternalAccountR
         = accountsAPI
 
     postTransactionR

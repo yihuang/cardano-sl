@@ -17,7 +17,6 @@ import           Universum
 import qualified Data.Text.Buildable as Buildable
 import           Formatting (bprint, build, builder, (%))
 
-import           Pos.Binary.Crypto ()
 import           Pos.Core.Block.Blockchain (Blockchain (..), GenericBlock (..),
                                             GenericBlockHeader (..))
 import           Pos.Core.Common (ChainDifficulty, HeaderHash)

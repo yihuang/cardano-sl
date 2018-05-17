@@ -113,6 +113,7 @@ library
                      , bytestring
                      , cardano-crypto
                      , cardano-sl
+                     , cardano-sl-binary
                      , cardano-sl-block
                      , cardano-sl-client
                      , cardano-sl-core

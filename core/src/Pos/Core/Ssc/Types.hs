@@ -33,6 +33,8 @@ module Pos.Core.Ssc.Types
        , _vcSignature
        , _vcSigningKey
        , VssCertificatesMap (..)
+       , getCertId
+       , validateVssCertificatesMap
 
        -- * Payload and proof
        , VssCertificatesHash
@@ -43,20 +45,25 @@ module Pos.Core.Ssc.Types
 import           Universum
 
 import           Control.Lens (makeLensesFor, makeWrapped)
+import           Control.Monad.Except (MonadError (throwError))
+import           Data.Aeson (FromJSON (..), ToJSON (..))
+import           Data.Aeson.TH (deriveJSON)
 import           Data.Hashable (Hashable (..))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import qualified Data.Text.Buildable as Buildable
 import           Data.Text.Lazy.Builder (Builder)
 import           Fmt (genericF)
-import           Formatting (Format, bprint, build, int, (%))
-import           Serokell.Util (listJson)
+import           Formatting (Format, bprint, build, int, sformat, (%))
+import qualified Serokell.Aeson.Options as S (defaultOptions)
+import           Serokell.Util (allDistinct, listJson)
 
 import           Pos.Binary.Class (AsBinary (..), Bi, serialize')
 import           Pos.Core.Common (StakeholderId, addressHash)
 import           Pos.Core.Slotting.Types (EpochIndex)
 import           Pos.Crypto (DecShare, EncShare, Hash, PublicKey, Secret, SecretProof, Signature,
                              VssPublicKey, shortHashF)
+import           Pos.Util.Util (toAesonError)
 
 type NodeSet = HashSet StakeholderId
 
@@ -206,6 +213,8 @@ instance Hashable VssCertificate where
     hashWithSalt s UnsafeVssCertificate{..} =
         hashWithSalt s (vcExpiryEpoch, vcVssKey, vcSigningKey, vcSignature)
 
+deriveJSON S.defaultOptions ''VssCertificate
+
 -- | VssCertificatesMap contains all valid certificates collected
 -- during some period of time.
 --
@@ -231,6 +240,33 @@ instance Semigroup VssCertificatesMap where
 instance Monoid VssCertificatesMap where
     mempty = UnsafeVssCertificatesMap mempty
     mappend = (<>)
+
+instance ToJSON VssCertificatesMap where
+    toJSON = toJSON . getVssCertificatesMap
+
+instance FromJSON VssCertificatesMap where
+    parseJSON = parseJSON >=>
+        toAesonError . validateVssCertificatesMap . UnsafeVssCertificatesMap
+
+getCertId :: VssCertificate -> StakeholderId
+getCertId = addressHash . vcSigningKey
+
+-- | Return given 'VssCertificatesMap' if it's valid or an error if
+-- it's not.
+validateVssCertificatesMap ::
+       MonadError Text m
+    => VssCertificatesMap
+    -> m VssCertificatesMap
+validateVssCertificatesMap (UnsafeVssCertificatesMap certs) = do
+    forM_ (HM.toList certs) $ \(k, v) ->
+        when (getCertId v /= k) $
+            throwError $ sformat
+                ("wrong issuerPk set as key for delegation map: "%
+                 "issuer id = "%build%", cert id = "%build)
+                k (getCertId v)
+    unless (allDistinct (map vcVssKey (toList certs))) $
+        throwError "two certs have the same VSS key"
+    pure (UnsafeVssCertificatesMap certs)
 
 ----------------------------------------------------------------------------
 -- Payload and proof

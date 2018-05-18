@@ -2,8 +2,6 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE ViewPatterns #-}
 
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-
 module Pos.Core.Common.Coin
        ( coinF
        , sumCoins
@@ -13,7 +11,6 @@ module Pos.Core.Common.Coin
        , coinToInteger
        , integerToCoin
        , unsafeIntegerToCoin
-       , coinPortionToDouble
 
        -- * Arithmetic operations
        , unsafeAddCoin
@@ -26,9 +23,6 @@ module Pos.Core.Common.Coin
        ) where
 
 import           Universum
-
-import qualified Data.Text.Buildable
-import           Formatting (bprint, float, int, (%))
 
 import           Pos.Core.Common.Types (Coin (..), CoinPortion (..), coinF, coinPortionDenominator,
                                         unsafeGetCoin)
@@ -93,19 +87,6 @@ unsafeIntegerToCoin n = leftToPanic "unsafeIntegerToCoin: " (integerToCoin n)
 ----------------------------------------------------------------------------
 -- CoinPortion
 ----------------------------------------------------------------------------
-
-instance Buildable CoinPortion where
-    build cp@(getCoinPortion -> x) =
-        bprint
-            (int%"/"%int%" (approx. "%float%")")
-            x
-            coinPortionDenominator
-            (coinPortionToDouble cp)
-
-coinPortionToDouble :: CoinPortion -> Double
-coinPortionToDouble (getCoinPortion -> x) =
-    realToFrac @_ @Double x / realToFrac coinPortionDenominator
-{-# INLINE coinPortionToDouble #-}
 
 -- | Apply CoinPortion to Coin (with rounding down).
 --

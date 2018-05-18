@@ -120,7 +120,6 @@ import qualified Data.ByteArray as ByteArray
 import qualified Data.ByteString as BS
 import qualified Data.Map.Strict as Map
 import           Data.Swagger.Internal.TypeShape (GenericHasSimpleShape, GenericShape)
-import           Pos.Aeson.Core ()
 import           Pos.Arbitrary.Core ()
 import qualified Pos.Client.Txp.Util as Core
 import           Pos.Core (addressF)

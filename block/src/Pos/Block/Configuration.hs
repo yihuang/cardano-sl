@@ -32,7 +32,8 @@ import           Data.Time.Units (Microsecond, Second, convertUnit)
 import           Serokell.Aeson.Options (defaultOptions)
 import           Serokell.Util (sec)
 
-import           Pos.Aeson.Core ()
+-- TODO: Move instances that don't logically belong somewhere to util
+import           Pos.Core.Orphans ()
 
 type HasBlockConfiguration = Given BlockConfiguration
 

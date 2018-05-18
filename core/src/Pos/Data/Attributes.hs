@@ -15,6 +15,8 @@ module Pos.Data.Attributes
 
 import           Universum
 
+import           Data.Aeson (FromJSON (..), ToJSON (..))
+import           Data.Aeson.TH (defaultOptions, deriveJSON)
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Default (Default (..))
 import qualified Data.Hashable as H
@@ -23,6 +25,7 @@ import           Data.Text.Buildable (Buildable)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting (bprint, build, int, (%))
 import qualified Prelude
+import           Serokell.Util.Base64 (JsonByteString (..))
 
 import           Pos.Binary.Class
 
@@ -34,6 +37,12 @@ newtype UnparsedFields = UnparsedFields (Map Word8 LBS.ByteString)
 
 instance Hashable UnparsedFields where
     hashWithSalt salt = H.hashWithSalt salt . M.toList . fromUnparsedFields
+
+instance FromJSON UnparsedFields where
+    parseJSON v = UnparsedFields . M.map (LBS.fromStrict . getJsonByteString) <$> parseJSON v
+
+instance ToJSON UnparsedFields where
+    toJSON (UnparsedFields fields) = toJSON (M.map (JsonByteString . LBS.toStrict) fields)
 
 fromUnparsedFields :: UnparsedFields -> Map Word8 LBS.ByteString
 fromUnparsedFields (UnparsedFields m) = m
@@ -80,6 +89,7 @@ instance Hashable h => Hashable (Attributes h)
 
 instance NFData h => NFData (Attributes h)
 
+
 -- | Check whether all data from 'Attributes' is known, i. e. was
 -- successfully parsed into some structured data.
 areAttributesKnown :: Attributes __ -> Bool
@@ -87,6 +97,8 @@ areAttributesKnown = M.null . fromUnparsedFields . attrRemain
 
 unknownAttributesLength :: Attributes __ -> Int
 unknownAttributesLength = fromIntegral . sum . map LBS.length . fromUnparsedFields . attrRemain
+
+deriveJSON defaultOptions ''Attributes
 
 {- NOTE: Attributes serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-
 -- | Functionality related to 'Address' data type and related types.
 
 module Pos.Core.Common.Address
@@ -9,9 +7,7 @@ module Pos.Core.Common.Address
        , StakeholderId
 
        -- * Formatting
-       , addressF
        , addressDetailedF
-       , decodeTextAddress
 
        -- * Spending data checks
        , checkAddrSpendingData
@@ -62,11 +58,9 @@ import           Universum
 import           Crypto.Hash (Blake2b_224, Digest, SHA3_256)
 import qualified Crypto.Hash as CryptoHash
 import qualified Data.ByteString as BS
-import           Data.ByteString.Base58 (Alphabet (..), bitcoinAlphabet, decodeBase58, encodeBase58)
 import qualified Data.Text.Buildable as Buildable
-import           Formatting (Format, bprint, build, builder, int, later, (%))
+import           Formatting (Format, bprint, build, builder, later, (%))
 import           Serokell.Data.Memory.Units (Byte)
-import           Serokell.Util (mapJson)
 
 import           Pos.Binary.Class (Bi, biSize)
 import qualified Pos.Binary.Class as Bi
@@ -75,7 +69,7 @@ import           Pos.Core.Common.Types (AddrAttributes (..), AddrSpendingData (.
                                         AddrStakeDistribution (..), AddrType (..), Address (..),
                                         Address' (..), AddressHash, Script, StakeholderId)
 import           Pos.Core.Constants (accountGenesisIndex, wAddressGenesisIndex)
-import           Pos.Crypto.Hashing (AbstractHash (AbstractHash), hashHexF, shortHashF)
+import           Pos.Crypto.Hashing (AbstractHash (AbstractHash), hashHexF)
 import           Pos.Crypto.HD (HDAddressPayload, HDPassphrase, ShouldCheckPassphrase (..),
                                 deriveHDPassphrase, deriveHDPublicKey, deriveHDSecretKey,
                                 packHDAddressAttr)
@@ -87,36 +81,6 @@ import           Pos.Data.Attributes (attrData, mkAttributes)
 ----------------------------------------------------------------------------
 -- Formatting, pretty-printing
 ----------------------------------------------------------------------------
-
-instance Buildable AddrSpendingData where
-    build =
-        \case
-            PubKeyASD pk -> bprint ("PubKeyASD " %build) pk
-            ScriptASD script -> bprint ("ScriptASD "%build) script
-            RedeemASD rpk -> bprint ("RedeemASD "%build) rpk
-            UnknownASD tag _ -> bprint ("UnknownASD with tag "%int) tag
-
-instance Buildable AddrStakeDistribution where
-    build =
-        \case
-            BootstrapEraDistr -> "Bootstrap era distribution"
-            SingleKeyDistr id ->
-                bprint ("Single key distribution ("%shortHashF%")") id
-            UnsafeMultiKeyDistr distr ->
-                bprint ("Multi key distribution: "%mapJson) distr
-
-instance Buildable AddrAttributes where
-    build (AddrAttributes {..}) =
-        bprint
-            ("AddrAttributes { stake distribution: "%build%
-             ", derivation path: "%builder%" }")
-            aaStakeDistribution
-            derivationPathBuilder
-      where
-        derivationPathBuilder =
-            case aaPkDerivationPath of
-                Nothing -> "{}"
-                Just _  -> "{path is encrypted}"
 
 -- | A formatter showing guts of an 'Address'.
 addressDetailedF :: Format r (Address -> r)
@@ -131,31 +95,6 @@ addressDetailedF =
             ATScript      -> "Script"
             ATRedeem      -> "Redeem"
             ATUnknown tag -> "Unknown#" <> Buildable.build tag
-
--- | Currently we gonna use Bitcoin alphabet for representing addresses in
--- base58
-addrAlphabet :: Alphabet
-addrAlphabet = bitcoinAlphabet
-
-addrToBase58 :: Address -> ByteString
-addrToBase58 = encodeBase58 addrAlphabet . Bi.serialize'
-
-instance Buildable Address where
-    build = Buildable.build . decodeUtf8 @Text . addrToBase58
-
--- | Specialized formatter for 'Address'.
-addressF :: Format r (Address -> r)
-addressF = build
-
--- | A function which decodes base58-encoded 'Address'.
-decodeTextAddress :: Text -> Either Text Address
-decodeTextAddress = decodeAddress . encodeUtf8
-  where
-    decodeAddress :: ByteString -> Either Text Address
-    decodeAddress bs = do
-        let base58Err = "Invalid base58 representation of address"
-        dbs <- maybeToRight base58Err $ decodeBase58 addrAlphabet bs
-        Bi.decodeFull' dbs
 
 ----------------------------------------------------------------------------
 -- Constructors

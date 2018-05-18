@@ -30,15 +30,15 @@ import           Universum
 import           Control.Monad.Except (MonadError (throwError))
 import qualified Data.HashMap.Strict as HM
 import           Data.List.Extra (nubOrdOn)
-import           Formatting (build, sformat, (%))
 import           Serokell.Util (allDistinct)
 
 import           Pos.Binary.Class (AsBinary (..), Bi)
-import           Pos.Core.Common (StakeholderId, addressHash)
+import           Pos.Core.Common (StakeholderId)
 import           Pos.Core.Slotting.Types (EpochIndex)
-import           Pos.Core.Ssc.Types (VssCertificate (..), VssCertificatesMap (..))
-import           Pos.Crypto (ProtocolMagic, SecretKey, SignTag (SignVssCert),
-                             VssPublicKey, checkSig, sign, toPublic)
+import           Pos.Core.Ssc.Types (VssCertificate (..), VssCertificatesMap (..), getCertId,
+                                     validateVssCertificatesMap)
+import           Pos.Crypto (ProtocolMagic, SecretKey, SignTag (SignVssCert), VssPublicKey,
+                             checkSig, sign, toPublic)
 
 -- | Make VssCertificate valid up to given epoch using 'SecretKey' to sign
 -- data.
@@ -70,9 +70,6 @@ checkVssCertificate pm it =
 checkCertSign :: (Bi EpochIndex) => ProtocolMagic -> VssCertificate -> Bool
 checkCertSign pm UnsafeVssCertificate {..} =
     checkSig pm SignVssCert vcSigningKey (vcVssKey, vcExpiryEpoch) vcSignature
-
-getCertId :: VssCertificate -> StakeholderId
-getCertId = addressHash . vcSigningKey
 
 -- Unexported but useful in the three functions below
 toCertPair :: VssCertificate -> (StakeholderId, VssCertificate)
@@ -113,23 +110,6 @@ mkVssCertificatesMapLossy =
 mkVssCertificatesMapSingleton :: VssCertificate -> VssCertificatesMap
 mkVssCertificatesMapSingleton =
     UnsafeVssCertificatesMap . uncurry HM.singleton . toCertPair
-
--- | Return given 'VssCertificatesMap' if it's valid or an error if
--- it's not.
-validateVssCertificatesMap ::
-       MonadError Text m
-    => VssCertificatesMap
-    -> m VssCertificatesMap
-validateVssCertificatesMap (UnsafeVssCertificatesMap certs) = do
-    forM_ (HM.toList certs) $ \(k, v) ->
-        when (getCertId v /= k) $
-            throwError $ sformat
-                ("wrong issuerPk set as key for delegation map: "%
-                 "issuer id = "%build%", cert id = "%build)
-                k (getCertId v)
-    unless (allDistinct (map vcVssKey (toList certs))) $
-        throwError "two certs have the same VSS key"
-    pure (UnsafeVssCertificatesMap certs)
 
 memberVss :: StakeholderId -> VssCertificatesMap -> Bool
 memberVss id (UnsafeVssCertificatesMap m) = HM.member id m

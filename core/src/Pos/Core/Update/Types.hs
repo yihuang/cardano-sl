@@ -45,6 +45,8 @@ module Pos.Core.Update.Types
 import           Universum
 
 import           Control.Monad.Except (MonadError (throwError))
+import           Data.Aeson (FromJSON (..))
+import           Data.Aeson.TH (defaultOptions, deriveJSON, deriveToJSON)
 import           Data.Char (isAscii)
 import           Data.Default (Default (..))
 import           Data.Hashable (Hashable)
@@ -58,15 +60,16 @@ import           Instances.TH.Lift ()
 import           Language.Haskell.TH.Syntax (Lift)
 import qualified Prelude
 import           Serokell.AcidState ()
+import qualified Serokell.Aeson.Options as S (defaultOptions)
 import           Serokell.Data.Memory.Units (Byte, memory)
 import           Serokell.Util.Text (listJson)
 
 import           Pos.Binary.Class (Bi, Raw)
 import           Pos.Core.Common (CoinPortion, ScriptVersion, TxFeePolicy, addressHash)
 import           Pos.Core.Slotting.Types (EpochIndex, FlatSlotId)
-import           Pos.Crypto (ProtocolMagic, Hash, PublicKey, SafeSigner, SecretKey,
-                             SignTag (SignUSVote), Signature, hash, safeSign,
-                             safeToPublic, shortHashF, sign, toPublic)
+import           Pos.Crypto (Hash, ProtocolMagic, PublicKey, SafeSigner, SecretKey,
+                             SignTag (SignUSVote), Signature, hash, safeSign, safeToPublic,
+                             shortHashF, sign, toPublic)
 import           Pos.Data.Attributes (Attributes, areAttributesKnown)
 import           Pos.Util.Orphans ()
 
@@ -84,6 +87,13 @@ data BlockVersion = BlockVersion
 newtype ApplicationName = ApplicationName
     { getApplicationName :: Text
     } deriving (Eq, Ord, Show, Generic, Typeable, ToString, Hashable, Buildable, NFData)
+
+instance FromJSON ApplicationName where
+    -- FIXME does the defaultOptions derived JSON encode directly as text? Or
+    -- as an object with a single key?
+    parseJSON v = ApplicationName <$> parseJSON v
+
+deriveToJSON defaultOptions ''ApplicationName
 
 -- | Smart constructor of 'ApplicationName'.
 checkApplicationName :: MonadError Text m => ApplicationName -> m ()
@@ -126,6 +136,10 @@ instance Hashable BlockVersion
 instance NFData BlockVersion
 instance NFData SoftwareVersion
 
+deriveJSON defaultOptions ''BlockVersion
+
+deriveJSON defaultOptions ''SoftwareVersion
+
 -- | A software version is valid iff its application name is valid.
 checkSoftwareVersion :: MonadError Text m => SoftwareVersion -> m ()
 checkSoftwareVersion sv = checkApplicationName (svAppName sv)
@@ -159,6 +173,8 @@ instance Buildable SoftforkRule where
     build SoftforkRule {..} =
         bprint ("(init = "%build%", min = "%build%", decrement = "%build%")")
         srInitThd srMinThd srThdDecrement
+
+deriveJSON S.defaultOptions ''SoftforkRule
 
 -- | Data which is associated with 'BlockVersion'.
 data BlockVersionData = BlockVersionData
@@ -211,6 +227,8 @@ instance Buildable BlockVersionData where
         bvdSoftforkRule
         bvdTxFeePolicy
         bvdUnlockStakeEpoch
+
+deriveJSON S.defaultOptions ''BlockVersionData
 
 -- | Data which represents modifications of block (aka protocol) version.
 data BlockVersionModifier = BlockVersionModifier

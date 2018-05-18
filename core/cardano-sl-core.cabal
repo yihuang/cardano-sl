@@ -22,11 +22,6 @@ library
                        Pos.Arbitrary.Core
                        Pos.Arbitrary.Core.Unsafe
 
-                       Pos.Aeson.Core
-                       Pos.Aeson.Core.Configuration
-                       Pos.Aeson.Fee
-                       Pos.Aeson.Genesis
-
                        Pos.Binary.Core
                        Pos.Binary.Merkle
 
@@ -47,6 +42,7 @@ library
                        Pos.Core.Context
                        Pos.Core.Delegation
                        Pos.Core.Genesis
+                       Pos.Core.Orphans
                        Pos.Core.Script
                        Pos.Core.Slotting
                        Pos.Core.Ssc
@@ -105,7 +101,6 @@ library
                        -- Genesis
                        Pos.Core.Genesis.Canonical
                        Pos.Core.Genesis.Generate
-                       Pos.Core.Genesis.Helpers
                        Pos.Core.Genesis.Types
 
                        -- Slotting

@@ -1,6 +1,8 @@
 {-# LANGUAGE RankNTypes          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 -- | Reference implementation of CBOR (de)serialization.
 
 module Test.Pos.Cbor.RefImpl

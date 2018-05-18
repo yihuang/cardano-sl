@@ -11,6 +11,8 @@ module Pos.Core.Common.Types
        , MultiKeyDistrError (..)
        , mkMultiKeyDistr
        , Address (..)
+       , addressF
+       , decodeTextAddress
 
        -- * Forward-declared BlockHeader
        , BlockHeader
@@ -40,6 +42,7 @@ module Pos.Core.Common.Types
        , unsafeGetCoin
        , coinPortionDenominator
        , checkCoinPortion
+       , coinPortionToDouble
        , unsafeCoinPortionFromDouble
        , maxCoinVal
 
@@ -59,27 +62,33 @@ import           Control.Exception.Safe (Exception (displayException))
 import           Control.Lens (makePrisms, _Left)
 import           Control.Monad.Except (MonadError (throwError))
 import           Crypto.Hash (Blake2b_224)
+import           Data.Aeson (FromJSON (..), FromJSONKey (..), FromJSONKeyFunction (..), ToJSON (..),
+                             ToJSONKey (..), object, withObject, (.:), (.=))
+import           Data.Aeson.TH (defaultOptions, deriveJSON)
+import           Data.Aeson.Types (toJSONKeyText)
 import qualified Data.ByteString as BS (pack, zipWith)
+import           Data.ByteString.Base58 (Alphabet (..), bitcoinAlphabet, decodeBase58, encodeBase58)
 import qualified Data.ByteString.Char8 as BSC (pack)
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Data (Data)
 import           Data.Hashable (Hashable (..))
 import qualified Data.Semigroup (Semigroup (..))
 import qualified Data.Text.Buildable as Buildable
-import           Formatting (Format, bprint, build, int, later, sformat, (%))
+import           Formatting (Format, bprint, build, builder, float, int, later, sformat, (%))
 import qualified PlutusCore.Program as PLCore
-import           Serokell.Util (enumerate, listChunkedJson, pairBuilder)
+import           Serokell.Util (enumerate, listChunkedJson, mapJson, pairBuilder)
 import           Serokell.Util.Base16 (formatBase16)
+import           Serokell.Util.Base64 (JsonByteString (..))
 import           System.Random (Random (..))
 
 import           Pos.Binary.Class (Bi, decode, encode)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Core.Constants (sharedSeedLength)
-import           Pos.Crypto.Hashing (AbstractHash, Hash)
+import           Pos.Crypto.Hashing (AbstractHash, Hash, shortHashF)
 import           Pos.Crypto.HD (HDAddressPayload)
 import           Pos.Crypto.Signing (PublicKey, RedeemPublicKey)
 import           Pos.Data.Attributes (Attributes (..), decodeAttributes, encodeAttributes)
-import           Pos.Util.Util (cborError, toCborError)
+import           Pos.Util.Util (cborError, toAesonError, toCborError)
 
 ----------------------------------------------------------------------------
 -- Address, StakeholderId
@@ -114,6 +123,14 @@ data AddrSpendingData
     -- arbitrary 'ByteString'. It allows us to introduce a new type of
     -- spending data via softfork.
     deriving (Eq, Generic, Typeable, Show)
+
+instance Buildable AddrSpendingData where
+    build =
+        \case
+            PubKeyASD pk -> bprint ("PubKeyASD " %build) pk
+            ScriptASD script -> bprint ("ScriptASD "%build) script
+            RedeemASD rpk -> bprint ("RedeemASD "%build) rpk
+            UnknownASD tag _ -> bprint ("UnknownASD with tag "%int) tag
 
 {- NOTE: Address spending data serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,6 +219,15 @@ data AddrStakeDistribution
     -- 'SingleKeyDistr' can be used instead (which is smaller).
     deriving (Eq, Ord, Show, Generic, Typeable)
 
+instance Buildable AddrStakeDistribution where
+    build =
+        \case
+            BootstrapEraDistr -> "Bootstrap era distribution"
+            SingleKeyDistr id ->
+                bprint ("Single key distribution ("%shortHashF%")") id
+            UnsafeMultiKeyDistr distr ->
+                bprint ("Multi key distribution: "%mapJson) distr
+
 instance Bi AddrStakeDistribution where
     encode =
         \case
@@ -264,6 +290,19 @@ data AddrAttributes = AddrAttributes
     { aaPkDerivationPath  :: !(Maybe HDAddressPayload)
     , aaStakeDistribution :: !AddrStakeDistribution
     } deriving (Eq, Ord, Show, Generic, Typeable)
+
+instance Buildable AddrAttributes where
+    build (AddrAttributes {..}) =
+        bprint
+            ("AddrAttributes { stake distribution: "%build%
+             ", derivation path: "%builder%" }")
+            aaStakeDistribution
+            derivationPathBuilder
+      where
+        derivationPathBuilder =
+            case aaPkDerivationPath of
+                Nothing -> "{}"
+                Just _  -> "{path is encrypted}"
 
 {- NOTE: Address attributes serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -351,6 +390,9 @@ instance NFData AddrAttributes
 instance NFData AddrStakeDistribution
 instance NFData Address
 
+instance Buildable Address where
+    build = Buildable.build . decodeUtf8 @Text . addrToBase58
+
 instance Bi Address where
     encode Address{..} =
         Bi.encodeCrcProtected (addrRoot, addrAttributes, addrType)
@@ -362,15 +404,39 @@ instance Bi Address where
 instance Hashable Address where
     hashWithSalt s = hashWithSalt s . Bi.serialize
 
-----------------------------------------------------------------------------
--- ChainDifficulty
-----------------------------------------------------------------------------
+instance FromJSONKey Address where
+    fromJSONKey = FromJSONKeyTextParser (toAesonError . decodeTextAddress)
 
--- | Chain difficulty represents necessary effort to generate a
--- chain. In the simplest case it can be number of blocks in chain.
-newtype ChainDifficulty = ChainDifficulty
-    { getChainDifficulty :: BlockCount
-    } deriving (Show, Eq, Ord, Num, Enum, Real, Integral, Generic, Buildable, Typeable, NFData)
+instance ToJSONKey Address where
+    toJSONKey = toJSONKeyText (sformat addressF)
+
+instance FromJSON Address where
+    parseJSON = toAesonError . decodeTextAddress <=< parseJSON
+
+instance ToJSON Address where
+    toJSON = toJSON . sformat addressF
+
+-- | Currently we gonna use Bitcoin alphabet for representing addresses in
+-- base58
+addrAlphabet :: Alphabet
+addrAlphabet = bitcoinAlphabet
+
+addrToBase58 :: Address -> ByteString
+addrToBase58 = encodeBase58 addrAlphabet . Bi.serialize'
+
+-- | Specialized formatter for 'Address'.
+addressF :: Format r (Address -> r)
+addressF = build
+
+-- | A function which decodes base58-encoded 'Address'.
+decodeTextAddress :: Text -> Either Text Address
+decodeTextAddress = decodeAddress . encodeUtf8
+  where
+    decodeAddress :: ByteString -> Either Text Address
+    decodeAddress bs = do
+        let base58Err = "Invalid base58 representation of address"
+        dbs <- maybeToRight base58Err $ decodeBase58 addrAlphabet bs
+        Bi.decodeFull' dbs
 
 ----------------------------------------------------------------------------
 -- BlockHeader (forward-declaration)
@@ -417,6 +483,12 @@ instance Monoid SharedSeed where
     mappend = (Data.Semigroup.<>)
     mconcat = foldl' mappend mempty
 
+instance ToJSON SharedSeed where
+    toJSON = toJSON . JsonByteString . getSharedSeed
+
+instance FromJSON SharedSeed where
+    parseJSON v = SharedSeed . getJsonByteString <$> parseJSON v
+
 -- | 'NonEmpty' list of slot leaders.
 type SlotLeaders = NonEmpty StakeholderId
 
@@ -450,6 +522,12 @@ instance Buildable Coin where
 instance Bounded Coin where
     minBound = Coin 0
     maxBound = Coin maxCoinVal
+
+instance FromJSON Coin where
+    parseJSON v = mkCoin <$> parseJSON v
+
+instance ToJSON Coin where
+    toJSON = toJSON . unsafeGetCoin
 
 -- | Maximal possible value of 'Coin'.
 maxCoinVal :: Word64
@@ -530,6 +608,25 @@ unsafeCoinPortionFromDouble x
     v = round $ realToFrac coinPortionDenominator * x
 {-# INLINE unsafeCoinPortionFromDouble #-}
 
+coinPortionToDouble :: CoinPortion -> Double
+coinPortionToDouble (getCoinPortion -> x) =
+    realToFrac @_ @Double x / realToFrac coinPortionDenominator
+{-# INLINE coinPortionToDouble #-}
+
+instance Buildable CoinPortion where
+    build cp@(getCoinPortion -> x) =
+        bprint
+            (int%"/"%int%" (approx. "%float%")")
+            x
+            coinPortionDenominator
+            (coinPortionToDouble cp)
+
+instance FromJSON CoinPortion where
+    parseJSON v = unsafeCoinPortionFromDouble <$> parseJSON v
+
+instance ToJSON CoinPortion where
+    toJSON = toJSON . coinPortionToDouble
+
 ----------------------------------------------------------------------------
 -- Script
 ----------------------------------------------------------------------------
@@ -549,6 +646,17 @@ instance Hashable Script
 instance Buildable Script where
     build Script{..} = bprint ("<script v"%int%">") scrVersion
 
+instance ToJSON Script where
+    toJSON Script{..} = object [
+        "version"    .= scrVersion,
+        "script" .= JsonByteString scrScript ]
+
+instance FromJSON Script where
+    parseJSON = withObject "Script" $ \obj -> do
+        scrVersion <- obj .: "version"
+        scrScript  <- getJsonByteString <$> obj .: "script"
+        pure $ Script {..}
+
 -- | Deserialized script (i.e. an AST), version 0.
 type Script_v0 = PLCore.Program
 
@@ -559,6 +667,20 @@ type Script_v0 = PLCore.Program
 newtype BlockCount = BlockCount {getBlockCount :: Word64}
     deriving (Eq, Ord, Num, Real, Integral, Enum, Read, Show,
               Buildable, Generic, Typeable, NFData, Hashable, Random)
+
+deriveJSON defaultOptions ''BlockCount
+
+----------------------------------------------------------------------------
+-- ChainDifficulty
+----------------------------------------------------------------------------
+
+-- | Chain difficulty represents necessary effort to generate a
+-- chain. In the simplest case it can be number of blocks in chain.
+newtype ChainDifficulty = ChainDifficulty
+    { getChainDifficulty :: BlockCount
+    } deriving (Show, Eq, Ord, Num, Enum, Real, Integral, Generic, Buildable, Typeable, NFData)
+
+deriveJSON defaultOptions ''ChainDifficulty
 
 ----------------------------------------------------------------------------
 -- Template Haskell invocations, banished to the end of the module because

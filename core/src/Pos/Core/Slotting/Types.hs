@@ -20,6 +20,8 @@ module Pos.Core.Slotting.Types
 import           Universum
 
 import           Control.Lens (makeLensesFor)
+import           Data.Aeson (FromJSON (..), ToJSON (..))
+import           Data.Aeson.TH (defaultOptions, deriveJSON)
 import           Data.Ix (Ix)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting (Format, bprint, build, int, ords, (%))
@@ -35,10 +37,15 @@ newtype EpochIndex = EpochIndex
 instance Buildable EpochIndex where
     build = bprint ("#"%int)
 
+deriving instance FromJSON EpochIndex
+deriving instance ToJSON EpochIndex
+
 -- | Index of slot inside a concrete epoch.
 newtype LocalSlotIndex = UnsafeLocalSlotIndex
     { getSlotIndex :: Word16
     } deriving (Show, Eq, Ord, Ix, Generic, Hashable, Buildable, Typeable, NFData)
+
+deriveJSON defaultOptions ''LocalSlotIndex
 
 -- | Slot is identified by index of epoch and index of slot in
 -- this epoch. This is a global index, an index to a global
@@ -51,6 +58,10 @@ data SlotId = SlotId
 instance Buildable SlotId where
     build SlotId {..} =
         bprint (ords%" slot of "%ords%" epoch") (getSlotIndex siSlot) siEpoch
+
+instance NFData SlotId
+
+deriveJSON defaultOptions ''SlotId
 
 -- | Specialized formatter for 'SlotId'.
 slotIdF :: Format r (SlotId -> r)
@@ -79,8 +90,6 @@ instance Ord EpochOrSlot where
 instance Buildable EpochOrSlot where
     build = either Buildable.build Buildable.build . unEpochOrSlot
 
-instance NFData SlotId
-
 flip makeLensesFor ''SlotId [
     ("siEpoch", "siEpochL"),
     ("siSlot" , "siSlotL") ]
@@ -88,3 +97,5 @@ flip makeLensesFor ''SlotId [
 newtype SlotCount = SlotCount {getSlotCount :: Word64}
     deriving (Eq, Ord, Num, Real, Integral, Enum, Read, Show,
               Buildable, Generic, Typeable, NFData, Hashable, Random)
+
+deriving instance ToJSON SlotCount

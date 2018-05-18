@@ -28,10 +28,9 @@ import           Serokell.Aeson.Options (defaultOptions)
 import           Serokell.Util.ANSI (Color (Blue, Red), colorize)
 
 -- For FromJSON instances.
-import           Pos.Aeson.Core ()
 import           Pos.Aeson.Update ()
 import           Pos.Core (ApplicationName, BlockVersion (..), SoftwareVersion (..))
-import           Pos.Core.Update (SystemTag (..), archHelper, osHelper, checkSystemTag)
+import           Pos.Core.Update (SystemTag (..), archHelper, checkSystemTag, osHelper)
 
 ----------------------------------------------------------------------------
 -- Config itself

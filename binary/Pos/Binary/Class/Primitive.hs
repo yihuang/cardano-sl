@@ -42,15 +42,17 @@ import qualified Codec.CBOR.Read as CBOR.Read
 import qualified Codec.CBOR.Write as CBOR.Write
 import           Control.Exception.Safe (impureThrow)
 import           Control.Monad.ST (ST, runST)
-import           Data.ByteString.Builder (Builder)
+import           Data.Aeson (FromJSON (..), ToJSON (..))
 import qualified Data.ByteString as BS
+import           Data.ByteString.Builder (Builder)
+import qualified Data.ByteString.Builder.Extra as Builder
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.ByteString.Lazy.Internal as BSL
-import qualified Data.ByteString.Builder.Extra as Builder
 import           Data.Digest.CRC32 (CRC32 (..))
 import           Data.Typeable (typeOf)
 import           Formatting (sformat, shown, (%))
 import           Serokell.Data.Memory.Units (Byte)
+import           Serokell.Util.Base64 (JsonByteString (..))
 
 import           Pos.Binary.Class.Core (Bi (..), cborError, enforceSize, toCborError)
 
@@ -185,6 +187,12 @@ newtype Raw = Raw ByteString
 newtype AsBinary a = AsBinary
     { getAsBinary :: ByteString
     } deriving (Show, Eq, Ord, Hashable, NFData)
+
+instance ToJSON (AsBinary w) where
+    toJSON = toJSON . JsonByteString . getAsBinary
+
+instance FromJSON (AsBinary w) where
+    parseJSON v = AsBinary . getJsonByteString <$> parseJSON v
 
 -- | A simple helper class simplifying work with 'AsBinary'.
 class AsBinaryClass a where

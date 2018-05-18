@@ -8,10 +8,14 @@ module Pos.Core.Common.Fee
 
 import           Universum
 
-import           Data.Fixed (Fixed (..), Nano, showFixed)
+import           Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:), (.=))
+import           Data.Aeson.Types (Parser, withScientific)
+import           Data.Fixed (Fixed (..), Nano, resolution, showFixed)
 import           Data.Hashable (Hashable)
+import qualified Data.HashMap.Strict as HM.S
 import qualified Data.Text.Buildable as Buildable
 import           Formatting (bprint, build, shown, (%))
+import           Pos.Util.Util (aesonError, toAesonError)
 import           Serokell.Data.Memory.Units (Byte, toBytes)
 
 -- | A fractional coefficient of fixed precision.
@@ -20,6 +24,22 @@ newtype Coeff = Coeff Nano
 
 instance Buildable Coeff where
     build (Coeff x) = fromString (showFixed True x)
+
+instance Hashable Coeff
+
+instance ToJSON Coeff where
+    toJSON (Coeff v) = toJSON (realToFrac @_ @Double v)
+
+instance FromJSON Coeff where
+    parseJSON = withScientific "Coeff" $ \sc -> do
+        -- Code below is resistant to changes in precision of 'Coeff'.
+        let
+            rat = toRational sc * toRational res
+            fxd = MkFixed (numerator rat)
+            res = resolution fxd
+            bad = denominator rat /= 1
+        when bad $ aesonError "Fixed precision for coefficient exceeded"
+        return $ Coeff fxd
 
 -- | A linear equation on the transaction size. Represents the @\s -> a + b*s@
 -- function where @s@ is the transaction size in bytes, @a@ and @b@ are
@@ -32,6 +52,20 @@ instance NFData TxSizeLinear
 instance Buildable TxSizeLinear where
     build (TxSizeLinear a b) =
         bprint (build%" + "%build%"*s") a b
+
+instance Hashable TxSizeLinear
+
+instance ToJSON TxSizeLinear where
+    toJSON (TxSizeLinear a b) = object [
+        "a" .= a,
+        "b" .= b
+        ]
+
+instance FromJSON TxSizeLinear where
+    parseJSON = withObject "TxSizeLinear" $ \o -> do
+        TxSizeLinear
+            <$> (o .: "a")
+            <*> (o .: "b")
 
 calculateTxSizeLinear :: TxSizeLinear -> Byte -> Nano
 calculateTxSizeLinear
@@ -71,5 +105,31 @@ instance Buildable TxFeePolicy where
         bprint ("policy(unknown:"%build%"): "%shown) v bs
 
 instance Hashable TxFeePolicy
-instance Hashable TxSizeLinear
-instance Hashable Coeff
+
+instance ToJSON TxFeePolicy where
+    toJSON =
+        object . \case
+            TxFeePolicyTxSizeLinear linear -> ["txSizeLinear" .= linear]
+            TxFeePolicyUnknown policyTag policyPayload ->
+                ["unknown" .= (policyTag, decodeUtf8 @Text policyPayload)]
+
+instance FromJSON TxFeePolicy where
+    parseJSON = withObject "TxFeePolicy" $ \o -> do
+        (policyName, policyBody) <- toAesonError $ case HM.S.toList o of
+            []  -> Left "TxFeePolicy: none provided"
+            [a] -> Right a
+            _   -> Left "TxFeePolicy: ambiguous choice"
+        let
+          policyParser :: FromJSON p => Parser p
+          policyParser = parseJSON policyBody
+        case policyName of
+            "txSizeLinear" ->
+                TxFeePolicyTxSizeLinear <$> policyParser
+            "unknown" ->
+                mkTxFeePolicyUnknown <$> policyParser
+            _ ->
+                aesonError "TxFeePolicy: unknown policy name"
+        where
+            mkTxFeePolicyUnknown (policyTag, policyPayload) =
+                TxFeePolicyUnknown policyTag
+                    (encodeUtf8 @Text @ByteString policyPayload)

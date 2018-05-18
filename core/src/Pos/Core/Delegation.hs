@@ -18,6 +18,7 @@ module Pos.Core.Delegation
 import           Universum
 
 import           Control.Monad.Except (MonadError, throwError)
+import           Data.Aeson (FromJSON (..), ToJSON (..))
 import           Data.Default (Default (def))
 import qualified Data.Text.Buildable
 import           Formatting (bprint, build, int, (%))
@@ -25,8 +26,8 @@ import           Serokell.Util (allDistinct, listJson, pairF)
 
 import           Pos.Binary.Class (Bi)
 import           Pos.Core.Slotting.Types (EpochIndex)
-import           Pos.Crypto (Hash, ProxySecretKey (..), ProxySignature,
-                             ProtocolMagic, hash, validateProxySecretKey)
+import           Pos.Crypto (Hash, ProtocolMagic, ProxySecretKey (..), ProxySignature, hash,
+                             validateProxySecretKey)
 
 ----------------------------------------------------------------------------
 -- Proxy signatures and signing keys
@@ -69,6 +70,12 @@ instance Hashable HeavyDlgIndex
 
 instance Buildable HeavyDlgIndex where
     build (HeavyDlgIndex i) = bprint build i
+
+instance FromJSON HeavyDlgIndex where
+    parseJSON v = HeavyDlgIndex <$> parseJSON v
+
+instance ToJSON HeavyDlgIndex where
+    toJSON = toJSON . getHeavyDlgIndex
 
 -- | Simple proxy signature without ttl/epoch index constraints.
 type ProxySigHeavy a = ProxySignature HeavyDlgIndex a

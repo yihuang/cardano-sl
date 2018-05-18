@@ -33,11 +33,11 @@ import           Pos.Core.Common (Address, Coeff (..), Coin (..), CoinPortion (.
                                   StakeholderId, TxFeePolicy (..), TxSizeLinear (..), addressF,
                                   decodeTextAddress, getCoinPortion, unsafeGetCoin)
 import           Pos.Core.Delegation (HeavyDlgIndex (..), ProxySKHeavy)
-import           Pos.Core.Genesis.Helpers (recreateGenesisDelegation)
 import           Pos.Core.Genesis.Types (GenesisAvvmBalances (..), GenesisData (..),
                                          GenesisDelegation (..), GenesisNonAvvmBalances (..),
                                          GenesisProtocolConstants (..),
-                                         GenesisVssCertificatesMap (..), GenesisWStakeholders (..))
+                                         GenesisVssCertificatesMap (..), GenesisWStakeholders (..),
+                                         recreateGenesisDelegation)
 import           Pos.Core.ProtocolConstants (VssMaxTTL (..), VssMinTTL (..))
 import           Pos.Core.Slotting.Types (EpochIndex (..), Timestamp (..))
 import           Pos.Core.Ssc.Types (VssCertificate (..), VssCertificatesMap (..))

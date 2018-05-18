@@ -19,7 +19,8 @@ module Pos.Core.Slotting.Timestamp
 
 import           Universum
 
-import           Control.Lens (Iso', iso, makePrisms, from)
+import           Control.Lens (Iso', from, iso, makePrisms)
+import           Data.Aeson (FromJSON (..), ToJSON (..))
 import qualified Data.Text.Buildable as Buildable
 import           Data.Time (UTCTime, defaultTimeLocale, iso8601DateFormat, parseTimeM)
 import           Data.Time.Clock.POSIX (POSIXTime, posixSecondsToUTCTime, utcTimeToPOSIXSeconds)
@@ -28,6 +29,8 @@ import           Formatting (Format, build)
 import           Mockable (CurrentTime, Mockable, currentTime)
 import           Numeric.Lens (dividing)
 import qualified Prelude
+
+import           Pos.Core.Orphans ()
 
 -- | Timestamp is a number which represents some point in time. It is
 -- used in MonadSlots and its meaning is up to implementation of this
@@ -54,6 +57,9 @@ instance Buildable Timestamp where
 
 instance NFData Timestamp where
     rnf Timestamp{..} = rnf (toInteger getTimestamp)
+
+deriving instance FromJSON Timestamp
+deriving instance ToJSON Timestamp
 
 -- | Specialized formatter for 'Timestamp' data type.
 timestampF :: Format r (Timestamp -> r)

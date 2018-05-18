@@ -8,6 +8,8 @@ module Pos.Core.Genesis.Types
        , GenesisDelegation (..)
        , GenesisVssCertificatesMap (..)
        , noGenesisDelegation
+       , mkGenesisDelegation
+       , recreateGenesisDelegation
 
          -- * GenesisSpec
        , TestnetBalanceOptions (..)
@@ -27,22 +29,30 @@ module Pos.Core.Genesis.Types
 
 import           Universum
 
+import           Control.Lens (at)
 import           Control.Monad.Except (MonadError (throwError))
+import           Data.Aeson (FromJSON (..), ToJSON (..))
+import           Data.Aeson.TH (deriveJSON)
 import           Data.Hashable (Hashable)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.Buildable as Buildable
 import           Fmt (genericF)
-import           Formatting (bprint, build, fixed, int, (%))
+import           Formatting (bprint, build, fixed, int, sformat, (%))
+import           Serokell.Aeson.Options (defaultOptions)
 import           Serokell.Util (allDistinct, mapJson)
 
-import           Pos.Core.Common (Address, Coin, CoinPortion, SharedSeed, StakeholderId)
+import           Pos.Binary.Class (Bi)
+import           Pos.Core.Common (Address, Coin, CoinPortion, SharedSeed, StakeholderId,
+                                  addressHash, decodeTextAddress, unsafeAddCoin, unsafeGetCoin,
+                                  unsafeIntegerToCoin)
 import           Pos.Core.Delegation (ProxySKHeavy)
 import           Pos.Core.ProtocolConstants (ProtocolConstants (..), VssMaxTTL (..), VssMinTTL (..))
 import           Pos.Core.Slotting.Types (Timestamp)
 import           Pos.Core.Ssc.Types (VssCertificatesMap, getVssCertificatesMap)
 import           Pos.Core.Update.Types (BlockVersionData)
 import           Pos.Crypto.Configuration (ProtocolMagic)
-import           Pos.Crypto.Signing (RedeemPublicKey)
+import           Pos.Crypto.Signing (RedeemPublicKey, isSelfSignedPsk, pskDelegatePk, pskIssuerPk)
+import           Pos.Util.Util (toAesonError)
 
 -- | Wrapper around weighted stakeholders map to be used in genesis
 -- core data.
@@ -59,6 +69,9 @@ instance Buildable GenesisWStakeholders where
     build (GenesisWStakeholders m) =
         bprint ("GenesisWStakeholders: "%mapJson) m
 
+deriving instance ToJSON GenesisWStakeholders
+deriving instance FromJSON GenesisWStakeholders
+
 -- | Predefined balances of non avvm entries.
 newtype GenesisVssCertificatesMap = GenesisVssCertificatesMap
     { getGenesisVssCertificatesMap :: VssCertificatesMap
@@ -67,6 +80,12 @@ newtype GenesisVssCertificatesMap = GenesisVssCertificatesMap
 instance Buildable GenesisVssCertificatesMap where
     build (GenesisVssCertificatesMap m) =
         bprint ("GenesisVssCertificatesMap: "%mapJson) (getVssCertificatesMap m)
+
+instance ToJSON GenesisVssCertificatesMap where
+    toJSON = toJSON . getGenesisVssCertificatesMap
+
+instance FromJSON GenesisVssCertificatesMap where
+    parseJSON val = GenesisVssCertificatesMap <$> parseJSON val
 
 -- | This type contains genesis state of heavyweight delegation. It
 -- wraps a map where keys are issuers (i. e. stakeholders who
@@ -82,9 +101,48 @@ newtype GenesisDelegation = UnsafeGenesisDelegation
 
 type instance Element GenesisDelegation = ProxySKHeavy
 
+instance ToJSON GenesisDelegation where
+    toJSON = toJSON . unGenesisDelegation
+
+instance FromJSON GenesisDelegation where
+    parseJSON = parseJSON >=> \v -> do
+        (elems :: HashMap StakeholderId ProxySKHeavy) <- mapM parseJSON v
+        toAesonError $ recreateGenesisDelegation elems
+
 -- | Empty 'GenesisDelegation'.
 noGenesisDelegation :: GenesisDelegation
 noGenesisDelegation = UnsafeGenesisDelegation mempty
+
+-- | Safe constructor of 'GenesisDelegation' from a list of PSKs.
+mkGenesisDelegation ::
+       MonadError Text m
+    => [ProxySKHeavy]
+    -> m GenesisDelegation
+mkGenesisDelegation psks = do
+    unless (allDistinct $ pskIssuerPk <$> psks) $
+        throwError "all issuers must be distinct"
+    let res = HM.fromList [(addressHash (pskIssuerPk psk), psk) | psk <- psks]
+    recreateGenesisDelegation res
+
+-- | Safe constructor of 'GenesisDelegation' from existing map.
+recreateGenesisDelegation ::
+       MonadError Text m
+    => HashMap StakeholderId ProxySKHeavy
+    -> m GenesisDelegation
+recreateGenesisDelegation pskMap = do
+    forM_ (HM.toList pskMap) $ \(k, psk) ->
+        when (addressHash (pskIssuerPk psk) /= k) $
+            throwError $ sformat
+                ("wrong issuerPk set as key for delegation map: "%
+                 "issuer id = "%build%", cert id = "%build)
+                k (addressHash (pskIssuerPk psk))
+    when (any isSelfSignedPsk pskMap) $
+        throwError "there is a self-signed (revocation) psk"
+    let isIssuer psk =
+            isJust $ pskMap ^. at (addressHash (pskDelegatePk psk))
+    when (any isIssuer pskMap) $
+        throwError "one of the delegates is also an issuer, don't do it"
+    return $ UnsafeGenesisDelegation pskMap
 
 ----------------------------------------------------------------------------
 -- Genesis Spec
@@ -119,6 +177,8 @@ instance Buildable TestnetBalanceOptions where
             tboRichmenShare
             tboUseHDAddresses
 
+deriveJSON defaultOptions ''TestnetBalanceOptions
+
 -- | These options determines balances of fake AVVM nodes which didn't
 -- really go through vending, but pretend they did.
 data FakeAvvmOptions = FakeAvvmOptions
@@ -128,6 +188,8 @@ data FakeAvvmOptions = FakeAvvmOptions
 
 instance Buildable FakeAvvmOptions where
     build = genericF
+
+deriveJSON defaultOptions ''FakeAvvmOptions
 
 -- | This data type contains various options which determine genesis
 -- stakes, balanaces, heavy delegation, etc.
@@ -165,12 +227,17 @@ instance (Hashable Address, Buildable Address) =>
         giUseHeavyDlg
         giSeed
 
+deriveJSON defaultOptions ''GenesisInitializer
+
 -- | Predefined balances of avvm entries.
 newtype GenesisAvvmBalances = GenesisAvvmBalances
     { getGenesisAvvmBalances :: HashMap RedeemPublicKey Coin
     } deriving (Show, Eq, Semigroup, Monoid, ToList, Container)
 
 type instance Element GenesisAvvmBalances = Coin
+
+deriving instance ToJSON GenesisAvvmBalances
+deriving instance FromJSON GenesisAvvmBalances
 
 -- | Predefined balances of non avvm entries.
 newtype GenesisNonAvvmBalances = GenesisNonAvvmBalances
@@ -183,6 +250,34 @@ instance (Hashable Address, Buildable Address) =>
         bprint ("GenesisNonAvvmBalances: " %mapJson) m
 
 deriving instance Hashable Address => Monoid GenesisNonAvvmBalances
+
+instance ToJSON GenesisNonAvvmBalances where
+    toJSON = toJSON . convert . getGenesisNonAvvmBalances
+      where
+        convert :: HashMap Address Coin -> HashMap Text Integer
+        convert = HM.fromList . map f . HM.toList
+        f :: (Address, Coin) -> (Text, Integer)
+        f = bimap pretty (toInteger . unsafeGetCoin)
+
+instance FromJSON GenesisNonAvvmBalances where
+    parseJSON = toAesonError . convertNonAvvmDataToBalances <=< parseJSON
+
+-- | Generate genesis address distribution out of avvm
+-- parameters. Txdistr of the utxo is all empty. Redelegate it in
+-- calling funciton.
+convertNonAvvmDataToBalances
+    :: forall m .
+       ( MonadError Text m, Bi Address )
+    => HashMap Text Integer
+    -> m GenesisNonAvvmBalances
+convertNonAvvmDataToBalances balances = GenesisNonAvvmBalances <$> balances'
+  where
+    balances' :: m (HashMap Address Coin)
+    balances' = HM.fromListWith unsafeAddCoin <$> traverse convert (HM.toList balances)
+    convert :: (Text, Integer) -> m (Address, Coin)
+    convert (txt, i) = do
+        addr <- either throwError pure $ decodeTextAddress txt
+        return (addr, unsafeIntegerToCoin i)
 
 -- | 'GensisProtocolConstants' are not really part of genesis global state,
 -- but they affect consensus, so they are part of 'GenesisSpec' and
@@ -197,6 +292,8 @@ data GenesisProtocolConstants = GenesisProtocolConstants
       -- | VSS certificates min timeout to live (number of epochs).
     , gpcVssMinTTL     :: !VssMinTTL
     } deriving (Show, Eq, Generic)
+
+deriveJSON defaultOptions ''GenesisProtocolConstants
 
 genesisProtocolConstantsToProtocolConstants
     :: GenesisProtocolConstants
@@ -237,6 +334,8 @@ data GenesisSpec = UnsafeGenesisSpec
     , gsInitializer       :: !GenesisInitializer
     -- ^ Other data which depend on genesis type.
     } deriving (Show, Generic)
+
+deriveJSON defaultOptions ''GenesisSpec
 
 -- | Safe constructor for 'GenesisSpec'. Throws error if something
 -- goes wrong.

@@ -11,20 +11,25 @@ module Pos.Crypto.Signing.Types.Redeem
        ) where
 
 import           Control.Exception.Safe (Exception (..))
+import           Control.Lens (_Left)
 import qualified Crypto.Sign.Ed25519 as Ed25519
+import           Data.Aeson (FromJSONKey (..), FromJSONKeyFunction (..), ToJSONKey (..),
+                             ToJSONKeyFunction (..))
+import           Data.Aeson.Encoding (text)
 import           Data.Aeson.TH (defaultOptions, deriveJSON)
 import qualified Data.ByteString as BS
 import           Data.Hashable (Hashable)
 import qualified Data.Text as T
 import qualified Data.Text.Buildable as B
 import qualified Data.Text.Lazy.Builder as Builder (fromText)
-import           Formatting (Format, bprint, fitLeft, later, (%), (%.))
+import           Formatting (Format, bprint, fitLeft, later, sformat, (%), (%.))
 import           Serokell.Util.Base64 (formatBase64)
 import qualified Serokell.Util.Base64 as B64
 import           Universum
 
 import           Pos.Binary.Class (Bi)
 import           Pos.Crypto.Orphans ()
+import           Pos.Util.Util (toAesonError)
 
 ----------------------------------------------------------------------------
 -- PK/SK and formatters
@@ -35,6 +40,15 @@ newtype RedeemPublicKey = RedeemPublicKey Ed25519.PublicKey
     deriving (Eq, Ord, Show, Generic, NFData, Hashable, Typeable)
 
 deriveJSON defaultOptions ''RedeemPublicKey
+
+instance ToJSONKey RedeemPublicKey where
+    toJSONKey = ToJSONKeyText render (text . render)
+      where
+        render = sformat redeemPkB64UrlF
+
+instance FromJSONKey RedeemPublicKey where
+    fromJSONKey = FromJSONKeyTextParser (toAesonError . over _Left pretty . fromAvvmPk)
+    fromJSONKeyList = FromJSONKeyTextParser (toAesonError . bimap pretty pure . fromAvvmPk)
 
 deriving instance Bi RedeemPublicKey
 
@@ -66,21 +80,6 @@ instance B.Buildable RedeemPublicKey where
 
 instance B.Buildable RedeemSecretKey where
     build = bprint ("redeem_sec_of_pk:"%redeemPkB64F) . redeemToPublic
-
-----------------------------------------------------------------------------
--- Redeem signatures
-----------------------------------------------------------------------------
-
--- | Wrapper around 'Ed25519.Signature'.
-newtype RedeemSignature a = RedeemSignature Ed25519.Signature
-    deriving (Eq, Ord, Show, Generic, NFData, Hashable, Typeable)
-
-instance B.Buildable (RedeemSignature a) where
-    build _ = "<redeem signature>"
-
-deriveJSON defaultOptions ''RedeemSignature
-
-deriving instance Typeable a => Bi (RedeemSignature a)
 
 data AvvmPkError
     = ApeAddressFormat Text
@@ -122,3 +121,18 @@ redeemPkBuild bs
         "consRedeemPk: failed to form pk, wrong bs length: " <> show (BS.length bs) <>
         ", when should be 32"
     | otherwise = RedeemPublicKey $ Ed25519.PublicKey $ bs
+
+----------------------------------------------------------------------------
+-- Redeem signatures
+----------------------------------------------------------------------------
+
+-- | Wrapper around 'Ed25519.Signature'.
+newtype RedeemSignature a = RedeemSignature Ed25519.Signature
+    deriving (Eq, Ord, Show, Generic, NFData, Hashable, Typeable)
+
+instance B.Buildable (RedeemSignature a) where
+    build _ = "<redeem signature>"
+
+deriveJSON defaultOptions ''RedeemSignature
+
+deriving instance Typeable a => Bi (RedeemSignature a)

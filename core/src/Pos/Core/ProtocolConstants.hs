@@ -13,17 +13,19 @@ module Pos.Core.ProtocolConstants
 
 import           Universum
 
+import           Data.Aeson (FromJSON (..), ToJSON (..))
+
 import           Pos.Core.Common (BlockCount (..))
 import           Pos.Core.Slotting.Types (SlotCount)
 
 -- | The 'k' parameter and TTLs for VSS certificates.
 data ProtocolConstants = ProtocolConstants
     { -- | Security parameter from the paper.
-      pcK             :: !Int
+      pcK         :: !Int
       -- | VSS certificates min timeout to live (number of epochs).
-    , pcVssMinTTL     :: !VssMinTTL
+    , pcVssMinTTL :: !VssMinTTL
       -- | VSS certificates max timeout to live (number of epochs).
-    , pcVssMaxTTL     :: !VssMaxTTL
+    , pcVssMaxTTL :: !VssMaxTTL
     } deriving (Show, Eq, Generic)
 
 -- | Minimum time-to-live for a VSS certificate.
@@ -31,10 +33,22 @@ newtype VssMinTTL = VssMinTTL
     { getVssMinTTL :: Word32
     } deriving (Eq, Show, Bounded, Enum, Generic)
 
+instance ToJSON VssMinTTL where
+    toJSON = toJSON . getVssMinTTL
+
+instance FromJSON VssMinTTL where
+    parseJSON = fmap VssMinTTL . parseJSON
+
 -- | Maximum time-to-live for a VSS certificate.
 newtype VssMaxTTL = VssMaxTTL
     { getVssMaxTTL :: Word32
     } deriving (Eq, Show, Bounded, Enum, Generic)
+
+instance ToJSON VssMaxTTL where
+    toJSON = toJSON . getVssMaxTTL
+
+instance FromJSON VssMaxTTL where
+    parseJSON = fmap VssMaxTTL . parseJSON
 
 -- | Security parameter which is maximum number of blocks which can be
 -- rolled back.

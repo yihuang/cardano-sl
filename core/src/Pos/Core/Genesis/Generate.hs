@@ -34,12 +34,11 @@ import           Pos.Core.Common (Address, Coin, IsBootstrapEraAddr (..), Stakeh
 import           Pos.Core.Configuration.BlockVersionData (HasGenesisBlockVersionData)
 import           Pos.Core.Configuration.Protocol (HasProtocolConstants, vssMaxTTL, vssMinTTL)
 import           Pos.Core.Delegation (HeavyDlgIndex (..), ProxySKHeavy)
-import           Pos.Core.Genesis.Helpers (mkGenesisDelegation)
 import           Pos.Core.Genesis.Types (FakeAvvmOptions (..), GenesisAvvmBalances (..),
                                          GenesisDelegation, GenesisInitializer (..),
                                          GenesisNonAvvmBalances (..),
                                          GenesisVssCertificatesMap (..), GenesisWStakeholders (..),
-                                         TestnetBalanceOptions (..))
+                                         TestnetBalanceOptions (..), mkGenesisDelegation)
 import           Pos.Core.Ssc.Vss (VssCertificate, mkVssCertificate, mkVssCertificatesMap)
 import           Pos.Crypto (EncryptedSecretKey, ProtocolMagic, RedeemPublicKey, SecretKey,
                              VssKeyPair, createPsk, deterministic, emptyPassphrase, encToSecret,

@@ -21,9 +21,11 @@ module Pos.Core.Configuration.Core
 
 import           Universum
 
-import           Data.Reflection (Given (..), give)
-
+import           Data.Aeson.TH (deriveJSON)
 import qualified Data.HashMap.Strict as HM
+import           Data.Reflection (Given (..), give)
+import           Serokell.Aeson.Options (defaultOptions)
+
 import           Pos.Binary.Class (Raw)
 import           Pos.Core.Common.Fee (Coeff (..), TxFeePolicy (..), TxSizeLinear (..))
 import           Pos.Core.Common.Types (SharedSeed (..), unsafeCoinPortionFromDouble)
@@ -49,6 +51,8 @@ data GenesisConfiguration
             }
     deriving (Show)
 
+deriveJSON defaultOptions ''GenesisConfiguration
+
 data CoreConfiguration = CoreConfiguration
     {
       -- | Specifies the genesis
@@ -59,6 +63,8 @@ data CoreConfiguration = CoreConfiguration
 
     }
     deriving (Show, Generic)
+
+deriveJSON defaultOptions ''CoreConfiguration
 
 defaultCoreConfiguration :: CoreConfiguration
 defaultCoreConfiguration = CoreConfiguration (GCSpec defaultGenesisSpec)  0

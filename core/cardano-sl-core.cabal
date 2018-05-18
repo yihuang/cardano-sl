@@ -58,9 +58,7 @@ library
   other-modules:
                        -- Binary
                        Pos.Binary.Core.Address
-                       Pos.Binary.Core.Block
                        Pos.Binary.Core.Blockchain
-                       Pos.Binary.Core.Common
                        Pos.Binary.Core.Delegation
                        Pos.Binary.Core.Fee
                        Pos.Binary.Core.Script

@@ -27,7 +27,7 @@ import           Formatting (bprint, build, int, (%))
 import qualified Prelude
 import           Serokell.Util.Base64 (JsonByteString (..))
 
-import           Pos.Binary.Class
+import           Pos.Binary.Class (Bi (..), Decoder, Encoding)
 
 -- | Representation of unparsed fields in Attributes. Newtype wrapper is used
 -- for clear backward compatibility between previous representation (which was
@@ -88,7 +88,6 @@ instance Buildable (Attributes ()) where
 instance Hashable h => Hashable (Attributes h)
 
 instance NFData h => NFData (Attributes h)
-
 
 -- | Check whether all data from 'Attributes' is known, i. e. was
 -- successfully parsed into some structured data.
@@ -181,3 +180,7 @@ decodeAttributes initval updater = do
                 { attrData   = newData
                 , attrRemain = UnparsedFields . M.delete k $ fromUnparsedFields attrRemain
                 }
+
+instance Bi (Attributes ()) where
+    encode = encodeAttributes []
+    decode = decodeAttributes () $ \_ _ _ -> pure Nothing

@@ -3,9 +3,7 @@
 
 module Pos.Binary.Core
        ( module Pos.Binary.Core.Address
-       , module Pos.Binary.Core.Block
        , module Pos.Binary.Core.Blockchain
-       , module Pos.Binary.Core.Common
        , module Pos.Binary.Core.Delegation
        , module Pos.Binary.Core.Fee
        , module Pos.Binary.Core.Script
@@ -16,9 +14,7 @@ module Pos.Binary.Core
        ) where
 
 import           Pos.Binary.Core.Address
-import           Pos.Binary.Core.Block
 import           Pos.Binary.Core.Blockchain
-import           Pos.Binary.Core.Common ()
 import           Pos.Binary.Core.Delegation ()
 import           Pos.Binary.Core.Fee ()
 import           Pos.Binary.Core.Script ()

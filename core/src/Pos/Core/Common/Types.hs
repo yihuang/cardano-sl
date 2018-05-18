@@ -81,8 +81,10 @@ import           Serokell.Util.Base16 (formatBase16)
 import           Serokell.Util.Base64 (JsonByteString (..))
 import           System.Random (Random (..))
 
-import           Pos.Binary.Class (Bi, decode, encode)
-import qualified Pos.Binary.Class as Bi
+import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), decodeCrcProtected, decodeFull',
+                                   decodeListLenCanonical, decodeUnknownCborDataItem,
+                                   deriveSimpleBi, deserialize, encodeCrcProtected, encodeListLen,
+                                   encodeUnknownCborDataItem, enforceSize, serialize, serialize')
 import           Pos.Core.Constants (sharedSeedLength)
 import           Pos.Crypto.Hashing (AbstractHash, Hash, shortHashF)
 import           Pos.Crypto.HD (HDAddressPayload)
@@ -166,16 +168,16 @@ instance Bi AddrSpendingData where
             UnknownASD tag payload ->
                 -- `encodeListLen 2` is semantically equivalent to encode (x,y)
                 -- but we need to "unroll" it in order to apply CBOR's tag 24 to `payload`.
-                Bi.encodeListLen 2
+                encodeListLen 2
                     <> encode tag
-                    <> Bi.encodeUnknownCborDataItem (LBS.fromStrict payload)
+                    <> encodeUnknownCborDataItem (LBS.fromStrict payload)
     decode = do
-        Bi.enforceSize "AddrSpendingData" 2
+        enforceSize "AddrSpendingData" 2
         decode @Word8 >>= \case
             0 -> PubKeyASD <$> decode
             1 -> ScriptASD <$> decode
             2 -> RedeemASD <$> decode
-            tag -> UnknownASD tag <$> Bi.decodeUnknownCborDataItem
+            tag -> UnknownASD tag <$> decodeUnknownCborDataItem
 
 -- | Type of an address. It corresponds to constructors of
 -- 'AddrSpendingData'. It's separated, because 'Address' doesn't store
@@ -231,11 +233,11 @@ instance Buildable AddrStakeDistribution where
 instance Bi AddrStakeDistribution where
     encode =
         \case
-            BootstrapEraDistr -> Bi.encodeListLen 0
+            BootstrapEraDistr -> encodeListLen 0
             SingleKeyDistr id -> encode (w8 0, id)
             UnsafeMultiKeyDistr distr -> encode (w8 1, distr)
     decode =
-        Bi.decodeListLenCanonical >>= \case
+        decodeListLenCanonical >>= \case
             0 -> pure BootstrapEraDistr
             2 ->
                 decode @Word8 >>= \case
@@ -331,14 +333,14 @@ instance Bi (Attributes AddrAttributes) where
         stakeDistributionListWithIndices =
             case stakeDistr of
                 BootstrapEraDistr -> []
-                _                 -> [(0, Bi.serialize . aaStakeDistribution)]
+                _                 -> [(0, serialize . aaStakeDistribution)]
         derivationPathListWithIndices =
             case derivationPath of
                 Nothing -> []
                 -- 'unsafeFromJust' is safe, because 'case' ensures
                 -- that derivation path is 'Just'.
                 Just _ ->
-                    [(1, Bi.serialize . unsafeFromJust . aaPkDerivationPath)]
+                    [(1, serialize . unsafeFromJust . aaPkDerivationPath)]
         unsafeFromJust =
             fromMaybe
                 (error "Maybe was Nothing in Bi (Attributes AddrAttributes)")
@@ -352,8 +354,8 @@ instance Bi (Attributes AddrAttributes) where
             }
         go n v acc =
             case n of
-                0 -> (\distr -> Just $ acc {aaStakeDistribution = distr }    ) <$> Bi.deserialize v
-                1 -> (\deriv -> Just $ acc {aaPkDerivationPath = Just deriv }) <$> Bi.deserialize v
+                0 -> (\distr -> Just $ acc {aaStakeDistribution = distr }    ) <$> deserialize v
+                1 -> (\deriv -> Just $ acc {aaPkDerivationPath = Just deriv }) <$> deserialize v
                 _ -> pure Nothing
 
 -- | Hash of this data is stored in 'Address'. This type exists mostly
@@ -395,14 +397,14 @@ instance Buildable Address where
 
 instance Bi Address where
     encode Address{..} =
-        Bi.encodeCrcProtected (addrRoot, addrAttributes, addrType)
+        encodeCrcProtected (addrRoot, addrAttributes, addrType)
     decode = do
-        (addrRoot, addrAttributes, addrType) <- Bi.decodeCrcProtected
+        (addrRoot, addrAttributes, addrType) <- decodeCrcProtected
         let res = Address {..}
         pure res
 
 instance Hashable Address where
-    hashWithSalt s = hashWithSalt s . Bi.serialize
+    hashWithSalt s = hashWithSalt s . serialize
 
 instance FromJSONKey Address where
     fromJSONKey = FromJSONKeyTextParser (toAesonError . decodeTextAddress)
@@ -422,7 +424,7 @@ addrAlphabet :: Alphabet
 addrAlphabet = bitcoinAlphabet
 
 addrToBase58 :: Address -> ByteString
-addrToBase58 = encodeBase58 addrAlphabet . Bi.serialize'
+addrToBase58 = encodeBase58 addrAlphabet . serialize'
 
 -- | Specialized formatter for 'Address'.
 addressF :: Format r (Address -> r)
@@ -436,7 +438,7 @@ decodeTextAddress = decodeAddress . encodeUtf8
     decodeAddress bs = do
         let base58Err = "Invalid base58 representation of address"
         dbs <- maybeToRight base58Err $ decodeBase58 addrAlphabet bs
-        Bi.decodeFull' dbs
+        decodeFull' dbs
 
 ----------------------------------------------------------------------------
 -- BlockHeader (forward-declaration)
@@ -461,53 +463,6 @@ headerHashF :: Format r (HeaderHash -> r)
 headerHashF = build
 
 ----------------------------------------------------------------------------
--- SSC. It means shared seed computation, btw
-----------------------------------------------------------------------------
-
--- | This is a shared seed used for follow-the-satoshi. This seed is
--- randomly generated by each party and eventually they agree on the
--- same value.
-newtype SharedSeed = SharedSeed
-    { getSharedSeed :: ByteString
-    } deriving (Show, Eq, Ord, Generic, NFData, Typeable)
-
-instance Buildable SharedSeed where
-    build = formatBase16 . getSharedSeed
-
-instance Semigroup SharedSeed where
-    (<>) (SharedSeed a) (SharedSeed b) =
-        SharedSeed $ BS.pack (BS.zipWith xor a b) -- fast due to rewrite rules
-
-instance Monoid SharedSeed where
-    mempty = SharedSeed $ BSC.pack $ replicate sharedSeedLength '\NUL'
-    mappend = (Data.Semigroup.<>)
-    mconcat = foldl' mappend mempty
-
-instance ToJSON SharedSeed where
-    toJSON = toJSON . JsonByteString . getSharedSeed
-
-instance FromJSON SharedSeed where
-    parseJSON v = SharedSeed . getJsonByteString <$> parseJSON v
-
--- | 'NonEmpty' list of slot leaders.
-type SlotLeaders = NonEmpty StakeholderId
-
--- | Pretty-printer for slot leaders. Note: it takes list (not
--- 'NonEmpty' as an argument, because one can always convert @NonEmpty
--- a@ to @[a]@, but it also may be convenient to use it with a simple
--- list of slot leaders).
---
--- Example:
--- [
---    (0, 44283ce5), (1, 5f53e01e), (2, 44283ce5), (3, 1a1ff703), (4, 44283ce5), (5, 44283ce5), (6, 281e5ae9), (7, 1a1ff703)
---    (8, 1a1ff703), (9, 5f53e01e), (10, 1a1ff703), (11, 44283ce5), (12, 44283ce5), (13, 5f53e01e), (14, 5f53e01e), (15, 5f53e01e)
---    (16, 44283ce5), (17, 281e5ae9), (18, 281e5ae9), (19, 44283ce5)
--- ]
-slotLeadersF :: Format r ([StakeholderId] -> r)
-slotLeadersF =
-    later $ bprint (listChunkedJson 8) . map pairBuilder . enumerate @Int
-
-----------------------------------------------------------------------------
 -- Coin
 ----------------------------------------------------------------------------
 
@@ -528,6 +483,25 @@ instance FromJSON Coin where
 
 instance ToJSON Coin where
     toJSON = toJSON . unsafeGetCoin
+
+-- number of total coins is 45*10^9 * 10^6
+--
+--  Input                        | Bits to represent |
+-- ------------------------------| ----------------- |
+-- 0-9                           |      8 bits       |
+-- 0-99                          |      16 bits      |
+-- 0-999                         |      24 bits      |
+-- 0-9999                        |      24 bits      |
+-- 0-99999                       |      40 bits      |
+-- 0-999999                      |      40 bits      |
+-- 45*10^15                      |      72 bits      |
+-- 45*10^9                       |      72 bits      |
+-- 45*10^9 * 10^6 (maxbound)     |      72 bits      |
+-- maxbound - 1                  |      72 bits      |
+
+instance Bi Coin where
+    encode = encode . unsafeGetCoin
+    decode = Coin <$> decode
 
 -- | Maximal possible value of 'Coin'.
 maxCoinVal :: Word64
@@ -657,8 +631,66 @@ instance FromJSON Script where
         scrScript  <- getJsonByteString <$> obj .: "script"
         pure $ Script {..}
 
+deriveSimpleBi ''Script [
+    Cons 'Script [
+        Field [| scrVersion :: ScriptVersion |],
+        Field [| scrScript  :: ByteString   |]
+    ]]
+
 -- | Deserialized script (i.e. an AST), version 0.
 type Script_v0 = PLCore.Program
+
+----------------------------------------------------------------------------
+-- SSC. It means shared seed computation, btw
+----------------------------------------------------------------------------
+
+-- | This is a shared seed used for follow-the-satoshi. This seed is
+-- randomly generated by each party and eventually they agree on the
+-- same value.
+newtype SharedSeed = SharedSeed
+    { getSharedSeed :: ByteString
+    } deriving (Show, Eq, Ord, Generic, NFData, Typeable)
+
+instance Buildable SharedSeed where
+    build = formatBase16 . getSharedSeed
+
+instance Semigroup SharedSeed where
+    (<>) (SharedSeed a) (SharedSeed b) =
+        SharedSeed $ BS.pack (BS.zipWith xor a b) -- fast due to rewrite rules
+
+instance Monoid SharedSeed where
+    mempty = SharedSeed $ BSC.pack $ replicate sharedSeedLength '\NUL'
+    mappend = (Data.Semigroup.<>)
+    mconcat = foldl' mappend mempty
+
+instance ToJSON SharedSeed where
+    toJSON = toJSON . JsonByteString . getSharedSeed
+
+instance FromJSON SharedSeed where
+    parseJSON v = SharedSeed . getJsonByteString <$> parseJSON v
+
+deriveSimpleBi ''SharedSeed [
+    Cons 'SharedSeed [
+        Field [| getSharedSeed :: ByteString |]
+    ]]
+
+-- | 'NonEmpty' list of slot leaders.
+type SlotLeaders = NonEmpty StakeholderId
+
+-- | Pretty-printer for slot leaders. Note: it takes list (not
+-- 'NonEmpty' as an argument, because one can always convert @NonEmpty
+-- a@ to @[a]@, but it also may be convenient to use it with a simple
+-- list of slot leaders).
+--
+-- Example:
+-- [
+--    (0, 44283ce5), (1, 5f53e01e), (2, 44283ce5), (3, 1a1ff703), (4, 44283ce5), (5, 44283ce5), (6, 281e5ae9), (7, 1a1ff703)
+--    (8, 1a1ff703), (9, 5f53e01e), (10, 1a1ff703), (11, 44283ce5), (12, 44283ce5), (13, 5f53e01e), (14, 5f53e01e), (15, 5f53e01e)
+--    (16, 44283ce5), (17, 281e5ae9), (18, 281e5ae9), (19, 44283ce5)
+-- ]
+slotLeadersF :: Format r ([StakeholderId] -> r)
+slotLeadersF =
+    later $ bprint (listChunkedJson 8) . map pairBuilder . enumerate @Int
 
 ----------------------------------------------------------------------------
 -- Newtypes
@@ -669,6 +701,10 @@ newtype BlockCount = BlockCount {getBlockCount :: Word64}
               Buildable, Generic, Typeable, NFData, Hashable, Random)
 
 deriveJSON defaultOptions ''BlockCount
+
+instance Bi BlockCount where
+    encode = encode . getBlockCount
+    decode = BlockCount <$> decode
 
 ----------------------------------------------------------------------------
 -- ChainDifficulty
@@ -682,15 +718,14 @@ newtype ChainDifficulty = ChainDifficulty
 
 deriveJSON defaultOptions ''ChainDifficulty
 
+deriveSimpleBi ''ChainDifficulty [
+    Cons 'ChainDifficulty [
+        Field [| getChainDifficulty :: BlockCount |]
+    ]]
+
 ----------------------------------------------------------------------------
 -- Template Haskell invocations, banished to the end of the module because
 -- we don't want to topsort the whole module
 ----------------------------------------------------------------------------
 
 makePrisms ''Address
-
-Bi.deriveSimpleBi ''Script [
-    Bi.Cons 'Script [
-        Bi.Field [| scrVersion :: ScriptVersion |],
-        Bi.Field [| scrScript  :: ByteString   |]
-    ]]

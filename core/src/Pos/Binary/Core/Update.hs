@@ -13,7 +13,6 @@ import           Serokell.Data.Memory.Units (Byte)
 
 import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), Raw, deriveSimpleBi,
                                    encodeListLen, enforceSize)
-import           Pos.Binary.Core.Common ()
 import           Pos.Binary.Core.Fee ()
 import           Pos.Binary.Core.Script ()
 import           Pos.Binary.Core.Slotting ()

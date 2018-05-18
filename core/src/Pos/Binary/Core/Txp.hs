@@ -14,7 +14,6 @@ import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), decodeKnownCb
                                    decodeListLenCanonical, decodeUnknownCborDataItem,
                                    deriveSimpleBi, encodeKnownCborDataItem, encodeListLen,
                                    encodeUnknownCborDataItem, enforceSize, matchSize)
-import           Pos.Binary.Core.Common ()
 import           Pos.Binary.Core.Script ()
 import           Pos.Binary.Merkle ()
 import qualified Pos.Core.Common as Common

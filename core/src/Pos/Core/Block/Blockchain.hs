@@ -1,5 +1,5 @@
-{-# LANGUAGE Rank2Types   #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE Rank2Types          #-}
 
 -- | This module contains some general definitions related to blocks
 -- and headers. The heart of this module is 'Blockchain' type class.
@@ -36,9 +36,10 @@ import           Control.Lens (makeLenses)
 import           Control.Monad.Except (MonadError (throwError))
 import           Formatting (build, sformat, (%))
 
+import           Pos.Binary.Class (Bi (..), encodeListLen, enforceSize)
 import           Pos.Core.Class (HasPrevBlock (..))
 import           Pos.Core.Common (HeaderHash)
-import           Pos.Crypto (ProtocolMagic)
+import           Pos.Crypto (ProtocolMagic (..), getProtocolMagic)
 
 ----------------------------------------------------------------------------
 -- Blockchain class
@@ -48,9 +49,9 @@ import           Pos.Crypto (ProtocolMagic)
 -- different blockchains.
 class Blockchain p where
     -- | Proof of data stored in the body. Ensures immutability.
-    data BodyProof p :: *
+    type BodyProof p :: *
     -- | Consensus data which can be used to check consensus properties.
-    data ConsensusData p :: *
+    type ConsensusData p :: *
     -- | Whatever extra data.
     type ExtraHeaderData p :: *
     type ExtraHeaderData p = ()
@@ -62,7 +63,7 @@ class Blockchain p where
     type BHeaderHash p = HeaderHash
 
     -- | Body contains payload and other heavy data.
-    data Body p :: *
+    type Body p :: *
     -- | Whatever extra data.
     type ExtraBodyData p :: *
     type ExtraBodyData p = ()
@@ -78,7 +79,7 @@ class Blockchain p where
         (MonadError Text m, Buildable (BodyProof p), Eq (BodyProof p)) =>
         Body p -> BodyProof p -> m ()
     checkBodyProof body proof = do
-        let calculatedProof = mkBodyProof body
+        let calculatedProof = mkBodyProof @p body
         let errMsg =
                 sformat ("Incorrect proof of body. "%
                          "Proof in header: "%build%
@@ -99,13 +100,13 @@ class Blockchain p where
 data GenericBlockHeader b = UnsafeGenericBlockHeader
     { _gbhProtocolMagic :: !ProtocolMagic
       -- | Pointer to the header of the previous block.
-    , _gbhPrevBlock :: !(BHeaderHash b)
+    , _gbhPrevBlock     :: !(BHeaderHash b)
     , -- | Proof of body.
-      _gbhBodyProof :: !(BodyProof b)
+      _gbhBodyProof     :: !(BodyProof b)
     , -- | Consensus data to verify consensus algorithm.
-      _gbhConsensus :: !(ConsensusData b)
+      _gbhConsensus     :: !(ConsensusData b)
     , -- | Any extra data.
-      _gbhExtra     :: !(ExtraHeaderData b)
+      _gbhExtra         :: !(ExtraHeaderData b)
     } deriving (Generic)
 
 deriving instance
@@ -128,6 +129,28 @@ instance
     , NFData (ConsensusData b)
     , NFData (ExtraHeaderData b)
     ) => NFData (GenericBlockHeader b)
+
+instance ( Typeable b
+         , Bi (BHeaderHash b)
+         , Bi (BodyProof b)
+         , Bi (ConsensusData b)
+         , Bi (ExtraHeaderData b)
+         ) =>
+         Bi (GenericBlockHeader b) where
+    encode bh =  encodeListLen 5
+              <> encode (getProtocolMagic (_gbhProtocolMagic bh))
+              <> encode (_gbhPrevBlock bh)
+              <> encode (_gbhBodyProof bh)
+              <> encode (_gbhConsensus bh)
+              <> encode (_gbhExtra bh)
+    decode = do
+        enforceSize "GenericBlockHeader b" 5
+        _gbhProtocolMagic <- ProtocolMagic <$> decode
+        _gbhPrevBlock <- decode
+        _gbhBodyProof <- decode
+        _gbhConsensus <- decode
+        _gbhExtra     <- decode
+        pure UnsafeGenericBlockHeader {..}
 
 -- | In general Block consists of header and body. It may contain
 -- extra data as well.
@@ -165,6 +188,26 @@ deriving instance
 --    , NFData (ExtraBodyData b)
 --    ) => NFData (GenericBlock b)
 
+instance ( Typeable b
+         , Bi (BHeaderHash b)
+         , Bi (BodyProof b)
+         , Bi (ConsensusData b)
+         , Bi (ExtraHeaderData b)
+         , Bi (Body b)
+         , Bi (ExtraBodyData b)
+         ) =>
+         Bi (GenericBlock b) where
+    encode gb =  encodeListLen 3
+              <> encode (_gbHeader gb)
+              <> encode (_gbBody gb)
+              <> encode (_gbExtra gb)
+    decode = do
+        enforceSize "GenericBlock" 3
+        _gbHeader <- decode
+        _gbBody   <- decode
+        _gbExtra  <- decode
+        pure UnsafeGenericBlock {..}
+
 ----------------------------------------------------------------------------
 -- Smart constructors
 ----------------------------------------------------------------------------
@@ -184,7 +227,7 @@ mkGenericHeader
 mkGenericHeader pm hashPrev body consensus extra =
     UnsafeGenericBlockHeader pm hashPrev proof (consensus proof) extra
   where
-    proof = mkBodyProof body
+    proof = mkBodyProof @b body
 
 -- | Smart constructor for 'GenericBlock'.
 -- "Smart" because it uses the 'mkGenericHeader' "smart" constructor.

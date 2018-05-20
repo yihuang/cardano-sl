@@ -16,8 +16,8 @@ module Pos.Block.Network.Logic
 import           Universum
 
 import           Control.Concurrent.STM (isFullTBQueue, readTVar, writeTBQueue, writeTVar)
-import           Control.Exception.Safe (Exception (..))
 import           Control.Exception (IOException)
+import           Control.Exception.Safe (Exception (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as M
 import qualified Data.Text.Buildable as B
@@ -40,6 +40,8 @@ import           Pos.Communication.Protocol (NodeId)
 import           Pos.Core (HasHeaderHash (..), HeaderHash, gbHeader, headerHashG, isMoreDifficult,
                            prevBlockL)
 import           Pos.Core.Block (Block, BlockHeader, blockHeader)
+import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..), _NewestFirst,
+                                  _OldestFirst)
 import           Pos.Crypto (shortHashF)
 import qualified Pos.DB.Block.Load as DB
 import           Pos.Diffusion.Types (Diffusion)
@@ -50,8 +52,6 @@ import           Pos.Reporting.MemState (HasMisbehaviorMetrics (..), Misbehavior
 import           Pos.StateLock (Priority (..), modifyStateLock)
 import           Pos.Util (buildListBounds, multilineBounds, _neLast)
 import           Pos.Util.AssertMode (inAssertMode)
-import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..), _NewestFirst,
-                                  _OldestFirst)
 import           Pos.Util.JsonLog.Events (MemPoolModifyReason (..), jlAdoptedBlock)
 import           Pos.Util.TimeWarp (CanJsonLog (..))
 import           Pos.Util.Util (lensOf)
@@ -118,7 +118,7 @@ triggerRecovery diffusion = unlessM recoveryInProgress $ do
     waitAndProcessOne (nodeId, mbh) = do
         -- 'mbh' is an 'm' term that returns when the header has been
         -- downloaded.
-        bh <- mbh 
+        bh <- mbh
         -- I know, it's not unsolicited. TODO rename.
         handleUnsolicitedHeader bh nodeId
 

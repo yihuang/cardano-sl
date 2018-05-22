@@ -783,7 +783,7 @@ let
            homepage = "http://github.com/ryantm/hdbc-mysql";
            description = "MySQL driver for HDBC";
            license = "LGPL";
-         }) {inherit (pkgs) mysqlclient; inherit (pkgs) openssl;
+         }) {inherit (pkgs) mysqlclient; inherit (pkgs) openssl; 
 inherit (pkgs) zlib;};
       "HDBC-session" = callPackage
         ({ mkDerivation, base, HDBC, stdenv }:
@@ -2028,8 +2028,8 @@ inherit (pkgs) zlib;};
            description = "A binding to part of the Win32 library";
            license = stdenv.lib.licenses.bsd3;
            platforms = stdenv.lib.platforms.none;
-         }) {inherit (pkgs) advapi32; inherit (pkgs) gdi32;
-inherit (pkgs) shell32; inherit (pkgs) shfolder;
+         }) {inherit (pkgs) advapi32; inherit (pkgs) gdi32; 
+inherit (pkgs) shell32; inherit (pkgs) shfolder; 
 inherit (pkgs) user32; inherit (pkgs) winmm;};
       "Win32-extras" = callPackage
         ({ mkDerivation, base, imm32, msimg32, stdenv, Win32 }:
@@ -2099,7 +2099,7 @@ inherit (pkgs) user32; inherit (pkgs) winmm;};
            homepage = "https://github.com/xmonad/X11";
            description = "A binding to the X11 graphics library";
            license = stdenv.lib.licenses.bsd3;
-         }) {inherit (pkgs.xorg) libXext; inherit (pkgs.xorg) libXinerama;
+         }) {inherit (pkgs.xorg) libXext; inherit (pkgs.xorg) libXinerama; 
 inherit (pkgs.xorg) libXrender;};
       "X11-xft" = callPackage
         ({ mkDerivation, base, libXft, stdenv, utf8-string, X11 }:
@@ -5511,7 +5511,7 @@ inherit (pkgs.xorg) libXrender;};
            doCheck = false;
            description = "Low-level bindings to GLFW OpenGL library";
            license = stdenv.lib.licenses.bsd3;
-         }) {inherit (pkgs.xorg) libXext; inherit (pkgs.xorg) libXfixes;
+         }) {inherit (pkgs.xorg) libXext; inherit (pkgs.xorg) libXfixes; 
 inherit (pkgs) mesa;};
       "bindings-libzip" = callPackage
         ({ mkDerivation, base, bindings-DSL, libzip, stdenv }:
@@ -7345,12 +7345,15 @@ inherit (pkgs) mesa;};
            license = stdenv.lib.licenses.mit;
          }) {};
       "cardano-sl-faucet" = callPackage
-        ({ mkDerivation, aeson, base, cardano-sl-core, cardano-sl-wallet
-         , cardano-sl-wallet-new, ekg, ekg-core, ekg-statsd, lens, mtl
-         , optparse-applicative, servant, servant-client
+        ({ mkDerivation, aeson, base, base16-bytestring, bytestring
+         , cardano-sl-core, cardano-sl-crypto, cardano-sl-wallet
+         , cardano-sl-wallet-new, connection, cryptonite, data-default, ekg
+         , ekg-core, ekg-statsd, exceptions, http-client, http-client-tls
+         , lens, log-warper, memory, mmorph, mtl, optparse-applicative
+         , QuickCheck, serokell-util, servant, servant-client
          , servant-client-core, servant-server, servant-swagger
-         , servant-swagger-ui, stdenv, swagger2, wai, wai-cors, wai-extra
-         , warp
+         , servant-swagger-ui, stdenv, swagger2, text, text-format, tls, wai
+         , wai-cors, wai-extra, warp
          }:
          mkDerivation {
            pname = "cardano-sl-faucet";
@@ -7359,17 +7362,21 @@ inherit (pkgs) mesa;};
            isLibrary = true;
            isExecutable = true;
            libraryHaskellDepends = [
-             aeson base cardano-sl-core cardano-sl-wallet cardano-sl-wallet-new
-             ekg-core ekg-statsd lens mtl servant servant-client
-             servant-client-core servant-server servant-swagger
-             servant-swagger-ui swagger2
+             aeson base base16-bytestring bytestring cardano-sl-core
+             cardano-sl-crypto cardano-sl-wallet cardano-sl-wallet-new
+             connection cryptonite data-default ekg-core ekg-statsd exceptions
+             http-client http-client-tls lens log-warper memory mmorph mtl
+             QuickCheck serokell-util servant servant-client servant-client-core
+             servant-server servant-swagger servant-swagger-ui swagger2 text
+             text-format tls
            ];
            executableHaskellDepends = [
-             base cardano-sl-wallet cardano-sl-wallet-new ekg ekg-core
-             ekg-statsd lens mtl optparse-applicative servant servant-client
-             servant-server wai wai-cors wai-extra warp
+             aeson base bytestring cardano-sl-core cardano-sl-wallet
+             cardano-sl-wallet-new ekg ekg-core ekg-statsd exceptions lens
+             log-warper mmorph mtl optparse-applicative servant servant-client
+             servant-server text wai wai-cors wai-extra warp
            ];
-           testHaskellDepends = [ base cardano-sl-wallet ];
+           testHaskellDepends = [ base cardano-sl-wallet QuickCheck ];
            doHaddock = false;
            license = stdenv.lib.licenses.mit;
          }) {};
@@ -14372,7 +14379,7 @@ inherit (pkgs) mesa;};
            homepage = "https://github.com/chrisdone/freenect";
            description = "Interface to the Kinect device";
            license = stdenv.lib.licenses.bsd3;
-         }) {inherit (pkgs) freenect; inherit (pkgs) freenect_sync;
+         }) {inherit (pkgs) freenect; inherit (pkgs) freenect_sync; 
 inherit (pkgs) libfreenect;};
       "freer" = callPackage
         ({ mkDerivation, base, stdenv }:
@@ -14609,8 +14616,8 @@ inherit (pkgs) libfreenect;};
            doCheck = false;
            description = "A Haskell binding to a subset of the GD graphics library";
            license = stdenv.lib.licenses.bsd3;
-         }) {inherit (pkgs) expat; inherit (pkgs) fontconfig;
-inherit (pkgs) freetype; inherit (pkgs) gd;
+         }) {inherit (pkgs) expat; inherit (pkgs) fontconfig; 
+inherit (pkgs) freetype; inherit (pkgs) gd; 
 inherit (pkgs) libjpeg; inherit (pkgs) libpng; inherit (pkgs) zlib;};
       "general-games" = callPackage
         ({ mkDerivation, base, monad-loops, MonadRandom, random
@@ -15481,9 +15488,9 @@ inherit (pkgs) libjpeg; inherit (pkgs) libpng; inherit (pkgs) zlib;};
            description = "manage files with git, without checking their contents into git";
            license = stdenv.lib.licenses.gpl3;
            platforms = [ "i686-linux" "x86_64-linux" ];
-         }) {inherit (pkgs) bup; inherit (pkgs) curl; inherit (pkgs) git;
-inherit (pkgs) gnupg; inherit (pkgs) lsof; inherit (pkgs) openssh;
-inherit (pkgs) perl; inherit (pkgs) rsync; inherit (pkgs) wget;
+         }) {inherit (pkgs) bup; inherit (pkgs) curl; inherit (pkgs) git; 
+inherit (pkgs) gnupg; inherit (pkgs) lsof; inherit (pkgs) openssh; 
+inherit (pkgs) perl; inherit (pkgs) rsync; inherit (pkgs) wget; 
 inherit (pkgs) which;};
       "github" = callPackage
         ({ mkDerivation, aeson, aeson-compat, base, base-compat
@@ -44521,3 +44528,4 @@ in compiler.override {
   configurationCommon = { ... }: self: super: {};
   compilerConfig = self: super: {};
 }
+

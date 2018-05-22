@@ -24,18 +24,16 @@ import           Serokell.Data.Memory.Units (Byte, memory)
 import           Serokell.Util (VerificationRes (..), verifyGeneric)
 
 import qualified Pos.Binary.Class as Bi
-import           Pos.Binary.Core ()
 import           Pos.Binary.Update ()
 import qualified Pos.Block.BHelpers as BHelpers
-import           Pos.Core (BlockVersionData (..), ChainDifficulty, EpochOrSlot,
-                           HasDifficulty (..), HasEpochIndex (..), HasEpochOrSlot (..),
-                           HasHeaderHash (..), HeaderHash, SlotId (..), SlotLeaders,
-                           protocolMagic, addressHash, gbExtra, gbhExtra, getSlotIndex,
-                           headerSlotL, prevBlockL, HasProtocolConstants, HasProtocolMagic)
-import           Pos.Core.Block (Block, BlockHeader (..), blockHeaderProtocolMagic,
-                                 gebAttributes, gehAttributes, genBlockLeaders,
-                                 getBlockHeader, mainHeaderLeaderKey,
-                                 mebAttributes, mehAttributes)
+import           Pos.Core (BlockVersionData (..), ChainDifficulty, EpochOrSlot, HasDifficulty (..),
+                           HasEpochIndex (..), HasEpochOrSlot (..), HasHeaderHash (..),
+                           HasProtocolConstants, HasProtocolMagic, HeaderHash, SlotId (..),
+                           SlotLeaders, addressHash, gbExtra, gbhExtra, getSlotIndex, headerSlotL,
+                           prevBlockL, protocolMagic)
+import           Pos.Core.Block (Block, BlockHeader (..), blockHeaderProtocolMagic, gebAttributes,
+                                 gehAttributes, genBlockLeaders, getBlockHeader,
+                                 mainHeaderLeaderKey, mebAttributes, mehAttributes)
 import           Pos.Crypto (ProtocolMagic (getProtocolMagic))
 import           Pos.Data.Attributes (areAttributesKnown)
 import           Pos.Util.Chrono (NewestFirst (..), OldestFirst)
@@ -64,8 +62,8 @@ data VerifyHeaderParams = VerifyHeaderParams
     } deriving (Eq, Show)
 
 verifyFromEither :: Text -> Either Text b -> VerificationRes
-verifyFromEither txt (Left reason)  = verifyGeneric [(False, txt <> ": " <> reason)]
-verifyFromEither txt (Right _) = verifyGeneric [(True, txt)]
+verifyFromEither txt (Left reason) = verifyGeneric [(False, txt <> ": " <> reason)]
+verifyFromEither txt (Right _)     = verifyGeneric [(True, txt)]
 
 -- CHECK: @verifyHeader
 -- | Check some predicates (determined by 'VerifyHeaderParams') about

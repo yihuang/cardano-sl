@@ -7,28 +7,26 @@ module Pos.Diffusion.Full.Txp
        , txOutSpecs
        ) where
 
-import           Universum
 import           Data.Tagged (Tagged)
 import qualified Network.Broadcast.OutboundQueue as OQ
+import           Universum
 
 import           Pos.Binary.Communication ()
-import           Pos.Binary.Core ()
 import           Pos.Binary.Txp ()
-import           Pos.Communication.Message ()
 import           Pos.Communication.Limits (mlTxMsgContents)
-import           Pos.Communication.Protocol (EnqueueMsg, MsgType (..), Origin (..), NodeId,
-                                             MkListeners, OutSpecs)
-import           Pos.Communication.Relay (invReqDataFlowTK, resOk,
-                                          InvReqDataParams (..), invReqMsgType, Relay (..),
-                                          relayListeners, MempoolParams (..),
-                                          relayPropagateOut)
+import           Pos.Communication.Message ()
+import           Pos.Communication.Protocol (EnqueueMsg, MkListeners, MsgType (..), NodeId,
+                                             Origin (..), OutSpecs)
+import           Pos.Communication.Relay (InvReqDataParams (..), MempoolParams (..), Relay (..),
+                                          invReqDataFlowTK, invReqMsgType, relayListeners,
+                                          relayPropagateOut, resOk)
 import           Pos.Core.Txp (TxAux (..), TxId)
 import           Pos.Crypto (hash)
 import           Pos.Logic.Types (Logic (..))
 import qualified Pos.Logic.Types as KV (KeyVal (..))
 import           Pos.Network.Types (Bucket)
 import           Pos.Txp.Network.Types (TxMsgContents (..))
-import           Pos.Util.Trace (Trace, Severity)
+import           Pos.Util.Trace (Severity, Trace)
 
 -- | Send Tx to given addresses.
 -- Returns 'True' if any peer accepted and applied this transaction.

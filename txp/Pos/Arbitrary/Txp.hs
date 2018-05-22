@@ -29,7 +29,6 @@ import           Test.QuickCheck.Arbitrary.Generic (genericArbitrary, genericShr
 
 import           Pos.Arbitrary.Core ()
 import           Pos.Binary.Class (Raw)
-import           Pos.Binary.Core ()
 import           Pos.Core.Common (Coin, IsBootstrapEraAddr (..), makePubKeyAddress)
 import           Pos.Core.Txp (Tx (..), TxAux (..), TxIn (..), TxInWitness (..), TxOut (..),
                                TxOutAux (..), TxPayload (..), TxProof (..), TxSigData (..),

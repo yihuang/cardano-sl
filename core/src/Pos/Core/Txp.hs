@@ -47,6 +47,7 @@ import           Universum
 
 import           Control.Lens (makeLenses, makePrisms)
 import           Control.Monad.Except (MonadError (throwError))
+import qualified Data.ByteString.Lazy as LBS (fromStrict)
 import           Data.Hashable (Hashable)
 import qualified Data.Text.Buildable as Buildable
 import           Data.Vector (Vector)
@@ -56,8 +57,10 @@ import           Serokell.Util.Base16 (base16F)
 import           Serokell.Util.Text (listJson, listJsonIndent)
 import           Serokell.Util.Verify (VerificationRes (..), verResSingleF, verifyGeneric)
 
-import           Pos.Binary.Class (Bi)
-import           Pos.Binary.Core.Address ()
+import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), decodeKnownCborDataItem,
+                                   decodeListLenCanonical, decodeUnknownCborDataItem,
+                                   deriveSimpleBi, encodeKnownCborDataItem, encodeListLen,
+                                   encodeUnknownCborDataItem, enforceSize, matchSize)
 import           Pos.Core.Common (Address (..), Coin (..), Script, addressHash, checkCoin, coinF)
 import           Pos.Crypto (Hash, PublicKey, RedeemPublicKey, RedeemSignature, Signature, hash,
                              shortHashF)
@@ -77,6 +80,10 @@ data TxSigData = TxSigData
       txSigTxHash      :: !(Hash Tx)
     }
     deriving (Eq, Show, Generic, Typeable)
+
+instance Bi TxSigData where
+    encode (TxSigData {..}) = encode txSigTxHash
+    decode = TxSigData <$> decode
 
 -- | 'Signature' of addrId.
 type TxSig = Signature TxSigData
@@ -109,6 +116,41 @@ instance Buildable TxInWitness where
 
 instance NFData TxInWitness
 
+instance Bi TxInWitness where
+    encode input = case input of
+        PkWitness key sig         ->
+            encodeListLen 2 <>
+            encode (0 :: Word8) <>
+            encodeKnownCborDataItem (key, sig)
+        ScriptWitness val red     ->
+            encodeListLen 2 <>
+            encode (1 :: Word8) <>
+            encodeKnownCborDataItem (val, red)
+        RedeemWitness key sig     ->
+            encodeListLen 2 <>
+            encode (2 :: Word8) <>
+            encodeKnownCborDataItem (key, sig)
+        UnknownWitnessType tag bs ->
+            encodeListLen 2 <>
+            encode tag <>
+            encodeUnknownCborDataItem (LBS.fromStrict bs)
+    decode = do
+        len <- decodeListLenCanonical
+        tag <- decode @Word8
+        case tag of
+            0 -> do
+                matchSize len "TxInWitness.PkWitness" 2
+                uncurry PkWitness <$> decodeKnownCborDataItem
+            1 -> do
+                matchSize len "TxInWitness.ScriptWitness" 2
+                uncurry ScriptWitness <$> decodeKnownCborDataItem
+            2 -> do
+                matchSize len "TxInWitness.RedeemWitness" 2
+                uncurry RedeemWitness <$> decodeKnownCborDataItem
+            _ -> do
+                matchSize len "TxInWitness.UnknownWitnessType" 2
+                UnknownWitnessType tag <$> decodeUnknownCborDataItem
+
 -- | A witness is a proof that a transaction is allowed to spend the funds it
 -- spends (by providing signatures, redeeming scripts, etc). A separate proof
 -- is provided for each input.
@@ -136,6 +178,22 @@ instance Buildable TxIn where
     build (TxInUnknown tag bs) = bprint ("TxInUnknown "%int%" "%base16F) tag bs
 
 instance NFData TxIn
+
+instance Bi TxIn where
+    encode TxInUtxo{..} =
+        encodeListLen 2 <>
+        encode (0 :: Word8) <>
+        encodeKnownCborDataItem (txInHash, txInIndex)
+    encode (TxInUnknown tag bs) =
+        encodeListLen 2 <>
+        encode tag <>
+        encodeUnknownCborDataItem (LBS.fromStrict bs)
+    decode = do
+        enforceSize "TxIn" 2
+        tag <- decode @Word8
+        case tag of
+            0 -> uncurry TxInUtxo <$> decodeKnownCborDataItem
+            _ -> TxInUnknown tag  <$> decodeUnknownCborDataItem
 
 isTxInUnknown :: TxIn -> Bool
 isTxInUnknown (TxInUnknown _ _) = True
@@ -185,6 +243,15 @@ data Tx = UnsafeTx
     , _txAttributes :: !TxAttributes     -- ^ Attributes of transaction
     } deriving (Eq, Ord, Generic, Show, Typeable)
 
+instance Bi Tx where
+    encode tx = encodeListLen 3
+                <> encode (_txInputs tx)
+                <> encode (_txOutputs tx)
+                <> encode (_txAttributes tx)
+    decode = do
+        enforceSize "Tx" 3
+        UnsafeTx <$> decode <*> decode <*> decode
+
 makeLenses ''Tx
 
 -- | Transaction + auxiliary data
@@ -194,6 +261,12 @@ data TxAux = TxAux
     } deriving (Generic, Show, Eq)
 
 instance NFData TxAux
+
+deriveSimpleBi ''TxAux [
+    Cons 'TxAux [
+        Field [| taTx           :: Tx             |],
+        Field [| taWitness      :: TxWitness      |]
+    ]]
 
 instance Hashable Tx
 
@@ -271,6 +344,17 @@ instance Buildable TxProof where
 
 instance NFData TxProof
 
+instance Bi TxProof where
+    encode proof =  encodeListLen 3
+                 <> encode (txpNumber proof)
+                 <> encode (txpRoot proof)
+                 <> encode (txpWitnessesHash proof)
+    decode = do
+        enforceSize "TxProof" 3
+        TxProof <$> decode <*>
+                      decode <*>
+                      decode
+
 -- | Construct 'TxProof' which proves given 'TxPayload'.
 -- This will construct a merkle tree, which can be very expensive. Use with
 -- care. Bi constraints arise because we need to hash these things.
@@ -297,6 +381,10 @@ data TxPayload = UnsafeTxPayload
 instance NFData TxPayload
 
 makeLenses ''TxPayload
+
+instance Bi TxPayload where
+    encode UnsafeTxPayload {..} = encode $ zip (toList _txpTxs) _txpWitnesses
+    decode = mkTxPayload <$> decode
 
 -- | Smart constructor of 'TxPayload' which ensures that invariants of 'TxPayload' hold.
 --
@@ -328,5 +416,16 @@ type TxpUndo = [TxUndo]
 ----------------------------------------------------------------------------
 -- TH instances
 ----------------------------------------------------------------------------
+
+deriveSimpleBi ''TxOut [
+    Cons 'TxOut [
+        Field [| txOutAddress :: Address |],
+        Field [| txOutValue   :: Coin    |]
+    ]]
+
+deriveSimpleBi ''TxOutAux [
+    Cons 'TxOutAux [
+        Field [| toaOut   :: TxOut |]
+    ]]
 
 makePrisms ''TxOut

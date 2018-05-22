@@ -20,7 +20,6 @@ import           Formatting (bprint, build, (%))
 
 import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), deriveSimpleBi, encodeListLen,
                                    encodeListLen, enforceSize)
-import           Pos.Binary.Core.Slotting ()
 import           Pos.Core.Block.Blockchain (GenericBlock (..), GenericBlockHeader (..))
 import           Pos.Core.Common (ChainDifficulty, SlotLeaders)
 import           Pos.Core.Slotting.Types (EpochIndex (..))

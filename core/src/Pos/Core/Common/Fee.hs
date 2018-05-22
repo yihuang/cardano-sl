@@ -10,13 +10,18 @@ import           Universum
 
 import           Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:), (.=))
 import           Data.Aeson.Types (Parser, withScientific)
+import qualified Data.ByteString.Lazy as LBS (fromStrict)
 import           Data.Fixed (Fixed (..), Nano, resolution, showFixed)
 import           Data.Hashable (Hashable)
 import qualified Data.HashMap.Strict as HM.S
 import qualified Data.Text.Buildable as Buildable
 import           Formatting (bprint, build, shown, (%))
-import           Pos.Util.Util (aesonError, toAesonError)
 import           Serokell.Data.Memory.Units (Byte, toBytes)
+
+import           Pos.Binary.Class (Bi (..), decode, decodeKnownCborDataItem,
+                                   decodeUnknownCborDataItem, encode, encodeKnownCborDataItem,
+                                   encodeListLen, encodeUnknownCborDataItem, enforceSize)
+import           Pos.Util.Util (aesonError, toAesonError)
 
 -- | A fractional coefficient of fixed precision.
 newtype Coeff = Coeff Nano
@@ -40,6 +45,10 @@ instance FromJSON Coeff where
             bad = denominator rat /= 1
         when bad $ aesonError "Fixed precision for coefficient exceeded"
         return $ Coeff fxd
+
+instance Bi Coeff where
+    encode (Coeff n) = encode n
+    decode = Coeff <$> decode @Nano
 
 -- | A linear equation on the transaction size. Represents the @\s -> a + b*s@
 -- function where @s@ is the transaction size in bytes, @a@ and @b@ are
@@ -66,6 +75,14 @@ instance FromJSON TxSizeLinear where
         TxSizeLinear
             <$> (o .: "a")
             <*> (o .: "b")
+
+instance Bi TxSizeLinear where
+    encode (TxSizeLinear a b) = encodeListLen 2 <> encode a <> encode b
+    decode = do
+        enforceSize "TxSizeLinear" 2
+        !a <- decode @Coeff
+        !b <- decode @Coeff
+        return $ TxSizeLinear a b
 
 calculateTxSizeLinear :: TxSizeLinear -> Byte -> Nano
 calculateTxSizeLinear
@@ -133,3 +150,18 @@ instance FromJSON TxFeePolicy where
             mkTxFeePolicyUnknown (policyTag, policyPayload) =
                 TxFeePolicyUnknown policyTag
                     (encodeUtf8 @Text @ByteString policyPayload)
+
+instance Bi TxFeePolicy where
+    encode policy = case policy of
+        TxFeePolicyTxSizeLinear txSizeLinear ->
+            encodeListLen 2 <> encode (0 :: Word8)
+                            <> encodeKnownCborDataItem txSizeLinear
+        TxFeePolicyUnknown word8 bs          ->
+            encodeListLen 2 <> encode word8
+                            <> encodeUnknownCborDataItem (LBS.fromStrict bs)
+    decode = do
+        enforceSize "TxFeePolicy" 2
+        tag <- decode @Word8
+        case tag of
+            0 -> TxFeePolicyTxSizeLinear <$> decodeKnownCborDataItem
+            _ -> TxFeePolicyUnknown tag  <$> decodeUnknownCborDataItem

@@ -24,7 +24,6 @@ import           Text.Parsec (parserFail, try)
 import qualified Text.Parsec.Char as P
 import qualified Text.Parsec.Text as P
 
-import           Pos.Binary.Core ()
 import           Pos.Block.Configuration (blockConfiguration)
 import           Pos.Client.CLI.NodeOptions (CommonNodeArgs (..))
 import           Pos.Client.CLI.Options (configurationOptions)
@@ -35,8 +34,8 @@ import           Pos.Core.Configuration (HasConfiguration, canonicalGenesisJson,
 import           Pos.Core.Genesis (gdStartTime)
 import           Pos.Crypto (decodeAbstractHash)
 import           Pos.Delegation.Configuration (dlgConfiguration)
-import           Pos.Ntp.Configuration (NtpConfiguration)
 import           Pos.Launcher.Configuration (Configuration (..), HasConfigurations)
+import           Pos.Ntp.Configuration (NtpConfiguration)
 import           Pos.Security.Params (AttackTarget (..), AttackType (..))
 import           Pos.Ssc.Configuration (sscConfiguration)
 import           Pos.Txp.Configuration (txpConfiguration)

@@ -23,11 +23,7 @@ import           Fmt (genericF)
 import           Formatting (bprint, build, builder, (%))
 
 import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), cborError, deriveSimpleBi,
-                                   encodeListLen, encodeListLen, enforceSize)
-import           Pos.Binary.Core.Delegation ()
-import           Pos.Binary.Core.Ssc ()
-import           Pos.Binary.Core.Txp ()
-import           Pos.Binary.Core.Update ()
+                                   encodeListLen, enforceSize)
 import           Pos.Core.Block.Blockchain (GenericBlock (..), GenericBlockHeader (..))
 import           Pos.Core.Common (ChainDifficulty, HeaderHash)
 import           Pos.Core.Delegation (DlgPayload, ProxySigHeavy, ProxySigLight)

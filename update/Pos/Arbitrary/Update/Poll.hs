@@ -15,7 +15,6 @@ import           Test.QuickCheck.Arbitrary.Generic (genericArbitrary, genericShr
 import           Pos.Arbitrary.Core ()
 import           Pos.Arbitrary.Slotting ()
 import           Pos.Arbitrary.Update.Core ()
-import           Pos.Binary.Core ()
 import           Pos.Binary.Update ()
 import           Pos.Core.Common (HeaderHash)
 import           Pos.Core.Configuration (HasProtocolConstants)

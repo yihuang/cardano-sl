@@ -13,7 +13,6 @@ import           Test.QuickCheck (Arbitrary (..), Gen, listOf)
 import           Test.QuickCheck.Arbitrary.Generic (genericArbitrary, genericShrink)
 
 import           Pos.Arbitrary.Core ()
-import           Pos.Binary.Core ()
 import           Pos.Core (EpochIndex, HeavyDlgIndex (..))
 import           Pos.Crypto (HasProtocolMagic, ProtocolMagic, ProxySecretKey (..), createPsk,
                              protocolMagic)

@@ -29,14 +29,14 @@ import           Universum
 
 import           Control.Monad.Except (MonadError (throwError))
 import qualified Data.HashMap.Strict as HM
-import           Data.List.Extra (nubOrdOn)
 import           Serokell.Util (allDistinct)
 
 import           Pos.Binary.Class (AsBinary (..), Bi)
 import           Pos.Core.Common (StakeholderId)
 import           Pos.Core.Slotting.Types (EpochIndex)
 import           Pos.Core.Ssc.Types (VssCertificate (..), VssCertificatesMap (..), getCertId,
-                                     validateVssCertificatesMap)
+                                     mkVssCertificatesMap, mkVssCertificatesMapLossy,
+                                     mkVssCertificatesMapSingleton, validateVssCertificatesMap)
 import           Pos.Crypto (ProtocolMagic, SecretKey, SignTag (SignVssCert), VssPublicKey,
                              checkSig, sign, toPublic)
 
@@ -71,15 +71,6 @@ checkCertSign :: (Bi EpochIndex) => ProtocolMagic -> VssCertificate -> Bool
 checkCertSign pm UnsafeVssCertificate {..} =
     checkSig pm SignVssCert vcSigningKey (vcVssKey, vcExpiryEpoch) vcSignature
 
--- Unexported but useful in the three functions below
-toCertPair :: VssCertificate -> (StakeholderId, VssCertificate)
-toCertPair vc = (getCertId vc, vc)
-
--- | Construct a 'VssCertificatesMap' from a list of certs by making a
--- hashmap on certificate identifiers.
-mkVssCertificatesMap :: [VssCertificate] -> VssCertificatesMap
-mkVssCertificatesMap = UnsafeVssCertificatesMap . HM.fromList . map toCertPair
-
 -- | Guard against certificates with duplicate signing keys or with duplicate
 -- 'vcVssKey's. Also checks every VssCertificate in the map (see
 -- 'checkVssCertificate').
@@ -96,20 +87,6 @@ checkVssCertificatesMap pm vssCertsMap = do
         (throwError "VssCertificatesMap: two certs have the same VSS key")
   where
     certs = HM.elems (getVssCertificatesMap vssCertsMap)
-
--- | A convenient constructor of 'VssCertificatesMap' that throws away
--- certificates with duplicate signing keys or with duplicate 'vcVssKey's.
-mkVssCertificatesMapLossy :: [VssCertificate] -> VssCertificatesMap
-mkVssCertificatesMapLossy =
-    UnsafeVssCertificatesMap . HM.fromList .
-    map toCertPair . nubOrdOn vcVssKey
-
--- | A map with a single certificate is always valid so this function is
--- safe to use in case you have one certificate and want to create a map
--- from it.
-mkVssCertificatesMapSingleton :: VssCertificate -> VssCertificatesMap
-mkVssCertificatesMapSingleton =
-    UnsafeVssCertificatesMap . uncurry HM.singleton . toCertPair
 
 memberVss :: StakeholderId -> VssCertificatesMap -> Bool
 memberVss id (UnsafeVssCertificatesMap m) = HM.member id m

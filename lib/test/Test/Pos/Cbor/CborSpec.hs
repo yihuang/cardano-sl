@@ -43,7 +43,6 @@ import           Pos.Arbitrary.Ssc ()
 import           Pos.Arbitrary.Update ()
 import           Pos.Binary.Class
 import           Pos.Binary.Communication ()
-import           Pos.Binary.Core ()
 import           Pos.Binary.Infra ()
 import           Pos.Binary.Ssc ()
 import qualified Pos.Block.Network as BT

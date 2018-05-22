@@ -12,6 +12,8 @@ module Pos.Core.Common.Types
        , mkMultiKeyDistr
        , Address (..)
        , addressF
+       , encodeAddr
+       , encodeAddrCRC32
        , decodeTextAddress
 
        -- * Forward-declared BlockHeader
@@ -58,6 +60,7 @@ module Pos.Core.Common.Types
 
 import           Universum
 
+import           Codec.CBOR.Encoding (Encoding)
 import           Control.Exception.Safe (Exception (displayException))
 import           Control.Lens (makePrisms, _Left)
 import           Control.Monad.Except (MonadError (throwError))
@@ -417,6 +420,18 @@ instance FromJSON Address where
 
 instance ToJSON Address where
     toJSON = toJSON . sformat addressF
+
+-- Encodes the `Address` __without__ the CRC32.
+-- It's important to keep this function separated from the `encode`
+-- definition to avoid that `encode` would call `crc32` and
+-- the latter invoke `crc32Update`, which would then try to call `encode`
+-- indirectly once again, in an infinite loop.
+encodeAddr :: Address -> Encoding
+encodeAddr Address {..} =
+    encode addrRoot <> encode addrAttributes <> encode addrType
+
+encodeAddrCRC32 :: Address -> Encoding
+encodeAddrCRC32 Address{..} = encodeCrcProtected (addrRoot, addrAttributes, addrType)
 
 -- | Currently we gonna use Bitcoin alphabet for representing addresses in
 -- base58

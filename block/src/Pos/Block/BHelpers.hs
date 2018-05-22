@@ -21,7 +21,6 @@ import           Universum
 import           Control.Monad.Except (MonadError (throwError))
 
 import           Pos.Binary.Class (Bi)
-import           Pos.Binary.Core ()
 import           Pos.Core.Block (Block)
 import           Pos.Core.Block.Blockchain (Blockchain (..), GenericBlock (..),
                                             GenericBlockHeader (..), gbExtra)
@@ -31,7 +30,7 @@ import           Pos.Core.Block.Main (Body (..), ConsensusData (..), MainBlockHe
                                       mainBlockEBDataProof)
 import           Pos.Core.Block.Union (BlockHeader (..), BlockSignature (..))
 import           Pos.Core.Class (IsMainHeader (..))
-import           Pos.Core.Configuration (HasProtocolMagic, protocolMagic, HasProtocolConstants)
+import           Pos.Core.Configuration (HasProtocolConstants, HasProtocolMagic, protocolMagic)
 import           Pos.Core.Delegation (LightDlgIndices (..), checkDlgPayload)
 import           Pos.Core.Slotting (SlotId (..))
 import           Pos.Core.Ssc (checkSscPayload)

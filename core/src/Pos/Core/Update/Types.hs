@@ -64,7 +64,8 @@ import qualified Serokell.Aeson.Options as S (defaultOptions)
 import           Serokell.Data.Memory.Units (Byte, memory)
 import           Serokell.Util.Text (listJson)
 
-import           Pos.Binary.Class (Bi, Raw)
+import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), Raw, deriveSimpleBi,
+                                   encodeListLen, enforceSize)
 import           Pos.Core.Common (CoinPortion, ScriptVersion, TxFeePolicy, addressHash)
 import           Pos.Core.Slotting.Types (EpochIndex, FlatSlotId)
 import           Pos.Crypto (Hash, ProtocolMagic, PublicKey, SafeSigner, SecretKey,
@@ -94,6 +95,10 @@ instance FromJSON ApplicationName where
     parseJSON v = ApplicationName <$> parseJSON v
 
 deriveToJSON defaultOptions ''ApplicationName
+
+instance Bi ApplicationName where
+    encode appName = encode (getApplicationName appName)
+    decode = ApplicationName <$> decode
 
 -- | Smart constructor of 'ApplicationName'.
 checkApplicationName :: MonadError Text m => ApplicationName -> m ()
@@ -140,6 +145,19 @@ deriveJSON defaultOptions ''BlockVersion
 
 deriveJSON defaultOptions ''SoftwareVersion
 
+deriveSimpleBi ''BlockVersion [
+    Cons 'BlockVersion [
+        Field [| bvMajor :: Word16 |],
+        Field [| bvMinor :: Word16 |],
+        Field [| bvAlt   :: Word8  |]
+    ]]
+
+deriveSimpleBi ''SoftwareVersion [
+    Cons 'SoftwareVersion [
+        Field [| svAppName :: ApplicationName    |],
+        Field [| svNumber  :: NumSoftwareVersion |]
+    ]]
+
 -- | A software version is valid iff its application name is valid.
 checkSoftwareVersion :: MonadError Text m => SoftwareVersion -> m ()
 checkSoftwareVersion sv = checkApplicationName (svAppName sv)
@@ -175,6 +193,13 @@ instance Buildable SoftforkRule where
         srInitThd srMinThd srThdDecrement
 
 deriveJSON S.defaultOptions ''SoftforkRule
+
+deriveSimpleBi ''SoftforkRule [
+    Cons 'SoftforkRule [
+        Field [| srInitThd      :: CoinPortion |],
+        Field [| srMinThd       :: CoinPortion |],
+        Field [| srThdDecrement :: CoinPortion |]
+    ]]
 
 -- | Data which is associated with 'BlockVersion'.
 data BlockVersionData = BlockVersionData
@@ -229,6 +254,24 @@ instance Buildable BlockVersionData where
         bvdUnlockStakeEpoch
 
 deriveJSON S.defaultOptions ''BlockVersionData
+
+deriveSimpleBi ''BlockVersionData [
+    Cons 'BlockVersionData [
+        Field [| bvdScriptVersion     :: ScriptVersion |],
+        Field [| bvdSlotDuration      :: Millisecond   |],
+        Field [| bvdMaxBlockSize      :: Byte          |],
+        Field [| bvdMaxHeaderSize     :: Byte          |],
+        Field [| bvdMaxTxSize         :: Byte          |],
+        Field [| bvdMaxProposalSize   :: Byte          |],
+        Field [| bvdMpcThd            :: CoinPortion   |],
+        Field [| bvdHeavyDelThd       :: CoinPortion   |],
+        Field [| bvdUpdateVoteThd     :: CoinPortion   |],
+        Field [| bvdUpdateProposalThd :: CoinPortion   |],
+        Field [| bvdUpdateImplicit    :: FlatSlotId    |],
+        Field [| bvdSoftforkRule      :: SoftforkRule  |],
+        Field [| bvdTxFeePolicy       :: TxFeePolicy   |],
+        Field [| bvdUnlockStakeEpoch  :: EpochIndex    |]
+    ]]
 
 -- | Data which represents modifications of block (aka protocol) version.
 data BlockVersionModifier = BlockVersionModifier
@@ -304,6 +347,24 @@ instance Buildable BlockVersionModifier where
         bmodifier :: Format Builder (a -> Builder) -> Format r (Maybe a -> r)
         bmodifier b = later $ maybe "no change" (bprint b)
 
+deriveSimpleBi ''BlockVersionModifier [
+    Cons 'BlockVersionModifier [
+        Field [| bvmScriptVersion     :: Maybe ScriptVersion |],
+        Field [| bvmSlotDuration      :: Maybe Millisecond   |],
+        Field [| bvmMaxBlockSize      :: Maybe Byte          |],
+        Field [| bvmMaxHeaderSize     :: Maybe Byte          |],
+        Field [| bvmMaxTxSize         :: Maybe Byte          |],
+        Field [| bvmMaxProposalSize   :: Maybe Byte          |],
+        Field [| bvmMpcThd            :: Maybe CoinPortion   |],
+        Field [| bvmHeavyDelThd       :: Maybe CoinPortion   |],
+        Field [| bvmUpdateVoteThd     :: Maybe CoinPortion   |],
+        Field [| bvmUpdateProposalThd :: Maybe CoinPortion   |],
+        Field [| bvmUpdateImplicit    :: Maybe FlatSlotId    |],
+        Field [| bvmSoftforkRule      :: Maybe SoftforkRule  |],
+        Field [| bvmTxFeePolicy       :: Maybe TxFeePolicy   |],
+        Field [| bvmUnlockStakeEpoch  :: Maybe EpochIndex    |]
+    ]]
+
 ----------------------------------------------------------------------------
 -- UpdateProposal and related
 ----------------------------------------------------------------------------
@@ -311,6 +372,10 @@ instance Buildable BlockVersionModifier where
 -- | Tag of system for which update data is purposed, e.g. win64, mac32
 newtype SystemTag = SystemTag { getSystemTag :: Text }
   deriving (Eq, Ord, Show, Generic, Buildable, Hashable, Lift, Typeable)
+
+instance Bi SystemTag where
+    encode = encode . getSystemTag
+    decode = SystemTag <$> decode
 
 systemTagMaxLength :: Integral i => i
 systemTagMaxLength = 10
@@ -324,8 +389,51 @@ checkSystemTag (SystemTag tag)
     | otherwise
           = pure ()
 
--- | ID of software update proposal
-type UpId = Hash UpdateProposal
+-- | Data which describes update. It is specific for each system.
+data UpdateData = UpdateData
+    { udAppDiffHash  :: !(Hash Raw)
+    -- ^ Hash of binary diff between two applications. This diff can
+    -- be passed to updater to create new application.
+    , udPkgHash      :: !(Hash Raw)
+    -- ^ Hash of package to install new application. This package can
+    -- be used to install new application from scratch instead of
+    -- updating existing application.
+    , udUpdaterHash  :: !(Hash Raw)
+    -- ^ Hash if update application which can be used to install this
+    -- update (relevant only when updater is used, not package).
+    , udMetadataHash :: !(Hash Raw)
+    -- ^ Hash of metadata relevant to this update.  It is raw hash,
+    -- because metadata can include image or something
+    -- (maybe). Anyway, we can always use `unsafeHash`.
+    } deriving (Eq, Show, Generic, Typeable)
+
+
+instance NFData SystemTag
+-- Proper NFData Millisecond instance should be defined in
+-- time-units. I'm sorry for this. volhovm.
+instance NFData UpdateData
+
+instance Hashable UpdateData
+
+instance Buildable UpdateData where
+    build UpdateData {..} =
+      bprint ("{ appDiff: "%build%
+              ", pkg: "%build%
+              ", updater: "%build%
+              ", metadata: "%build%
+              " }")
+        udAppDiffHash
+        udPkgHash
+        udUpdaterHash
+        udMetadataHash
+
+deriveSimpleBi ''UpdateData [
+    Cons 'UpdateData [
+        Field [| udAppDiffHash  :: Hash Raw |],
+        Field [| udPkgHash      :: Hash Raw |],
+        Field [| udUpdaterHash  :: Hash Raw |],
+        Field [| udMetadataHash :: Hash Raw |]
+    ]]
 
 type UpAttributes = Attributes ()
 
@@ -337,6 +445,18 @@ data UpdateProposalToSign
     , upsData :: !(HM.HashMap SystemTag UpdateData)
     , upsAttr :: !UpAttributes
     } deriving (Eq, Show, Generic)
+
+deriveSimpleBi ''UpdateProposalToSign [
+    Cons 'UpdateProposalToSign [
+        Field [| upsBV   :: BlockVersion                     |],
+        Field [| upsBVM  :: BlockVersionModifier           |],
+        Field [| upsSV   :: SoftwareVersion                  |],
+        Field [| upsData :: HashMap SystemTag UpdateData |],
+        Field [| upsAttr :: UpAttributes                   |]
+    ]]
+
+-- | ID of software update proposal
+type UpId = Hash UpdateProposal
 
 -- | Proposal for software update
 data UpdateProposal = UnsafeUpdateProposal
@@ -357,6 +477,8 @@ data UpdateProposal = UnsafeUpdateProposal
 type UpdateProposals = HashMap UpId UpdateProposal
 
 instance Hashable UpdateProposal
+
+instance NFData UpdateProposal
 
 instance Bi UpdateProposal => Buildable UpdateProposal where
     build up@UnsafeUpdateProposal {..} =
@@ -387,44 +509,24 @@ instance (Bi UpdateProposal) =>
             up
             (map formatVoteShort votes)
 
--- | Data which describes update. It is specific for each system.
-data UpdateData = UpdateData
-    { udAppDiffHash  :: !(Hash Raw)
-    -- ^ Hash of binary diff between two applications. This diff can
-    -- be passed to updater to create new application.
-    , udPkgHash      :: !(Hash Raw)
-    -- ^ Hash of package to install new application. This package can
-    -- be used to install new application from scratch instead of
-    -- updating existing application.
-    , udUpdaterHash  :: !(Hash Raw)
-    -- ^ Hash if update application which can be used to install this
-    -- update (relevant only when updater is used, not package).
-    , udMetadataHash :: !(Hash Raw)
-    -- ^ Hash of metadata relevant to this update.  It is raw hash,
-    -- because metadata can include image or something
-    -- (maybe). Anyway, we can always use `unsafeHash`.
-    } deriving (Eq, Show, Generic, Typeable)
-
-
-instance NFData SystemTag
-instance NFData UpdateProposal
--- Proper NFData Millisecond instance should be defined in
--- time-units. I'm sorry for this. volhovm.
-instance NFData UpdateData
-
-instance Hashable UpdateData
-
-instance Buildable UpdateData where
-    build UpdateData {..} =
-      bprint ("{ appDiff: "%build%
-              ", pkg: "%build%
-              ", updater: "%build%
-              ", metadata: "%build%
-              " }")
-        udAppDiffHash
-        udPkgHash
-        udUpdaterHash
-        udMetadataHash
+instance Bi UpdateProposal where
+    encode up = encodeListLen 7
+            <> encode (upBlockVersion up)
+            <> encode (upBlockVersionMod up)
+            <> encode (upSoftwareVersion up)
+            <> encode (upData up)
+            <> encode (upAttributes up)
+            <> encode (upFrom up)
+            <> encode (upSignature up)
+    decode = do
+        enforceSize "UpdateProposal" 7
+        UnsafeUpdateProposal <$> decode
+                               <*> decode
+                               <*> decode
+                               <*> decode
+                               <*> decode
+                               <*> decode
+                               <*> decode
 
 ----------------------------------------------------------------------------
 -- UpdateVote and related
@@ -454,6 +556,20 @@ instance Buildable UpdateVote where
     build UnsafeUpdateVote {..} =
       bprint ("Update Vote { voter: "%build%", proposal id: "%build%", voter's decision: "%build%" }")
              (addressHash uvKey) uvProposalId uvDecision
+
+instance Bi UpdateVote where
+    encode uv =  encodeListLen 4
+            <> encode (uvKey uv)
+            <> encode (uvProposalId uv)
+            <> encode (uvDecision uv)
+            <> encode (uvSignature uv)
+    decode = do
+        enforceSize "UpdateVote" 4
+        uvKey        <- decode
+        uvProposalId <- decode
+        uvDecision   <- decode
+        uvSignature  <- decode
+        pure UnsafeUpdateVote{..}
 
 instance Buildable VoteId where
     build (upId, pk, dec) =
@@ -523,6 +639,12 @@ formatMaybeProposal = maybe "no proposal" Buildable.build
 
 instance Default UpdatePayload where
     def = UpdatePayload Nothing []
+
+deriveSimpleBi ''UpdatePayload [
+    Cons 'UpdatePayload [
+        Field [| upProposal :: Maybe UpdateProposal |],
+        Field [| upVotes    :: [UpdateVote]         |]
+    ]]
 
 -- | Proof that body of update message contains 'UpdatePayload'.
 type UpdateProof = Hash UpdatePayload

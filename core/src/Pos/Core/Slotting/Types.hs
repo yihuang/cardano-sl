@@ -27,6 +27,7 @@ import qualified Data.Text.Buildable as Buildable
 import           Formatting (Format, bprint, build, int, ords, (%))
 import           System.Random (Random (..))
 
+import           Pos.Binary.Class (Bi (..), Cons (..), Field (..), deriveSimpleBi)
 import           Pos.Core.Slotting.Timestamp (TimeDiff (..), Timestamp (..))
 
 -- | Index of epoch.
@@ -40,12 +41,20 @@ instance Buildable EpochIndex where
 deriving instance FromJSON EpochIndex
 deriving instance ToJSON EpochIndex
 
+instance Bi EpochIndex where
+    encode (EpochIndex epoch) = encode epoch
+    decode = EpochIndex <$> decode
+
 -- | Index of slot inside a concrete epoch.
 newtype LocalSlotIndex = UnsafeLocalSlotIndex
     { getSlotIndex :: Word16
     } deriving (Show, Eq, Ord, Ix, Generic, Hashable, Buildable, Typeable, NFData)
 
 deriveJSON defaultOptions ''LocalSlotIndex
+
+instance Bi LocalSlotIndex where
+    encode = encode . getSlotIndex
+    decode = UnsafeLocalSlotIndex <$> decode
 
 -- | Slot is identified by index of epoch and index of slot in
 -- this epoch. This is a global index, an index to a global
@@ -62,6 +71,12 @@ instance Buildable SlotId where
 instance NFData SlotId
 
 deriveJSON defaultOptions ''SlotId
+
+deriveSimpleBi ''SlotId [
+    Cons 'SlotId [
+        Field [| siEpoch :: EpochIndex     |],
+        Field [| siSlot  :: LocalSlotIndex |]
+    ]]
 
 -- | Specialized formatter for 'SlotId'.
 slotIdF :: Format r (SlotId -> r)
@@ -90,6 +105,10 @@ instance Ord EpochOrSlot where
 instance Buildable EpochOrSlot where
     build = either Buildable.build Buildable.build . unEpochOrSlot
 
+instance Bi EpochOrSlot where
+    encode (EpochOrSlot e) = encode e
+    decode = EpochOrSlot <$> decode @(Either EpochIndex SlotId)
+
 flip makeLensesFor ''SlotId [
     ("siEpoch", "siEpochL"),
     ("siSlot" , "siSlotL") ]
@@ -99,3 +118,7 @@ newtype SlotCount = SlotCount {getSlotCount :: Word64}
               Buildable, Generic, Typeable, NFData, Hashable, Random)
 
 deriving instance ToJSON SlotCount
+
+instance Bi SlotCount where
+    encode = encode . getSlotCount
+    decode = SlotCount <$> decode

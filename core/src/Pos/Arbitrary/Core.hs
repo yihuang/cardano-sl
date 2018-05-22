@@ -38,7 +38,6 @@ import           Test.QuickCheck.Arbitrary.Generic (genericArbitrary, genericShr
 import           Test.QuickCheck.Instances ()
 
 import           Pos.Binary.Class (Bi)
-import           Pos.Binary.Core ()
 import           Pos.Core.Common (coinToInteger, divCoin, makeAddress, maxCoinVal, unsafeSubCoin)
 import qualified Pos.Core.Common.Fee as Fee
 import qualified Pos.Core.Common.Types as Types

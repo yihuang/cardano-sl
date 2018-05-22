@@ -22,9 +22,6 @@ library
                        Pos.Arbitrary.Core
                        Pos.Arbitrary.Core.Unsafe
 
-                       Pos.Binary.Core
-                       Pos.Binary.Merkle
-
                        Pos.Core
 
                        Pos.Core.ProtocolConstants
@@ -56,17 +53,6 @@ library
                        Pos.System.Metrics.Constants
 
   other-modules:
-                       -- Binary
-                       Pos.Binary.Core.Address
-                       Pos.Binary.Core.Blockchain
-                       Pos.Binary.Core.Delegation
-                       Pos.Binary.Core.Fee
-                       Pos.Binary.Core.Script
-                       Pos.Binary.Core.Slotting
-                       Pos.Binary.Core.Ssc
-                       Pos.Binary.Core.Txp
-                       Pos.Binary.Core.Update
-
                        -- Block
                        Pos.Core.Block.Genesis.Chain
                        Pos.Core.Block.Genesis.Lens

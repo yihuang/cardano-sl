@@ -30,6 +30,7 @@ import           Mockable (CurrentTime, Mockable, currentTime)
 import           Numeric.Lens (dividing)
 import qualified Prelude
 
+import           Pos.Binary.Class (Bi (..))
 import           Pos.Core.Orphans ()
 
 -- | Timestamp is a number which represents some point in time. It is
@@ -60,6 +61,10 @@ instance NFData Timestamp where
 
 deriving instance FromJSON Timestamp
 deriving instance ToJSON Timestamp
+
+instance Bi Timestamp where
+    encode (Timestamp ms) = encode . toInteger $ ms
+    decode = Timestamp . fromIntegral <$> decode @Integer
 
 -- | Specialized formatter for 'Timestamp' data type.
 timestampF :: Format r (Timestamp -> r)
@@ -134,6 +139,10 @@ instance Buildable TimeDiff where
 
 instance NFData TimeDiff where
     rnf TimeDiff{..} = rnf (toInteger getTimeDiff)
+
+instance Bi TimeDiff where
+    encode = encode . toInteger
+    decode = fromInteger <$> decode
 
 addTimeDiffToTimestamp :: TimeDiff -> Timestamp -> Timestamp
 addTimeDiffToTimestamp = addMicrosecondsToTimestamp . getTimeDiff

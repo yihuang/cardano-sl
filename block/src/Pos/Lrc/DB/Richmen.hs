@@ -29,10 +29,9 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 
-import           Pos.Binary.Core ()
-import           Pos.Core (Coin, ProxySKHeavy, StakeholderId, addressHash,
-                           gdHeavyDelegation, genesisData, unGenesisDelegation, HasGenesisBlockVersionData,
-                           HasGenesisData)
+import           Pos.Core (Coin, HasGenesisBlockVersionData, HasGenesisData, ProxySKHeavy,
+                           StakeholderId, addressHash, gdHeavyDelegation, genesisData,
+                           unGenesisDelegation)
 import           Pos.Crypto (pskDelegatePk)
 import           Pos.DB.Class (MonadDB)
 import           Pos.Delegation.Lrc (RCDlg, tryGetDlgRichmen)

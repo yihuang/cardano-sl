@@ -9,10 +9,12 @@ module Pos.Core.Block.Union.Instances
 
 import           Universum
 
+import           Codec.CBOR.Decoding (decodeWordCanonical)
+import           Codec.CBOR.Encoding (encodeWord)
 import           Control.Lens (Getter, choosing, lens, to)
 import qualified Data.Text.Buildable as Buildable
 
-import           Pos.Binary.Class (Bi)
+import           Pos.Binary.Class (Bi (..), decodeListLenCanonicalOf, encodeListLen)
 import           Pos.Core.Block.Blockchain (GenericBlock (..))
 import           Pos.Core.Block.Genesis ()
 import           Pos.Core.Block.Main ()
@@ -21,6 +23,7 @@ import           Pos.Core.Block.Union.Types (Block, BlockHeader (..), ComponentB
 import           Pos.Core.Class (HasDifficulty (..), HasEpochIndex (..), HasEpochOrSlot (..),
                                  HasHeaderHash (..), HasPrevBlock (..), IsHeader, IsMainHeader (..))
 import           Pos.Core.Slotting.Types (EpochOrSlot (..))
+import           Pos.Util.Util (cborError)
 
 ----------------------------------------------------------------------------
 -- Buildable
@@ -121,3 +124,18 @@ instance HasEpochOrSlot BlockHeader where
 instance HasEpochOrSlot (ComponentBlock a) where
     getEpochOrSlot (ComponentBlockMain a _)  = EpochOrSlot $ Right $ a ^. headerSlotL
     getEpochOrSlot (ComponentBlockGenesis a) = EpochOrSlot $ Left $ a ^. epochIndexL
+
+instance Bi BlockHeader where
+   encode x = encodeListLen 2 <> encodeWord tag <> body
+     where
+       (tag, body) = case x of
+         BlockHeaderGenesis bh -> (0, encode bh)
+         BlockHeaderMain bh    -> (1, encode bh)
+
+   decode = do
+       decodeListLenCanonicalOf 2
+       t <- decodeWordCanonical
+       case t of
+           0 -> BlockHeaderGenesis <$!> decode
+           1 -> BlockHeaderMain <$!> decode
+           _ -> cborError $ "decode@BlockHeader: unknown tag " <> pretty t

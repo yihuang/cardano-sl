@@ -31,15 +31,14 @@ import           Serokell.Util (Color (Red), colorize)
 import           Serokell.Util.Verify (formatAllErrors, verResToMonadError)
 import           System.Wlog (WithLogger)
 
-import           Pos.Binary.Core ()
 import           Pos.Block.BListener (MonadBListener (..))
 import           Pos.Block.Logic.Integrity (verifyBlocks)
 import           Pos.Block.Slog.Context (slogGetLastSlots, slogPutLastSlots)
 import           Pos.Block.Slog.Types (HasSlogGState)
 import           Pos.Block.Types (Blund, SlogUndo (..), Undo (..))
-import           Pos.Core (BlockVersion (..), FlatSlotId, blkSecurityParam, HasProtocolConstants,
-                           difficultyL, epochIndexL, flattenSlotId, headerHash, headerHashG,
-                           prevBlockL, HasProtocolMagic)
+import           Pos.Core (BlockVersion (..), FlatSlotId, HasProtocolConstants, HasProtocolMagic,
+                           blkSecurityParam, difficultyL, epochIndexL, flattenSlotId, headerHash,
+                           headerHashG, prevBlockL)
 import           Pos.Core.Block (Block, genBlockLeaders, mainBlockSlot)
 import           Pos.DB (SomeBatchOp (..))
 import           Pos.DB.Block (putBlunds)

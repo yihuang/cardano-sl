@@ -247,5 +247,3 @@ deriveSimpleBi ''MainExtraBodyData [
 -- | MainBlock is a block with transactions and MPC messages. It's the
 -- main part of our consensus algorithm.
 type MainBlock = GenericBlock MainBlockchain
-
--- instance NFData MainBlock

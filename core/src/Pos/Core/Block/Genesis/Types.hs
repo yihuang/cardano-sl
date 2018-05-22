@@ -124,5 +124,3 @@ deriveSimpleBi ''GenesisExtraBodyData [
 
 -- | Genesis block parametrized by 'GenesisBlockchain'.
 type GenesisBlock = GenericBlock GenesisBlockchain
-
--- instance NFData GenesisBlock

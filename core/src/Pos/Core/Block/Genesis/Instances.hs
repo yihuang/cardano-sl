@@ -28,6 +28,8 @@ import           Pos.Core.Common (HeaderHash, slotLeadersF)
 import           Pos.Core.Slotting.Types (EpochOrSlot (..))
 import           Pos.Crypto (hashHexF)
 
+instance NFData GenesisBlock
+
 ----------------------------------------------------------------------------
 -- Buildable
 ----------------------------------------------------------------------------

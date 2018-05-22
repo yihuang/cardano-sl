@@ -33,6 +33,7 @@ import           Pos.Core.Common (HeaderHash)
 import           Pos.Core.Slotting.Types (EpochOrSlot (..), slotIdF)
 import           Pos.Crypto (hashHexF)
 
+instance NFData MainBlock
 
 instance Bi BlockHeader => Buildable MainBlockHeader where
     build gbh@UnsafeGenericBlockHeader {..} =

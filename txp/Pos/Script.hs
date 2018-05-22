@@ -39,6 +39,7 @@ import qualified Utils.Names as PL
 
 import qualified Pos.Binary.Class as Bi
 import           Pos.Core.Common (Script (..), ScriptVersion)
+import           Pos.Core.Orphans ()
 import           Pos.Core.Script ()
 import           Pos.Core.Txp (TxSigData (..))
 

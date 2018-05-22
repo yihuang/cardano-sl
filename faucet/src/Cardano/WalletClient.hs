@@ -1,32 +1,26 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-module Cardano.WalletClient where
+{-# OPTIONS_GHC -Wall #-}
+module Cardano.WalletClient (
+    withdraw
+  ) where
     -- ( export
     -- , export
     -- ) where
 
-import Crypto.Hash (Blake2b, Blake2b_224, Blake2b_256, Digest)
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Base16 as Base16
-import qualified Data.ByteArray as BA
--- import qualified Serokell.Util.Base16 as Base16
-import qualified Crypto.Hash as CryptoHash
-import           Control.Lens
-import           Control.Monad.Reader
-import Data.Text (Text)
-import Data.List.NonEmpty (NonEmpty(..))
-import Data.Text.Buildable (build)
 import           Cardano.Faucet.Types
-import           Cardano.Wallet.API.V1.Types (Payment (..), PaymentDistribution (..),
-                                              PaymentSource (..), V1(..), mkPassPhrase)
--- import           Cardano.Wallet.API.V1.Types.V1 (Coin (..), Address(..))
-import           Cardano.Wallet.Client (Resp, Transaction, WalletClient (..), WalletResponse (..),
-                                        liftClient)
-import           Pos.Wallet.Web.Methods.Payment (newPayment)
-import           Pos.Core (Coin (..), Address(..))
-import Pos.Crypto.Signing (PassPhrase(..))
-import           Pos.Wallet.Web.ClientTypes.Types (Addr (..), CId (..))
+import           Cardano.Wallet.API.V1.Types (Payment (..), PaymentDistribution (..), V1 (..))
+import           Cardano.Wallet.Client (Resp, Transaction, WalletClient (..), liftClient)
+import           Control.Lens
+import           Crypto.Hash (Blake2b_256, Digest)
+import qualified Crypto.Hash as CryptoHash
+import qualified Data.ByteArray as BA
+import           Data.ByteString (ByteString)
+import           Data.List.NonEmpty (NonEmpty (..))
+import           Pos.Core (Address (..), Coin (..))
+import           Pos.Crypto.Signing (PassPhrase)
+
 
 
 withdraw :: (MonadFaucet c m) => V1 Address -> V1 Coin -> Resp m Transaction

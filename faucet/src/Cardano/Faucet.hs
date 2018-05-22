@@ -1,7 +1,7 @@
+{-# LANGUAGE ConstraintKinds   #-}
 {-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE ConstraintKinds #-}
 {-# OPTIONS_GHC -Wall #-}
 module Cardano.Faucet (
     server
@@ -10,17 +10,14 @@ module Cardano.Faucet (
   ) where
 
 import           Control.Lens
-import Data.Monoid ((<>))
-import Data.Text.Lens
-import           Control.Monad.IO.Class
+import           Data.Monoid ((<>))
+import           Data.Text.Lens
 import           Servant
-import           System.Wlog (HasLoggerName, LoggerName (..), WithLogger, logError, logInfo,
-                              withSublogger)
+import           System.Wlog (LoggerName (..), logError, logInfo, withSublogger)
 
-import           Pos.Core (Address (..))
-import           Cardano.Wallet.API.V1.Types (V1(..), unV1)
-import           Cardano.Wallet.API.Response (WalletResponse(..))
 import           Cardano.Faucet.Types
+import           Cardano.Wallet.API.Response (WalletResponse (..))
+import           Cardano.Wallet.API.V1.Types (unV1)
 import qualified Cardano.WalletClient as Client
 -- import           Client.Cardano.Wallet.Web.Run     (runEndpointClient)
 

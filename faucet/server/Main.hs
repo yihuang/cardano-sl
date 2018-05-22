@@ -6,6 +6,9 @@ module Main where
 import Control.Lens
 import           Network.Wai.Handler.Warp (run)
 import           Servant
+import System.Environment (getArgs)
+import Data.ByteString.Lazy as BSL
+import Data.Aeson (eitherDecode)
 
 import Control.Monad.Except
 -- import           Cardano.Wallet.API.V1.Types (PaymentSource (..), WalletId(..), AccountIndex)
@@ -16,9 +19,14 @@ import           System.Remote.Monitoring.Statsd (forkStatsd)
 main :: IO ()
 main = do
   ekg <- forkServer "localhost" 8001
-  let c = testFC -- mkFaucetConfig "wallet-url" 8000 (PaymentSource w idx) defaultStatsdOptions "./logging.cfg"
-  fEnv <- initEnv c (serverMetricStore ekg)
-  _statsd <- forkStatsd (c ^. fcStatsdOpts) (fEnv ^. feStore)
+  args <- getArgs
+  config <- case args of
+    [ "--config", cfgFile ] -> do
+      ecfg <- eitherDecode <$> BSL.readFile cfgFile
+      either (error . ("Error decoding: " ++)) return ecfg
+    _ -> error "Need a --config argument pointing to a json file"
+  fEnv <- initEnv config (serverMetricStore ekg)
+  _statsd <- forkStatsd (config ^. fcStatsdOpts . _Wrapped') (fEnv ^. feStore)
   run 8081 (serve serverAPI $ s fEnv)
   where
       nat :: FaucetEnv -> M a -> Handler a

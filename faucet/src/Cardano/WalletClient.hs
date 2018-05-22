@@ -18,6 +18,7 @@ import qualified Crypto.Hash as CryptoHash
 import qualified Data.ByteArray as BA
 import           Data.ByteString (ByteString)
 import           Data.List.NonEmpty (NonEmpty (..))
+import Data.Text.Strict.Lens (utf8)
 import           Pos.Core (Address (..), Coin (..))
 import           Pos.Crypto.Signing (PassPhrase)
 
@@ -26,13 +27,12 @@ import           Pos.Crypto.Signing (PassPhrase)
 withdraw :: (MonadFaucet c m) => V1 Address -> V1 Coin -> Resp m Transaction
 withdraw addr coin = do
     paymentSource <- view (feFaucetConfig . fcFaucetPaymentSource)
+    spendingPassword <- view (feFaucetConfig . fcSpendingPassword . re utf8)
     client <- liftClient <$> view feWalletClient
     let paymentDist = (PaymentDistribution addr coin :| [])
+        sp = Just $ V1 $ hashPwd spendingPassword
         payment = Payment paymentSource paymentDist Nothing sp
     postTransaction client payment
-  where
-    sp :: Maybe (V1 PassPhrase)
-    sp = Just $ V1 $ hashPwd "XXX" -- TODO: get from config
 
 hashPwd :: ByteString -> PassPhrase
 hashPwd  bs =

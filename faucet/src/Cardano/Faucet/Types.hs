@@ -1,13 +1,16 @@
 {-# LANGUAGE ConstraintKinds            #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE DuplicateRecordFields      #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE ViewPatterns               #-}
 {-# OPTIONS_GHC -Wall #-}
 module Cardano.Faucet.Types (
-   FaucetConfig(..), mkFaucetConfig, testFC
+   FaucetConfig(..), mkFaucetConfig
  , HasFaucetConfig(..)
  , FaucetEnv(..), initEnv
  , HasFaucetEnv(..)
@@ -46,12 +49,11 @@ import           System.Metrics.Counter (Counter)
 import qualified System.Metrics.Counter as Counter
 import           System.Metrics.Gauge (Gauge)
 import qualified System.Metrics.Gauge as Gauge
-import           System.Remote.Monitoring.Statsd (StatsdOptions, defaultStatsdOptions)
+import           System.Remote.Monitoring.Statsd (StatsdOptions (..))
 import           System.Wlog (CanLog, HasLoggerName, LoggerName (..), LoggerNameBox (..),
                               WithLogger, launchFromFile)
 
-import           Cardano.Wallet.API.V1.Types (PaymentSource (..), Transaction,
-                                              V1, WalletId (..))
+import           Cardano.Wallet.API.V1.Types (PaymentSource (..), Transaction, V1)
 import           Cardano.Wallet.Client (ClientError (..), WalletClient)
 import           Cardano.Wallet.Client.Http (mkHttpClient)
 import           Pos.Core (Address (..), Coin (..))
@@ -105,11 +107,16 @@ data DepositResult = DepositResult
 instance ToJSON DepositResult
 
 --------------------------------------------------------------------------------
+newtype FaucetStatsdOpts = FaucetStatsdOpts StatsdOptions deriving (Generic)
+
+makeWrapped ''FaucetStatsdOpts
+--------------------------------------------------------------------------------
 data FaucetConfig = FaucetConfig {
     _fcWalletApiHost       :: String
   , _fcWalletApiPort       :: Int
   , _fcFaucetPaymentSource :: PaymentSource
-  , _fcStatsdOpts          :: StatsdOptions
+  , _fcSpendingPassword    :: Text
+  , _fcStatsdOpts          :: FaucetStatsdOpts
   , _fcLoggerConfigFile    :: FilePath
   , _fcPubCertFile         :: FilePath
   , _fcPrivKeyFile         :: FilePath
@@ -117,21 +124,40 @@ data FaucetConfig = FaucetConfig {
 
 makeClassy ''FaucetConfig
 
+instance FromJSON FaucetStatsdOpts where
+    parseJSON = fmap FaucetStatsdOpts . (withObject "StatsdOptions" $ \v ->
+        StatsdOptions
+          <$> v .: "host"
+          <*> v .: "port"
+          <*> v .: "flush-interval"
+          <*> pure False
+          <*> pure "faucet"
+          <*> pure "")
+
+instance FromJSON FaucetConfig where
+    parseJSON = withObject "FaucetConfig" $ \v ->
+        FaucetConfig
+          <$> v .: "wallet-host"
+          <*> v .: "wallet-port"
+          <*> v .: "payment-source"
+          <*> v .: "spending-password"
+          <*> v .: "statsd"
+          <*> v .: "logging-config"
+          <*> v .: "public-certificate"
+          <*> v .: "private-key"
+
 mkFaucetConfig
     :: String
     -> Int
     -> PaymentSource
-    -> StatsdOptions
+    -> Text
+    -> FaucetStatsdOpts
     -> FilePath
     -> FilePath
     -> FilePath
     -> FaucetConfig
 mkFaucetConfig = FaucetConfig
 
-testFC :: FaucetConfig
-testFC = FaucetConfig "127.0.0.1" 8090 ps defaultStatsdOptions "./logging.cfg" "./tls/ca.crt" "./tls/server.key"
-    where
-        ps = PaymentSource (WalletId "Ae2tdPwUPEZLBG2sEmiv8Y6DqD4LoZKQ5wosXucbLnYoacg2YZSPhMn4ETi") 2147483648
 
 --------------------------------------------------------------------------------
 data FaucetEnv = FaucetEnv {

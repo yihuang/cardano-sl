@@ -103,3 +103,7 @@ result*
 
 # remove when done debugging
 1.1.1-1-w/
+
+# Don't include config files with sensitive data or tls certs
+/faucet/test-config.json
+/faucet/tls/*

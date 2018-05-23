@@ -26,8 +26,8 @@ import           Pos.Crypto.Signing (PassPhrase)
 
 withdraw :: (MonadFaucet c m) => V1 Address -> V1 Coin -> Resp m Transaction
 withdraw addr coin = do
-    paymentSource <- view (feFaucetConfig . fcFaucetPaymentSource)
-    spendingPassword <- view (feFaucetConfig . fcSpendingPassword . re utf8)
+    paymentSource <- view (fePaymentSource)
+    spendingPassword <- view (feSpendingPassword . re utf8)
     client <- liftClient <$> view feWalletClient
     let paymentDist = (PaymentDistribution addr coin :| [])
         sp = Just $ V1 $ hashPwd spendingPassword

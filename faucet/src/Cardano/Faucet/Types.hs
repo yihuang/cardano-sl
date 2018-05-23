@@ -139,7 +139,7 @@ instance FromJSON SourceWalletConfig where
     parseJSON = withObject "SourceWalletConfig" $ \v -> SourceWalletConfig
       <$> v .: "wallet-id"
       <*> v .: "account-index"
-      <*> v .: "sending-password"
+      <*> v .: "spending-password"
 
 readSourceWalletConfig :: FilePath -> IO (Either String SourceWalletConfig)
 readSourceWalletConfig = fmap eitherDecode . BSL.readFile

@@ -151,6 +151,7 @@ cfgToPaymentSource (SourceWalletConfig wId aIdx _) = PaymentSource wId aIdx
 data FaucetConfig = FaucetConfig {
     _fcWalletApiHost          :: !String
   , _fcWalletApiPort          :: !Int
+  , _fcPort                   :: !Int
   , _fcStatsdOpts             :: !FaucetStatsdOpts
   , _fcSourceWalletConfigFile :: !FilePath
   , _fcLoggerConfigFile       :: !FilePath
@@ -165,6 +166,7 @@ instance FromJSON FaucetConfig where
         FaucetConfig
           <$> v .: "wallet-host"
           <*> v .: "wallet-port"
+          <*> v .: "port"
           <*> v .: "statsd"
           <*> v .: "source-wallet-config"
           <*> v .: "logging-config"
@@ -173,6 +175,7 @@ instance FromJSON FaucetConfig where
 
 mkFaucetConfig
     :: String
+    -> Int
     -> Int
     -> FaucetStatsdOpts
     -> FilePath

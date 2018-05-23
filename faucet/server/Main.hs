@@ -27,7 +27,7 @@ main = do
     _ -> error "Need a --config argument pointing to a json file"
   fEnv <- initEnv config (serverMetricStore ekg)
   _statsd <- forkStatsd (config ^. fcStatsdOpts . _Wrapped') (fEnv ^. feStore)
-  run 8081 (serve serverAPI $ s fEnv)
+  run (config ^. fcPort) (serve serverAPI $ s fEnv)
   where
       nat :: FaucetEnv -> M a -> Handler a
       nat e = Handler . ExceptT . runM e

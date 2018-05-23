@@ -28,8 +28,10 @@ module Cardano.Faucet.Types (
 import           Control.Lens hiding ((.=))
 import           Control.Monad.Except
 import           Control.Monad.Reader
-import           Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:), (.=))
+import           Data.Aeson (FromJSON (..), ToJSON (..), eitherDecode, object, withObject, (.:),
+                             (.=))
 import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as BSL
 import           Data.Default (def)
 import           Data.Monoid ((<>))
 import           Data.Text (Text)
@@ -53,7 +55,8 @@ import           System.Remote.Monitoring.Statsd (StatsdOptions (..))
 import           System.Wlog (CanLog, HasLoggerName, LoggerName (..), LoggerNameBox (..),
                               WithLogger, launchFromFile)
 
-import           Cardano.Wallet.API.V1.Types (PaymentSource (..), Transaction, V1)
+import           Cardano.Wallet.API.V1.Types (AccountIndex, PaymentSource (..), Transaction,
+                                              V1, WalletId (..))
 import           Cardano.Wallet.Client (ClientError (..), WalletClient)
 import           Cardano.Wallet.Client.Http (mkHttpClient)
 import           Pos.Core (Address (..), Coin (..))
@@ -61,8 +64,8 @@ import           Pos.Core (Address (..), Coin (..))
 
 --------------------------------------------------------------------------------
 data WithDrawlRequest = WithDrawlRequest {
-    _wAddress :: V1 Address -- Pos.Wallet.Web.ClientTypes.Types.CAccountId
-  , _wAmount  :: V1 Coin -- Pos.Core.Common.Types.Coin
+    _wAddress :: !(V1 Address)
+  , _wAmount  :: !(V1 Coin)
   } deriving (Show, Typeable, Generic)
 
 makeLenses ''WithDrawlRequest
@@ -110,19 +113,6 @@ instance ToJSON DepositResult
 newtype FaucetStatsdOpts = FaucetStatsdOpts StatsdOptions deriving (Generic)
 
 makeWrapped ''FaucetStatsdOpts
---------------------------------------------------------------------------------
-data FaucetConfig = FaucetConfig {
-    _fcWalletApiHost       :: String
-  , _fcWalletApiPort       :: Int
-  , _fcFaucetPaymentSource :: PaymentSource
-  , _fcSpendingPassword    :: Text
-  , _fcStatsdOpts          :: FaucetStatsdOpts
-  , _fcLoggerConfigFile    :: FilePath
-  , _fcPubCertFile         :: FilePath
-  , _fcPrivKeyFile         :: FilePath
-  }
-
-makeClassy ''FaucetConfig
 
 instance FromJSON FaucetStatsdOpts where
     parseJSON = fmap FaucetStatsdOpts . (withObject "StatsdOptions" $ \v ->
@@ -134,14 +124,49 @@ instance FromJSON FaucetStatsdOpts where
           <*> pure "faucet"
           <*> pure "")
 
+--------------------------------------------------------------------------------
+data SourceWalletConfig = SourceWalletConfig {
+    _srcWalletId         :: !WalletId
+  , _srcAccountIndex     :: !AccountIndex
+  , _srcSpendingPassword :: !Text
+  }
+
+srcSpendingPassword :: Lens' SourceWalletConfig Text
+srcSpendingPassword f = \(SourceWalletConfig w a p) ->
+    SourceWalletConfig w a <$> f p
+
+instance FromJSON SourceWalletConfig where
+    parseJSON = withObject "SourceWalletConfig" $ \v -> SourceWalletConfig
+      <$> v .: "wallet-id"
+      <*> v .: "account-index"
+      <*> v .: "sending-password"
+
+readSourceWalletConfig :: FilePath -> IO (Either String SourceWalletConfig)
+readSourceWalletConfig = fmap eitherDecode . BSL.readFile
+
+cfgToPaymentSource :: SourceWalletConfig -> PaymentSource
+cfgToPaymentSource (SourceWalletConfig wId aIdx _) = PaymentSource wId aIdx
+
+--------------------------------------------------------------------------------
+data FaucetConfig = FaucetConfig {
+    _fcWalletApiHost          :: !String
+  , _fcWalletApiPort          :: !Int
+  , _fcStatsdOpts             :: !FaucetStatsdOpts
+  , _fcSourceWalletConfigFile :: !FilePath
+  , _fcLoggerConfigFile       :: !FilePath
+  , _fcPubCertFile            :: !FilePath
+  , _fcPrivKeyFile            :: !FilePath
+  }
+
+makeClassy ''FaucetConfig
+
 instance FromJSON FaucetConfig where
     parseJSON = withObject "FaucetConfig" $ \v ->
         FaucetConfig
           <$> v .: "wallet-host"
           <*> v .: "wallet-port"
-          <*> v .: "payment-source"
-          <*> v .: "spending-password"
           <*> v .: "statsd"
+          <*> v .: "source-wallet-config"
           <*> v .: "logging-config"
           <*> v .: "public-certificate"
           <*> v .: "private-key"
@@ -149,9 +174,8 @@ instance FromJSON FaucetConfig where
 mkFaucetConfig
     :: String
     -> Int
-    -> PaymentSource
-    -> Text
     -> FaucetStatsdOpts
+    -> FilePath
     -> FilePath
     -> FilePath
     -> FilePath
@@ -161,12 +185,14 @@ mkFaucetConfig = FaucetConfig
 
 --------------------------------------------------------------------------------
 data FaucetEnv = FaucetEnv {
-    _feWithdrawn     :: Counter
-  , _feNumWithdrawn  :: Counter
-  , _feWalletBalance :: Gauge
-  , _feStore         :: Store
-  , _feFaucetConfig  :: FaucetConfig
-  , _feWalletClient  :: WalletClient IO
+    _feWithdrawn        :: !Counter
+  , _feNumWithdrawn     :: !Counter
+  , _feWalletBalance    :: !Gauge
+  , _feStore            :: !Store
+  , _fePaymentSource    :: !PaymentSource
+  , _feSpendingPassword :: !Text
+  , _feFaucetConfig     :: !FaucetConfig
+  , _feWalletClient     :: !(WalletClient IO)
   }
 
 makeClassy ''FaucetEnv
@@ -178,9 +204,13 @@ initEnv fc store = do
     withdrawCount <- createCounter "num-withdrawals" store
     balance <- createGauge "wallet-balance" store
     manager <- createManager fc
+    srcCfg <- either (error . ("SourceWalletConfig decode errror: " ++)) id
+                 <$> readSourceWalletConfig (fc ^. fcSourceWalletConfigFile)
     let url = BaseUrl Https (fc ^. fcWalletApiHost) (fc ^. fcWalletApiPort) ""
     return $ FaucetEnv withdrawn withdrawCount balance
                        store
+                       (cfgToPaymentSource srcCfg)
+                       (srcCfg ^. srcSpendingPassword)
                        fc
                        (mkHttpClient url manager)
 

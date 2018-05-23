@@ -107,3 +107,4 @@ result*
 # Don't include config files with sensitive data or tls certs
 /faucet/test-config.json
 /faucet/tls/*
+/faucet/wallet-source.json

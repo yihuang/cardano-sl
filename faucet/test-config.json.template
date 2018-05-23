@@ -1,16 +1,12 @@
 {
   "wallet-host": "127.0.0.1"
 , "wallet-port": 8090
-, "payment-source": {
-     "walletId": "XXX"
-   , "accountIndex": 2147483648
-   }
-, "spending-password": "XXX"
 , "statsd": {
     "host": "127.0.0.1"
   , "port": 8125
   , "flush-interval": 1000
   }
+, "source-logging-config": "./wallet-source.json"
 , "logging-config": "./logging.cfg"
 , "public-certificate": "./tls/ca.crt"
 , "private-key": "./tls/server.key"

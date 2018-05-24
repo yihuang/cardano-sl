@@ -6948,29 +6948,27 @@ inherit (pkgs) mesa;};
          , cardano-sl-crypto, cardano-sl-crypto-test, cardano-sl-db
          , cardano-sl-delegation, cardano-sl-infra, cardano-sl-lrc
          , cardano-sl-lrc-test, cardano-sl-networking, cardano-sl-ssc
-         , cardano-sl-txp, cardano-sl-txp-test, cardano-sl-update
-         , cardano-sl-util, cardano-sl-util-test, cborg, cereal, conduit
-         , constraints, containers, contravariant, cpphs, criterion
-         , cryptonite, data-default, directory, ed25519, ekg-core, ether
-         , exceptions, extra, filelock, filepath, fmt, formatting
-         , generic-arbitrary, hashable, hspec, lens, log-warper, mmorph
-         , monad-control, mtl, neat-interpolation, network
-         , network-transport, optparse-applicative, parsec, plutus-prototype
-         , pvss, QuickCheck, random, reflection, safe-exceptions, safecopy
-         , serokell-util, servant, servant-client, servant-client-core
-         , servant-server, servant-swagger, stdenv, stm, streaming-commons
-         , systemd, tagged, template-haskell, text, text-format, time
-         , time-units, tls, transformers, universum, unix, unliftio
-         , unordered-containers, vector, wai, warp, warp-tls, x509
-         , x509-store, x509-validation, yaml
+         , cardano-sl-txp, cardano-sl-update, cardano-sl-util
+         , cardano-sl-util-test, cborg, cereal, conduit, constraints
+         , containers, contravariant, cpphs, criterion, cryptonite
+         , data-default, directory, ed25519, ekg-core, ether, exceptions
+         , extra, filelock, filepath, fmt, formatting, generic-arbitrary
+         , hashable, hspec, lens, log-warper, mmorph, monad-control, mtl
+         , neat-interpolation, network, network-transport
+         , optparse-applicative, parsec, plutus-prototype, pvss, QuickCheck
+         , random, reflection, safe-exceptions, safecopy, serokell-util
+         , servant, servant-client, servant-client-core, servant-server
+         , servant-swagger, stdenv, stm, streaming-commons, systemd, tagged
+         , template-haskell, text, text-format, time, time-units, tls
+         , transformers, universum, unix, unliftio, unordered-containers
+         , vector, wai, warp, warp-tls, x509, x509-store, x509-validation
+         , yaml
          }:
          mkDerivation {
            pname = "cardano-sl";
            version = "1.1.1";
            src = ./../lib;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              aeson ansi-terminal ansi-wl-pprint async base bytestring
              canonical-json cardano-crypto cardano-sl-binary
@@ -6997,17 +6995,16 @@ inherit (pkgs) mesa;};
              cardano-sl-crypto cardano-sl-crypto-test cardano-sl-delegation
              cardano-sl-infra cardano-sl-lrc cardano-sl-lrc-test
              cardano-sl-networking cardano-sl-ssc cardano-sl-txp
-             cardano-sl-txp-test cardano-sl-update cardano-sl-util
-             cardano-sl-util-test cborg containers cryptonite data-default extra
-             filelock fmt formatting generic-arbitrary hspec lens mtl pvss
-             QuickCheck random reflection safecopy serokell-util tagged text
-             text-format time-units universum unordered-containers vector
+             cardano-sl-update cardano-sl-util cardano-sl-util-test cborg
+             containers cryptonite data-default extra filelock fmt formatting
+             generic-arbitrary hspec lens mtl pvss QuickCheck random reflection
+             safecopy serokell-util tagged text text-format time-units universum
+             unordered-containers vector
            ];
            benchmarkHaskellDepends = [
              aeson base cardano-sl-block cardano-sl-core cardano-sl-crypto
-             cardano-sl-ssc cardano-sl-txp cardano-sl-txp-test
-             cardano-sl-util-test criterion formatting QuickCheck universum
-             vector
+             cardano-sl-ssc cardano-sl-txp cardano-sl-util-test criterion
+             formatting QuickCheck universum vector
            ];
            doHaddock = false;
            description = "Cardano SL main implementation";
@@ -7032,9 +7029,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-auxx";
            version = "1.1.1";
            src = ./../auxx;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            isLibrary = true;
            isExecutable = true;
            libraryHaskellDepends = [
@@ -7068,11 +7063,14 @@ inherit (pkgs) mesa;};
            license = stdenv.lib.licenses.mit;
          }) {};
       "cardano-sl-binary" = callPackage
-        ({ mkDerivation, base, binary, bytestring, cborg, containers, cpphs
-         , digest, formatting, half, hashable, lens, mtl, QuickCheck
-         , safe-exceptions, serokell-util, stdenv, tagged, template-haskell
-         , text, th-utilities, time-units, transformers, universum
-         , unordered-containers, vector
+        ({ mkDerivation, base, binary, bytestring, canonical-json
+         , cardano-sl-util, cardano-sl-util-test, cborg, cereal, containers
+         , cpphs, cryptonite, data-default, digest, extra, filelock, fmt
+         , formatting, generic-arbitrary, half, hashable, hspec, lens, mtl
+         , pvss, QuickCheck, quickcheck-instances, random, reflection
+         , safe-exceptions, safecopy, serokell-util, stdenv, tagged
+         , template-haskell, text, text-format, th-utilities, time-units
+         , transformers, universum, unordered-containers, vector
          }:
          mkDerivation {
            pname = "cardano-sl-binary";
@@ -7085,22 +7083,33 @@ inherit (pkgs) mesa;};
              universum unordered-containers vector
            ];
            libraryToolDepends = [ cpphs ];
+           testHaskellDepends = [
+             base bytestring canonical-json cardano-sl-util cardano-sl-util-test
+             cborg cereal containers cryptonite data-default extra filelock fmt
+             formatting generic-arbitrary half hspec lens mtl pvss QuickCheck
+             quickcheck-instances random reflection safecopy serokell-util
+             tagged text text-format time-units universum unordered-containers
+             vector
+           ];
+           testToolDepends = [ cpphs ];
            doHaddock = false;
            description = "Cardano SL - binary serialization";
            license = stdenv.lib.licenses.mit;
          }) {};
       "cardano-sl-binary-test" = callPackage
-        ({ mkDerivation, base, bytestring, cardano-sl-util, cpphs
-         , cryptonite, formatting, half, mtl, QuickCheck
-         , quickcheck-instances, stdenv, tagged, text, universum
+        ({ mkDerivation, base, bytestring, cardano-sl-binary
+         , cardano-sl-util, cardano-sl-util-test, cborg, cereal, cpphs
+         , cryptonite, formatting, half, hspec, mtl, QuickCheck
+         , quickcheck-instances, safecopy, stdenv, tagged, text, universum
          }:
          mkDerivation {
            pname = "cardano-sl-binary-test";
            version = "1.1.0";
            src = ./../binary/test;
            libraryHaskellDepends = [
-             base bytestring cardano-sl-util cryptonite formatting half mtl
-             QuickCheck quickcheck-instances tagged text universum
+             base bytestring cardano-sl-binary cardano-sl-util
+             cardano-sl-util-test cborg cereal cryptonite formatting half hspec
+             mtl QuickCheck quickcheck-instances safecopy tagged text universum
            ];
            libraryToolDepends = [ cpphs ];
            doHaddock = false;
@@ -7109,10 +7118,10 @@ inherit (pkgs) mesa;};
          }) {};
       "cardano-sl-block" = callPackage
         ({ mkDerivation, aeson, base, bytestring, cardano-sl-binary
-         , cardano-sl-core, cardano-sl-crypto, cardano-sl-db
-         , cardano-sl-delegation, cardano-sl-infra, cardano-sl-lrc
-         , cardano-sl-lrc-test, cardano-sl-networking, cardano-sl-ssc
-         , cardano-sl-txp, cardano-sl-txp-test, cardano-sl-update
+         , cardano-sl-core, cardano-sl-core-test, cardano-sl-crypto
+         , cardano-sl-db, cardano-sl-delegation, cardano-sl-infra
+         , cardano-sl-lrc, cardano-sl-lrc-test, cardano-sl-networking
+         , cardano-sl-ssc, cardano-sl-txp, cardano-sl-update
          , cardano-sl-util, cardano-sl-util-test, cborg, conduit, containers
          , cpphs, criterion, cryptonite, data-default, deepseq, directory
          , ekg-core, ether, exceptions, filepath, formatting
@@ -7125,15 +7134,13 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-block";
            version = "1.1.1";
            src = ./../block;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              aeson base bytestring cardano-sl-binary cardano-sl-core
-             cardano-sl-crypto cardano-sl-db cardano-sl-delegation
-             cardano-sl-infra cardano-sl-lrc cardano-sl-lrc-test
-             cardano-sl-networking cardano-sl-ssc cardano-sl-txp
-             cardano-sl-txp-test cardano-sl-update cardano-sl-util
+             cardano-sl-core-test cardano-sl-crypto cardano-sl-db
+             cardano-sl-delegation cardano-sl-infra cardano-sl-lrc
+             cardano-sl-lrc-test cardano-sl-networking cardano-sl-ssc
+             cardano-sl-txp cardano-sl-update cardano-sl-util
              cardano-sl-util-test cborg conduit containers cryptonite
              data-default directory ekg-core ether exceptions filepath
              formatting generic-arbitrary lens log-warper mtl QuickCheck random
@@ -7165,9 +7172,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-client";
            version = "1.1.1";
            src = ./../client;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              base cardano-sl cardano-sl-block cardano-sl-core cardano-sl-crypto
              cardano-sl-db cardano-sl-infra cardano-sl-lrc cardano-sl-networking
@@ -7191,23 +7196,21 @@ inherit (pkgs) mesa;};
       "cardano-sl-core" = callPackage
         ({ mkDerivation, aeson, ansi-terminal, base, base58-bytestring
          , bytestring, Cabal, canonical-json, cardano-sl-binary
-         , cardano-sl-crypto, cardano-sl-crypto-test, cardano-sl-networking
-         , cardano-sl-util, cardano-sl-util-test, cborg, containers, cpphs
-         , cryptonite, data-default, deepseq, deriving-compat, exceptions
-         , extra, filepath, fmt, formatting, generic-arbitrary, hashable
-         , hspec, lens, log-warper, memory, mtl, plutus-prototype
-         , QuickCheck, quickcheck-instances, random, reflection
-         , safe-exceptions, serokell-util, stdenv, template-haskell, text
-         , text-format, th-lift-instances, time, time-units, universum
-         , unordered-containers, vector
+         , cardano-sl-binary-test, cardano-sl-crypto, cardano-sl-crypto-test
+         , cardano-sl-networking, cardano-sl-util, cardano-sl-util-test
+         , cborg, containers, cpphs, cryptonite, data-default, deepseq
+         , deriving-compat, exceptions, extra, filepath, fmt, formatting
+         , generic-arbitrary, hashable, hspec, lens, log-warper, memory, mtl
+         , plutus-prototype, QuickCheck, quickcheck-instances, random
+         , reflection, safe-exceptions, serokell-util, stdenv
+         , template-haskell, text, text-format, th-lift-instances, time
+         , time-units, universum, unordered-containers, vector
          }:
          mkDerivation {
            pname = "cardano-sl-core";
            version = "1.1.1";
            src = ./../core;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              aeson ansi-terminal base base58-bytestring bytestring Cabal
              canonical-json cardano-sl-binary cardano-sl-crypto
@@ -7222,13 +7225,32 @@ inherit (pkgs) mesa;};
            ];
            libraryToolDepends = [ cpphs ];
            testHaskellDepends = [
-             base bytestring cardano-sl-binary cardano-sl-crypto
-             cardano-sl-util-test formatting hspec QuickCheck serokell-util text
-             universum
+             base bytestring cardano-sl-binary cardano-sl-binary-test
+             cardano-sl-crypto cardano-sl-util-test formatting hspec QuickCheck
+             serokell-util text universum unordered-containers
            ];
            testToolDepends = [ cpphs ];
            doHaddock = false;
            description = "Cardano SL - core";
+           license = stdenv.lib.licenses.mit;
+         }) {};
+      "cardano-sl-core-test" = callPackage
+        ({ mkDerivation, base, bytestring, cardano-sl-core, cardano-sl-util
+         , cpphs, cryptonite, formatting, hspec, mtl, QuickCheck
+         , quickcheck-instances, stdenv, tagged, time-units, universum
+         }:
+         mkDerivation {
+           pname = "cardano-sl-core-test";
+           version = "1.1.0";
+           src = ./../core/test;
+           libraryHaskellDepends = [
+             base bytestring cardano-sl-core cardano-sl-util cryptonite
+             formatting hspec mtl QuickCheck quickcheck-instances tagged
+             time-units universum
+           ];
+           libraryToolDepends = [ cpphs ];
+           doHaddock = false;
+           description = "Cardano SL - core functionalit (tests)";
            license = stdenv.lib.licenses.mit;
          }) {};
       "cardano-sl-crypto" = callPackage
@@ -7290,9 +7312,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-db";
            version = "1.1.1";
            src = ./../db;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              base bytestring cardano-sl-binary cardano-sl-core cardano-sl-crypto
              cardano-sl-util concurrent-extra conduit containers data-default
@@ -7318,9 +7338,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-delegation";
            version = "1.1.1";
            src = ./../delegation;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              aeson base cardano-sl-binary cardano-sl-core cardano-sl-crypto
              cardano-sl-db cardano-sl-infra cardano-sl-lrc cardano-sl-networking
@@ -7340,25 +7358,23 @@ inherit (pkgs) mesa;};
          , cardano-sl-crypto, cardano-sl-db, cardano-sl-delegation
          , cardano-sl-generator, cardano-sl-infra, cardano-sl-lrc
          , cardano-sl-networking, cardano-sl-ssc, cardano-sl-txp
-         , cardano-sl-txp-test, cardano-sl-update, cardano-sl-util, conduit
-         , containers, cpphs, criterion, cryptonite, data-default, engine-io
-         , engine-io-wai, ether, exceptions, formatting, free
-         , generic-arbitrary, hspec, http-types, lens, log-warper, memory
-         , mmorph, mtl, optparse-applicative, optparse-simple
-         , purescript-bridge, QuickCheck, resourcet, rocksdb-haskell-ng
-         , safe-exceptions, serokell-util, servant, servant-generic
-         , servant-multipart, servant-server, servant-swagger, socket-io
-         , stdenv, stm, swagger2, text, text-format, time, time-units
-         , transformers, universum, unliftio, unordered-containers, vector
-         , wai, wai-cors, wai-extra, warp, weigh
+         , cardano-sl-update, cardano-sl-util, conduit, containers, cpphs
+         , criterion, cryptonite, data-default, engine-io, engine-io-wai
+         , ether, exceptions, formatting, free, generic-arbitrary, hspec
+         , http-types, lens, log-warper, memory, mmorph, mtl
+         , optparse-applicative, optparse-simple, purescript-bridge
+         , QuickCheck, resourcet, rocksdb-haskell-ng, safe-exceptions
+         , serokell-util, servant, servant-generic, servant-multipart
+         , servant-server, servant-swagger, socket-io, stdenv, stm, swagger2
+         , text, text-format, time, time-units, transformers, universum
+         , unliftio, unordered-containers, vector, wai, wai-cors, wai-extra
+         , warp, weigh
          }:
          mkDerivation {
            pname = "cardano-sl-explorer";
            version = "1.1.1";
            src = ./../explorer;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            isLibrary = true;
            isExecutable = true;
            libraryHaskellDepends = [
@@ -7366,10 +7382,10 @@ inherit (pkgs) mesa;};
              cardano-sl-core cardano-sl-crypto cardano-sl-db
              cardano-sl-delegation cardano-sl-generator cardano-sl-infra
              cardano-sl-lrc cardano-sl-networking cardano-sl-ssc cardano-sl-txp
-             cardano-sl-txp-test cardano-sl-update cardano-sl-util conduit
-             containers data-default engine-io engine-io-wai ether exceptions
-             formatting free generic-arbitrary http-types lens log-warper memory
-             mmorph mtl QuickCheck resourcet rocksdb-haskell-ng safe-exceptions
+             cardano-sl-update cardano-sl-util conduit containers data-default
+             engine-io engine-io-wai ether exceptions formatting free
+             generic-arbitrary http-types lens log-warper memory mmorph mtl
+             QuickCheck resourcet rocksdb-haskell-ng safe-exceptions
              serokell-util servant servant-generic servant-server socket-io stm
              text text-format time time-units transformers universum unliftio
              unordered-containers vector wai wai-cors wai-extra warp
@@ -7390,8 +7406,7 @@ inherit (pkgs) mesa;};
            ];
            testToolDepends = [ cpphs ];
            benchmarkHaskellDepends = [
-             base cardano-sl cardano-sl-txp cardano-sl-txp-test criterion
-             QuickCheck universum weigh
+             base cardano-sl cardano-sl-txp criterion QuickCheck universum weigh
            ];
            benchmarkToolDepends = [ cpphs ];
            doHaddock = false;
@@ -7403,21 +7418,19 @@ inherit (pkgs) mesa;};
          , cardano-sl-block, cardano-sl-client, cardano-sl-core
          , cardano-sl-crypto, cardano-sl-db, cardano-sl-delegation
          , cardano-sl-infra, cardano-sl-lrc, cardano-sl-networking
-         , cardano-sl-ssc, cardano-sl-txp, cardano-sl-txp-test
-         , cardano-sl-update, cardano-sl-util, cardano-sl-util-test
-         , containers, cpphs, cryptonite, data-default, ether, exceptions
-         , formatting, hspec, lens, log-warper, monad-control, MonadRandom
-         , QuickCheck, random, safe-exceptions, serokell-util, stdenv, text
-         , text-format, time-units, transformers-base, universum, unliftio
+         , cardano-sl-ssc, cardano-sl-txp, cardano-sl-update
+         , cardano-sl-util, cardano-sl-util-test, containers, cpphs
+         , cryptonite, data-default, ether, exceptions, formatting, hspec
+         , lens, log-warper, monad-control, MonadRandom, QuickCheck, random
+         , safe-exceptions, serokell-util, stdenv, text, text-format
+         , time-units, transformers-base, universum, unliftio
          , unordered-containers, vector
          }:
          mkDerivation {
            pname = "cardano-sl-generator";
            version = "1.1.1";
            src = ./../generator;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              base bytestring cardano-sl cardano-sl-block cardano-sl-client
              cardano-sl-core cardano-sl-crypto cardano-sl-db
@@ -7433,10 +7446,10 @@ inherit (pkgs) mesa;};
            testHaskellDepends = [
              base cardano-sl cardano-sl-binary cardano-sl-block cardano-sl-core
              cardano-sl-crypto cardano-sl-db cardano-sl-delegation
-             cardano-sl-lrc cardano-sl-ssc cardano-sl-txp cardano-sl-txp-test
-             cardano-sl-update cardano-sl-util cardano-sl-util-test data-default
-             formatting hspec lens MonadRandom QuickCheck safe-exceptions
-             serokell-util universum unordered-containers
+             cardano-sl-lrc cardano-sl-ssc cardano-sl-txp cardano-sl-update
+             cardano-sl-util cardano-sl-util-test data-default formatting hspec
+             lens MonadRandom QuickCheck safe-exceptions serokell-util universum
+             unordered-containers
            ];
            testToolDepends = [ cpphs ];
            doHaddock = false;
@@ -7461,9 +7474,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-infra";
            version = "1.1.1";
            src = ./../infra;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              aeson async base base64-bytestring bytestring cardano-report-server
              cardano-sl-binary cardano-sl-core cardano-sl-crypto cardano-sl-db
@@ -7494,9 +7505,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-lrc";
            version = "1.1.1";
            src = ./../lrc;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              base bytestring cardano-sl-binary cardano-sl-core cardano-sl-crypto
              cardano-sl-db cardano-sl-networking cardano-sl-txp cardano-sl-util
@@ -7537,13 +7546,12 @@ inherit (pkgs) mesa;};
          , cardano-sl-util, conduit, conduit-extra, containers
          , contravariant, cryptonite, ekg-core, exceptions, formatting
          , hashable, hspec, hspec-core, kademlia, lens, log-warper, mmorph
-         , monad-control, MonadRandom, mtl, mwc-random, network
-         , network-transport, network-transport-inmemory
-         , network-transport-tcp, optparse-simple, QuickCheck, random
-         , resourcet, safe-exceptions, serokell-util, statistics, stdenv
-         , stm, text, text-format, time, time-units, transformers
-         , transformers-base, transformers-lift, universum, unliftio-core
-         , vector
+         , monad-control, mtl, mwc-random, network, network-transport
+         , network-transport-inmemory, network-transport-tcp
+         , optparse-simple, QuickCheck, random, resourcet, safe-exceptions
+         , serokell-util, statistics, stdenv, stm, text, text-format, time
+         , time-units, transformers, transformers-base, transformers-lift
+         , universum, unliftio-core, vector
          }:
          mkDerivation {
            pname = "cardano-sl-networking";
@@ -7563,9 +7571,8 @@ inherit (pkgs) mesa;};
            executableHaskellDepends = [
              async attoparsec base binary bytestring cardano-sl-util conduit
              conduit-extra containers contravariant formatting lens log-warper
-             MonadRandom mtl network-transport network-transport-tcp
-             optparse-simple random resourcet safe-exceptions serokell-util text
-             text-format time time-units unliftio-core
+             mtl network-transport network-transport-tcp optparse-simple random
+             resourcet safe-exceptions serokell-util text time-units
            ];
            testHaskellDepends = [
              async base binary bytestring cardano-sl-util containers hspec
@@ -7589,9 +7596,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-node";
            version = "1.1.1";
            src = ./../node;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            isLibrary = false;
            isExecutable = true;
            executableHaskellDepends = [
@@ -7620,9 +7625,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-ssc";
            version = "1.1.1";
            src = ./../ssc;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              aeson array base bytestring cardano-sl-binary cardano-sl-core
              cardano-sl-crypto cardano-sl-crypto-test cardano-sl-db
@@ -7646,12 +7649,12 @@ inherit (pkgs) mesa;};
          , cardano-report-server, cardano-sl, cardano-sl-binary
          , cardano-sl-block, cardano-sl-client, cardano-sl-core
          , cardano-sl-crypto, cardano-sl-db, cardano-sl-infra
-         , cardano-sl-networking, cardano-sl-txp, cardano-sl-txp-test
-         , cardano-sl-update, cardano-sl-util, cardano-sl-wallet, cassava
-         , Chart, Chart-diagrams, containers, cpphs, cryptonite
-         , data-default, data-default-class, directory, fgl, filepath, foldl
-         , formatting, Glob, graphviz, hourglass, hspec, kademlia, lens
-         , lifted-async, log-warper, MonadRandom, mtl, neat-interpolation
+         , cardano-sl-networking, cardano-sl-txp, cardano-sl-update
+         , cardano-sl-util, cardano-sl-wallet, cassava, Chart
+         , Chart-diagrams, containers, cpphs, cryptonite, data-default
+         , data-default-class, directory, fgl, filepath, foldl, formatting
+         , Glob, graphviz, hourglass, hspec, kademlia, lens, lifted-async
+         , log-warper, MonadRandom, mtl, neat-interpolation
          , network-transport-tcp, optparse-applicative, optparse-generic
          , parsers, pipes, pipes-bytestring, pipes-interleave, pipes-safe
          , process, QuickCheck, random, safe-exceptions, serokell-util
@@ -7663,9 +7666,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-tools";
            version = "1.1.1";
            src = ./../tools;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            isLibrary = true;
            isExecutable = true;
            libraryHaskellDepends = [
@@ -7677,16 +7678,15 @@ inherit (pkgs) mesa;};
              canonical-json cardano-report-server cardano-sl cardano-sl-binary
              cardano-sl-block cardano-sl-client cardano-sl-core
              cardano-sl-crypto cardano-sl-db cardano-sl-infra
-             cardano-sl-networking cardano-sl-txp cardano-sl-txp-test
-             cardano-sl-update cardano-sl-util cardano-sl-wallet cassava Chart
-             Chart-diagrams containers cryptonite data-default
-             data-default-class directory fgl filepath foldl formatting Glob
-             graphviz hourglass kademlia lens lifted-async log-warper
-             MonadRandom mtl neat-interpolation network-transport-tcp
-             optparse-applicative optparse-generic pipes pipes-bytestring
-             pipes-interleave pipes-safe process QuickCheck random
-             safe-exceptions serokell-util silently stm string-conv tabl tar
-             text time time-units universum unix unix-compat
+             cardano-sl-networking cardano-sl-txp cardano-sl-update
+             cardano-sl-util cardano-sl-wallet cassava Chart Chart-diagrams
+             containers cryptonite data-default data-default-class directory fgl
+             filepath foldl formatting Glob graphviz hourglass kademlia lens
+             lifted-async log-warper MonadRandom mtl neat-interpolation
+             network-transport-tcp optparse-applicative optparse-generic pipes
+             pipes-bytestring pipes-interleave pipes-safe process QuickCheck
+             random safe-exceptions serokell-util silently stm string-conv tabl
+             tar text time time-units universum unix unix-compat
              unordered-containers x509 x509-store x509-validation yaml
            ];
            executableToolDepends = [ cpphs ];
@@ -7702,20 +7702,17 @@ inherit (pkgs) mesa;};
          , cardano-sl-db, cardano-sl-infra, cardano-sl-networking
          , cardano-sl-util, cardano-sl-util-test, conduit, containers, cpphs
          , data-default, ekg-core, ether, exceptions, fmt, formatting, free
-         , generic-arbitrary, hashable, hspec, lens, log-warper, memory
-         , mmorph, mtl, neat-interpolation, plutus-prototype, QuickCheck
-         , reflection, resourcet, rocksdb-haskell-ng, safe-exceptions
-         , serokell-util, stdenv, stm, tagged, template-haskell, text
-         , text-format, transformers, universum, unliftio
-         , unordered-containers, vector
+         , generic-arbitrary, hashable, lens, log-warper, memory, mmorph
+         , mtl, neat-interpolation, plutus-prototype, QuickCheck, reflection
+         , resourcet, rocksdb-haskell-ng, safe-exceptions, serokell-util
+         , stdenv, stm, tagged, template-haskell, text, text-format
+         , transformers, universum, unliftio, unordered-containers, vector
          }:
          mkDerivation {
            pname = "cardano-sl-txp";
            version = "1.1.1";
            src = ./../txp;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              aeson base bytestring cardano-sl-binary cardano-sl-core
              cardano-sl-crypto cardano-sl-crypto-test cardano-sl-db
@@ -7723,40 +7720,13 @@ inherit (pkgs) mesa;};
              cardano-sl-util-test conduit containers data-default ekg-core ether
              exceptions fmt formatting free generic-arbitrary hashable lens
              log-warper memory mmorph mtl neat-interpolation plutus-prototype
-             reflection resourcet rocksdb-haskell-ng safe-exceptions
+             QuickCheck reflection resourcet rocksdb-haskell-ng safe-exceptions
              serokell-util stm tagged template-haskell text text-format
              transformers universum unliftio unordered-containers vector
            ];
            libraryToolDepends = [ cpphs ];
-           testHaskellDepends = [
-             base cardano-sl-binary cardano-sl-core cardano-sl-crypto
-             cardano-sl-crypto-test cardano-sl-util cardano-sl-util-test
-             containers data-default fmt generic-arbitrary hspec lens mtl
-             QuickCheck serokell-util text-format universum unordered-containers
-             vector
-           ];
            doHaddock = false;
            description = "Cardano SL - transaction processing";
-           license = stdenv.lib.licenses.mit;
-         }) {};
-      "cardano-sl-txp-test" = callPackage
-        ({ mkDerivation, base, cardano-sl-binary, cardano-sl-core
-         , cardano-sl-crypto, cardano-sl-crypto-test, cardano-sl-infra
-         , cardano-sl-txp, cardano-sl-util-test, data-default
-         , generic-arbitrary, QuickCheck, stdenv, universum, vector
-         }:
-         mkDerivation {
-           pname = "cardano-sl-txp-test";
-           version = "1.0.0";
-           src = ./../txp/test;
-           libraryHaskellDepends = [
-             base cardano-sl-binary cardano-sl-core cardano-sl-crypto
-             cardano-sl-crypto-test cardano-sl-infra cardano-sl-txp
-             cardano-sl-util-test data-default generic-arbitrary QuickCheck
-             universum vector
-           ];
-           doHaddock = false;
-           description = "Cardano SL - arbitrary instances for cardano-sl-txp";
            license = stdenv.lib.licenses.mit;
          }) {};
       "cardano-sl-update" = callPackage
@@ -7776,9 +7746,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-update";
            version = "1.1.1";
            src = ./../update;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              aeson base bytestring Cabal cardano-sl-binary cardano-sl-core
              cardano-sl-crypto cardano-sl-crypto-test cardano-sl-db
@@ -7797,10 +7765,10 @@ inherit (pkgs) mesa;};
            license = stdenv.lib.licenses.mit;
          }) {};
       "cardano-sl-util" = callPackage
-        ({ mkDerivation, aeson, async, base, binary, cardano-sl-binary
-         , cborg, cereal, concurrent-extra, containers, contravariant, cpphs
-         , cryptonite, data-default, deepseq, directory, ether, exceptions
-         , filepath, formatting, hashable, hspec, lens, log-warper, lrucache
+        ({ mkDerivation, aeson, async, base, binary, cborg, cereal
+         , concurrent-extra, containers, contravariant, cpphs, cryptonite
+         , data-default, deepseq, directory, ether, exceptions, filepath
+         , formatting, hashable, hspec, lens, log-warper, lrucache
          , megaparsec, mtl, optparse-applicative, parsec, process
          , QuickCheck, quickcheck-instances, reflection, resourcet
          , safe-exceptions, serokell-util, stdenv, stm, tagged
@@ -7816,20 +7784,19 @@ inherit (pkgs) mesa;};
              "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
            ];
            libraryHaskellDepends = [
-             aeson base binary cardano-sl-binary cborg cereal concurrent-extra
-             containers contravariant cryptonite data-default deepseq directory
-             ether exceptions filepath formatting hashable lens log-warper
-             lrucache megaparsec mtl optparse-applicative parsec process
-             reflection resourcet safe-exceptions serokell-util stm tagged
-             template-haskell text text-format th-lift-instances time time-units
-             transformers transformers-base transformers-lift universum
-             unliftio-core unordered-containers
+             aeson base binary cborg cereal concurrent-extra containers
+             contravariant cryptonite data-default deepseq directory ether
+             exceptions filepath formatting hashable lens log-warper lrucache
+             megaparsec mtl optparse-applicative parsec process reflection
+             resourcet safe-exceptions serokell-util stm tagged template-haskell
+             text text-format th-lift-instances time time-units transformers
+             transformers-base transformers-lift universum unliftio-core
+             unordered-containers
            ];
            libraryToolDepends = [ cpphs ];
            testHaskellDepends = [
-             async base cardano-sl-binary hspec QuickCheck quickcheck-instances
-             serokell-util stm text time time-units universum
-             unordered-containers
+             async base hspec QuickCheck quickcheck-instances serokell-util stm
+             text time time-units universum unordered-containers
            ];
            testToolDepends = [ cpphs ];
            doHaddock = false;
@@ -7837,18 +7804,17 @@ inherit (pkgs) mesa;};
            license = stdenv.lib.licenses.mit;
          }) {};
       "cardano-sl-util-test" = callPackage
-        ({ mkDerivation, attoparsec, base, base16-bytestring, bytestring
-         , cardano-sl-util, cpphs, cryptonite, formatting, hspec, mtl
-         , QuickCheck, quickcheck-instances, stdenv, tagged, universum
+        ({ mkDerivation, base, bytestring, cardano-sl-util, cpphs
+         , cryptonite, formatting, hspec, mtl, QuickCheck
+         , quickcheck-instances, stdenv, tagged, time-units, universum
          }:
          mkDerivation {
            pname = "cardano-sl-util-test";
            version = "1.1.0";
            src = ./../util/test;
            libraryHaskellDepends = [
-             attoparsec base base16-bytestring bytestring cardano-sl-util
-             cryptonite formatting hspec mtl QuickCheck quickcheck-instances
-             tagged universum
+             base bytestring cardano-sl-util cryptonite formatting hspec mtl
+             QuickCheck quickcheck-instances tagged time-units universum
            ];
            libraryToolDepends = [ cpphs ];
            doHaddock = false;
@@ -7861,26 +7827,23 @@ inherit (pkgs) mesa;};
          , cardano-sl-core, cardano-sl-crypto, cardano-sl-db
          , cardano-sl-delegation, cardano-sl-generator, cardano-sl-infra
          , cardano-sl-lrc, cardano-sl-networking, cardano-sl-ssc
-         , cardano-sl-txp, cardano-sl-txp-test, cardano-sl-update
-         , cardano-sl-util, cardano-sl-util-test, containers, cpphs
-         , cryptonite, data-default, deepseq, directory, dlist, ekg-core
-         , ether, exceptions, filepath, formatting, hashable, hspec, lens
-         , log-warper, memory, monad-control, MonadRandom, mtl, node-ipc
-         , QuickCheck, quickcheck-instances, random, reflection
-         , safe-exceptions, safecopy, semver, serokell-util, servant
-         , servant-generic, servant-multipart, servant-server
-         , servant-swagger, servant-swagger-ui, stdenv, stm, swagger2, text
-         , text-format, time, time-units, transformers, universum, unix
-         , unliftio, unordered-containers, wai, wai-websockets, warp
-         , websockets
+         , cardano-sl-txp, cardano-sl-update, cardano-sl-util
+         , cardano-sl-util-test, containers, cpphs, cryptonite, data-default
+         , deepseq, directory, dlist, ekg-core, ether, exceptions, filepath
+         , formatting, hashable, hspec, lens, log-warper, memory
+         , monad-control, MonadRandom, mtl, node-ipc, QuickCheck
+         , quickcheck-instances, random, reflection, safe-exceptions
+         , safecopy, semver, serokell-util, servant, servant-generic
+         , servant-multipart, servant-server, servant-swagger
+         , servant-swagger-ui, stdenv, stm, swagger2, text, text-format
+         , time, time-units, transformers, universum, unix, unliftio
+         , unordered-containers, wai, wai-websockets, warp, websockets
          }:
          mkDerivation {
            pname = "cardano-sl-wallet";
            version = "1.1.1";
            src = ./../wallet;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            libraryHaskellDepends = [
              acid-state aeson async base base58-bytestring bytestring cardano-sl
              cardano-sl-block cardano-sl-client cardano-sl-core
@@ -7903,11 +7866,11 @@ inherit (pkgs) mesa;};
              cardano-sl-crypto cardano-sl-db cardano-sl-delegation
              cardano-sl-generator cardano-sl-infra cardano-sl-lrc
              cardano-sl-networking cardano-sl-ssc cardano-sl-txp
-             cardano-sl-txp-test cardano-sl-update cardano-sl-util
-             cardano-sl-util-test containers data-default deepseq ekg-core ether
-             formatting hspec lens log-warper MonadRandom mtl QuickCheck
-             safe-exceptions safecopy serokell-util servant-server stm
-             text-format universum unordered-containers
+             cardano-sl-update cardano-sl-util cardano-sl-util-test containers
+             data-default deepseq ekg-core ether formatting hspec lens
+             log-warper MonadRandom mtl QuickCheck safe-exceptions safecopy
+             serokell-util servant-server stm text-format universum
+             unordered-containers
            ];
            testToolDepends = [ cpphs ];
            doHaddock = false;
@@ -7940,9 +7903,7 @@ inherit (pkgs) mesa;};
            pname = "cardano-sl-wallet-new";
            version = "1.1.1";
            src = ./../wallet-new;
-           configureFlags = [
-             "--ghc-option=-fwarn-redundant-constraints" "--ghc-option=-Werror"
-           ];
+           configureFlags = [ "--ghc-option=-Werror" ];
            isLibrary = true;
            isExecutable = true;
            libraryHaskellDepends = [

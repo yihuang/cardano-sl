@@ -10,14 +10,14 @@
 {-# LANGUAGE ViewPatterns               #-}
 {-# OPTIONS_GHC -Wall #-}
 module Cardano.Faucet.Types (
-   FaucetConfig(..), mkFaucetConfig
+   FaucetConfig(..)
  , HasFaucetConfig(..)
  , FaucetEnv(..), initEnv
  , HasFaucetEnv(..)
  , incWithDrawn
  , decrWithDrawn
  , setWalletBalance
- , WithDrawlRequest(..), wAddress, wAmount
+ , WithDrawlRequest(..), wAddress
  , WithDrawlResult(..)
  , DepositRequest(..), dWalletId, dAmount
  , DepositResult(..)
@@ -65,7 +65,6 @@ import           Pos.Core (Address (..), Coin (..))
 --------------------------------------------------------------------------------
 data WithDrawlRequest = WithDrawlRequest {
     _wAddress :: !(V1 Address)
-  , _wAmount  :: !(V1 Coin)
   } deriving (Show, Typeable, Generic)
 
 makeLenses ''WithDrawlRequest
@@ -73,11 +72,10 @@ makeLenses ''WithDrawlRequest
 instance FromJSON WithDrawlRequest where
   parseJSON = withObject "WithDrawlRequest" $ \v -> WithDrawlRequest
     <$> v .: "address"
-    <*> v .: "amount"
 
 instance ToJSON WithDrawlRequest where
-    toJSON (WithDrawlRequest w a) =
-        object ["address" .= w, "amount" .= a]
+    toJSON (WithDrawlRequest w) =
+        object [ "address" .= w ]
 
 data WithDrawlResult =
     WithdrawlError ClientError
@@ -148,10 +146,26 @@ cfgToPaymentSource :: SourceWalletConfig -> PaymentSource
 cfgToPaymentSource (SourceWalletConfig wId aIdx _) = PaymentSource wId aIdx
 
 --------------------------------------------------------------------------------
+newtype PaymentCenter = PaymentCenter Int deriving (Generic, Show, Eq, Ord)
+
+makeWrapped ''PaymentCenter
+
+instance FromJSON PaymentCenter
+
+--------------------------------------------------------------------------------
+newtype PaymentVariation = PaymentVariation Float deriving (Generic, Show, Eq, Ord)
+
+makeWrapped ''PaymentVariation
+
+instance FromJSON PaymentVariation
+
+--------------------------------------------------------------------------------
 data FaucetConfig = FaucetConfig {
     _fcWalletApiHost          :: !String
   , _fcWalletApiPort          :: !Int
   , _fcPort                   :: !Int
+  , _fcPaymentAmount          :: !PaymentCenter
+  , _fcPaymentVariation       :: !PaymentVariation
   , _fcStatsdOpts             :: !FaucetStatsdOpts
   , _fcSourceWalletConfigFile :: !FilePath
   , _fcLoggerConfigFile       :: !FilePath
@@ -167,24 +181,13 @@ instance FromJSON FaucetConfig where
           <$> v .: "wallet-host"
           <*> v .: "wallet-port"
           <*> v .: "port"
+          <*> v .: "payment-amount"
+          <*> v .: "payment-variation"
           <*> v .: "statsd"
           <*> v .: "source-wallet-config"
           <*> v .: "logging-config"
           <*> v .: "public-certificate"
           <*> v .: "private-key"
-
-mkFaucetConfig
-    :: String
-    -> Int
-    -> Int
-    -> FaucetStatsdOpts
-    -> FilePath
-    -> FilePath
-    -> FilePath
-    -> FilePath
-    -> FaucetConfig
-mkFaucetConfig = FaucetConfig
-
 
 --------------------------------------------------------------------------------
 data FaucetEnv = FaucetEnv {

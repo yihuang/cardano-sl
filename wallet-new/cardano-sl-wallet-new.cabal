@@ -280,6 +280,7 @@ executable cardano-integration-test
                        Error
                        Util
                        WalletSpecs
+                       AccountSpecs
                        AddressSpecs
                        TransactionSpecs
                        QuickCheckSpecs

@@ -110,13 +110,16 @@ test-suite test
   other-modules:
                        Spec
                        Test.Pos.Crypto.CryptoSpec
+                       Test.Pos.Crypto.Golden
 
   build-depends:       QuickCheck
                      , base
                      , bytestring
                      , cardano-sl-binary
+                     , cardano-sl-binary-test
                      , cardano-sl-crypto
                      , formatting
+                     , hedgehog
                      , hspec
                      , text
                      , universum >= 0.1.11
@@ -153,7 +156,6 @@ test-suite test
                         BangPatterns
                         TemplateHaskell
                         ScopedTypeVariables
-                        GADTs
                         MonadFailDesugaring
 
   build-tools: cpphs >= 1.19

@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
 module Test.Pos.Binary.Tripping
        ( goldenTestBi
+       , embedGoldenTest
        , runTests
        , trippingBiBuildable
        , trippingBiShow
@@ -8,22 +10,26 @@ module Test.Pos.Binary.Tripping
 
 import           Universum
 
-import qualified Data.ByteString.Base16 as B16
+-- import qualified Data.ByteString.Base16.Lazy as B16
 import qualified Data.ByteString.Lazy.Char8 as BS
-import qualified Data.Text.Lazy as LazyText
+import           Data.FileEmbed (embedStringFile, makeRelativeToProject)
 import           Data.Text.Buildable (Buildable (..))
 import           Data.Text.Internal.Builder (fromText, toLazyText)
+import qualified Data.Text.Lazy as LazyText
+import           Language.Haskell.TH (ExpQ)
 
-import           Hedgehog (MonadTest,( ===))
-import           Hedgehog.Internal.Show (valueDiff)
-import           Hedgehog.Internal.Property (Diff (..), failWith)
+import           Hedgehog (MonadTest, (===))
 import qualified Hedgehog as H
+import           Hedgehog.Internal.Property (Diff (..), failWith)
+import           Hedgehog.Internal.Show (valueDiff)
 
-import           Pos.Binary.Class (Bi (..), serialize, serialize', decodeFull)
+import           Pos.Binary.Class (Bi (..), decodeFull, serialize)
 
 import qualified Prelude
 
-import           Text.Show.Pretty (Value(..), parseValue)
+import           Text.Show.Pretty (Value (..), parseValue)
+
+import qualified Test.Pos.Util.Base16 as B16
 
 runTests :: [IO Bool] -> IO ()
 runTests tests = do
@@ -31,13 +37,21 @@ runTests tests = do
     unless result
         exitFailure
 
+-- | A handy shortcut for embedding golden testing files
+embedGoldenTest :: FilePath -> ExpQ
+embedGoldenTest path = makeRelativeToProject ("golden/" <> path) >>= embedStringFile
+
 -- | Round trip
-goldenTestBi :: (Bi a, Eq a, Show a) => a -> ByteString -> m ()
-goldenTestBi x bs = do
-    let target = fst $ B16.decode bs
+goldenTestBi :: (Bi a, Eq a, Show a, HasCallStack) => a -> LByteString -> H.Property
+goldenTestBi x bs = withFrozenCallStack $ do
+    let bss = BS.lines bs
+    let bss' = BS.lines . B16.encodeWithIndex . serialize $ x
+    let target = B16.decode bs
     H.withTests 1 . H.property $ do
-        serialize' a === target
-        -- decodeFull target === a
+        -- length bss === length bss'
+        -- void . mapM (uncurry (===)) $ zip bss bss'
+        bss === bss'
+        fmap decodeFull target === Just (Right x)
 
 -- | Round trip test a value (any instance of both the 'Bi' and 'Show' classes)
 -- by serializing it to a ByteString and back again and
@@ -80,7 +94,7 @@ trippingBiBuildable x =
 
 
 instance Buildable a => Buildable (Either Text a) where
-    build (Left t) = fromText t
+    build (Left t)  = fromText t
     build (Right a) = build a
 
 buildPretty :: Buildable a => a -> String

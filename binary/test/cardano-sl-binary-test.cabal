@@ -16,7 +16,6 @@ library
                        Test.Pos.Binary.Helpers
                        Test.Pos.Cbor.Canonicity
                        Test.Pos.Cbor.RefImpl
-                       Test.Pos.Binary.Helpers
                        Test.Pos.Binary.Tripping
 
   build-depends:       QuickCheck
@@ -29,6 +28,7 @@ library
                      , cborg
                      , cereal
                      , cryptonite
+                     , file-embed
                      , formatting
                      , half
                      , hedgehog
@@ -37,6 +37,7 @@ library
                      , pretty-show
                      , quickcheck-instances
                      , safecopy
+                     , template-haskell
                      , text
                      , text-format
                      , tagged

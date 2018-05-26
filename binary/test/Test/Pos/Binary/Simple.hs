@@ -1,11 +1,14 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass  #-}
+{-# LANGUAGE NumDecimals     #-}
 {-# LANGUAGE TemplateHaskell #-}
+
 module Test.Pos.Binary.Simple
     ( tests
     ) where
 
 import           Universum
 
+-- import           Data.FileEmbed
 import           Data.Text.Buildable (Buildable (..))
 import qualified Data.Text.Internal.Builder as Builder
 
@@ -18,7 +21,8 @@ import           Pos.Binary.Class (Cons (..), Field (..), cborError, deriveSimpl
 
 import qualified Serokell.Util.Base16 as B16
 
-import           Test.Pos.Binary.Tripping (trippingBiBuildable, trippingBiShow)
+import           Test.Pos.Binary.Tripping (embedGoldenTest, goldenTestBi, trippingBiBuildable,
+                                           trippingBiShow)
 
 data Test
     = TestInt { a :: Int }
@@ -66,9 +70,9 @@ genTest =
 
 
 prop_golden_TestInt :: Property
-prop_golden_TestInt =
-    H.withTests 1 . H.property $
-        B16.encode (serialize' $ TestInt 42) === "8200182a"
+prop_golden_TestInt = goldenTestBi (TestInt 42) "8200182a"
+    -- H.withTests 1 . H.property $
+    --     B16.encode (serialize' $ TestInt 42) === "8200182b" -- "8200182a"
 
 prop_golden_TestIntList :: Property
 prop_golden_TestIntList =
@@ -81,10 +85,14 @@ prop_golden_TestChar2 =
         B16.encode (serialize' $ TestChar2 '\0' 'a') === "830261006161"
 
 prop_golden_TestInteger :: Property
-prop_golden_TestInteger =
-    H.withTests 1 . H.property $
-        B16.encode (serialize' $ TestInteger 123456789123456789123456789)
-            === "8203c24b661efdf2e3b19f7c045f15"
+prop_golden_TestInteger = goldenTestBi
+    (TestInteger 123456789123456789123456789)
+    "8203c24b661efdf2e3b19f7c045f15"
+
+prop_golden_TestBigInteger :: Property
+prop_golden_TestBigInteger = goldenTestBi
+    (TestInteger 2e50)
+    $(embedGoldenTest "prop_golden_TestBigInteger")
 
 prop_golden_TestMaybeIntNothing :: Property
 prop_golden_TestMaybeIntNothing =

@@ -46,8 +46,6 @@ module Cardano.Wallet.API.V1.Types (
   , WalletAddress (..)
   , NewAddress (..)
   , AddressPath -- Constructor not exposed, use smart constructor & lenses
-  , purpose
-  , coinType
   , change
   , account
   , addressIndex
@@ -97,7 +95,7 @@ module Cardano.Wallet.API.V1.Types (
 
 import           Universum
 
-import           Control.Lens (At, Getter, Index, IxValue, at, ix, makeLensesFor, makePrisms, to,
+import           Control.Lens (At, Index, IxValue, at, ix, makeLensesFor, makePrisms, to,
                                (?~))
 import           Data.Aeson
 import           Data.Aeson.TH as A
@@ -1087,10 +1085,10 @@ addressLevelToWord32 = \case
 
 word32ToAddressLevel :: Word32 -> AddressLevel
 word32ToAddressLevel lvl =
-  if lvl <= (maxBound `div` 2 + 1) then
-    AddressLevelNormal lvl
-  else
-    AddressLevelHardened (lvl - maxBound `div` 2 - 1)
+    if lvl <= (maxBound `div` 2 + 1) then
+        AddressLevelNormal lvl
+    else
+        AddressLevelHardened (lvl - maxBound `div` 2 - 1)
 
 data AddressLevel
     = AddressLevelHardened Word32
@@ -1108,16 +1106,16 @@ instance ToSchema AddressLevel where
             ]
 
 instance Arbitrary AddressLevel where
-  arbitrary = oneof
-    [ AddressLevelHardened <$> arbitrary
-    , AddressLevelNormal   <$> arbitrary
-    ]
+    arbitrary = oneof
+        [ AddressLevelHardened <$> arbitrary
+        , AddressLevelNormal   <$> arbitrary
+        ]
 
 deriveSafeBuildable ''AddressLevel
 instance BuildableSafeGen AddressLevel where
     buildSafeGen sl = \case
-      AddressLevelNormal lvl   -> bprint (buildSafe sl) lvl
-      AddressLevelHardened lvl -> bprint (buildSafe sl%"'") lvl
+        AddressLevelNormal lvl   -> bprint (buildSafe sl) lvl
+        AddressLevelHardened lvl -> bprint (buildSafe sl%"'") lvl
 
 instance ToJSON AddressLevel where
     toJSON = toJSON . addressLevelToWord32
@@ -1149,12 +1147,6 @@ makeLensesFor
   , ("addrpathChange", "change")
   , ("addrpathAddressIndex", "addressIndex")
   ] ''AddressPath
-
-purpose :: Getter AddressPath AddressLevel
-purpose = to addrpathPurpose
-
-coinType :: Getter AddressPath AddressLevel
-coinType = to addrpathCoinType
 
 instance ToSchema AddressPath where
     declareNamedSchema =
@@ -1643,12 +1635,12 @@ data SignedTransaction = SignedTransaction
 deriveJSON Serokell.defaultOptions ''SignedTransaction
 
 instance ToSchema SignedTransaction where
-  declareNamedSchema =
-    genericSchemaDroppingPrefix "stx" (\(--^) props -> props
-      & ("extPubKey"   --^ "Extended public key of the wallet we'll send money from.")
-      & ("transaction" --^ "New transaction that wasn't published yet.")
-      & ("signature"   --^ "Signature of this transaction.")
-    )
+    declareNamedSchema =
+        genericSchemaDroppingPrefix "stx" (\(--^) props -> props
+            & ("extPubKey"   --^ "Extended public key of the wallet we'll send money from.")
+            & ("transaction" --^ "New transaction that wasn't published yet.")
+            & ("signature"   --^ "Signature of this transaction.")
+        )
 
 instance Arbitrary SignedTransaction where
   arbitrary = SignedTransaction <$> arbitrary

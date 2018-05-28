@@ -12,6 +12,7 @@ import           Cardano.Wallet.API.V1.Migration
 import           Cardano.Wallet.API.V1.Types
 import qualified Data.IxSet.Typed as IxSet
 
+import           Pos.Core (decodeTextAddress)
 import qualified Pos.Wallet.Web.Account as V0
 import qualified Pos.Wallet.Web.ClientTypes.Types as V0
 import qualified Pos.Wallet.Web.Methods.Logic as V0
@@ -27,6 +28,7 @@ handlers =
     :<|> newAccount
     :<|> updateAccount
     :<|> newAddressPath
+    :<|> storeNewAddress
 
 deleteAccount
     :: (V0.MonadWalletLogic ctx m)
@@ -84,3 +86,18 @@ newAddressPath wId accIdx = do
     case mkAddressPathBIP44 (IsChangeAddress False) acc of
         Left msg   -> throwM $ CannotCreateAddress msg
         Right path -> return $ single path
+
+-- | After external wallet generated new address (using secret key and derivation path)
+-- we have to store this new address. It will be returned in the @/api/v1/addresses@ result.
+storeNewAddress
+    :: (MonadThrow m, V0.MonadWalletLogic ctx m)
+    => WalletId
+    -> AccountIndex
+    -> Text
+    -> m NoContent
+storeNewAddress wId accIdx newAddressAsText = do
+    accId <- migrate (wId, accIdx)
+    newAddress <- either (throwM . InvalidAddressFormat)
+                         pure
+                         (decodeTextAddress newAddressAsText)
+    V0.storeNewAddress accId newAddress

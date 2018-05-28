@@ -8,7 +8,7 @@ import           Cardano.Crypto.Wallet (xsignature)
 import           Cardano.Wallet.API.Request
 import           Cardano.Wallet.API.Response
 import           Cardano.Wallet.API.V1.Errors
-import           Cardano.Wallet.API.V1.Migration (HasCompileInfo, HasConfigurations, MonadV1,
+import           Cardano.Wallet.API.V1.Migration (HasConfigurations, MonadV1,
                                                   migrate)
 import qualified Cardano.Wallet.API.V1.Transactions as Transactions
 import           Cardano.Wallet.API.V1.Types
@@ -29,13 +29,6 @@ import qualified Pos.Wallet.Web.State as V0
 import qualified Pos.Wallet.Web.Util as V0
 
 import           Servant
-
-import           Cardano.Wallet.API.Request
-import           Cardano.Wallet.API.Response
-import           Cardano.Wallet.API.V1.Errors
-import           Cardano.Wallet.API.V1.Migration (HasConfigurations, MonadV1, migrate)
-import qualified Cardano.Wallet.API.V1.Transactions as Transactions
-import           Cardano.Wallet.API.V1.Types
 
 handlers :: HasConfigurations
          => (TxAux -> MonadV1 Bool) -> ServerT Transactions.API MonadV1

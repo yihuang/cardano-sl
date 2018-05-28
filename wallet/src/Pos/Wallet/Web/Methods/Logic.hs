@@ -19,6 +19,7 @@ module Pos.Wallet.Web.Methods.Logic
        , newExternalAccountIncludeUnready
        , newAddress
        , newAddress_
+       , storeNewAddress
        , markWalletReady
 
        , deleteWallet
@@ -59,14 +60,14 @@ import           Pos.Util.Servant (encodeCType)
 import           Pos.Wallet.Aeson ()
 import           Pos.Wallet.WalletMode (WalletMempoolExt)
 import           Pos.Wallet.Web.Account (AddrGenSeed, GenSeed (..), findKey, genUniqueAccountId,
-                                         genUniqueAddress, getSKById)
+                                         genUniqueAddress, genUniqueAddressIndex, getSKById)
 import           Pos.Wallet.Web.ClientTypes (AccountId (..), CAccount (..), CAccountInit (..),
                                              CAccountMeta (..), CAddress (..), CId, CWallet (..),
                                              CWalletMeta (..), Wal, encToCId, mkCCoin)
 import           Pos.Wallet.Web.Error (WalletError (..))
 import           Pos.Wallet.Web.State (AddressInfo (..),
                                        AddressLookupMode (Deleted, Ever, Existing),
-                                       CustomAddressType (ChangeAddr, UsedAddr), WAddressMeta,
+                                       CustomAddressType (ChangeAddr, UsedAddr), WAddressMeta (..),
                                        WalletDB, WalletDbReader, WalletSnapshot, addWAddress,
                                        askWalletDB, askWalletSnapshot, createAccountWithAddress,
                                        createAccountWithoutAddresses, createWallet,
@@ -251,6 +252,32 @@ newAddress addGenSeed passphrase accId = do
     cwAddrMeta <- newAddress_ ws addGenSeed passphrase accId
     accMod <- txMempoolToModifier ws mps . keyToWalletDecrCredentials =<< findKey accId
     return $ getWAddress ws accMod cwAddrMeta
+
+storeNewAddress
+    :: MonadWalletLogic ctx m
+    => AccountId
+    -> Address
+    -> m NoContent
+storeNewAddress accId newAddr = do
+    (_, db, ws) <- getSnapshots
+
+    -- Check whether this account exists in external wallet.
+    let parentExists = doesAccountExist ws accId
+    unless parentExists $ throwM noAccount
+
+    let walletId      = aiWId accId
+        accIndex      = aiIndex accId
+        fakeAddrIndex = 0
+        wAddrMeta     = WAddressMeta walletId accIndex fakeAddrIndex newAddr
+
+    -- Address already exists, but we have to generate unique index for it.
+    realAddrIndex <- genUniqueAddressIndex ws wAddrMeta
+    let realWAddrMeta = wAddrMeta { _wamAddressIndex = realAddrIndex }
+    addWAddress db realWAddrMeta
+    return NoContent
+  where
+    noAccount = RequestError $ sformat ("storeNewAddress: no account with id "%build%" found")
+                                       accId
 
 newAccountIncludeUnready
     :: MonadWalletLogic ctx m

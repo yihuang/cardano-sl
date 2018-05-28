@@ -22,6 +22,7 @@ module Pos.Wallet.Web.Methods.Logic
        , markWalletReady
 
        , deleteWallet
+       , deleteExternalWallet
        , deleteAccount
 
        , updateWallet
@@ -44,10 +45,10 @@ import           Servant.API.ContentTypes (NoContent (..))
 import           System.Wlog (WithLogger)
 
 import           Pos.Client.KeyStorage (MonadKeys (..), MonadKeysRead,
-                                        addSecretKey, deleteSecretKeyBy)
-import           Pos.Core (Address, Coin, mkCoin, sumCoins, unsafeIntegerToCoin)
+                                        addSecretKey, deleteSecretKeyBy, deletePublicKeyBy)
+import           Pos.Core (Address, Coin, mkCoin, sumCoins, unsafeIntegerToCoin, makePubKeyAddressBoot)
 import           Pos.Core.Configuration (HasConfiguration)
-import           Pos.Crypto (PassPhrase, changeEncPassphrase, checkPassMatches, emptyPassphrase,
+import           Pos.Crypto (PassPhrase, PublicKey, changeEncPassphrase, checkPassMatches, emptyPassphrase,
                              firstHardened)
 import           Pos.Slotting (MonadSlots)
 import           Pos.Txp (GenericTxpLocalData, MonadTxpMem, TxAux, TxId, UndoMap,
@@ -366,6 +367,15 @@ deleteWallet wid = do
     db <- askWalletDB
     removeWallet db wid
     deleteSecretKeyBy ((== wid) . encToCId)
+    return NoContent
+
+deleteExternalWallet :: MonadWalletLogic ctx m => PublicKey -> m NoContent
+deleteExternalWallet publicKey = do
+    let walletId = encodeCType . makePubKeyAddressBoot $ publicKey
+    db <- askWalletDB
+    removeWallet db walletId
+    -- There's no secret key for an external wallet.
+    deletePublicKeyBy (== publicKey)
     return NoContent
 
 deleteAccount :: MonadWalletLogicRead ctx m => AccountId -> m NoContent

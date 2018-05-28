@@ -29,6 +29,7 @@ import           Pos.Update.Configuration ()
 import           Pos.Client.KeyStorage (addPublicKey)
 import           Pos.StateLock (Priority (..), withStateLockNoMetrics)
 
+import           Pos.Update.Configuration ()
 import           Pos.Util (HasLens (..))
 import           Pos.Util.Servant (encodeCType)
 import qualified Pos.Wallet.WalletMode as V0
@@ -37,6 +38,17 @@ import           Pos.Wallet.Web.Methods.Logic (MonadWalletLogic, MonadWalletLogi
 import           Pos.Wallet.Web.Tracking.Types (SyncQueue)
 
 import           Servant
+
+-- import qualified Cardano.Wallet.API.V1.Wallets as Wallets
+-- import qualified Data.IxSet.Typed as IxSet
+-- import qualified Pos.Core as Core
+-- import qualified Pos.Wallet.WalletMode as V0
+-- import qualified Pos.Wallet.Web.ClientTypes.Types as V0
+-- import qualified Pos.Wallet.Web.Error.Types as V0
+-- import qualified Pos.Wallet.Web.Methods as V0
+-- import qualified Pos.Wallet.Web.State as V0 (WalletSnapshot, askWalletDB, askWalletSnapshot)
+-- import qualified Pos.Wallet.Web.State.Storage as V0
+
 
 -- | All the @Servant@ handlers for wallet-specific operations.
 handlers :: HasConfigurations
@@ -48,6 +60,7 @@ handlers = newWallet
     :<|> getWallet
     :<|> updateWallet
     :<|> newExternalWallet
+    :<|> deleteExternalWallet
 
 
 -- | Pure function which returns whether or not the underlying node is
@@ -232,7 +245,7 @@ createNewExternalWallet
     -> m V0.CWallet
 createNewExternalWallet walletMeta encodedExtPubKey = do
     publicKey <- case decodeBase58PublicKey encodedExtPubKey of
-        Left problem -> throwM (InvalidPublicKey $ sformat build problem)
+        Left problem    -> throwM (InvalidPublicKey $ sformat build problem)
         Right publicKey -> return publicKey
 
     -- Add this public key in the 'public.key' file. Public key will be used during
@@ -258,3 +271,15 @@ createNewExternalWallet walletMeta encodedExtPubKey = do
     -- thus setting it up to date manually here
     withStateLockNoMetrics HighPriority $ \tip -> setWalletSyncTip db walletId tip
     V0.getWallet walletId
+
+-- | On disk, once imported or created, there's so far not much difference
+-- between a wallet and an external wallet, except one: node stores a public key
+-- for external wallet, there's no secret key.
+deleteExternalWallet
+    :: (V0.MonadWalletLogic ctx m)
+    => Text
+    -> m NoContent
+deleteExternalWallet encodedExtPubKey =
+    case decodeBase58PublicKey encodedExtPubKey of
+        Left problem    -> throwM (InvalidPublicKey $ sformat build problem)
+        Right publicKey -> V0.deleteExternalWallet publicKey

@@ -8,7 +8,6 @@ module Test.Pos.Binary.Simple
 
 import           Universum
 
--- import           Data.FileEmbed
 import           Data.Text.Buildable (Buildable (..))
 import qualified Data.Text.Internal.Builder as Builder
 

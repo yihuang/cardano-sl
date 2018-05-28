@@ -13,11 +13,16 @@ import           Universum
 
 -- import qualified Data.ByteString.Base16.Lazy as B16
 import qualified Data.ByteString.Lazy.Char8 as BS
-import           Data.FileEmbed (embedStringFile, makeRelativeToProject)
+import           Data.FileEmbed (embedStringFile)
+import qualified Data.List as List (isSuffixOf)
+import qualified Data.Text as T
 import           Data.Text.Buildable (Buildable (..))
 import           Data.Text.Internal.Builder (fromText, toLazyText)
 import qualified Data.Text.Lazy as LazyText
-import           Language.Haskell.TH (ExpQ)
+import           Language.Haskell.TH (ExpQ, Q, loc_filename, runIO)
+import           Language.Haskell.TH.Syntax (qLocation)
+import           System.Directory (canonicalizePath)
+import           System.FilePath (takeDirectory, (</>))
 
 import           Hedgehog (MonadTest, (===))
 import qualified Hedgehog as H
@@ -79,18 +84,33 @@ failHexDumpDiff x y =
     Just diff ->
       withFrozenCallStack $ failWith Nothing $ renderHexDumpDiff diff
 
+makeRelativeToTestDir :: FilePath -> Q FilePath
+makeRelativeToTestDir rel = do
+    loc <- qLocation
+    fp  <- runIO $ canonicalizePath $ loc_filename loc
+    case findTestDir fp of
+        Nothing ->
+            error $ "Couldn't find directory 'test' in path: " <> T.pack fp
+        Just testDir -> pure $ testDir </> rel
+  where
+    findTestDir f =
+        let dir = takeDirectory f
+        in  if dir == f
+                then Nothing
+                else if List.isSuffixOf "/test" dir
+                    then Just dir
+                    else findTestDir dir
+
 -- | A handy shortcut for embedding golden testing files
 embedGoldenTest :: FilePath -> ExpQ
-embedGoldenTest path = makeRelativeToProject ("golden/" <> path) >>= embedStringFile
+embedGoldenTest path =
+    makeRelativeToTestDir ("golden/" <> path) >>= embedStringFile
 
--- | Round trip
 goldenTestBi :: (Bi a, Eq a, Show a, HasCallStack) => a -> LByteString -> H.Property
 goldenTestBi x bs = withFrozenCallStack $ do
     let bs' = B16.encodeWithIndex . serialize $ x
     let target = B16.decode bs
     H.withTests 1 . H.property $ do
-        -- length bss === length bss'
-        -- void . mapM (uncurry (===)) $ zip bss bss'
         compareHexDump bs bs'
         fmap decodeFull target === Just (Right x)
 

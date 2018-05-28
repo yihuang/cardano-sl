@@ -28,7 +28,9 @@ library
                      , cborg
                      , cereal
                      , cryptonite
+                     , directory
                      , file-embed
+                     , filepath
                      , formatting
                      , half
                      , hedgehog

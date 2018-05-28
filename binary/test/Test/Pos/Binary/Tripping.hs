@@ -6,6 +6,7 @@ module Test.Pos.Binary.Tripping
        , runTests
        , trippingBiBuildable
        , trippingBiShow
+       , compareHexDump
        ) where
 
 import           Universum
@@ -21,7 +22,8 @@ import           Language.Haskell.TH (ExpQ)
 import           Hedgehog (MonadTest, (===))
 import qualified Hedgehog as H
 import           Hedgehog.Internal.Property (Diff (..), failWith)
-import           Hedgehog.Internal.Show (valueDiff)
+import           Hedgehog.Internal.Show (LineDiff, lineDiff, mkValue, renderLineDiff, showPretty,
+                                         valueDiff)
 
 import           Pos.Binary.Class (Bi (..), decodeFull, serialize)
 
@@ -37,6 +39,46 @@ runTests tests = do
     unless result
         exitFailure
 
+type HexDump = LByteString
+
+type HexDumpDiff = [LineDiff]
+
+renderHexDumpDiff :: HexDumpDiff -> String
+renderHexDumpDiff = Prelude.unlines . fmap renderLineDiff
+
+-- | Diff two @HexDump@s by comparing lines pairwise
+hexDumpDiff :: HexDump -> HexDump -> Maybe HexDumpDiff
+hexDumpDiff x y =
+  concatMap (uncurry lineDiff)
+    ... zipWithPadding (String "") (String "")
+    <$> (sequence $ mkValue <$> BS.lines x)
+    <*> (sequence $ mkValue <$> BS.lines y)
+
+zipWithPadding :: a -> b -> [a] -> [b] -> [(a,b)]
+zipWithPadding a b (x:xs) (y:ys) = (x,y) : zipWithPadding a b xs ys
+zipWithPadding a _ []     ys     = zip (repeat a) ys
+zipWithPadding _ b xs     []     = zip xs (repeat b)
+
+-- | A custom version of @(===)@ for @HexDump@s to get prettier diffs
+compareHexDump :: (MonadTest m, HasCallStack) => HexDump -> HexDump -> m ()
+compareHexDump x y = do
+    ok <- withFrozenCallStack $ H.eval (x == y)
+    if ok then H.success else withFrozenCallStack $ failHexDumpDiff x y
+
+-- | Fail with a nice line diff of the two HexDumps
+failHexDumpDiff :: (MonadTest m, HasCallStack) => HexDump -> HexDump -> m ()
+failHexDumpDiff x y =
+  case hexDumpDiff x y of
+    Nothing ->
+      withFrozenCallStack $
+        failWith Nothing $ Prelude.unlines [
+            "━━━ Not Equal ━━━"
+          , showPretty x
+          , showPretty y
+          ]
+    Just diff ->
+      withFrozenCallStack $ failWith Nothing $ renderHexDumpDiff diff
+
 -- | A handy shortcut for embedding golden testing files
 embedGoldenTest :: FilePath -> ExpQ
 embedGoldenTest path = makeRelativeToProject ("golden/" <> path) >>= embedStringFile
@@ -44,13 +86,12 @@ embedGoldenTest path = makeRelativeToProject ("golden/" <> path) >>= embedString
 -- | Round trip
 goldenTestBi :: (Bi a, Eq a, Show a, HasCallStack) => a -> LByteString -> H.Property
 goldenTestBi x bs = withFrozenCallStack $ do
-    let bss = BS.lines bs
-    let bss' = BS.lines . B16.encodeWithIndex . serialize $ x
+    let bs' = B16.encodeWithIndex . serialize $ x
     let target = B16.decode bs
     H.withTests 1 . H.property $ do
         -- length bss === length bss'
         -- void . mapM (uncurry (===)) $ zip bss bss'
-        bss === bss'
+        compareHexDump bs bs'
         fmap decodeFull target === Just (Right x)
 
 -- | Round trip test a value (any instance of both the 'Bi' and 'Show' classes)

@@ -11,17 +11,15 @@ import           Universum
 import           Data.Text.Buildable (Buildable (..))
 import qualified Data.Text.Internal.Builder as Builder
 
-import           Hedgehog (Gen, Property, discover, (===))
+import           Hedgehog (Gen, Property, discover)
 import qualified Hedgehog as H
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
-import           Pos.Binary.Class (Cons (..), Field (..), cborError, deriveSimpleBi, serialize')
+import           Pos.Binary.Class (Cons (..), Field (..), cborError, deriveSimpleBi)
 
-import qualified Serokell.Util.Base16 as B16
-
-import           Test.Pos.Binary.Tripping (embedGoldenTest, goldenTestBi, trippingBiBuildable,
-                                           trippingBiShow)
+import           Test.Pos.Binary.Tripping (discoverGolden, embedGoldenTest, goldenTestBi,
+                                           trippingBiBuildable, trippingBiShow)
 
 data Test
     = TestInt { a :: Int }
@@ -67,41 +65,28 @@ genTest =
   where
     bignum = 2 ^ (80 :: Integer)
 
+golden_TestInt :: Property
+golden_TestInt = goldenTestBi (TestInt 42) "8200182a"
 
-prop_golden_TestInt :: Property
-prop_golden_TestInt = goldenTestBi (TestInt 42) "8200182a"
-    -- H.withTests 1 . H.property $
-    --     B16.encode (serialize' $ TestInt 42) === "8200182b" -- "8200182a"
+golden_TestIntList :: Property
+golden_TestIntList = goldenTestBi (TestIntList [1, 3, 5, 7]) "82019f01030507ff"
 
-prop_golden_TestIntList :: Property
-prop_golden_TestIntList =
-    H.withTests 1 . H.property $
-        B16.encode (serialize' $ TestIntList [1, 3, 5, 7]) === "82019f01030507ff"
+golden_TestChar2 :: Property
+golden_TestChar2 = goldenTestBi (TestChar2 '\0' 'a') "830261006161"
 
-prop_golden_TestChar2 :: Property
-prop_golden_TestChar2 =
-    H.withTests 1 . H.property $
-        B16.encode (serialize' $ TestChar2 '\0' 'a') === "830261006161"
+golden_TestInteger :: Property
+golden_TestInteger = goldenTestBi (TestInteger 123456789123456789123456789)
+                                  "8203c24b661efdf2e3b19f7c045f15"
 
-prop_golden_TestInteger :: Property
-prop_golden_TestInteger = goldenTestBi
-    (TestInteger 123456789123456789123456789)
-    "8203c24b661efdf2e3b19f7c045f15"
+golden_TestBigInteger :: Property
+golden_TestBigInteger = goldenTestBi (TestInteger 2e50)
+                                     $(embedGoldenTest "TestBigInteger")
 
-prop_golden_TestBigInteger :: Property
-prop_golden_TestBigInteger = goldenTestBi
-    (TestInteger 2e50)
-    $(embedGoldenTest "prop_golden_TestBigInteger")
+golden_TestMaybeIntNothing :: Property
+golden_TestMaybeIntNothing = goldenTestBi (TestMaybeInt Nothing) "820480"
 
-prop_golden_TestMaybeIntNothing :: Property
-prop_golden_TestMaybeIntNothing =
-    H.withTests 1 . H.property $
-        B16.encode (serialize' $ TestMaybeInt Nothing) === "820480"
-
-prop_golden_TestMaybeIntJust :: Property
-prop_golden_TestMaybeIntJust =
-    H.withTests 1 . H.property $
-        B16.encode (serialize' $ TestMaybeInt (Just 42)) === "820481182a"
+golden_TestMaybeIntJust :: Property
+golden_TestMaybeIntJust = goldenTestBi (TestMaybeInt (Just 42)) "820481182a"
 
 -- -----------------------------------------------------------------------------
 
@@ -120,4 +105,5 @@ prop_round_trip_derived_bi_buildable_instance =
 
 tests :: IO Bool
 tests =
-  H.checkParallel $$discover
+    (&&) <$> H.checkSequential $$discoverGolden <*> H.checkParallel
+        $$discover

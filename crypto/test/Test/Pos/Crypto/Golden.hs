@@ -10,14 +10,14 @@ import           Hedgehog
 
 import           Pos.Binary.Class (Cons (..), deriveSimpleBi)
 
-import           Test.Pos.Binary.Tripping (embedGoldenTest, goldenTestBi)
+import           Test.Pos.Binary.Tripping (discoverGolden, embedGoldenTest, goldenTestBi)
 
 data MyData = MyData deriving (Eq, Show)
 
 deriveSimpleBi ''MyData [ Cons 'MyData [] ]
 
-prop_golden_MyData :: Property
-prop_golden_MyData = goldenTestBi MyData $(embedGoldenTest "prop_golden_MyData")
+golden_MyData :: Property
+golden_MyData = goldenTestBi MyData $(embedGoldenTest "MyData")
 
 tests :: IO Bool
-tests = checkParallel $$discover
+tests = checkSequential $$discoverGolden

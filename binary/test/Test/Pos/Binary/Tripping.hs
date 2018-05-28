@@ -3,6 +3,7 @@
 module Test.Pos.Binary.Tripping
        ( goldenTestBi
        , embedGoldenTest
+       , discoverGolden
        , runTests
        , trippingBiBuildable
        , trippingBiShow
@@ -29,6 +30,7 @@ import qualified Hedgehog as H
 import           Hedgehog.Internal.Property (Diff (..), failWith)
 import           Hedgehog.Internal.Show (LineDiff, lineDiff, mkValue, renderLineDiff, showPretty,
                                          valueDiff)
+import           Hedgehog.Internal.TH (TExpQ)
 
 import           Pos.Binary.Class (Bi (..), decodeFull, serialize)
 
@@ -105,6 +107,9 @@ makeRelativeToTestDir rel = do
 embedGoldenTest :: FilePath -> ExpQ
 embedGoldenTest path =
     makeRelativeToTestDir ("golden/" <> path) >>= embedStringFile
+
+discoverGolden :: TExpQ H.Group
+discoverGolden = H.discoverPrefix "golden_"
 
 goldenTestBi :: (Bi a, Eq a, Show a, HasCallStack) => a -> LByteString -> H.Property
 goldenTestBi x bs = withFrozenCallStack $ do

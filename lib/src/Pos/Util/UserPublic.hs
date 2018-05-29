@@ -25,7 +25,6 @@ module Pos.Util.UserPublic
        , writeUserPublicRelease
 
        , UserPublicDecodingError (..)
-       , ensureModeIs600
        ) where
 
 import           Control.Exception.Safe (onException)
@@ -40,7 +39,9 @@ import           System.FileLock (FileLock, SharedExclusive (..), lockFile, unlo
                                   withFileLock)
 import           System.FilePath (takeDirectory, takeFileName)
 import           System.IO (hClose, openBinaryTempFile)
+#ifdef POSIX
 import           System.Wlog (WithLogger)
+#endif
 import           Test.QuickCheck (Arbitrary (..))
 import           Test.QuickCheck.Arbitrary.Generic (genericArbitrary, genericShrink)
 import           Universum
@@ -163,8 +164,8 @@ setMode600 :: (MonadIO m) => FilePath -> m ()
 setMode600 path = liftIO $ PSX.setFileMode path mode600
 #endif
 
-ensureModeIs600 :: (MonadIO m, WithLogger m) => FilePath -> m ()
 #ifdef POSIX
+ensureModeIs600 :: (MonadIO m, WithLogger m) => FilePath -> m ()
 ensureModeIs600 path = do
     accessMode <- getAccessMode path
     unless (accessMode == mode600) $ do
@@ -172,14 +173,15 @@ ensureModeIs600 path = do
             sformat ("Key file at "%build%" has access mode "%oct%" instead of 600. Fixing it automatically.")
             path accessMode
         setMode600 path
-#else
-ensureModeIs600 _ = do
-    pure ()
 #endif
 
 -- | Create user public file at the given path, but only when one doesn't
 -- already exist.
+#ifdef POSIX
 initializeUserPublic :: (MonadIO m, WithLogger m) => FilePath -> m ()
+#else
+initializeUserPublic :: (MonadIO m) => FilePath -> m ()
+#endif
 initializeUserPublic publicPath = do
     exists <- liftIO $ doesFileExist publicPath
 #ifdef POSIX
@@ -197,7 +199,11 @@ initializeUserPublic publicPath = do
 
 -- | Reads user public from file, assuming that file exists,
 -- and has mode 600, throws exception in other case
+#ifdef POSIX
 readUserPublic :: (MonadIO m, WithLogger m) => FilePath -> m UserPublic
+#else
+readUserPublic :: (MonadIO m) => FilePath -> m UserPublic
+#endif
 readUserPublic path = do
 #ifdef POSIX
     ensureModeIs600 path
@@ -209,7 +215,11 @@ readUserPublic path = do
 
 -- | Reads user public from the given file.
 -- If the file does not exist/is empty, returns empty user public
+#ifdef POSIX
 peekUserPublic :: (MonadIO m, WithLogger m) => FilePath -> m UserPublic
+#else
+peekUserPublic :: (MonadIO m) => FilePath -> m UserPublic
+#endif
 peekUserPublic path = do
     initializeUserPublic path
     takeReadLock path $ do
@@ -218,7 +228,11 @@ peekUserPublic path = do
 
 -- | Read user public putting an exclusive lock on it. To unlock, use
 -- 'writeUserPublicRelease'.
+#ifdef POSIX
 takeUserPublic :: (MonadIO m, WithLogger m) => FilePath -> m UserPublic
+#else
+takeUserPublic :: (MonadIO m) => FilePath -> m UserPublic
+#endif
 takeUserPublic path = do
     initializeUserPublic path
     liftIO $ do

@@ -1150,7 +1150,7 @@ makeLensesFor
 
 instance ToSchema AddressPath where
     declareNamedSchema =
-        genericSchemaDroppingPrefix "addr" (\(--^) props -> props
+        genericSchemaDroppingPrefix "addrpath" (\(--^) props -> props
             & ("purpose"      --^ "44, refers to BIP-44")
             & ("coinType"     --^ "1815 for ADA (Ada Lovelace's birthdate)")
             & ("account"      --^ "Account index, used as child index in BIP-32 derivation")

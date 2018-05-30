@@ -5,7 +5,6 @@ module AccountSpecs (accountSpecs) where
 
 import           Universum
 
-import           Cardano.Wallet.API.V1.Errors (WalletError (..))
 import           Cardano.Wallet.Client.Http
 import           Control.Lens hiding ((^..), (^?))
 import           Test.Hspec
@@ -36,14 +35,3 @@ accountSpecs wc = do
             -- We don't expect a different path unless new addresses have
             -- actually been created
             addrPath `shouldBe` addrPath'
-
-        it "Cannot create an address path on a non-hardened account key" $ do
-            -- create a wallet
-            newWallet <- randomWallet CreateWallet
-            Wallet{..} <- createWalletCheck wc newWallet
-
-            pathResp <- postAddressPath wc walId 0
-            err <- pathResp `shouldPrism` _Left
-            let errMsg = "AddressLevel out-of-bound: must be a 31-byte unsigned integer"
-
-            err `shouldBe` (ClientWalletError (CannotCreateAddress errMsg))

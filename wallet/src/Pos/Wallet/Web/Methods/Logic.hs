@@ -144,7 +144,7 @@ getAccountsIncludeUnready
     -> Bool -> Maybe (CId Wal) -> m [CAccount]
 getAccountsIncludeUnready ws mps includeUnready mCAddr = do
     whenJust mCAddr $ \cAddr ->
-      void $ maybeThrow (noWallet cAddr) $
+      void $ maybeThrow (noSuchWallet cAddr) $
         getWalletMetaIncludeUnready ws includeUnready cAddr
     let accIds = maybe (getAccountIds ws) (getWalletAccountIds ws) mCAddr
     let groupedAccIds = fmap reverse $ HM.fromListWith mappend $
@@ -153,10 +153,7 @@ getAccountsIncludeUnready ws mps includeUnready mCAddr = do
       accMod <- txMempoolToModifier ws mps . keyToWalletDecrCredentials =<< findKey wid
       mapM (getAccountMod ws accMod) walAccIds
   where
-    noWallet cAddr = RequestError $
-        -- TODO No WALLET with id ...
-        -- dunno whether I can fix and not break compatible w/ daedalus
-        sformat ("No account with id "%build%" found") cAddr
+    noSuchWallet cAddr = NoSuchWalletError $ sformat build cAddr
 
 getAccounts
     :: MonadWalletLogicRead ctx m
@@ -171,7 +168,7 @@ getWalletIncludeUnready :: MonadWalletLogicRead ctx m
                         -> ([(TxId, TxAux)], UndoMap) -- ^ Transactions and UndoMap from mempool
                         -> Bool -> CId Wal -> m CWallet
 getWalletIncludeUnready ws mps includeUnready cAddr = do
-    meta     <- maybeThrow noWallet $ getWalletMetaIncludeUnready ws includeUnready cAddr
+    meta     <- maybeThrow noSuchWallet $ getWalletMetaIncludeUnready ws includeUnready cAddr
     accounts <- getAccountsIncludeUnready ws mps includeUnready (Just cAddr)
     let accountsNum = length accounts
     key      <- findKey cAddr
@@ -180,7 +177,7 @@ getWalletIncludeUnready ws mps includeUnready cAddr = do
     hasPass  <- getSKById cAddr >>= \case
                     Nothing -> return False -- No secret key, it's external wallet, so no password.
                     Just sk -> return $ isNothing . checkPassMatches emptyPassphrase $ sk
-    passLU   <- maybeThrow noWallet (getWalletPassLU ws cAddr)
+    passLU   <- maybeThrow noSuchWallet (getWalletPassLU ws cAddr)
     pure $ CWallet cAddr meta accountsNum balance hasPass passLU
   where
     computeBalance accMod = do
@@ -188,9 +185,7 @@ getWalletIncludeUnready ws mps includeUnready cAddr = do
         let addrIds = map (view wamAddress) waddrIds
         let coins = getBalancesWithMod ws accMod addrIds
         pure . mkCCoin . unsafeIntegerToCoin . sumCoins $ coins
-
-    noWallet = RequestError $
-        sformat ("getWalletIncludeUnready: No wallet with address "%build%" found") cAddr
+    noSuchWallet = NoSuchWalletError $ sformat build cAddr
 
 getWallet :: MonadWalletLogicRead ctx m => CId Wal -> m CWallet
 getWallet wid = do
@@ -349,15 +344,12 @@ createWalletSafe cid wsMeta isReady = do
     -- Disallow duplicate wallets (including unready wallets)
     (mps, db, ws) <- getSnapshots
     let wSetExists = isJust $ getWalletMetaIncludeUnready ws True cid
-    when wSetExists $ throwM suchWalletIsAlreadyHere
+    when wSetExists $ throwM (DuplicateWalletError $ sformat build cid)
     curTime <- liftIO getPOSIXTime
     createWallet db cid wsMeta isReady curTime
     -- Return the newly created wallet irrespective of whether it's ready yet
     ws' <- getWalletSnapshot db
     getWalletIncludeUnready ws' mps True cid
-  where
-    suchWalletIsAlreadyHere = RequestError $
-        sformat ("createWalletSafe: Wallet with that id "%build%" already exists") cid
 
 getSnapshots
     :: MonadWalletLogic ctx m
@@ -377,13 +369,11 @@ markWalletReady
 markWalletReady cid isReady = do
     db <- askWalletDB
     ws <- getWalletSnapshot db
-    _ <- maybeThrow noWallet $ getWalletMetaIncludeUnready ws True cid
+    _ <- maybeThrow noSuchWallet $ getWalletMetaIncludeUnready ws True cid
     setWalletReady db cid isReady
     return NoContent
   where
-    noWallet = RequestError $
-        sformat ("markWalletReady: No wallet with that id "%build%" found") cid
-
+    noSuchWallet = NoSuchWalletError $ sformat build cid
 
 ----------------------------------------------------------------------------
 -- Deleters
@@ -444,8 +434,7 @@ changeWalletPassphrase wid oldPass newPass = do
     return NoContent
   where
     badPass = RequestError "Invalid old passphrase given"
-    noSuchWallet = RequestError $ sformat ("Change password, no wallet with id "%build%" found") wid
-
+    noSuchWallet = NoSuchWalletError $ sformat build wid
 ----------------------------------------------------------------------------
 -- Helper functions
 ----------------------------------------------------------------------------

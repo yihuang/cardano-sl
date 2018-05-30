@@ -16,6 +16,7 @@ module Pos.Crypto.Signing.Types.Signing
        , shortPublicKeyHexF
        , parseFullPublicKey
        , decodeBase58PublicKey
+       , encodeBase58PublicKey
        , Base58PublicKeyError (..)
 
        -- * Signing and verification
@@ -42,7 +43,7 @@ import           Prelude (show)
 import qualified Serokell.Util.Base16 as B16
 import qualified Serokell.Util.Base64 as Base64 (decode, formatBase64)
 import           Universum hiding (show)
-import           Data.ByteString.Base58 (bitcoinAlphabet, decodeBase58)
+import           Data.ByteString.Base58 (bitcoinAlphabet, decodeBase58, encodeBase58)
 
 import           Pos.Binary.Class (Bi)
 import           Pos.Crypto.Hashing (hash)
@@ -139,6 +140,13 @@ decodeBase58PublicKey encodedXPub = do
     case extPubKey of
         Left problem -> Left $ InvalidPublicKey (toText problem)
         Right xPub -> Right $ PublicKey xPub
+
+-- | Encode 'PublicKey' in Base58-encoded form. We use it for integration tests.
+encodeBase58PublicKey :: PublicKey -> Text
+encodeBase58PublicKey (PublicKey xPub) = encodedXPub
+  where
+    encodedXPub  = decodeUtf8 $ encodeBase58 bitcoinAlphabet rawExtPubKey
+    rawExtPubKey = CC.unXPub xPub
 
 ----------------------------------------------------------------------------
 -- Signatures

@@ -10,7 +10,6 @@ import           Cardano.Wallet.Client.Http
 import           Control.Lens hiding ((^..), (^?))
 import           Test.Hspec
 
-import qualified Data.List
 import           Util
 
 
@@ -63,18 +62,16 @@ walletSpecs _ wc = do
                 >>= (`shouldPrism` _Right)
 
         it "Delete an external wallet removes it and its accounts completely" $ do
+            -- By default external wallet has one account _without_ addresses
+            -- (because they didn't generated yet), so we shouldn't check addresses.
             newExtWallet <- randomExternalWallet CreateWallet
             let pubKeyAsText = newewalExtPubKey newExtWallet
-            extWallet@Wallet{..} <- createExternalWalletCheck wc newExtWallet
-            (_, addr) <- firstAccountAndId wc extWallet
+            Wallet{..} <- createExternalWalletCheck wc newExtWallet
 
             deleteExternalWallet wc pubKeyAsText
                 >>= (`shouldPrism` _Right)
             getWallet wc walId
                 >>= (`shouldFailWith` (ClientWalletError WalletNotFound))
-            getAddressIndexPaginated wc Nothing (Just 1000)
-                >>= (`shouldPrism` _Right)
-                >>= (`shouldNotSatisfy` (Data.List.elem addr . wrData))
   where
     testWalletAlreadyExists action = do
             newWallet1 <- randomWallet action

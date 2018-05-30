@@ -107,7 +107,7 @@ newWallet NewWallet{..} = do
     --   https://github.com/input-output-hk/cardano-sl/pull/2811#discussion_r183472103
     rethrowDuplicateMnemonic (e :: V0.WalletError) =
         case e of
-            V0.RequestError "Wallet with that mnemonics already exists" -> throwM WalletAlreadyExists
+            V0.DuplicateWalletError _ -> throwM WalletAlreadyExists
             _ -> throwM e
 
 -- | Returns the full (paginated) list of wallets.
@@ -154,8 +154,13 @@ getWallet :: ( MonadThrow m
 getWallet wid = do
     ss <- V0.askWalletSnapshot
     wid' <- migrate wid
-    wallet <- V0.getWallet wid'
+    wallet <- V0.getWallet wid' `catch` rethrowWalletNotFound
     single <$> addWalletInfo ss wallet
+  where
+    rethrowWalletNotFound (e :: V0.WalletError) =
+        case e of
+            V0.NoSuchWalletError _ -> throwM WalletNotFound
+            _ -> throwM e
 
 addWalletInfo
     :: ( MonadThrow m

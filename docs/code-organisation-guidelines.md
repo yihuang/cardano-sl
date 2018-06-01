@@ -29,7 +29,7 @@ as a series of small easy-to-review commits that can be merged relatively quickl
 * Tests for a Haskell package should always be a part of the same package as the implementation of
   the code it is testing. Test code should not be included in the library that a package provides.
   All test code for a Haskell package should be in the `test` directory of that package and modules
-  with testing related code should have module names staring with `Test` and then reflecting the
+  with testing related code should have module names starting with `Test` and then reflecting the
   Haskell package which the code is testing, so test code for the `core` package would have all its
   test module names begin with `Test.Pos.Core`. An example of where the current code base
   contravenes these guidelines is that `core` and `txp` currently don't define any tests, but at

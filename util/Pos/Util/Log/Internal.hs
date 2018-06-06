@@ -4,8 +4,8 @@ module Pos.Util.Log.Internal
        , sev2klog
        , updateConfig
        , getConfig
-       , getLogEnv
        , getLinesLogged
+       , getLogEnv
        , modifyLinesLogged
        ) where
 
@@ -18,7 +18,7 @@ import           Universum hiding (newMVar)
 import qualified Katip as K
 
 import           Pos.Util.Log.Severity
-import           Pos.Util.LoggerConfig (LoggerConfig)
+import           Pos.Util.LoggerConfig (LoggerConfig (..))
 
 
 -- | translate Severity to Katip.Severity

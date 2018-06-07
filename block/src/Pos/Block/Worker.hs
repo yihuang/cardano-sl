@@ -36,29 +36,28 @@ import           Pos.Core (BlockVersionData (..), ChainDifficulty, FlatSlotId, H
                            SlotId (..), Timestamp (Timestamp), addressHash, blkSecurityParam,
                            difficultyL, epochOrSlotToSlot, epochSlots, flattenSlotId, gbHeader,
                            getEpochOrSlot, getOurPublicKey, getSlotIndex, slotIdF, unflattenSlotId)
+import           Pos.Core.Chrono (OldestFirst (..))
 import           Pos.Crypto (ProxySecretKey (pskDelegatePk))
 import           Pos.DB (gsIsBootstrapEra)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.Delegation.DB (getPskByIssuer)
 import           Pos.Delegation.Logic (getDlgTransPsk)
 import           Pos.Delegation.Types (ProxySKBlockInfo)
-import           Pos.Diffusion.Types (Diffusion)
-import qualified Pos.Diffusion.Types as Diffusion (Diffusion (announceBlockHeader))
+import           Pos.Infra.Diffusion.Types (Diffusion)
+import qualified Pos.Infra.Diffusion.Types as Diffusion (Diffusion (announceBlockHeader))
+import           Pos.Infra.Recovery.Info (getSyncStatus, getSyncStatusK, needTriggerRecovery,
+                                          recoveryCommGuard)
+import           Pos.Infra.Reporting (HasMisbehaviorMetrics, MetricMonitor (..), MetricMonitorState,
+                                      noReportMonitor, recordValue, reportOrLogE)
+import           Pos.Infra.Slotting (ActionTerminationPolicy (..), OnNewSlotParams (..),
+                                     currentTimeSlotting, defaultOnNewSlotParams,
+                                     getSlotStartEmpatically, onNewSlot)
+import           Pos.Infra.Util.JsonLog.Events (jlCreatedBlock)
+import           Pos.Infra.Util.LogSafe (logDebugS, logInfoS, logWarningS)
+import           Pos.Infra.Util.TimeLimit (logWarningSWaitLinear)
+import           Pos.Infra.Util.TimeWarp (CanJsonLog (..))
 import qualified Pos.Lrc.DB as LrcDB (getLeadersForEpoch)
-import           Pos.Recovery.Info (getSyncStatus, getSyncStatusK, needTriggerRecovery,
-                                    recoveryCommGuard)
-import           Pos.Reporting (MetricMonitor (..), MetricMonitorState,
-                                HasMisbehaviorMetrics, noReportMonitor,
-                                recordValue, reportOrLogE)
-import           Pos.Slotting (ActionTerminationPolicy (..), OnNewSlotParams (..),
-                               currentTimeSlotting, defaultOnNewSlotParams,
-                               getSlotStartEmpatically, onNewSlot)
 import           Pos.Update.DB (getAdoptedBVData)
-import           Pos.Util.Chrono (OldestFirst (..))
-import           Pos.Util.JsonLog.Events (jlCreatedBlock)
-import           Pos.Util.LogSafe (logDebugS, logInfoS, logWarningS)
-import           Pos.Util.TimeLimit (logWarningSWaitLinear)
-import           Pos.Util.TimeWarp (CanJsonLog (..))
 
 ----------------------------------------------------------------------------
 -- All workers

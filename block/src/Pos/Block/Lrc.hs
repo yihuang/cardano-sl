@@ -32,11 +32,15 @@ import           Pos.Core (Coin, EpochIndex, EpochOrSlot (..), HasGeneratedSecre
                            HasGenesisBlockVersionData, HasGenesisData, HasGenesisHash,
                            HasProtocolConstants, HasProtocolMagic, SharedSeed, StakeholderId,
                            blkSecurityParam, crucialSlot, epochIndexL, getEpochOrSlot)
+import           Pos.Core.Chrono (NE, NewestFirst (..), toOldestFirst)
 import qualified Pos.DB.Block.Load as DB
 import           Pos.DB.Class (MonadDBRead, MonadGState)
 import qualified Pos.DB.GState.Stakes as GS (getRealStake, getRealTotalStake)
 import           Pos.Delegation (getDelegators, isIssuerByAddressHash)
 import qualified Pos.GState.SanityCheck as DB (sanityCheckDB)
+import           Pos.Infra.Reporting.MemState (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))
+import           Pos.Infra.Slotting (MonadSlots)
+import           Pos.Infra.Util.TimeLimit (logWarningWaitLinear)
 import           Pos.Lrc.Consumer (LrcConsumer (..))
 import           Pos.Lrc.Consumers (allLrcConsumers)
 import           Pos.Lrc.Context (LrcContext (lcLrcSync), LrcSyncData (..))
@@ -47,16 +51,12 @@ import           Pos.Lrc.Error (LrcError (..))
 import           Pos.Lrc.Fts (followTheSatoshiM)
 import           Pos.Lrc.Mode (LrcMode)
 import           Pos.Lrc.Types (RichmenStakes)
-import           Pos.Reporting.MemState (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))
-import           Pos.Slotting (MonadSlots)
 import           Pos.Ssc (MonadSscMem, noReportNoSecretsForEpoch1, sscCalculateSeed)
 import           Pos.Ssc.Message (SscMessageConstraints)
 import qualified Pos.Txp.DB.Stakes as GS (stakeSource)
 import           Pos.Update.DB (getCompetingBVStates)
 import           Pos.Update.Poll.Types (BlockVersionState (..))
 import           Pos.Util (maybeThrow)
-import           Pos.Util.Chrono (NE, NewestFirst (..), toOldestFirst)
-import           Pos.Util.TimeLimit (logWarningWaitLinear)
 import           Pos.Util.Util (HasLens (..))
 
 

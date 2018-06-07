@@ -49,14 +49,14 @@ import qualified Pos.DB.GState.Common as GS (CommonOp (PutMaxSeenDifficulty, Put
                                              getMaxSeenDifficulty)
 import           Pos.Exception (assertionFailed, reportFatalError)
 import qualified Pos.GState.BlockExtra as GS
+import           Pos.Infra.Slotting (MonadSlots (getCurrentSlot))
 import           Pos.Lrc.Context (HasLrcContext, lrcActionOnEpochReason)
 import qualified Pos.Lrc.DB as LrcDB
-import           Pos.Slotting (MonadSlots (getCurrentSlot))
 import           Pos.Update.Configuration (HasUpdateConfiguration, lastKnownBlockVersion)
 import qualified Pos.Update.DB as GS (getAdoptedBVFull)
 import           Pos.Util (_neHead, _neLast)
 import           Pos.Util.AssertMode (inAssertMode)
-import           Pos.Util.Chrono (NE, NewestFirst (getNewestFirst), OldestFirst (..), toOldestFirst,
+import           Pos.Core.Chrono (NE, NewestFirst (getNewestFirst), OldestFirst (..), toOldestFirst,
                                   _OldestFirst)
 
 ----------------------------------------------------------------------------

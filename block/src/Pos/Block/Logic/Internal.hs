@@ -48,8 +48,8 @@ import           Pos.Delegation.Logic (dlgApplyBlocks, dlgNormalizeOnRollback, d
 import           Pos.Delegation.Types (DlgBlock, DlgBlund)
 import           Pos.Exception (assertionFailed)
 import           Pos.GState.SanityCheck (sanityCheckDB)
+import           Pos.Infra.Reporting (MonadReporting)
 import           Pos.Lrc.Context (HasLrcContext)
-import           Pos.Reporting (MonadReporting)
 import           Pos.Ssc.Configuration (HasSscConfiguration)
 import           Pos.Ssc.Logic (sscApplyBlocks, sscNormalize, sscRollbackBlocks)
 import           Pos.Ssc.Mem (MonadSscMem)
@@ -61,7 +61,7 @@ import           Pos.Update.Context (UpdateContext)
 import           Pos.Update.Logic (usApplyBlocks, usNormalize, usRollbackBlocks)
 import           Pos.Update.Poll (PollModifier)
 import           Pos.Util (Some (..), spanSafe)
-import           Pos.Util.Chrono (NE, NewestFirst (..), OldestFirst (..))
+import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.Util.Util (HasLens', lensOf)
 
 -- | Set of basic constraints used by high-level block processing.

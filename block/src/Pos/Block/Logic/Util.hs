@@ -34,9 +34,10 @@ import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class (MonadBlockDBRead)
 import           Pos.Exception (reportFatalError)
 import           Pos.GState.BlockExtra (isBlockInMainChain)
-import           Pos.Slotting (MonadSlots (..), getCurrentSlotFlat, slotFromTimestamp)
+import           Pos.Infra.Slotting (MonadSlots (..), getCurrentSlotFlat,
+                                     slotFromTimestamp)
 import           Pos.Util (_neHead)
-import           Pos.Util.Chrono (NE, OldestFirst (..))
+import           Pos.Core.Chrono (NE, OldestFirst (..))
 
 -- | Find LCA of headers list and main chain, including oldest
 -- header's parent hash. Acts as it would iterate from newest to

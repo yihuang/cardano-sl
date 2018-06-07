@@ -24,10 +24,10 @@ import           Pos.Core.Update (BlockVersionData, UpId, UpdatePayload)
 import qualified Pos.DB.BatchOp as DB
 import qualified Pos.DB.Class as DB
 import           Pos.Exception (reportFatalError)
+import           Pos.Infra.Reporting (MonadReporting)
+import           Pos.Infra.Slotting (MonadSlotsData, slottingVar)
+import           Pos.Infra.Slotting.Types (SlottingData)
 import           Pos.Lrc.Context (HasLrcContext)
-import           Pos.Reporting (MonadReporting)
-import           Pos.Slotting (MonadSlotsData, slottingVar)
-import           Pos.Slotting.Types (SlottingData)
 import           Pos.Update.Configuration (HasUpdateConfiguration, lastKnownBlockVersion)
 import           Pos.Update.DB (UpdateOp (..))
 import           Pos.Update.Poll (BlockVersionState, ConfirmedProposalState, DBPoll, MonadPoll,
@@ -36,7 +36,7 @@ import           Pos.Update.Poll (BlockVersionState, ConfirmedProposalState, DBP
                                   processGenesisBlock, recordBlockIssuance, reportUnexpectedError,
                                   rollbackUS, runDBPoll, runPollT, verifyAndApplyUSPayload)
 import           Pos.Util.AssertMode (inAssertMode)
-import           Pos.Util.Chrono (NE, NewestFirst, OldestFirst)
+import           Pos.Core.Chrono (NE, NewestFirst, OldestFirst)
 import qualified Pos.Util.Modifier as MM
 
 ----------------------------------------------------------------------------

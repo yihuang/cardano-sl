@@ -12,11 +12,11 @@ import           Pos.Core (ComponentBlock (..), HasConfiguration, HeaderHash, Sl
                            epochIndexL, headerHash, headerSlotL)
 import           Pos.Core.Txp (TxAux, TxUndo)
 import           Pos.DB (SomeBatchOp (..))
-import           Pos.Slotting (getSlotStart)
+import           Pos.Infra.Slotting (getSlotStart)
 import           Pos.Txp (ProcessBlundsSettings (..), TxpBlund, TxpGlobalApplyMode,
                           TxpGlobalRollbackMode, TxpGlobalSettings (..), applyBlocksWith,
                           blundToAuxNUndo, processBlunds, txpGlobalSettings)
-import           Pos.Util.Chrono (NewestFirst (..))
+import           Pos.Core.Chrono (NewestFirst (..))
 import qualified Pos.Util.Modifier as MM
 
 import qualified Pos.Explorer.DB as GS

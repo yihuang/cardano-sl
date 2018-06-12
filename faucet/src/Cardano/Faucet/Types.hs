@@ -148,14 +148,6 @@ data SourceWalletConfig = SourceWalletConfig {
   , _srcSpendingPassword :: !Text
   }
 
-srcWalletId :: Lens' SourceWalletConfig WalletId
-srcWalletId f = \(SourceWalletConfig w a p) ->
-    f w <&> \w' -> SourceWalletConfig w' a p
-
-srcSpendingPassword :: Lens' SourceWalletConfig Text
-srcSpendingPassword f = \(SourceWalletConfig w a p) ->
-    SourceWalletConfig w a <$> f p
-
 instance FromJSON SourceWalletConfig where
     parseJSON = withObject "SourceWalletConfig" $ \v -> SourceWalletConfig
       <$> v .: "wallet-id"

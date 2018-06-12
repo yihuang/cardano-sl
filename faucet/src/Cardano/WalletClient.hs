@@ -5,9 +5,6 @@
 module Cardano.WalletClient (
     withdraw
   ) where
-    -- ( export
-    -- , export
-    -- ) where
 
 import           Cardano.Wallet.API.V1.Types (Payment (..), PaymentDistribution (..), V1 (..))
 import           Cardano.Wallet.Client (Resp, Transaction, WalletClient (..), liftClient)

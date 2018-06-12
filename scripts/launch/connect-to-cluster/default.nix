@@ -103,6 +103,7 @@ in pkgs.writeScript "${executable}-connect-to-${environment}" ''
     ${ ifWallet "--tlscert ${stateDir}/tls/server/server.crt"}     \
     ${ ifWallet "--tlskey ${stateDir}/tls/server/server.key"}      \
     ${ ifWallet "--tlsca ${stateDir}/tls/server/ca.crt"}           \
+    ${ ifWallet "--no-client-auth"}                                \
     --log-config ${configFiles}/log-config-connect-to-cluster.yaml \
     --topology "${configFiles}/topology.yaml"                      \
     --logs-prefix "${stateDir}/logs"                               \

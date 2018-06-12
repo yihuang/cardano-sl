@@ -4,15 +4,12 @@
 {-# OPTIONS_GHC -Wall #-}
 module Cardano.WalletClient (
     withdraw
-  , createWallet
   ) where
     -- ( export
     -- , export
     -- ) where
 
-import           Cardano.Wallet.API.V1.Types (NewWallet (..),
-                                              Payment (..), PaymentDistribution (..), V1 (..),
-                                              Wallet (..), WalletOperation (CreateWallet))
+import           Cardano.Wallet.API.V1.Types (Payment (..), PaymentDistribution (..), V1 (..))
 import           Cardano.Wallet.Client (Resp, Transaction, WalletClient (..), liftClient)
 import           Control.Lens
 import           Control.Monad.IO.Class (liftIO)
@@ -22,9 +19,9 @@ import qualified Data.ByteArray as BA
 import           Data.ByteString (ByteString)
 import           Data.List.NonEmpty (NonEmpty (..))
 import           Data.Text.Strict.Lens (utf8)
-import           System.Random
 import           Pos.Core (Address (..), Coin (..))
 import           Pos.Crypto.Signing (PassPhrase)
+import           System.Random
 
 import           Cardano.Faucet.Types
 
@@ -37,12 +34,12 @@ randomAmount = do
 
 withdraw :: (MonadFaucet c m) => V1 Address -> Resp m Transaction
 withdraw addr = do
-    paymentSource <- view (fePaymentSource)
-    spendingPassword <- view (feSpendingPassword . re utf8)
+    paymentSource <- view (feSourceWallet . to cfgToPaymentSource)
+    spendingPassword <- view (feSourceWallet . srcSpendingPassword)
     coin <- randomAmount
     client <- liftClient <$> view feWalletClient
     let paymentDist = (PaymentDistribution addr coin :| [])
-        sp = Just $ V1 $ hashPwd spendingPassword
+        sp =  spendingPassword <&> view (re utf8 . to hashPwd . to V1)
         payment = Payment paymentSource paymentDist Nothing sp
     postTransaction client payment
 

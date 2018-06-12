@@ -16,6 +16,9 @@ module Cardano.Faucet.Types (
  , HasFaucetConfig(..)
  , FaucetEnv(..), initEnv
  , HasFaucetEnv(..)
+ , SourceWalletConfig
+ , srcSpendingPassword
+ , cfgToPaymentSource
  , incWithDrawn
  , decrWithDrawn
  , setWalletBalance
@@ -34,7 +37,7 @@ import           Control.Monad.Except
 import           Control.Monad.Reader
 import           Crypto.Random.Entropy (getEntropy)
 import           Data.Aeson (FromJSON (..), ToJSON (..), eitherDecode, object, withObject, (.:),
-                             (.=))
+                             (.:?), (.=))
 import           Data.Aeson.Text (encodeToLazyText)
 import           Data.Bifunctor (first)
 import qualified Data.ByteString as BS
@@ -73,8 +76,8 @@ import           Cardano.Wallet.API.V1.Types (Account (..), AccountIndex,
                                               PaymentSource (..), Transaction, V1 (..), Wallet (..),
                                               WalletAddress (..), WalletId (..),
                                               WalletOperation (CreateWallet), unV1)
-import           Cardano.Wallet.Client (ClientError (..), WalletClient (..),
-                                        WalletResponse (..), liftClient)
+import           Cardano.Wallet.Client (ClientError (..), WalletClient (..), WalletResponse (..),
+                                        liftClient)
 import           Cardano.Wallet.Client.Http (mkHttpClient)
 import           Pos.Core (Address (..), Coin (..))
 import           Pos.Util.BackupPhrase (BackupPhrase (..))
@@ -145,14 +148,18 @@ instance FromJSON FaucetStatsdOpts where
 data SourceWalletConfig = SourceWalletConfig {
     _srcWalletId         :: !WalletId
   , _srcAccountIndex     :: !AccountIndex
-  , _srcSpendingPassword :: !Text
-  }
+  , _srcSpendingPassword :: !(Maybe Text)
+  } deriving (Generic, Show)
+
+srcSpendingPassword :: Lens' SourceWalletConfig (Maybe Text)
+srcSpendingPassword f = \(SourceWalletConfig w a p) ->
+    SourceWalletConfig w a <$> f p
 
 instance FromJSON SourceWalletConfig where
     parseJSON = withObject "SourceWalletConfig" $ \v -> SourceWalletConfig
       <$> v .: "wallet-id"
       <*> v .: "account-index"
-      <*> v .: "spending-password"
+      <*> v .:? "spending-password"
 
 readSourceWalletConfig :: FilePath -> IO (Either String SourceWalletConfig)
 readSourceWalletConfig = fmap eitherDecode . BSL.readFile
@@ -183,11 +190,12 @@ instance FromJSON SourceWallet where
         (Generate <$> v .: "generate-to") <|> (Provided <$> v .: "read-from")
 
 data InitializedWallet = InitializedWallet {
-    _paymentSource  :: !PaymentSource
+    _walletConfig  :: !SourceWalletConfig
   , _walletBallance :: !Int64
   } deriving (Show, Generic)
 
 makeLenses ''InitializedWallet
+
 --------------------------------------------------------------------------------
 data FaucetConfig = FaucetConfig {
     _fcWalletApiHost    :: !String
@@ -213,7 +221,7 @@ instance FromJSON FaucetConfig where
           <*> v .: "payment-amount"
           <*> v .: "payment-variation"
           <*> v .: "statsd"
-          <*> v .: "source-wallet-config"
+          <*> v .: "source-wallet"
           <*> v .: "logging-config"
           <*> v .: "public-certificate"
           <*> v .: "private-key"
@@ -251,8 +259,7 @@ data FaucetEnv = FaucetEnv {
   , _feNumWithdrawn     :: !Counter
   , _feWalletBalance    :: !Gauge
   , _feStore            :: !Store
-  , _fePaymentSource    :: !PaymentSource
-  , _feSpendingPassword :: !Text
+  , _feSourceWallet    :: !SourceWalletConfig
   , _feFaucetConfig     :: !FaucetConfig
   , _feWalletClient     :: !(WalletClient IO)
   }
@@ -277,7 +284,7 @@ generateBackupPhrase = do
 createWallet
     :: (HasLoggerName m, CanLog m, MonadIO m)
     => WalletClient m
-    -> m (Either InitFaucetError (BackupPhrase, WalletId, AccountIndex, Address))
+    -> m (Either InitFaucetError (SourceWalletConfig, BackupPhrase, Address))
 createWallet client = withSublogger "create-wallet" $ do
     phrase <- liftIO generateBackupPhrase
     let w = NewWallet (V1 phrase) Nothing NormalAssurance "Faucet-Wallet" CreateWallet
@@ -301,7 +308,7 @@ createWallet client = withSublogger "create-wallet" $ do
                         logInfo $ "Found a single account for wallet with ID: "
                                   <> (Text.pack $ show wId)
                                   <> " account index: " <> (Text.pack $ show aIdx)
-                        return (phrase, wId, aIdx, unV1 $ addrId addr)
+                        return (SourceWalletConfig wId aIdx Nothing, phrase, unV1 $ addrId addr)
                     _ -> do
                         logInfo $ "Didn't find an address for wallet with ID: "
                                   <> (Text.pack $ show wId)
@@ -342,20 +349,20 @@ makeInitializedWallet fc client = withSublogger "makeInitializedWallet" $ do
     case (fc ^. fcSourceWallet) of
         Provided fp -> do
             srcCfg <- liftIO $ readSourceWalletConfig fp
-            case cfgToPaymentSource <$> srcCfg of
+            case srcCfg of
                 Left e -> return $ Left $ SourceWalletParseError e
-                Right ps -> do
-                    fmap (InitializedWallet ps) <$> readWalletBalance client ps
+                Right wc -> do
+                    let ps = cfgToPaymentSource wc
+                    fmap (InitializedWallet wc) <$> readWalletBalance client ps
         Generate fp -> do
             resp <- createWallet client
-            forM resp $ \(phrase, wallet,accIdx, addr) -> do
-                    let iw = InitializedWallet (PaymentSource wallet accIdx) 0
+            forM resp $ \(swc@(SourceWalletConfig wallet accIdx _), phrase, addr) -> do
+                    let iw = InitializedWallet swc 0
                         createdWallet = CreatedWallet wallet phrase accIdx addr
                     liftIO $ writeCreatedWalletInfo fp createdWallet
-
                     return iw
 
-initEnv :: (HasLoggerName m, CanLog m, MonadIO m) => FaucetConfig -> Store -> m FaucetEnv
+initEnv :: FaucetConfig -> Store -> LoggerNameBox IO FaucetEnv
 initEnv fc store = withSublogger "init" $ do
     walletBallanceGauge <- liftIO $ createGauge "wallet-balance" store
     feConstruct <- liftIO $ FaucetEnv
@@ -372,8 +379,7 @@ initEnv fc store = withSublogger "init" $ do
           liftIO $ Gauge.set walletBallanceGauge (iw ^. walletBallance)
           return $ feConstruct
                       store
-                      (iw ^. paymentSource)
-                      "TODO: THIS SHOULD BE THE PASSWORD"
+                      (iw ^. walletConfig)
                       fc
                       client
 

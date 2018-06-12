@@ -32,9 +32,11 @@ library
                      , connection
                      , cryptonite
                      , data-default
+                     , directory
                      , ekg-core
                      , ekg-statsd
                      , exceptions
+                     , filepath
                      , http-client
                      , http-client-tls
                      , lens

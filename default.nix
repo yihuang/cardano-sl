@@ -1,15 +1,24 @@
 let
   localLib = import ./lib.nix;
+  jemallocOverlay = self: super: {
+    # jemalloc has a bug that caused cardano-sl-db to fail to link (via
+    # rocksdb, which can use jemalloc).
+    # https://github.com/jemalloc/jemalloc/issues/937
+    # Using jemalloc 510 with the --disable-initial-exec-tls flag seems to
+    # fix it.
+    jemalloc = self.callPackage ./nix/jemalloc/jemalloc510.nix {};
+  };
 in
 { system ? builtins.currentSystem
 , config ? {}
 , gitrev ? localLib.commitIdFromGitRepo ./.git
 , buildId ? null
-, pkgs ? (import (localLib.fetchNixPkgs) { inherit system config; })
+, pkgs ? (import (localLib.fetchNixPkgs) { inherit system config; overlays = [ jemallocOverlay ]; })
 # profiling slows down performance by 50% so we don't enable it by default
 , forceDontCheck ? false
 , enableProfiling ? false
 , enableDebugging ? false
+, enableBenchmarks ? true
 , allowCustomConfig ? true
 }:
 
@@ -17,7 +26,14 @@ with pkgs.lib;
 with pkgs.haskell.lib;
 
 let
-  addGitRev = subject: subject.overrideAttrs (drv: { GITREV = gitrev; });
+  addGitRev = subject:
+    subject.overrideAttrs (
+      drv: {
+        GITREV = gitrev;
+        librarySystemDepends = (drv.librarySystemDepends or []) ++ [ pkgs.git ];
+        executableSystemDepends = (drv.executableSystemDepends or []) ++ [ pkgs.git ];
+      }
+    );
   addRealTimeTestLogs = drv: overrideCabal drv (attrs: {
     testTarget = "--log=test.log || (sleep 10 && kill $TAILPID && false)";
     preCheck = ''
@@ -31,8 +47,14 @@ let
       kill $TAILPID
     '';
   });
+  # Enables building but not running of benchmarks when
+  # enableBenchmarks argument is true.
+  buildWithBenchmarks = drv: if enableBenchmarks
+    then doBenchmark (appendConfigureFlag drv "--enable-benchmarks")
+    else drv;
+
   cardanoPkgs = ((import ./pkgs { inherit pkgs; }).override {
-    ghc = overrideDerivation pkgs.haskell.compiler.ghc802 (drv: {
+    ghc = overrideDerivation pkgs.haskell.compiler.ghc822 (drv: {
       patches = drv.patches ++ [ ./ghc-8.0.2-darwin-rec-link.patch ];
     });
     overrides = self: super: {
@@ -59,22 +81,16 @@ let
       cardano-sl-client = addRealTimeTestLogs super.cardano-sl-client;
       cardano-sl-generator = addRealTimeTestLogs super.cardano-sl-generator;
       # cardano-sl-auxx = addGitRev (justStaticExecutables super.cardano-sl-auxx);
-      cardano-sl-auxx = addGitRev (justStaticExecutables (overrideCabal super.cardano-sl-auxx (drv: {
-        # waiting on load-command size fix in dyld
-        executableHaskellDepends = drv.executableHaskellDepends ++ [self.cabal-install];
-      })));
+      cardano-sl-auxx = addGitRev (justStaticExecutables super.cardano-sl-auxx);
       cardano-sl-node = addGitRev super.cardano-sl-node;
-      cardano-sl-wallet-new = addGitRev super.cardano-sl-wallet-new;
-      cardano-sl-wallet-new-static = justStaticExecutables self.cardano-sl-wallet-new;
+      cardano-sl-wallet-new = addGitRev (justStaticExecutables (buildWithBenchmarks super.cardano-sl-wallet-new));
       cardano-sl-tools = addGitRev (justStaticExecutables (overrideCabal super.cardano-sl-tools (drv: {
         # waiting on load-command size fix in dyld
         doCheck = ! pkgs.stdenv.isDarwin;
-        executableHaskellDepends = drv.executableHaskellDepends ++ [self.cabal-install];
       })));
 
       cardano-sl-node-static = justStaticExecutables self.cardano-sl-node;
       cardano-sl-explorer-static = addGitRev (justStaticExecutables self.cardano-sl-explorer);
-      cardano-sl-faucet-static = addGitRev (justStaticExecutables self.cardano-sl-faucet);
       cardano-report-server-static = justStaticExecutables self.cardano-report-server;
 
       # Undo configuration-nix.nix change to hardcode security binary on darwin
@@ -150,22 +166,26 @@ let
     });
     mkDocker = { environment, connectArgs ? {} }: import ./docker.nix { inherit environment connect gitrev pkgs connectArgs; };
     stack2nix = import (pkgs.fetchFromGitHub {
-      owner = "input-output-hk";
+      owner = "avieth";
       repo = "stack2nix";
-      rev = "9070f9173ae32f0be6f7830c41c8cfb8e780fdbf";
-      sha256 = "1qz7yfd6icl5sddpsij6fqn2dmzxwawm7cb8aw4diqh71drr1p29";
+      rev = "c51db2d31892f7c4e7ff6acebe4504f788c56dca";
+      sha256 = "10jcj33sxpq18gxf3zcck5i09b2y4jm6qjggqdlwd9ss86wg3ksb";
     }) { inherit pkgs; };
     inherit (pkgs) purescript;
     connectScripts = {
-      mainnetWallet = connect {};
-      mainnetExplorer = connect { executable = "explorer"; };
-      stagingWallet = connect { environment = "mainnet-staging"; };
+      mainnet = {
+        wallet = connect {};
+        explorer = connect { executable = "explorer"; };
+      };
+      staging = {
+        wallet = connect { environment = "mainnet-staging"; };
+        explorer = connect { executable = "explorer"; environment = "mainnet-staging"; };
+      };
       demoWallet = connect { environment = "demo"; };
-      stagingExplorer = connect { executable = "explorer"; environment = "mainnet-staging"; };
     };
     dockerImages = {
-      mainnetWallet = mkDocker { environment = "mainnet"; };
-      stagingWallet = mkDocker { environment = "mainnet-staging"; };
+      mainnet.wallet = mkDocker { environment = "mainnet"; };
+      staging.wallet = mkDocker { environment = "mainnet-staging"; };
     };
 
     daedalus-bridge = let

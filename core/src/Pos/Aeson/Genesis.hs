@@ -32,7 +32,7 @@ module Pos.Aeson.Genesis
         -- ** GenesisSpec
        ) where
 
-import           Universum
+import           Universum hiding (elems)
 
 import           Control.Lens (_Left)
 import           Data.Aeson (FromJSON (..), FromJSONKey (..), FromJSONKeyFunction (..), ToJSON (..),
@@ -44,7 +44,6 @@ import           Formatting (sformat)
 import           Serokell.Aeson.Options (defaultOptions)
 
 import           Pos.Aeson.Core ()
-import           Pos.Aeson.Crypto ()
 import           Pos.Binary.Core.Address ()
 import           Pos.Core.Common (Address, Coin, StakeholderId, unsafeGetCoin)
 import           Pos.Core.Delegation (ProxySKHeavy)

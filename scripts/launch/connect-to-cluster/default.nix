@@ -15,6 +15,7 @@
 , confKey ? null
 , relays ? null
 , debug ? false
+, disableClientAuth ? false
 , extraParams ? ""
 }:
 
@@ -26,6 +27,7 @@ with localLib;
 
 let
   ifDebug = localLib.optionalString (debug);
+  ifDisableClientAuth = localLib.optionalString (disableClientAuth);
   environments = {
     mainnet = {
       relays = "relays.cardano-mainnet.iohk.io";
@@ -44,7 +46,7 @@ let
     };
   };
   executables =  {
-    wallet = "${iohkPkgs.cardano-sl-wallet-new-static}/bin/cardano-node";
+    wallet = "${iohkPkgs.cardano-sl-wallet-new}/bin/cardano-node";
     explorer = "${iohkPkgs.cardano-sl-explorer-static}/bin/cardano-explorer";
   };
   ifWallet = localLib.optionalString (executable == "wallet");
@@ -103,13 +105,13 @@ in pkgs.writeScript "${executable}-connect-to-${environment}" ''
     ${ ifWallet "--tlscert ${stateDir}/tls/server/server.crt"}     \
     ${ ifWallet "--tlskey ${stateDir}/tls/server/server.key"}      \
     ${ ifWallet "--tlsca ${stateDir}/tls/server/ca.crt"}           \
-    ${ ifWallet "--no-client-auth"}                                \
     --log-config ${configFiles}/log-config-connect-to-cluster.yaml \
     --topology "${configFiles}/topology.yaml"                      \
     --logs-prefix "${stateDir}/logs"                               \
     --db-path "${stateDir}/db"   ${extraParams}                    \
     ${ ifWallet "--wallet-db-path '${stateDir}/wallet-db'"}        \
     ${ ifDebug "--wallet-debug"}                                   \
+    ${ ifDisableClientAuth "--no-client-auth"}                     \
     --keyfile ${stateDir}/secret.key                               \
     ${ ifWallet "--wallet-address ${walletListen}" }               \
     ${ ifWallet "--wallet-doc-address ${walletDocListen}" }        \

@@ -20,9 +20,9 @@ import           Universum
 
 import           Pos.Binary.Txp ()
 import           Pos.Core.Txp (TxAux (..), TxId)
-import           Pos.Crypto (hash)
+import           Pos.Crypto (ProtocolMagic, hash)
 import qualified Pos.Infra.Communication.Relay as Relay
-import           Pos.Infra.Util.JsonLog.Events (JLTxR (..))
+import           Pos.Infra.Util.JsonLog.Events (JLEvent (..), JLTxR (..))
 import           Pos.Txp.MemState (MempoolExt, MonadTxpLocal, MonadTxpMem, txpProcessTx)
 import           Pos.Txp.Network.Types (TxMsgContents (..))
 
@@ -31,13 +31,14 @@ import           Pos.Txp.Network.Types (TxMsgContents (..))
 -- #txProcessTransaction
 handleTxDo
     :: TxpMode ctx m
-    => (JLTxR -> m ())  -- ^ How to log transactions
-    -> TxAux            -- ^ Incoming transaction to be processed
+    => ProtocolMagic
+    -> (JLEvent -> m ())  -- ^ How to log transactions
+    -> TxAux              -- ^ Incoming transaction to be processed
     -> m Bool
-handleTxDo logTx txAux = do
+handleTxDo pm logTx txAux = do
     let txId = hash (taTx txAux)
-    res <- txpProcessTx (txId, txAux)
-    let json me = logTx $ JLTxR
+    res <- txpProcessTx pm (txId, txAux)
+    let json me = logTx $ JLTxReceived $ JLTxR
             { jlrTxId     = sformat build txId
             , jlrError    = me
             }

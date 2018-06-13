@@ -23,8 +23,6 @@ import           Test.Hspec.QuickCheck (modifyMaxSuccess, prop)
 import           Test.QuickCheck
 import           Test.QuickCheck.Arbitrary.Generic (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Block ()
-import           Pos.Arbitrary.Block.Message ()
 import           Pos.Arbitrary.Core ()
 import           Pos.Arbitrary.Delegation ()
 import           Pos.Arbitrary.Infra ()
@@ -34,7 +32,6 @@ import           Pos.Arbitrary.Update ()
 import           Pos.Binary.Class
 import           Pos.Binary.Communication ()
 import           Pos.Binary.Core ()
-import           Pos.Binary.Crypto ()
 import           Pos.Binary.Ssc ()
 import qualified Pos.Block.Network as BT
 import qualified Pos.Block.Types as BT
@@ -63,6 +60,8 @@ import qualified Pos.Update as U
 import           Pos.Util.UserSecret (UserSecret, WalletUserSecret)
 
 import           Test.Pos.Binary.Helpers (U, binaryTest, extensionProperty, msgLenLimitedTest)
+import           Test.Pos.Block.Arbitrary ()
+import           Test.Pos.Block.Arbitrary.Message ()
 import           Test.Pos.Configuration (withDefConfiguration)
 import           Test.Pos.Crypto.Arbitrary ()
 import           Test.Pos.Txp.Arbitrary.Network ()
@@ -133,7 +132,7 @@ soundSerializationAttributesOfAsProperty = forAll arbitraryAttrs $ \input ->
 
 
 spec :: Spec
-spec = withDefConfiguration $ do
+spec = withDefConfiguration $ \_ -> do
     describe "Cbor.Bi instances" $ do
         modifyMaxSuccess (const 1000) $ do
             describe "Test instances" $ do

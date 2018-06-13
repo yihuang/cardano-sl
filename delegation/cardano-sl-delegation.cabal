@@ -45,6 +45,7 @@ library
                      , cardano-sl-binary
                      , cardano-sl-core
                      , cardano-sl-crypto
+                     , cardano-sl-crypto-test
                      , cardano-sl-db
                      , cardano-sl-infra
                      , cardano-sl-lrc
@@ -66,6 +67,7 @@ library
                      , serokell-util
                      , text-format
                      , time
+                     , time-units
                      , transformers
                      , universum
                      , unliftio

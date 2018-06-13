@@ -42,6 +42,7 @@ library
                      , cardano-sl-client
                      , cardano-sl-core
                      , cardano-sl-crypto
+                     , cardano-sl-crypto-test
                      , cardano-sl-db
                      , cardano-sl-delegation
                      , cardano-sl-infra
@@ -111,6 +112,7 @@ test-suite cardano-generator-test
   other-modules:
                        Spec
 
+                       Test.Pos.Binary.CommunicationSpec
                        Test.Pos.Block.Logic.CreationSpec
                        Test.Pos.Block.Logic.VarSpec
                        Test.Pos.Block.Property
@@ -121,11 +123,14 @@ test-suite cardano-generator-test
   build-depends:       MonadRandom
                      , QuickCheck
                      , base
+                     , bytestring
                      , cardano-sl
                      , cardano-sl-binary
                      , cardano-sl-block
+                     , cardano-sl-block-test
                      , cardano-sl-core
                      , cardano-sl-crypto
+                     , cardano-sl-crypto-test
                      , cardano-sl-db
                      , cardano-sl-delegation
                      , cardano-sl-generator

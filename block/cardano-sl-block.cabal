@@ -13,7 +13,6 @@ extra-source-files:  README.md
 cabal-version:       >=1.10
 
 library
-  default-language: Haskell2010
   exposed-modules:
                         Pos.Block.Base
                         Pos.Block.BHelpers
@@ -136,7 +135,6 @@ library
   ghc-options: -pgmP cpphs -optP --cpp
 
 Benchmark bench-block
-    default-language: Haskell2010
     type: exitcode-stdio-1.0
     main-is: Block.hs
     hs-source-dirs: bench

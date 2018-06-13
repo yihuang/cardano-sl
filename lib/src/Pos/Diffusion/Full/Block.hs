@@ -32,7 +32,7 @@ import           Serokell.Util.Text (listJson)
 import           System.Metrics.Gauge (Gauge)
 import qualified System.Metrics.Gauge as Gauge
 
-import           Pos.Binary.Communication (serializeMsgSerializedBlock)
+import           Pos.Binary.Communication (serializeMsgSerializedBlock, serializeMsgStreamBlock)
 import           Pos.Block.Network (MsgBlock (..), MsgSerializedBlock (..), MsgGetBlocks (..), MsgGetHeaders (..),
                                     MsgHeaders (..), MsgStreamStart (..), MsgStreamUpdate (..),
                                     MsgStream (..), MsgStreamBlock (..))
@@ -289,7 +289,6 @@ streamBlocks
 streamBlocks _        _   _     0            _       _      _         _           _ = return Nothing -- Fallback to batch mode
 streamBlocks logTrace smM logic streamWindow enqueue nodeId tipHeader checkpoints k = do
     blockChan <- atomically $ Conc.newTBQueue $ fromIntegral streamWindow
-    -- TODO if the request ends early, it should signal that via the channel
     let wqgM = dhStreamWriteQueue <$> smM
     fallBack <- atomically $ Conc.newTVar False
     requestVar <- requestBlocks fallBack blockChan
@@ -306,6 +305,9 @@ streamBlocks logTrace smM logic streamWindow enqueue nodeId tipHeader checkpoint
           else pure $ Just r
   where
 
+    writeStreamEnd :: Conc.TBQueue StreamEntry -> IO ()
+    writeStreamEnd blockChan = atomically $ Conc.writeTBQueue blockChan StreamEnd
+
     mkStreamStart :: [HeaderHash] -> HeaderHash -> MsgStream
     mkStreamStart chain wantedBlock =
         MsgStart $ MsgStreamStart
@@ -317,8 +319,8 @@ streamBlocks logTrace smM logic streamWindow enqueue nodeId tipHeader checkpoint
     requestBlocks :: Conc.TVar Bool -> Conc.TBQueue StreamEntry -> IO (Conc.TVar (OQ.PacketStatus ()))
     requestBlocks fallBack blockChan = do
         convMap <- enqueue (MsgRequestBlocks (S.singleton nodeId))
-                            (\_ _ -> (Conversation $ requestBlocksConversation blockChan) :|
-                                      [(Conversation $ requestBatch fallBack blockChan)]
+                            (\_ _ -> (Conversation $ \it -> requestBlocksConversation blockChan it `finally` writeStreamEnd blockChan) :|
+                                      [(Conversation $ \it -> requestBatch fallBack blockChan it `finally` writeStreamEnd blockChan)]
                                      )
         case M.lookup nodeId convMap of
             Just tvar -> pure tvar
@@ -382,7 +384,6 @@ streamBlocks logTrace smM logic streamWindow enqueue nodeId tipHeader checkpoint
                  throwM $ DialogUnexpected msg
              MsgStreamEnd -> do
                  traceWith logTrace (Debug, sformat ("Streaming done client-side for node"%build) nodeId)
-                 atomically $ Conc.writeTBQueue blockChan StreamEnd
                  return ()
              MsgStreamBlock b -> do
                  -- traceWith logTrace (Debug, sformat ("Read block "%shortHashF) (headerHash b))
@@ -675,7 +676,7 @@ handleStreamStart logTrace logic oq = listenerConv logTrace oq $ \__ourVerInfo n
                       loop nodeId conv (msuWindow u)
     loop nodeId conv window = do
         b <- await
-        lift $ sendRaw conv $ BSL.fromStrict $ serializeMsgSerializedBlock $ MsgSerializedBlock b
+        lift $ sendRaw conv $ serializeMsgStreamBlock $ MsgSerializedBlock b
         loop nodeId conv (window - 1)
 
 ----------------------------------------------------------------------------

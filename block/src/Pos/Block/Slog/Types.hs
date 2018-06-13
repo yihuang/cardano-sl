@@ -11,18 +11,17 @@ module Pos.Block.Slog.Types
        , HasSlogContext (..)
 
        , SlogUndo (..)
+       , buildSlogUndo
        ) where
 
 import           Universum
 
 import           Control.Lens (makeClassy)
-import qualified Data.Text.Buildable
-import           Formatting (bprint)
+import           Formatting (Format, bprint, later)
 import           System.Metrics.Label (Label)
 
 import           Pos.Core (ChainDifficulty, EpochIndex, FlatSlotId,
-                     HasProtocolConstants, LocalSlotIndex, slotIdF,
-                     unflattenSlotId)
+                     LocalSlotIndex, SlotCount, slotIdF, unflattenSlotId)
 import           Pos.Core.Chrono (OldestFirst (..))
 import           Pos.Infra.Reporting.Metrics (MetricMonitorState)
 
@@ -91,7 +90,9 @@ newtype SlogUndo = SlogUndo
     { getSlogUndo :: Maybe FlatSlotId
     } deriving (Eq, Show, NFData, Generic)
 
-instance HasProtocolConstants => Buildable SlogUndo where
-    build (SlogUndo oldSlot) =
-        "SlogUndo: " <>
-        maybe "<nothing>" (bprint slotIdF . unflattenSlotId) oldSlot
+buildSlogUndo :: SlotCount -> Format r (SlogUndo -> r)
+buildSlogUndo epochSlots = later $ \(SlogUndo oldSlot) ->
+    "SlogUndo: "
+        <> maybe "<nothing>"
+                 (bprint slotIdF . unflattenSlotId epochSlots)
+                 oldSlot

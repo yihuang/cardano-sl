@@ -16,7 +16,7 @@ import           Control.Lens (makeLenses)
 import qualified Data.Text.Buildable as Buildable
 import           Universum
 
-import           Pos.Core (HasProtocolConstants, LocalSlotIndex, SlotId,
+import           Pos.Core (BlockCount, LocalSlotIndex, SlotId,
                      VssCertificatesMap)
 import           Pos.Core.Ssc (CommitmentsMap, OpeningsMap, SharesMap)
 import           Pos.Ssc.Base (isCommitmentId, isCommitmentIdx, isOpeningId,
@@ -36,17 +36,19 @@ instance Buildable SscTag where
     build SharesMsg         = "shares"
     build VssCertificateMsg = "VSS certificate"
 
-isGoodSlotForTag :: HasProtocolConstants => SscTag -> LocalSlotIndex -> Bool
-isGoodSlotForTag CommitmentMsg     = isCommitmentIdx
-isGoodSlotForTag OpeningMsg        = isOpeningIdx
-isGoodSlotForTag SharesMsg         = isSharesIdx
-isGoodSlotForTag VssCertificateMsg = const True
+isGoodSlotForTag :: BlockCount -> SscTag -> LocalSlotIndex -> Bool
+isGoodSlotForTag k = \case
+    CommitmentMsg     -> isCommitmentIdx k
+    OpeningMsg        -> isOpeningIdx k
+    SharesMsg         -> isSharesIdx k
+    VssCertificateMsg -> const True
 
-isGoodSlotIdForTag :: HasProtocolConstants => SscTag -> SlotId -> Bool
-isGoodSlotIdForTag CommitmentMsg     = isCommitmentId
-isGoodSlotIdForTag OpeningMsg        = isOpeningId
-isGoodSlotIdForTag SharesMsg         = isSharesId
-isGoodSlotIdForTag VssCertificateMsg = const True
+isGoodSlotIdForTag :: BlockCount -> SscTag -> SlotId -> Bool
+isGoodSlotIdForTag k = \case
+    CommitmentMsg     -> isCommitmentId k
+    OpeningMsg        -> isOpeningId k
+    SharesMsg         -> isSharesId k
+    VssCertificateMsg -> const True
 
 data TossModifier = TossModifier
     { _tmCommitments  :: !CommitmentsMap

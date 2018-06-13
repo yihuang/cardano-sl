@@ -68,7 +68,7 @@ import           Test.QuickCheck (Arbitrary (..))
 
 import           Pos.Binary (biSize)
 import           Pos.Block.Types (Undo (..))
-import           Pos.Core (Address, Coin, EpochIndex, LocalSlotIndex,
+import           Pos.Core (Address, Coin, EpochIndex, LocalSlotIndex, SlotCount,
                      SlotId (..), StakeholderId, Timestamp, addressF,
                      coinToInteger, decodeTextAddress, gbHeader, gbhConsensus,
                      getEpochIndex, getSlotIndex, headerHash, mkCoin,
@@ -203,10 +203,8 @@ data CBlockEntry = CBlockEntry
 instance NFData CBlockEntry
 
 toBlockEntry
-    :: ExplorerMode ctx m
-    => (MainBlock, Undo)
-    -> m CBlockEntry
-toBlockEntry (blk, Undo{..}) = do
+    :: ExplorerMode ctx m => SlotCount -> (MainBlock, Undo) -> m CBlockEntry
+toBlockEntry epochSlots (blk, Undo{..}) = do
 
     blkSlotStart      <- getSlotStartCSLI $ blk ^. gbHeader . gbhConsensus . mcdSlot
 
@@ -216,7 +214,7 @@ toBlockEntry (blk, Undo{..}) = do
         slotIndex     = siSlot  blkHeaderSlot
 
     -- Find the epoch and slot leader
-    epochSlotLeader   <- Lrc.getLeader $ SlotId epochIndex slotIndex
+    epochSlotLeader   <- Lrc.getLeader epochSlots $ SlotId epochIndex slotIndex
 
     -- Fill required fields for @CBlockEntry@
     let cbeEpoch      = getEpochIndex epochIndex
@@ -270,17 +268,16 @@ data CBlockSummary = CBlockSummary
     } deriving (Show, Generic)
 
 toBlockSummary
-    :: ExplorerMode ctx m
-    => (MainBlock, Undo)
-    -> m CBlockSummary
-toBlockSummary blund@(blk, _) = do
-    cbsEntry    <- toBlockEntry blund
+    :: ExplorerMode ctx m => SlotCount -> (MainBlock, Undo) -> m CBlockSummary
+toBlockSummary epochSlots blund@(blk, _) = do
+    cbsEntry    <- toBlockEntry epochSlots blund
     cbsNextHash <- fmap toCHash <$> GS.resolveForwardLink blk
 
-    let blockTxs      = blk ^. mainBlockTxPayload . txpTxs
+    let blockTxs    = blk ^. mainBlockTxPayload . txpTxs
 
-    let cbsPrevHash   = toCHash $ blk ^. prevBlockL
-    let cbsMerkleRoot = toCHash . getMerkleRoot . mtRoot . mkMerkleTree $ blockTxs
+    let cbsPrevHash = toCHash $ blk ^. prevBlockL
+    let cbsMerkleRoot =
+            toCHash . getMerkleRoot . mtRoot . mkMerkleTree $ blockTxs
 
     return CBlockSummary {..}
 

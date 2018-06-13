@@ -13,7 +13,7 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 
-import           Pos.Core (BlockVersionData, EpochIndex, Timestamp)
+import           Pos.Core (BlockVersionData, EpochIndex, SlotCount, Timestamp)
 import           Pos.Core.Txp (TxAux (..), TxId)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Infra.Slotting (MonadSlots (getCurrentSlot), getSlotStart)
@@ -40,36 +40,44 @@ type ETxpLocalWorkMode ctx m =
     , MempoolExt m ~ ExplorerExtraModifier
     )
 
-eTxProcessTransaction ::
-       ( ETxpLocalWorkMode ctx m
+eTxProcessTransaction
+    :: ( ETxpLocalWorkMode ctx m
        , HasLens' ctx StateLock
        , HasLens' ctx (StateLockMetrics MemPoolModifyReason)
        , CanJsonLog m
        )
     => ProtocolMagic
+    -> SlotCount
     -> (TxId, TxAux)
     -> m (Either ToilVerFailure ())
-eTxProcessTransaction pm itw =
-    withStateLock LowPriority ProcessTransaction $ \__tip -> eTxProcessTransactionNoLock pm itw
+eTxProcessTransaction pm epochSlots itw =
+    withStateLock LowPriority ProcessTransaction
+        $ \__tip -> eTxProcessTransactionNoLock pm epochSlots itw
 
-eTxProcessTransactionNoLock ::
-       forall ctx m. (ETxpLocalWorkMode ctx m)
+eTxProcessTransactionNoLock
+    :: forall ctx m
+     . (ETxpLocalWorkMode ctx m)
     => ProtocolMagic
+    -> SlotCount
     -> (TxId, TxAux)
     -> m (Either ToilVerFailure ())
-eTxProcessTransactionNoLock pm itw = getCurrentSlot >>= \case
-    Nothing   -> pure $ Left ToilSlotUnknown
-    Just slot -> do
-        -- First get the current @SlotId@ so we can calculate the time.
-        -- Then get when that @SlotId@ started and use that as a time for @Tx@.
-        mTxTimestamp <- getSlotStart slot
-        txProcessTransactionAbstract buildContext (processTx' mTxTimestamp) itw
+eTxProcessTransactionNoLock pm epochSlots itw =
+    getCurrentSlot epochSlots >>= \case
+        Nothing   -> pure $ Left ToilSlotUnknown
+        Just slot -> do
+            -- First get the current @SlotId@ so we can calculate the time. Then
+            -- get when that @SlotId@ started and use that as a time for @Tx@.
+            mTxTimestamp <- getSlotStart slot
+            txProcessTransactionAbstract epochSlots
+                                         buildContext
+                                         (processTx' mTxTimestamp)
+                                         itw
   where
     buildContext :: Utxo -> TxAux -> m ExplorerExtraLookup
     buildContext utxo = buildExplorerExtraLookup utxo . one
 
-    processTx' ::
-           Maybe Timestamp
+    processTx'
+        :: Maybe Timestamp
         -> BlockVersionData
         -> EpochIndex
         -> (TxId, TxAux)
@@ -81,17 +89,26 @@ eTxProcessTransactionNoLock pm itw = getCurrentSlot >>= \case
 --   2. Remove invalid transactions from MemPool
 --   3. Set new tip to txp local data
 eTxNormalize
-    :: forall ctx m . (ETxpLocalWorkMode ctx m) => ProtocolMagic -> m ()
-eTxNormalize pm = do
-    extras <- MM.insertionsMap . view eemLocalTxsExtra <$> withTxpLocalData getTxpExtra
-    txNormalizeAbstract buildExplorerExtraLookup (normalizeToil' extras)
+    :: forall ctx m
+     . (ETxpLocalWorkMode ctx m)
+    => ProtocolMagic
+    -> SlotCount
+    -> m ()
+eTxNormalize pm epochSlots = do
+    extras <-
+        MM.insertionsMap
+        .   view eemLocalTxsExtra
+        <$> withTxpLocalData getTxpExtra
+    txNormalizeAbstract epochSlots
+                        buildExplorerExtraLookup
+                        (normalizeToil' extras)
   where
-    normalizeToil' ::
-           HashMap TxId TxExtra
+    normalizeToil'
+        :: HashMap TxId TxExtra
         -> BlockVersionData
         -> EpochIndex
         -> HashMap TxId TxAux
         -> ELocalToilM ()
     normalizeToil' extras bvd epoch txs =
         let toNormalize = HM.toList $ HM.intersectionWith (,) txs extras
-        in eNormalizeToil pm bvd epoch toNormalize
+        in  eNormalizeToil pm bvd epoch toNormalize

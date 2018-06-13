@@ -39,6 +39,7 @@ import           Pos.Util.Util (leftToPanic)
 import           Test.Pos.Client.Txp.Mode (HasTxpConfigurations, TxpTestMode,
                      TxpTestProperty, withBVData)
 import           Test.Pos.Configuration (withDefConfigurations)
+import           Test.Pos.Core.Dummy (dummyEpochSlots)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 import           Test.Pos.Util.QuickCheck.Arbitrary (nonrepeating)
 import           Test.Pos.Util.QuickCheck.Property (stopProperty)
@@ -48,7 +49,7 @@ import           Test.Pos.Util.QuickCheck.Property (stopProperty)
 ----------------------------------------------------------------------------
 
 spec :: Spec
-spec = withDefConfigurations $ \_ _ ->
+spec = withDefConfigurations $ \_ ->
     describe "Client.Txp.Util" $ do
         describe "createMTx" $ createMTxSpec
 
@@ -115,9 +116,15 @@ testCreateMTx
     :: HasTxpConfigurations
     => CreateMTxParams
     -> TxpTestProperty (Either TxError (TxAux, NonEmpty TxOut))
-testCreateMTx CreateMTxParams{..} = lift $
-    createMTx dummyProtocolMagic mempty cmpInputSelectionPolicy cmpUtxo (getSignerFromList cmpSigners)
-    cmpOutputs cmpAddrData
+testCreateMTx CreateMTxParams {..} = lift $ createMTx
+    dummyProtocolMagic
+    dummyEpochSlots
+    mempty
+    cmpInputSelectionPolicy
+    cmpUtxo
+    (getSignerFromList cmpSigners)
+    cmpOutputs
+    cmpAddrData
 
 createMTxWorksWhenWeAreRichSpec
     :: HasTxpConfigurations
@@ -221,25 +228,31 @@ redemptionSpec = do
         pure CreateRedemptionTxParams {..}
 
 txWithRedeemOutputFailsSpec
-    :: HasTxpConfigurations
-    => InputSelectionPolicy
-    -> TxpTestProperty ()
+    :: HasTxpConfigurations => InputSelectionPolicy -> TxpTestProperty ()
 txWithRedeemOutputFailsSpec inputSelectionPolicy = do
     forAllM genParams $ \(CreateMTxParams {..}) -> do
-        txOrError <-
-            createMTx dummyProtocolMagic mempty cmpInputSelectionPolicy cmpUtxo
-                      (getSignerFromList cmpSigners)
-                      cmpOutputs cmpAddrData
+        txOrError <- createMTx dummyProtocolMagic
+                               dummyEpochSlots
+                               mempty
+                               cmpInputSelectionPolicy
+                               cmpUtxo
+                               (getSignerFromList cmpSigners)
+                               cmpOutputs
+                               cmpAddrData
         case txOrError of
-            Left (OutputIsRedeem _) -> return ()
-            Left err -> stopProperty $ pretty err
-            Right _  -> stopProperty $
-                sformat ("Transaction to a redeem address was created")
+            Left  (OutputIsRedeem _) -> return ()
+            Left  err                -> stopProperty $ pretty err
+            Right _                  -> stopProperty
+                $ sformat ("Transaction to a redeem address was created")
   where
     genParams = do
         txOutAuxOutput <- generateRedeemTxOutAux 1 <$> arbitrary
-        params <- makeManyAddressesToManyParams inputSelectionPolicy 1 1000000 1 1
-        pure params{ cmpOutputs = one txOutAuxOutput }
+        params         <- makeManyAddressesToManyParams inputSelectionPolicy
+                                                        1
+                                                        1000000
+                                                        1
+                                                        1
+        pure params { cmpOutputs = one txOutAuxOutput }
 
 feeForManyAddressesSpec
     :: HasTxpConfigurations

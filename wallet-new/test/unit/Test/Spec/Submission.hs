@@ -188,36 +188,39 @@ dependentTransactions = do
     outputForB <- (Core.TxOut <$> arbitrary <*> arbitrary)
     outputForC <- (Core.TxOut <$> arbitrary <*> arbitrary)
     outputForD <- (Core.TxOut <$> arbitrary <*> arbitrary)
-    [a,b,c,d] <- vectorOf 4 (Core.genTxAux (Core.ProtocolMagic 0))
-    let a' = a { Core.taTx = (Core.taTx a) {
-                     Core._txInputs  = inputForA :| mempty
-                   , Core._txOutputs = outputForA :| mempty
-                   , Core._txAttributes = emptyAttributes
-                   }
-               }
-    let b' = b { Core.taTx = (Core.taTx b) {
-                     Core._txInputs = Core.TxInUtxo (hash (Core.taTx a')) 0 :| mempty
-                   , Core._txOutputs = outputForB :| mempty
-                   , Core._txAttributes = emptyAttributes
-                   }
-               }
-    let c' = c { Core.taTx = (Core.taTx c) {
-                     Core._txInputs = Core.TxInUtxo (hash (Core.taTx b')) 0 :| mempty
-                   , Core._txOutputs = outputForC :| mempty
-                   , Core._txAttributes = emptyAttributes
-                   }
-               }
-    let d' = d { Core.taTx = (Core.taTx d) {
-                     Core._txInputs = Core.TxInUtxo (hash (Core.taTx c')) 0 :| mempty
-                   , Core._txOutputs = outputForD :| mempty
-                   , Core._txAttributes = emptyAttributes
-                   }
-               }
-    return ( LabelledTxAux "B" b'
-           , LabelledTxAux "C" c'
-           , LabelledTxAux "A" a'
-           , LabelledTxAux "D" d'
-           )
+    v <- vectorOf 4 (Core.genTxAux (Core.ProtocolMagic 0))
+    case v of
+      [a, b, c, d] -> do
+        let a' = a { Core.taTx = (Core.taTx a) {
+                        Core._txInputs  = inputForA :| mempty
+                      , Core._txOutputs = outputForA :| mempty
+                      , Core._txAttributes = emptyAttributes
+                      }
+                  }
+        let b' = b { Core.taTx = (Core.taTx b) {
+                        Core._txInputs = Core.TxInUtxo (hash (Core.taTx a')) 0 :| mempty
+                      , Core._txOutputs = outputForB :| mempty
+                      , Core._txAttributes = emptyAttributes
+                      }
+                  }
+        let c' = c { Core.taTx = (Core.taTx c) {
+                        Core._txInputs = Core.TxInUtxo (hash (Core.taTx b')) 0 :| mempty
+                      , Core._txOutputs = outputForC :| mempty
+                      , Core._txAttributes = emptyAttributes
+                      }
+                  }
+        let d' = d { Core.taTx = (Core.taTx d) {
+                        Core._txInputs = Core.TxInUtxo (hash (Core.taTx c')) 0 :| mempty
+                      , Core._txOutputs = outputForD :| mempty
+                      , Core._txAttributes = emptyAttributes
+                      }
+                  }
+        return ( LabelledTxAux "B" b'
+              , LabelledTxAux "C" c'
+              , LabelledTxAux "A" a'
+              , LabelledTxAux "D" d'
+              )
+      _ -> error "Impossible pattern match failure!"
 
 ---
 --- Pure generators, running in Identity

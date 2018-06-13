@@ -9,7 +9,9 @@
   , "port": 8125
   , "flush-interval": 1000
   }
-, "source-wallet": { "generate-to": "./wallet-source.json" }
+, "source-wallet": { "generate-to": "./write-generated-wallet-info-here.json" }
+  // or:
+, "source-wallet": { "read-from": "./existing-wallet-details.json" }
 , "logging-config": "./logging.cfg"
 , "public-certificate": "./tls/ca.crt"
 , "private-key": "./tls/server.key"

@@ -90,7 +90,7 @@ runRealMode nr@NodeResources {..} act = runServer
     makeLogicIO diffusion = hoistLogic (elimRealMode nr diffusion) logic
     act' :: Diffusion IO -> IO a
     act' diffusion =
-        let diffusion' = hoistDiffusion liftIO diffusion
+        let diffusion' = hoistDiffusion liftIO (elimRealMode nr diffusion) diffusion
          in elimRealMode nr diffusion (act diffusion')
 
 -- | RealMode runner: creates a JSON log configuration and uses the

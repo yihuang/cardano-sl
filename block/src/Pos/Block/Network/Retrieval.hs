@@ -314,11 +314,7 @@ getProcessBlocks diffusion nodeId desired checkpoints = do
 streamProcessBlocks
     :: forall ctx m.
        ( BlockWorkMode ctx m
-       , HasGeneratedSecrets
-       , HasGenesisBlockVersionData
-       , HasProtocolConstants
-       , HasGenesisHash
-       , HasGenesisData
+       , HasMisbehaviorMetrics ctx
        )
     => Diffusion m
     -> NodeId
@@ -359,5 +355,5 @@ streamProcessBlocks diffusion nodeId desired checkpoints = do
 
     addBlocks [] = return ()
     addBlocks (block : blocks) =
-        handleBlocks nodeId (OldestFirst (NE.reverse $ block :| blocks)) diffusion
+        handleBlocks (OldestFirst (NE.reverse $ block :| blocks)) diffusion
 

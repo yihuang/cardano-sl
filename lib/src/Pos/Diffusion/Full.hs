@@ -62,8 +62,8 @@ import           Pos.Infra.Diffusion.Subscription.Dns (dnsSubscriptionWorker)
 import           Pos.Infra.Diffusion.Subscription.Status (SubscriptionStates,
                                                           emptySubscriptionStates)
 import           Pos.Infra.Diffusion.Transport.TCP (bracketTransportTCP)
-import           Pos.Infra.Diffusion.Types (Diffusion (..), DiffusionLayer (..)
-                                            StreamEntry)
+import           Pos.Infra.Diffusion.Types (Diffusion (..), DiffusionLayer (..),
+                                            StreamEntry, DiffusionHealth (..))
 import           Pos.Infra.Communication.Relay.Logic (invReqDataFlowTK)
 import           Pos.Infra.Network.Types (NetworkConfig (..), Bucket (..),
                                           initQueue, topologySubscribers,

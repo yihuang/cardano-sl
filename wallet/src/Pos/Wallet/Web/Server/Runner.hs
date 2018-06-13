@@ -60,7 +60,7 @@ runWRealMode
 runWRealMode db conn syncRequests res action = Production $
     runRealMode res $ \diffusion ->
         walletWebModeToRealMode db conn syncRequests $
-            action (hoistDiffusion realModeToWalletWebMode diffusion)
+            action (hoistDiffusion realModeToWalletWebMode (walletWebModeToRealMode db conn syncRequests) diffusion)
 
 walletServeWebFull
     :: ( HasConfigurations

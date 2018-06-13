@@ -34,7 +34,7 @@ import           Pos.Core.Block (Block, BlockHeader)
 import           Pos.Crypto (shortHashF)
 import           Pos.DB (DBError (..), MonadDB, MonadDBRead (..), RocksBatchOp (..),
                          dbSerializeValue, getHeader)
-import           Pos.DB.Class (MonadBlockDBRead, getBlock)
+import           Pos.DB.Class (MonadBlockDBRead, getBlock, SerializedBlock)
 import           Pos.DB.GState.Common (gsGetBi, gsPutBi)
 import           Pos.Core.Chrono (OldestFirst (..))
 import           Pos.Util.Util (maybeThrow)
@@ -115,10 +115,10 @@ instance HasCoreConfiguration => RocksBatchOp BlockExtraOp where
 
 streamBlocks
     :: ( Monad m )
-    => (HeaderHash -> m (Maybe Block))
+    => (HeaderHash -> m (Maybe SerializedBlock))
     -> (HeaderHash -> m (Maybe HeaderHash))
     -> HeaderHash
-    -> Producer Block m ()
+    -> Producer SerializedBlock m ()
 streamBlocks loadBlock forwardLink base = do
     loop base
   where

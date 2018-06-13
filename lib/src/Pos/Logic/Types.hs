@@ -35,7 +35,7 @@ data Logic m = Logic
       ourStakeholderId   :: StakeholderId
       -- | Get serialized block, perhaps from a database.
     , getSerializedBlock :: HeaderHash -> m (Maybe SerializedBlock)
-    , streamBlocks       :: HeaderHash -> Producer Block m ()
+    , streamBlocks       :: HeaderHash -> Producer SerializedBlock m ()
       -- | Get a block header.
     , getBlockHeader     :: HeaderHash -> m (Maybe BlockHeader)
       -- TODO CSL-2089 use conduits in this and the following methods

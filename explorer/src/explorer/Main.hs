@@ -86,7 +86,7 @@ action (ExplorerNodeArgs (cArgs@CommonNodeArgs{..}) ExplorerArgs{..}) =
             extraCtx = makeExtraCtx
             explorerModeToRealMode  = runExplorerProd extraCtx
          in runRealMode nr $ \diffusion ->
-                explorerModeToRealMode (go (hoistDiffusion (lift . lift) diffusion))
+                explorerModeToRealMode (go (hoistDiffusion (lift . lift) (explorerModeToRealMode) diffusion))
 
     nodeArgs :: NodeArgs
     nodeArgs = NodeArgs { behaviorConfigPath = Nothing }

@@ -107,8 +107,8 @@ logicFull ourStakeholderId securityParams jsonLogTx =
         getSerializedBlock :: HeaderHash -> m (Maybe SerializedBlock)
         getSerializedBlock = DB.dbGetSerBlock
 
-        streamBlocks :: HeaderHash -> Producer Block m ()
-        streamBlocks = DB.streamBlocks DB.getBlock DB.resolveForwardLink
+        streamBlocks :: HeaderHash -> Producer SerializedBlock m ()
+        streamBlocks = DB.streamBlocks DB.dbGetSerBlock DB.resolveForwardLink
 
         getTip :: m Block
         getTip = DB.getTipBlock

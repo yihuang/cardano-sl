@@ -7,7 +7,8 @@ import           Universum
 
 
 import           Control.Concurrent.STM (readTBQueue)
-import           Control.DeepSeq (NFData, force)
+--import           Control.DeepSeq (NFData, force)
+import           Control.DeepSeq (force)
 import           Control.Monad.IO.Class (liftIO)
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Semigroup ((<>))
@@ -25,25 +26,27 @@ import           Node (NodeId)
 import qualified Node
 import           Pipes (each)
 
-import           Pos.Arbitrary.Block.Generate (generateMainBlock)
+import           Pos.Binary.Class (serialize')
 import           Pos.Core (Block, BlockHeader, BlockVersion (..), HeaderHash, blockHeaderHash)
 import qualified Pos.Core as Core (getBlockHeader)
 import           Pos.Core.ProtocolConstants (ProtocolConstants (..))
 import           Pos.Crypto (ProtocolMagic (..))
 import           Pos.Crypto.Hashing (Hash, unsafeMkAbstractHash)
+import           Pos.DB.Class (SerializedBlock, Serialized (..))
 import           Pos.Diffusion.Full (FullDiffusionConfiguration (..), FullDiffusionInternals (..),
                                      RunFullDiffusionInternals (..),
                                      diffusionLayerFullExposeInternals)
-import qualified Pos.Diffusion.Transport.TCP as Diffusion (bracketTransportTCP)
-import           Pos.Diffusion.Types as Diffusion (Diffusion (..), StreamEntry (..))
+import qualified Pos.Infra.Diffusion.Transport.TCP as Diffusion (bracketTransportTCP)
+import           Pos.Infra.Diffusion.Types as Diffusion (Diffusion (..), StreamEntry (..))
 import           Pos.Logic.Pure (pureLogic)
 import           Pos.Logic.Types as Logic (Logic (..))
-import qualified Pos.Network.Policy as Policy
-import           Pos.Network.Types (Bucket (..))
-import           Pos.Reporting.Health.Types (HealthStatus (..))
+import qualified Pos.Infra.Network.Policy as Policy
+import           Pos.Infra.Network.Types (Bucket (..))
+import           Pos.Infra.Reporting.Health.Types (HealthStatus (..))
 
-import           Pos.Util.Chrono (NewestFirst (..), OldestFirst (..))
+import           Pos.Core.Chrono (NewestFirst (..), OldestFirst (..))
 import           Pos.Util.Trace (noTrace, wlogTrace)
+import           Test.Pos.Block.Arbitrary.Generate (generateMainBlock)
 
 -- HLint warning disabled since I ran into https://ghc.haskell.org/trac/ghc/ticket/13106
 -- when trying to resolve it.
@@ -99,16 +102,21 @@ serverLogic
     -> NonEmpty BlockHeader
     -> Logic IO
 serverLogic streamIORef arbitraryBlock arbitraryHashes arbitraryHeaders = pureLogic
-    { getBlock = const (pure (Just arbitraryBlock))
+    { getSerializedBlock = const (pure (Just $ serializedBlock arbitraryBlock))
     , getBlockHeader = const (pure (Just (Core.getBlockHeader arbitraryBlock)))
     , getHashesRange = \_ _ _ -> pure (Right (OldestFirst arbitraryHashes))
     , getBlockHeaders = \_ _ _ -> pure (Right (NewestFirst arbitraryHeaders))
     , getTip = pure arbitraryBlock
     , getTipHeader = pure (Core.getBlockHeader arbitraryBlock)
     , Logic.streamBlocks = \_ -> do
-          blocks <- readIORef streamIORef
-          each blocks
+          bs <-  readIORef streamIORef
+          each $ map serializedBlock bs
     }
+
+serializedBlock :: Block -> SerializedBlock
+serializedBlock (Right b) = Serialized $ serialize' b
+serializedBlock (Left  _) = error "*sigh*"
+
 
 -- Modify a pure logic layer so that the LCA computation (suffix not in the
 -- chain) always gives the entire thing. This makes the batch block requester
@@ -232,7 +240,7 @@ blockDownloadStream serverAddress resultIORef streamIORef setStreamIORef ~(block
 -- an 'NFData' instance, but in that module we don't yet know that this is
 -- in fact 'HeaderHash' ~ 'Crypto.Digest Blake2b_256'.
 -- Anyway, there's a whole saga of pain caused by that silly abstraction.
-instance NFData BlockHeader
+--instance NFData BlockHeader
 
 -- Generate a list of n+1 blocks
 generateBlocks :: Int -> NonEmpty Block

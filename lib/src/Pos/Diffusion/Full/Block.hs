@@ -44,7 +44,6 @@ import           Pos.Core (BlockVersionData, HeaderHash, ProtocolConstants (..),
 import           Pos.Core.Block (Block, BlockHeader (..), MainBlockHeader, blockHeader)
 import           Pos.Crypto (shortHashF)
 import           Pos.DB (DBError (DBMalformed))
-import           Pos.Diffusion.Types (StreamEntry (..), DiffusionHealth (..))
 import           Pos.Exception (cardanoExceptionFromException, cardanoExceptionToException)
 import           Pos.Infra.Communication.Listener (listenerConv)
 import           Pos.Infra.Communication.Protocol (Conversation (..),
@@ -57,6 +56,7 @@ import           Pos.Infra.Communication.Protocol (Conversation (..),
                                                    waitForConversations,
                                                    waitForDequeues,
                                                    recvLimited)
+import           Pos.Infra.Diffusion.Types (StreamEntry (..), DiffusionHealth (..))
 import           Pos.Infra.Network.Types (Bucket)
 import           Pos.Infra.Util.TimeWarp (NetworkAddress, nodeIdToAddress)
 import           Pos.Logic.Types (Logic)
@@ -675,7 +675,7 @@ handleStreamStart logTrace logic oq = listenerConv logTrace oq $ \__ourVerInfo n
                       loop nodeId conv (msuWindow u)
     loop nodeId conv window = do
         b <- await
-        lift $ send conv $ MsgStreamBlock b
+        lift $ sendRaw conv $ BSL.fromStrict $ serializeMsgSerializedBlock $ MsgSerializedBlock b
         loop nodeId conv (window - 1)
 
 ----------------------------------------------------------------------------

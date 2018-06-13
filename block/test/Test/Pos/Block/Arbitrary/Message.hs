@@ -57,10 +57,7 @@ instance Arbitrary T.MsgStreamUpdate where
     arbitrary = genericArbitrary
     shrink = genericShrink
 
-instance ( Arbitrary SscPayload
-         , Arbitrary SscProof
-         , Arbitrary SscPayloadDependsOnSlot
-         , HasProtocolConstants
+instance ( HasProtocolConstants
          , HasProtocolMagic
          , HasGenesisHash
          ) =>

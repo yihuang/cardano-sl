@@ -120,7 +120,7 @@ action opts@AuxxOptions {..} command = do
                            else identity
                 auxxModeAction = modifier (auxxPlugin opts command)
              in runRealMode nr $ \diffusion ->
-                    toRealMode (auxxModeAction (hoistDiffusion realModeToAuxx diffusion))
+                    toRealMode (auxxModeAction (hoistDiffusion realModeToAuxx toRealMode diffusion))
 
     cArgs@CLI.CommonNodeArgs {..} = aoCommonNodeArgs
     conf = CLI.configurationOptions (CLI.commonArgs cArgs)

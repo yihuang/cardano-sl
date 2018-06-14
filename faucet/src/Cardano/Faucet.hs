@@ -7,6 +7,7 @@ module Cardano.Faucet (
     server
   , serverAPI
   , module Cardano.Faucet.Types
+  , module Cardano.Faucet.Init
   ) where
 
 import           Control.Lens
@@ -15,11 +16,11 @@ import           Data.Text.Lens
 import           Servant
 import           System.Wlog (LoggerName (..), logError, logInfo, withSublogger)
 
+import           Cardano.Faucet.Init
 import           Cardano.Faucet.Types
 import           Cardano.Wallet.API.Response (WalletResponse (..))
-import           Cardano.Wallet.API.V1.Types (unV1, txAmount)
+import           Cardano.Wallet.API.V1.Types (txAmount, unV1)
 import qualified Cardano.WalletClient as Client
--- import           Client.Cardano.Wallet.Web.Run     (runEndpointClient)
 
 type API = "withdraw" :> ReqBody '[JSON] WithDrawlRequest :> Post '[JSON] WithDrawlResult
       :<|> "deposit" :> ReqBody '[JSON] DepositRequest :> Post '[JSON] DepositResult

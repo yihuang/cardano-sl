@@ -14,9 +14,9 @@
 module Cardano.Faucet.Types (
    FaucetConfig(..)
  , HasFaucetConfig(..)
- , FaucetEnv(..), initEnv
+ , FaucetEnv(..)
  , HasFaucetEnv(..)
- , SourceWalletConfig
+ , SourceWalletConfig(..)
  , srcSpendingPassword
  , cfgToPaymentSource
  , incWithDrawn
@@ -25,63 +25,43 @@ module Cardano.Faucet.Types (
  , WithDrawlRequest(..), wAddress
  , WithDrawlResult(..)
  , DepositRequest(..), dWalletId, dAmount
+ , SourceWallet(..)
+ , InitializedWallet(..), walletBalance, walletConfig
+ , CreatedWallet(..)
+ , InitFaucetError(..)
  , DepositResult(..)
  , M, runM
  , MonadFaucet
   ) where
 
 import           Control.Applicative ((<|>))
-import           Control.Exception (Exception, throw)
+import           Control.Exception (Exception)
 import           Control.Lens hiding ((.=))
 import           Control.Monad.Except
 import           Control.Monad.Reader
-import           Crypto.Random.Entropy (getEntropy)
-import           Data.Aeson (FromJSON (..), ToJSON (..), eitherDecode, object, withObject, (.:),
+import           Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:),
                              (.:?), (.=))
-import           Data.Aeson.Text (encodeToLazyText)
-import           Data.Bifunctor (first)
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BSL
-import           Data.Default (def)
 import           Data.Int (Int64)
-import           Data.Monoid ((<>))
 import           Data.Text (Text)
-import           System.Directory (createDirectoryIfMissing)
-import           System.FilePath (takeDirectory)
 -- import           Data.Text (Text)
 import qualified Data.Text as Text
-import qualified Data.Text.Lazy.IO as Text
-import           Data.Text.Lens (packed)
 import           Data.Typeable (Typeable)
 import           GHC.Generics (Generic)
-import           Network.Connection (TLSSettings (..))
-import           Network.HTTP.Client (Manager, newManager)
-import           Network.HTTP.Client.TLS (mkManagerSettings)
-import           Network.TLS (ClientParams (..), credentialLoadX509FromMemory, defaultParamsClient,
-                              onCertificateRequest, onServerCertificate, supportedCiphers)
-import           Network.TLS.Extra.Cipher (ciphersuite_all)
 import           Servant (ServantErr)
-import           Servant.Client.Core (BaseUrl (..), Scheme (..))
-import           System.Metrics (Store, createCounter, createGauge)
+import           System.Metrics (Store)
 import           System.Metrics.Counter (Counter)
 import qualified System.Metrics.Counter as Counter
 import           System.Metrics.Gauge (Gauge)
 import qualified System.Metrics.Gauge as Gauge
 import           System.Remote.Monitoring.Statsd (StatsdOptions (..))
 import           System.Wlog (CanLog, HasLoggerName, LoggerName (..), LoggerNameBox (..),
-                              WithLogger, launchFromFile, logError, logInfo, withSublogger)
+                              WithLogger, launchFromFile)
 
-import           Cardano.Wallet.API.V1.Types (Account (..), AccountIndex,
-                                              AssuranceLevel (NormalAssurance), NewWallet (..),
-                                              PaymentSource (..), Transaction, V1 (..), Wallet (..),
-                                              WalletAddress (..), WalletId (..),
-                                              WalletOperation (CreateWallet), unV1)
-import           Cardano.Wallet.Client (ClientError (..), WalletClient (..), WalletResponse (..),
-                                        liftClient)
-import           Cardano.Wallet.Client.Http (mkHttpClient)
+import           Cardano.Wallet.API.V1.Types (AccountIndex, PaymentSource (..), Transaction,
+                                              V1 (..), WalletId (..))
+import           Cardano.Wallet.Client (ClientError (..), WalletClient (..))
 import           Pos.Core (Address (..), Coin (..))
 import           Pos.Util.BackupPhrase (BackupPhrase (..))
-import           Pos.Util.Mnemonics (toMnemonic)
 
 
 --------------------------------------------------------------------------------
@@ -161,9 +141,6 @@ instance FromJSON SourceWalletConfig where
       <*> v .: "account-index"
       <*> v .:? "spending-password"
 
-readSourceWalletConfig :: FilePath -> IO (Either String SourceWalletConfig)
-readSourceWalletConfig = fmap eitherDecode . BSL.readFile
-
 cfgToPaymentSource :: SourceWalletConfig -> PaymentSource
 cfgToPaymentSource (SourceWalletConfig wId aIdx _) = PaymentSource wId aIdx
 
@@ -190,12 +167,11 @@ instance FromJSON SourceWallet where
         (Generate <$> v .: "generate-to") <|> (Provided <$> v .: "read-from")
 
 data InitializedWallet = InitializedWallet {
-    _walletConfig  :: !SourceWalletConfig
-  , _walletBallance :: !Int64
+    _walletConfig   :: !SourceWalletConfig
+  , _walletBalance :: !Int64
   } deriving (Show, Generic)
 
 makeLenses ''InitializedWallet
-
 --------------------------------------------------------------------------------
 data FaucetConfig = FaucetConfig {
     _fcWalletApiHost    :: !String
@@ -244,6 +220,7 @@ instance ToJSON CreatedWallet where
 --------------------------------------------------------------------------------
 data InitFaucetError =
     SourceWalletParseError String
+  | CouldntReadSyncState ClientError
   | WalletCreationError ClientError
   | CouldntReadBalance ClientError
   | NoWalletAccounts WalletId
@@ -255,154 +232,17 @@ instance Exception InitFaucetError
 
 --------------------------------------------------------------------------------
 data FaucetEnv = FaucetEnv {
-    _feWithdrawn        :: !Counter
-  , _feNumWithdrawn     :: !Counter
-  , _feWalletBalance    :: !Gauge
-  , _feStore            :: !Store
-  , _feSourceWallet    :: !SourceWalletConfig
-  , _feFaucetConfig     :: !FaucetConfig
-  , _feWalletClient     :: !(WalletClient IO)
+    _feWithdrawn     :: !Counter
+  , _feNumWithdrawn  :: !Counter
+  , _feWalletBalance :: !Gauge
+  , _feStore         :: !Store
+  , _feSourceWallet  :: !SourceWalletConfig
+  , _feFaucetConfig  :: !FaucetConfig
+  , _feWalletClient  :: !(WalletClient IO)
   }
 
 makeClassy ''FaucetEnv
 
-
---------------------------------------------------------------------------------
-generateBackupPhrase :: IO BackupPhrase
-generateBackupPhrase = do
-    -- The size 16 should give us 12-words mnemonic after BIP-39 encoding.
-    genMnemonic <- getEntropy 16
-    let newMnemonic = either (error . show) id $ toMnemonic genMnemonic
-    return $ mkBackupPhrase12 $ Text.words newMnemonic
-  where
-    mkBackupPhrase12 :: [Text] -> BackupPhrase
-    mkBackupPhrase12 ls
-        | length ls == 12 = BackupPhrase ls
-        | otherwise = error "Invalid number of words in backup phrase! Expected 12 words."
-
---------------------------------------------------------------------------------
-createWallet
-    :: (HasLoggerName m, CanLog m, MonadIO m)
-    => WalletClient m
-    -> m (Either InitFaucetError (SourceWalletConfig, BackupPhrase, Address))
-createWallet client = withSublogger "create-wallet" $ do
-    phrase <- liftIO generateBackupPhrase
-    let w = NewWallet (V1 phrase) Nothing NormalAssurance "Faucet-Wallet" CreateWallet
-    runExceptT $ do
-        wId <- walId <$> (runClient WalletCreationError $ postWallet client w)
-        logInfo $ "Created wallet with ID: " <> (Text.pack $ show wId)
-        accounts <- runClient WalletCreationError $
-                       getAccountIndexPaged
-                         client
-                         wId
-                         Nothing
-                         Nothing
-        case accounts of
-            [a] -> do
-                let aIdx = accIndex a
-                logInfo $ "Found a single account for wallet with ID: "
-                          <> (Text.pack $ show wId)
-                          <> " account index: " <> (Text.pack $ show aIdx)
-                case accAddresses a of
-                    [addr] -> do
-                        logInfo $ "Found a single account for wallet with ID: "
-                                  <> (Text.pack $ show wId)
-                                  <> " account index: " <> (Text.pack $ show aIdx)
-                        return (SourceWalletConfig wId aIdx Nothing, phrase, unV1 $ addrId addr)
-                    _ -> do
-                        logInfo $ "Didn't find an address for wallet with ID: "
-                                  <> (Text.pack $ show wId)
-                                  <> " account index: " <> (Text.pack $ show aIdx)
-                        throwError $ BadAddress wId aIdx
-            [] -> do
-                logError $ "No accounts found for wallet with ID: " <> (Text.pack $ show wId)
-                throwError $ NoWalletAccounts wId
-            _ -> do
-                logError $ "Multiple accounts found for wallet with ID: " <> (Text.pack $ show wId)
-                throwError $ MultipleWalletAccounts wId
-    where
-        runClient err m = ExceptT $ (fmap (first err)) $ fmap (fmap wrData) m
-
---------------------------------------------------------------------------------
-writeCreatedWalletInfo :: FilePath -> CreatedWallet -> IO ()
-writeCreatedWalletInfo fp cw = do
-    let theDir = takeDirectory fp
-    createDirectoryIfMissing True theDir
-    Text.writeFile fp $ encodeToLazyText cw
-
---------------------------------------------------------------------------------
-readWalletBalance
-    :: (HasLoggerName m, MonadIO m)
-    => WalletClient m
-    -> PaymentSource
-    -> m (Either InitFaucetError Int64)
-readWalletBalance client (psWalletId -> wId) = do
-    r <- getWallet client wId
-    return $ first CouldntReadBalance $ fmap (fromIntegral . getCoin . unV1 . walBalance . wrData) $ r
-
-makeInitializedWallet
-    :: (HasLoggerName m, CanLog m, MonadIO m)
-    => FaucetConfig
-    -> WalletClient m
-    -> m (Either InitFaucetError InitializedWallet)
-makeInitializedWallet fc client = withSublogger "makeInitializedWallet" $ do
-    case (fc ^. fcSourceWallet) of
-        Provided fp -> do
-            srcCfg <- liftIO $ readSourceWalletConfig fp
-            case srcCfg of
-                Left e -> return $ Left $ SourceWalletParseError e
-                Right wc -> do
-                    let ps = cfgToPaymentSource wc
-                    fmap (InitializedWallet wc) <$> readWalletBalance client ps
-        Generate fp -> do
-            resp <- createWallet client
-            forM resp $ \(swc@(SourceWalletConfig wallet accIdx _), phrase, addr) -> do
-                    let iw = InitializedWallet swc 0
-                        createdWallet = CreatedWallet wallet phrase accIdx addr
-                    liftIO $ writeCreatedWalletInfo fp createdWallet
-                    return iw
-
-initEnv :: FaucetConfig -> Store -> LoggerNameBox IO FaucetEnv
-initEnv fc store = withSublogger "init" $ do
-    walletBallanceGauge <- liftIO $ createGauge "wallet-balance" store
-    feConstruct <- liftIO $ FaucetEnv
-      <$> createCounter "total-withdrawn" store
-      <*> createCounter "num-withdrawals" store
-      <*> pure walletBallanceGauge
-    manager <- liftIO $ createManager fc
-    let url = BaseUrl Https (fc ^. fcWalletApiHost) (fc ^. fcWalletApiPort) ""
-        client = mkHttpClient url manager
-    initialWallet <- makeInitializedWallet fc (liftClient client)
-    case initialWallet of
-        Left err -> throw err
-        Right iw -> do
-          liftIO $ Gauge.set walletBallanceGauge (iw ^. walletBallance)
-          return $ feConstruct
-                      store
-                      (iw ^. walletConfig)
-                      fc
-                      client
-
-createManager :: FaucetConfig -> IO Manager
-createManager fc = do
-    pubCert <- BS.readFile (fc ^. fcPubCertFile)
-    privKey <- BS.readFile (fc ^. fcPrivKeyFile)
-    case credentialLoadX509FromMemory pubCert privKey of
-        Left problem -> error $ "Unable to load credentials: " <> (problem ^. packed)
-        Right credential ->
-            let hooks = def {
-                            onCertificateRequest = \_ -> return $ Just credential,
-                            onServerCertificate  = \_ _ _ _ -> return []
-                        }
-                clientParams = (defaultParamsClient "localhost" "") {
-                                   clientHooks = hooks,
-                                   clientSupported = def {
-                                       supportedCiphers = ciphersuite_all
-                                   }
-                               }
-                tlsSettings = TLSSettings clientParams
-            in
-            newManager $ mkManagerSettings tlsSettings Nothing
 
 incWithDrawn :: (MonadReader e m, HasFaucetEnv e, MonadIO m) => Coin -> m ()
 incWithDrawn (Coin (fromIntegral -> c)) = do

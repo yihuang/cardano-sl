@@ -6,9 +6,9 @@ module Pos.Wallet.Web.Assurance
     ) where
 
 import           Pos.Core.Common
-    (BlockCount)
+                       (BlockCount)
 import           Pos.Wallet.Web.ClientTypes
-    (CWalletAssurance (..))
+                       (CWalletAssurance (..))
 
 data AssuranceLevel
     = HighAssurance

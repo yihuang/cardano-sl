@@ -12,31 +12,31 @@ module Pos.Update.Poll.RollTrans
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    ((%=), (.=))
+                       ((%=), (.=))
 import           Data.Default
-    (def)
+                       (def)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List as List
-    (find)
+                       (find)
 import qualified Ether
 
-import           Pos.Binary.Update
-    ()
+import           Pos.Binary.Update ()
 import           Pos.Core.Update
-    (SoftwareVersion (..))
+                       (SoftwareVersion (..))
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import           Pos.Update.Poll.Class
-    (MonadPoll (..), MonadPollRead (..))
+                       (MonadPoll (..), MonadPollRead (..))
 import           Pos.Update.Poll.Types
-    (PrevValue, USUndo (..), cpsSoftwareVersion, maybeToPrev, psProposal,
-    unChangedBVL, unChangedConfPropsL, unChangedPropsL, unChangedSVL,
-    unLastAdoptedBVL, unPrevProposersL, unSlottingDataL)
+                       (PrevValue, USUndo (..), cpsSoftwareVersion,
+                       maybeToPrev, psProposal, unChangedBVL,
+                       unChangedConfPropsL, unChangedPropsL, unChangedSVL,
+                       unLastAdoptedBVL, unPrevProposersL, unSlottingDataL)
 import           Pos.Util.Util
-    (ether)
+                       (ether)
 
 type RollT m = Ether.LazyStateT' USUndo m
 

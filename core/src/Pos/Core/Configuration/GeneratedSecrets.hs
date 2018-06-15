@@ -14,12 +14,13 @@ module Pos.Core.Configuration.GeneratedSecrets
 import           Universum
 
 import           Data.Reflection
-    (Given (..), give)
+                       (Given (..), give)
 
 import           Pos.Core.Genesis.Generate
-    (GeneratedSecrets (..), PoorSecret (..), RichSecrets (..), poorSecretToKey)
+                       (GeneratedSecrets (..), PoorSecret (..),
+                       RichSecrets (..), poorSecretToKey)
 import           Pos.Crypto.Signing
-    (SecretKey)
+                       (SecretKey)
 
 -- | 'GeneratedSecrets' are known only when 'GenesisSpec' with
 -- 'TestnetInitializer' is used to specify genesis. That's why we have

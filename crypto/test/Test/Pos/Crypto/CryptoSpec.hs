@@ -6,19 +6,19 @@ module Test.Pos.Crypto.CryptoSpec
 
 import qualified Data.ByteString as BS
 import           Formatting
-    (sformat)
+                       (sformat)
 
 import           Test.Hspec
-    (Expectation, Spec, describe, it, shouldBe, specify)
+                       (Expectation, Spec, describe, it, shouldBe, specify)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Property, (==>))
+                       (Property, (==>))
 
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 
 import qualified Pos.Crypto as Crypto
 

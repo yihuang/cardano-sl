@@ -27,49 +27,52 @@ module Pos.Infra.Communication.Relay.Logic
        ) where
 
 import           Control.Exception
-    (throwIO)
+                       (throwIO)
 import           Control.Exception.Safe
-    (handleAny, try)
+                       (handleAny, try)
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON)
+                       (defaultOptions, deriveJSON)
 import           Data.Proxy
-    (asProxyTypeOf)
+                       (asProxyTypeOf)
 import           Data.Tagged
-    (Tagged, tagWith)
+                       (Tagged, tagWith)
 import           Data.Typeable
-    (typeRep)
+                       (typeRep)
 import           Formatting
-    (build, sformat, shown, stext, (%))
+                       (build, sformat, shown, stext, (%))
 import qualified Network.Broadcast.OutboundQueue as OQ
 import           Node.Message.Class
-    (Message)
+                       (Message)
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..))
+                       (Bi (..))
 import           Pos.Binary.Limit
-    (Limit, mlEither)
+                       (Limit, mlEither)
 import           Pos.Infra.Communication.Limits.Instances
-    (mlDataMsg, mlInvMsg, mlMempoolMsg, mlReqMsg, mlResMsg)
+                       (mlDataMsg, mlInvMsg, mlMempoolMsg, mlReqMsg, mlResMsg)
 import           Pos.Infra.Communication.Listener
-    (listenerConv)
+                       (listenerConv)
 import           Pos.Infra.Communication.Protocol
-    (Conversation (..), ConversationActions (..), EnqueueMsg, ListenerSpec,
-    MkListeners, Msg, NodeId, Origin (..), OutSpecs, constantListeners, convH,
-    recvLimited, toOutSpecs, waitForConversations, waitForDequeues)
+                       (Conversation (..), ConversationActions (..),
+                       EnqueueMsg, ListenerSpec, MkListeners, Msg, NodeId,
+                       Origin (..), OutSpecs, constantListeners, convH,
+                       recvLimited, toOutSpecs, waitForConversations,
+                       waitForDequeues)
 import           Pos.Infra.Communication.Relay.Class
-    (DataParams (..), InvReqDataParams (..), MempoolParams (..), Relay (..))
+                       (DataParams (..), InvReqDataParams (..),
+                       MempoolParams (..), Relay (..))
 import           Pos.Infra.Communication.Relay.Types
-    (PropagationMsg (..))
+                       (PropagationMsg (..))
 import           Pos.Infra.Communication.Relay.Util
-    (expectData, expectInv)
+                       (expectData, expectInv)
 import           Pos.Infra.Communication.Types.Relay
-    (DataMsg (..), InvMsg (..), InvOrData, MempoolMsg (..), ReqMsg (..),
-    ReqOrRes, ResMsg (..))
+                       (DataMsg (..), InvMsg (..), InvOrData, MempoolMsg (..),
+                       ReqMsg (..), ReqOrRes, ResMsg (..))
 import           Pos.Infra.Network.Types
-    (Bucket)
+                       (Bucket)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 
 data InvReqCommunicationException =
       UnexpectedRequest

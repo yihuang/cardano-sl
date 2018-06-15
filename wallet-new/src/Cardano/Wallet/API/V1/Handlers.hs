@@ -5,7 +5,7 @@ import           Universum
 
 import qualified Cardano.Wallet.API.V1 as V1
 import           Cardano.Wallet.WalletLayer
-    (ActiveWalletLayer)
+                       (ActiveWalletLayer)
 
 handlers :: forall m. ActiveWalletLayer m -> Server V1.API
 handlers _w = error "TODO"

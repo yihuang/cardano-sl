@@ -6,27 +6,27 @@ module Pos.Core.Common.AddrStakeDistribution
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Exception.Safe
-    (Exception (displayException))
+                       (Exception (displayException))
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Serokell.Util
-    (mapJson)
+                       (mapJson)
 
 import           Pos.Binary.Class
-    (Bi, decode, encode)
+                       (Bi, decode, encode)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Crypto.Hashing
-    (shortHashF)
+                       (shortHashF)
 import           Pos.Util.Util
-    (cborError, toCborError)
+                       (cborError, toCborError)
 
 import           Pos.Core.Common.CoinPortion
 import           Pos.Core.Common.StakeholderId

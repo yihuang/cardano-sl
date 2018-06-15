@@ -18,50 +18,50 @@ import           Universum
 
 import qualified Control.Exception.Safe as E
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Control.Monad.Reader as Mtl
 import           Mockable
-    (runProduction)
+                       (runProduction)
 import           Servant.Server
-    (Handler, hoistServer)
+                       (Handler, hoistServer)
 
 import           Pos.Block.Configuration
-    (HasBlockConfiguration)
+                       (HasBlockConfiguration)
 import           Pos.Configuration
-    (HasNodeConfiguration)
+                       (HasNodeConfiguration)
 import           Pos.Core
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Infra.Reporting
-    (MonadReporting (..))
-import           Pos.Recovery
-    ()
+                       (MonadReporting (..))
+import           Pos.Recovery ()
 import           Pos.Ssc.Configuration
-    (HasSscConfiguration)
+                       (HasSscConfiguration)
 import           Pos.Txp
-    (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..))
+                       (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..))
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo)
-import           Pos.Util.Mockable
-    ()
+                       (HasCompileInfo)
+import           Pos.Util.Mockable ()
 import           Pos.WorkMode
-    (RealMode, RealModeContext (..))
+                       (RealMode, RealModeContext (..))
 
 import           Pos.Explorer.BListener
-    (ExplorerBListener, runExplorerBListener)
+                       (ExplorerBListener, runExplorerBListener)
 import           Pos.Explorer.ExtraContext
-    (ExtraContext, ExtraContextT, makeExtraCtx, runExtraContextT)
+                       (ExtraContext, ExtraContextT, makeExtraCtx,
+                       runExtraContextT)
 import           Pos.Explorer.Socket.App
-    (NotifierSettings, notifierApp)
+                       (NotifierSettings, notifierApp)
 import           Pos.Explorer.Txp
-    (ExplorerExtraModifier, eTxNormalize, eTxProcessTransaction)
+                       (ExplorerExtraModifier, eTxNormalize,
+                       eTxProcessTransaction)
 import           Pos.Explorer.Web.Api
-    (explorerApi)
+                       (explorerApi)
 import           Pos.Explorer.Web.Server
-    (explorerApp, explorerHandlers, explorerServeImpl)
+                       (explorerApp, explorerHandlers, explorerServeImpl)
 
 -----------------------------------------------------------------
 -- Transformation to `Handler`

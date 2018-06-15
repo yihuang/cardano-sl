@@ -17,11 +17,11 @@ import           Universum
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BSL
 import           System.FilePath
-    ((</>))
+                       ((</>))
 import qualified Text.JSON.Canonical as Canonical
 
 import           Pos.Binary.Class
-    (Raw)
+                       (Raw)
 import           Pos.Core.Configuration.BlockVersionData as E
 import           Pos.Core.Configuration.Core as E
 import           Pos.Core.Configuration.GeneratedSecrets as E
@@ -29,20 +29,22 @@ import           Pos.Core.Configuration.GenesisData as E
 import           Pos.Core.Configuration.GenesisHash as E
 import           Pos.Core.Configuration.Protocol as E
 import           Pos.Core.Genesis
-    (GenesisData (..), GenesisDelegation, GenesisInitializer (..),
-    GenesisProtocolConstants (..), GenesisSpec (..),
-    genesisProtocolConstantsToProtocolConstants, mkGenesisDelegation)
+                       (GenesisData (..), GenesisDelegation,
+                       GenesisInitializer (..), GenesisProtocolConstants (..),
+                       GenesisSpec (..),
+                       genesisProtocolConstantsToProtocolConstants,
+                       mkGenesisDelegation)
 import           Pos.Core.Genesis.Canonical
-    (SchemaError)
+                       (SchemaError)
 import           Pos.Core.Genesis.Generate
-    (GeneratedGenesisData (..), generateGenesisData)
+                       (GeneratedGenesisData (..), generateGenesisData)
 import           Pos.Core.Slotting
-    (Timestamp)
+                       (Timestamp)
 import           Pos.Crypto.Configuration as E
 import           Pos.Crypto.Hashing
-    (Hash, hashRaw, unsafeHash)
+                       (Hash, hashRaw, unsafeHash)
 import           Pos.Util.Util
-    (leftToPanic)
+                       (leftToPanic)
 
 -- | Coarse catch-all configuration constraint for use by depending modules.
 type HasConfiguration =

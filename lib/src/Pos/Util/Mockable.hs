@@ -12,13 +12,14 @@ module Pos.Util.Mockable
 import           Universum
 
 import           Control.Monad.Morph
-    (MFunctor (..))
+                       (MFunctor (..))
 import           Control.Monad.Trans.Identity
-    (IdentityT (..))
+                       (IdentityT (..))
 import qualified Ether
 import           Mockable
-    (ChannelT, Counter, Distribution, Gauge, MFunctor' (..), Mockable (..),
-    Promise, SharedAtomicT, SharedExclusiveT, ThreadId)
+                       (ChannelT, Counter, Distribution, Gauge, MFunctor' (..),
+                       Mockable (..), Promise, SharedAtomicT, SharedExclusiveT,
+                       ThreadId)
 
 instance {-# OVERLAPPABLE #-}
     (Monad m, MFunctor t) => MFunctor' t m n

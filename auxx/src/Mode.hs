@@ -23,82 +23,87 @@ module Mode
 import           Universum
 
 import           Control.Lens
-    (lens, makeLensesWith)
+                       (lens, makeLensesWith)
 import           Control.Monad.Reader
-    (withReaderT)
+                       (withReaderT)
 import           Control.Monad.Trans.Resource
-    (transResourceT)
+                       (transResourceT)
 import           Data.Conduit
-    (transPipe)
+                       (transPipe)
 import           Data.Default
-    (def)
+                       (def)
 import           Mockable
-    (Production)
+                       (Production)
 import           System.Wlog
-    (HasLoggerName (..))
+                       (HasLoggerName (..))
 
 import           Pos.Block.BListener
-    (MonadBListener (..))
+                       (MonadBListener (..))
 import           Pos.Block.Slog
-    (HasSlogContext (..), HasSlogGState (..))
+                       (HasSlogContext (..), HasSlogGState (..))
 import           Pos.Client.KeyStorage
-    (MonadKeys (..), MonadKeysRead (..), getSecretDefault, modifySecretDefault)
+                       (MonadKeys (..), MonadKeysRead (..), getSecretDefault,
+                       modifySecretDefault)
 import           Pos.Client.Txp.Addresses
-    (MonadAddresses (..))
+                       (MonadAddresses (..))
 import           Pos.Client.Txp.Balances
-    (MonadBalances (..), getBalanceFromUtxo, getOwnUtxosGenesis)
+                       (MonadBalances (..), getBalanceFromUtxo,
+                       getOwnUtxosGenesis)
 import           Pos.Client.Txp.History
-    (MonadTxHistory (..), getBlockHistoryDefault, getLocalHistoryDefault,
-    saveTxDefault)
+                       (MonadTxHistory (..), getBlockHistoryDefault,
+                       getLocalHistoryDefault, saveTxDefault)
 import           Pos.Context
-    (HasNodeContext (..))
+                       (HasNodeContext (..))
 import           Pos.Core
-    (Address, HasConfiguration, HasPrimaryKey (..), IsBootstrapEraAddr (..),
-    deriveFirstHDAddress, largestPubKeyAddressBoot,
-    largestPubKeyAddressSingleKey, makePubKeyAddress, siEpoch)
+                       (Address, HasConfiguration, HasPrimaryKey (..),
+                       IsBootstrapEraAddr (..), deriveFirstHDAddress,
+                       largestPubKeyAddressBoot, largestPubKeyAddressSingleKey,
+                       makePubKeyAddress, siEpoch)
 import           Pos.Crypto
-    (EncryptedSecretKey, PublicKey, emptyPassphrase)
+                       (EncryptedSecretKey, PublicKey, emptyPassphrase)
 import           Pos.DB
-    (DBSum (..), MonadGState (..), NodeDBs, gsIsBootstrapEra)
+                       (DBSum (..), MonadGState (..), NodeDBs,
+                       gsIsBootstrapEra)
 import           Pos.DB.Class
-    (MonadDB (..), MonadDBRead (..))
+                       (MonadDB (..), MonadDBRead (..))
 import           Pos.Generator.Block
-    (BlockGenMode)
+                       (BlockGenMode)
 import           Pos.GState
-    (HasGStateContext (..), getGStateImplicit)
+                       (HasGStateContext (..), getGStateImplicit)
 import           Pos.Infra.Network.Types
-    (HasNodeType (..), NodeType (..))
+                       (HasNodeType (..), NodeType (..))
 import           Pos.Infra.Reporting
-    (HasMisbehaviorMetrics (..), MonadReporting (..))
+                       (HasMisbehaviorMetrics (..), MonadReporting (..))
 import           Pos.Infra.Shutdown
-    (HasShutdownContext (..))
+                       (HasShutdownContext (..))
 import           Pos.Infra.Slotting.Class
-    (MonadSlots (..))
+                       (MonadSlots (..))
 import           Pos.Infra.Slotting.MemState
-    (HasSlottingVar (..), MonadSlotsData)
+                       (HasSlottingVar (..), MonadSlotsData)
 import           Pos.Infra.Util.JsonLog.Events
-    (HasJsonLogConfig (..))
+                       (HasJsonLogConfig (..))
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Ssc.Types
-    (HasSscContext (..))
+                       (HasSscContext (..))
 import           Pos.Txp
-    (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..), txNormalize,
-    txProcessTransaction, txProcessTransactionNoLock)
+                       (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..),
+                       txNormalize, txProcessTransaction,
+                       txProcessTransactionNoLock)
 import           Pos.Txp.DB.Utxo
-    (getFilteredUtxo)
+                       (getFilteredUtxo)
 import           Pos.Util
-    (HasLens (..), postfixLFields)
+                       (HasLens (..), postfixLFields)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, withCompileInfo)
+                       (HasCompileInfo, withCompileInfo)
 import           Pos.Util.LoggerName
-    (HasLoggerName' (..))
+                       (HasLoggerName' (..))
 import           Pos.Util.UserSecret
-    (HasUserSecret (..))
+                       (HasUserSecret (..))
 import           Pos.WorkMode
-    (EmptyMempoolExt, RealMode, RealModeContext (..))
+                       (EmptyMempoolExt, RealMode, RealModeContext (..))
 
 type AuxxMode = ReaderT AuxxContext Production
 

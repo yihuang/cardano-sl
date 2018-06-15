@@ -10,22 +10,22 @@ import           Universum
 
 import qualified Data.HashSet as HS
 import           Serokell.Util
-    (allDistinct)
+                       (allDistinct)
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Decoder, Encoding, Field (..), deriveSimpleBi,
-    encodeListLen, enforceSize)
-import           Pos.Binary.Core.Slotting
-    ()
+                       (Bi (..), Cons (..), Decoder, Encoding, Field (..),
+                       deriveSimpleBi, encodeListLen, enforceSize)
+import           Pos.Binary.Core.Slotting ()
 import           Pos.Core.Ssc
-    (Commitment (..), CommitmentsMap (..), Opening (..), OpeningsMap,
-    SharesMap, SignedCommitment, SscPayload (..), SscProof (..),
-    VssCertificate (..), VssCertificatesHash, VssCertificatesMap (..),
-    mkCommitmentsMap, mkVssCertificatesMap)
+                       (Commitment (..), CommitmentsMap (..), Opening (..),
+                       OpeningsMap, SharesMap, SignedCommitment,
+                       SscPayload (..), SscProof (..), VssCertificate (..),
+                       VssCertificatesHash, VssCertificatesMap (..),
+                       mkCommitmentsMap, mkVssCertificatesMap)
 import           Pos.Crypto
-    (Hash, PublicKey)
+                       (Hash, PublicKey)
 import           Pos.Util.Util
-    (cborError)
+                       (cborError)
 
 instance Bi Commitment where
     encode Commitment{..} = encodeListLen 2 <> encode commShares

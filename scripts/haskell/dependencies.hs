@@ -21,7 +21,7 @@ module Main where
 
 import           Algebra.Graph
 import           Control.Concurrent.Async
-    (mapConcurrently)
+                       (mapConcurrently)
 import           Control.Monad
 import           Data.Functor.Identity
 import           Data.List
@@ -185,7 +185,7 @@ uniqueDependenciesFor directDeps revDeps pkg = go (M.findWithDefault mempty pkg 
       go [] !deps     = deps
       go (d:ds) !deps = case M.findWithDefault mempty d revDeps of
           [x] | x == pkg -> go ds (d : deps)
-          _   -> go ds deps
+          _              -> go ds deps
 
 --------------------------------------------------------------------------------
 main :: IO ()

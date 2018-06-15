@@ -16,23 +16,23 @@ module Types ( initBlockchainAnalyser
 import           Universum
 
 import           Control.Lens
-    (makeLensesWith)
+                       (makeLensesWith)
 import qualified Control.Monad.Reader as Mtl
 import           Mockable
-    (Production)
+                       (Production)
 
 import           Pos.Core
-    (HasConfiguration, HeaderHash, prevBlockL)
+                       (HasConfiguration, HeaderHash, prevBlockL)
 import           Pos.Core.Block
-    (Block)
+                       (Block)
 import           Pos.DB
-    (MonadDBRead (..))
+                       (MonadDBRead (..))
 import qualified Pos.DB as DB
 import qualified Pos.DB.Block as BDB
 import           Pos.Util
-    (postfixLFields)
+                       (postfixLFields)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 type DBFolderStat = (Text, Integer)
 

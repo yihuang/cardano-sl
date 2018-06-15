@@ -3,17 +3,17 @@ module Util.Aeson
     ) where
 
 import           Data.Aeson
-    (FromJSON, Result (..), fromJSON)
+                       (FromJSON, Result (..), fromJSON)
 import           Data.Aeson.Parser
-    (json)
+                       (json)
 import           Pipes
 import           Pipes.Prelude
-    (map)
+                       (map)
 
 import           Universum hiding
-    (map)
+                       (map)
 import           Util.Pipes
-    (parseP)
+                       (parseP)
 
 parseJSONP:: (FromJSON a, Monad m) => Pipe ByteString a m b
 parseJSONP = parseP json >-> map (fromResult . fromJSON)

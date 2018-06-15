@@ -6,23 +6,24 @@ module Pos.Update.Poll.Failure
        ) where
 
 import           Universum hiding
-    (id, last)
+                       (id, last)
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, int, sformat, stext, (%))
+                       (bprint, build, int, sformat, stext, (%))
 import           Serokell.Data.Memory.Units
-    (Byte, memory)
+                       (Byte, memory)
 
 import           Pos.Core
-    (ApplicationName, BlockVersion, BlockVersionData, Coin, EpochIndex,
-    HeaderHash, NumSoftwareVersion, ScriptVersion, StakeholderId, coinF)
+                       (ApplicationName, BlockVersion, BlockVersionData, Coin,
+                       EpochIndex, HeaderHash, NumSoftwareVersion,
+                       ScriptVersion, StakeholderId, coinF)
 import           Pos.Core.Update
-    (BlockVersionModifier, UpAttributes, UpId)
+                       (BlockVersionModifier, UpAttributes, UpId)
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 import           Pos.Infra.Reporting
-    (MonadReporting, reportError)
+                       (MonadReporting, reportError)
 
 -- | PollVerFailure represents all possible errors which can
 -- appear in Poll data verification.

@@ -5,21 +5,19 @@ module Pos.Binary.Update.Relay
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Pos.Binary.Class
-    (Bi (..))
-import           Pos.Binary.Core
-    ()
+                       (Bi (..))
+import           Pos.Binary.Core ()
 import qualified Pos.Core.Update as U
 import           Pos.Crypto
-    (hash)
-import           Pos.Infra.Binary
-    ()
+                       (hash)
+import           Pos.Infra.Binary ()
 import           Pos.Infra.Communication.Types.Relay
-    (DataMsg (..))
+                       (DataMsg (..))
 import           Pos.Util.Util
-    (cborError)
+                       (cborError)
 
 ----------------------------------------------------------------------------
 -- Relay

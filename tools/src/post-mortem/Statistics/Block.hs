@@ -11,27 +11,27 @@ module Statistics.Block
     ) where
 
 import           Control.Foldl
-    (Fold (..), fold)
+                       (Fold (..), fold)
 import qualified Data.Map.Lazy as ML
 import qualified Data.Map.Strict as MS
 import           Data.Maybe
-    (fromJust, isJust)
+                       (fromJust, isJust)
 import qualified Data.Set as S
 import qualified Data.Text as T
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 
 import           JSONLog
-    (IndexedJLTimedEvent (..))
+                       (IndexedJLTimedEvent (..))
 import           Pos.Infra.Util.JsonLog.Events
-    (JLBlock (..), JLEvent (..))
+                       (JLBlock (..), JLEvent (..))
 import           Prelude
-    (id)
+                       (id)
 import           Statistics.Tx
-    (txFirstReceivedF)
+                       (txFirstReceivedF)
 import           Types
 import           Universum hiding
-    (fold)
+                       (fold)
 
 data BlockHeader = BlockHeader
     { bhNode      :: !NodeId

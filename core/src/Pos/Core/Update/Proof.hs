@@ -4,9 +4,9 @@ module Pos.Core.Update.Proof
        ) where
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Crypto
-    (Hash, hash)
+                       (Hash, hash)
 
 import           Pos.Core.Update.Payload
 

@@ -27,74 +27,77 @@ module Pos.Block.Logic.Internal
 import           Universum
 
 import           Control.Lens
-    (each, _Wrapped)
+                       (each, _Wrapped)
 import qualified Crypto.Random as Rand
 import           Formatting
-    (sformat, (%))
+                       (sformat, (%))
 import           Mockable
-    (CurrentTime, Mockable)
+                       (CurrentTime, Mockable)
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Block.BListener
-    (MonadBListener)
+                       (MonadBListener)
 import           Pos.Block.Slog
-    (BypassSecurityCheck (..), MonadSlogApply, MonadSlogBase,
-    ShouldCallBListener, slogApplyBlocks, slogRollbackBlocks)
+                       (BypassSecurityCheck (..), MonadSlogApply,
+                       MonadSlogBase, ShouldCallBListener, slogApplyBlocks,
+                       slogRollbackBlocks)
 import           Pos.Block.Types
-    (Blund, Undo (undoDlg, undoTx, undoUS))
+                       (Blund, Undo (undoDlg, undoTx, undoUS))
 import           Pos.Core
-    (ComponentBlock (..), IsGenesisHeader, epochIndexL, gbHeader, headerHash,
-    mainBlockDlgPayload, mainBlockSscPayload, mainBlockTxPayload,
-    mainBlockUpdatePayload)
+                       (ComponentBlock (..), IsGenesisHeader, epochIndexL,
+                       gbHeader, headerHash, mainBlockDlgPayload,
+                       mainBlockSscPayload, mainBlockTxPayload,
+                       mainBlockUpdatePayload)
 import           Pos.Core.Block
-    (Block, GenesisBlock, MainBlock)
+                       (Block, GenesisBlock, MainBlock)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..))
+                       (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.DB
-    (MonadDB, MonadDBRead, MonadGState, SomeBatchOp (..))
+                       (MonadDB, MonadDBRead, MonadGState, SomeBatchOp (..))
 import qualified Pos.DB.GState.Common as GS
-    (writeBatchGState)
+                       (writeBatchGState)
 import           Pos.Delegation.Class
-    (MonadDelegation)
+                       (MonadDelegation)
 import           Pos.Delegation.Logic
-    (dlgApplyBlocks, dlgNormalizeOnRollback, dlgRollbackBlocks)
+                       (dlgApplyBlocks, dlgNormalizeOnRollback,
+                       dlgRollbackBlocks)
 import           Pos.Delegation.Types
-    (DlgBlock, DlgBlund)
+                       (DlgBlock, DlgBlund)
 import           Pos.Exception
-    (assertionFailed)
+                       (assertionFailed)
 import           Pos.GState.SanityCheck
-    (sanityCheckDB)
+                       (sanityCheckDB)
 import           Pos.Infra.Reporting
-    (MonadReporting)
+                       (MonadReporting)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Ssc.Configuration
-    (HasSscConfiguration)
+                       (HasSscConfiguration)
 import           Pos.Ssc.Logic
-    (sscApplyBlocks, sscNormalize, sscRollbackBlocks)
+                       (sscApplyBlocks, sscNormalize, sscRollbackBlocks)
 import           Pos.Ssc.Mem
-    (MonadSscMem)
+                       (MonadSscMem)
 import           Pos.Ssc.Types
-    (SscBlock)
+                       (SscBlock)
 import           Pos.Txp.MemState
-    (MonadTxpLocal (..))
+                       (MonadTxpLocal (..))
 import           Pos.Txp.Settings
-    (TxpBlock, TxpBlund, TxpGlobalSettings (..))
+                       (TxpBlock, TxpBlund, TxpGlobalSettings (..))
 import           Pos.Update
-    (UpdateBlock)
+                       (UpdateBlock)
 import           Pos.Update.Context
-    (UpdateContext)
+                       (UpdateContext)
 import           Pos.Update.Logic
-    (usApplyBlocks, usNormalize, usRollbackBlocks)
+                       (usApplyBlocks, usNormalize, usRollbackBlocks)
 import           Pos.Update.Poll
-    (PollModifier)
+                       (PollModifier)
 import           Pos.Util
-    (Some (..), spanSafe)
+                       (Some (..), spanSafe)
 import           Pos.Util.Util
-    (HasLens', lensOf)
+                       (HasLens', lensOf)
 
 -- | Set of basic constraints used by high-level block processing.
 type MonadBlockBase ctx m

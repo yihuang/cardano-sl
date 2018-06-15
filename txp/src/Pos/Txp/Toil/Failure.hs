@@ -13,27 +13,27 @@ import           Universum
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, int, ords, shown, stext, (%))
+                       (bprint, build, int, ords, shown, stext, (%))
 import           GHC.TypeLits
-    (TypeError)
+                       (TypeError)
 import           Serokell.Data.Memory.Units
-    (Byte, memory)
+                       (Byte, memory)
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 
 import           Pos.Core
-    (Address, HeaderHash, ScriptVersion, TxFeePolicy, addressDetailedF,
-    addressF)
+                       (Address, HeaderHash, ScriptVersion, TxFeePolicy,
+                       addressDetailedF, addressF)
 import           Pos.Core.Txp
-    (TxIn, TxInWitness, TxOut (..))
+                       (TxIn, TxInWitness, TxOut (..))
 import           Pos.Data.Attributes
-    (UnparsedFields)
+                       (UnparsedFields)
 import           Pos.Script
-    (PlutusError)
+                       (PlutusError)
 import           Pos.Txp.Toil.Types
-    (TxFee)
+                       (TxFee)
 import           Pos.Util
-    (DisallowException)
+                       (DisallowException)
 
 ----------------------------------------------------------------------------
 -- ToilVerFailure

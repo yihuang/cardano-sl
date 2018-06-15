@@ -10,21 +10,19 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, listOf)
+                       (Arbitrary (..), Gen, listOf)
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Core
-    ()
-import           Pos.Binary.Core
-    ()
+import           Pos.Arbitrary.Core ()
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (EpochIndex, HeavyDlgIndex (..))
+                       (EpochIndex, HeavyDlgIndex (..))
 import           Pos.Crypto
-    (HasProtocolMagic, ProtocolMagic, ProxySecretKey (..), createPsk,
-    protocolMagic)
+                       (HasProtocolMagic, ProtocolMagic, ProxySecretKey (..),
+                       createPsk, protocolMagic)
 import           Pos.Delegation.Types
-    (DlgPayload (..), DlgUndo (..))
+                       (DlgPayload (..), DlgUndo (..))
 
 genDlgPayload :: ProtocolMagic -> EpochIndex -> Gen DlgPayload
 genDlgPayload pm epoch =

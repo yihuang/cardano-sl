@@ -27,73 +27,74 @@ module Test.Pos.Wallet.Web.Util
 import           Universum
 
 import           Control.Concurrent.STM
-    (writeTVar)
+                       (writeTVar)
 import           Control.Monad.Random.Strict
-    (evalRandT)
+                       (evalRandT)
 import           Data.List
-    (head, (!!))
+                       (head, (!!))
 import qualified Data.Map as M
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Test.QuickCheck
-    (Arbitrary (..), choose, frequency, sublistOf, suchThat, vectorOf)
+                       (Arbitrary (..), choose, frequency, sublistOf, suchThat,
+                       vectorOf)
 import           Test.QuickCheck.Gen
-    (Gen (MkGen))
+                       (Gen (MkGen))
 import           Test.QuickCheck.Monadic
-    (assert, pick)
+                       (assert, pick)
 
 import           Pos.Block.Types
-    (Blund, LastKnownHeaderTag)
+                       (Blund, LastKnownHeaderTag)
 import           Pos.Client.KeyStorage
-    (getSecretKeysPlain)
+                       (getSecretKeysPlain)
 import           Pos.Client.Txp.Balances
-    (getBalance)
+                       (getBalance)
 import           Pos.Core
-    (Address, BlockCount, Coin, HasConfiguration, genesisSecretsPoor,
-    headerHashG)
+                       (Address, BlockCount, Coin, HasConfiguration,
+                       genesisSecretsPoor, headerHashG)
 import           Pos.Core.Block
-    (blockHeader)
+                       (blockHeader)
 import           Pos.Core.Chrono
-    (OldestFirst (..))
+                       (OldestFirst (..))
 import           Pos.Core.Common
-    (IsBootstrapEraAddr (..), deriveLvl2KeyPair)
+                       (IsBootstrapEraAddr (..), deriveLvl2KeyPair)
 import           Pos.Core.Genesis
-    (poorSecretToEncKey)
+                       (poorSecretToEncKey)
 import           Pos.Core.Txp
-    (TxIn, TxOut (..), TxOutAux (..))
+                       (TxIn, TxOut (..), TxOutAux (..))
 import           Pos.Crypto
-    (EncryptedSecretKey, PassPhrase, ShouldCheckPassphrase (..),
-    emptyPassphrase, firstHardened)
+                       (EncryptedSecretKey, PassPhrase,
+                       ShouldCheckPassphrase (..), emptyPassphrase,
+                       firstHardened)
 import           Pos.Generator.Block
-    (genBlocks)
+                       (genBlocks)
 import           Pos.Infra.StateLock
-    (Priority (..), modifyStateLock)
+                       (Priority (..), modifyStateLock)
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Txp.Toil
-    (Utxo)
+                       (Utxo)
 import           Pos.Util
-    (HasLens (..), _neLast)
+                       (HasLens (..), _neLast)
 
 import           Pos.Util.Servant
-    (encodeCType)
+                       (encodeCType)
 import           Pos.Util.UserSecret
-    (mkGenesisWalletUserSecret)
+                       (mkGenesisWalletUserSecret)
 import           Pos.Wallet.Web.ClientTypes
-    (Addr, CId, Wal, encToCId)
+                       (Addr, CId, Wal, encToCId)
 import           Pos.Wallet.Web.Methods.Restore
-    (importWalletDo)
+                       (importWalletDo)
 
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason (ApplyBlock))
+                       (MemPoolModifyReason (ApplyBlock))
 import           Test.Pos.Block.Logic.Util
-    (EnableTxPayload, InplaceDB, genBlockGenParams)
-import           Test.Pos.Txp.Arbitrary
-    ()
+                       (EnableTxPayload, InplaceDB, genBlockGenParams)
+import           Test.Pos.Txp.Arbitrary ()
 import           Test.Pos.Util.QuickCheck.Property
-    (assertProperty, maybeStopProperty)
+                       (assertProperty, maybeStopProperty)
 import           Test.Pos.Wallet.Web.Mode
-    (WalletProperty)
+                       (WalletProperty)
 
 ----------------------------------------------------------------------------
 -- Block utils

@@ -8,64 +8,67 @@ module Test.Pos.Block.Logic.VarSpec
        ) where
 
 import           Universum hiding
-    ((<>))
+                       ((<>))
 
 import           Control.Monad.Random.Strict
-    (MonadRandom (..), RandomGen, evalRandT, uniform)
+                       (MonadRandom (..), RandomGen, evalRandT, uniform)
 import           Data.List
-    (span)
+                       (span)
 import           Data.List.NonEmpty
-    (NonEmpty ((:|)))
+                       (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Ratio as Ratio
 import           Data.Semigroup
-    ((<>))
+                       ((<>))
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess)
+                       (modifyMaxSuccess)
 import           Test.QuickCheck.Gen
-    (Gen (MkGen))
+                       (Gen (MkGen))
 import           Test.QuickCheck.Monadic
-    (assert, pick, pre)
+                       (assert, pick, pre)
 import           Test.QuickCheck.Random
-    (QCGen)
+                       (QCGen)
 
 import           Pos.Block.Logic
-    (verifyAndApplyBlocks, verifyBlocksPrefix)
+                       (verifyAndApplyBlocks, verifyBlocksPrefix)
 import           Pos.Block.Types
-    (Blund)
+                       (Blund)
 import           Pos.Core
-    (GenesisData (..), HasConfiguration, blkSecurityParam, epochSlots,
-    genesisData, headerHash)
+                       (GenesisData (..), HasConfiguration, blkSecurityParam,
+                       epochSlots, genesisData, headerHash)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..), nonEmptyNewestFirst,
-    nonEmptyOldestFirst, splitAtNewestFirst, toNewestFirst, _NewestFirst)
+                       (NE, NewestFirst (..), OldestFirst (..),
+                       nonEmptyNewestFirst, nonEmptyOldestFirst,
+                       splitAtNewestFirst, toNewestFirst, _NewestFirst)
 import           Pos.DB.Pure
-    (dbPureDump)
+                       (dbPureDump)
 import           Pos.Generator.BlockEvent.DSL
-    (BlockApplyResult (..), BlockEventGenT, BlockRollbackFailure (..),
-    BlockRollbackResult (..), BlockScenario, Path, byChance, emitBlockApply,
-    emitBlockRollback, enrichWithSnapshotChecking, pathSequence,
-    runBlockEventGenT)
+                       (BlockApplyResult (..), BlockEventGenT,
+                       BlockRollbackFailure (..), BlockRollbackResult (..),
+                       BlockScenario, Path, byChance, emitBlockApply,
+                       emitBlockRollback, enrichWithSnapshotChecking,
+                       pathSequence, runBlockEventGenT)
 import qualified Pos.GState as GS
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 
 import           Test.Pos.Block.Logic.Event
-    (BlockScenarioResult (..), DbNotEquivalentToSnapshot (..),
-    runBlockScenario)
+                       (BlockScenarioResult (..),
+                       DbNotEquivalentToSnapshot (..), runBlockScenario)
 import           Test.Pos.Block.Logic.Mode
-    (BlockProperty, BlockTestMode)
+                       (BlockProperty, BlockTestMode)
 import           Test.Pos.Block.Logic.Util
-    (EnableTxPayload (..), InplaceDB (..), bpGenBlock, bpGenBlocks,
-    bpGoToArbitraryState, getAllSecrets, satisfySlotCheck)
+                       (EnableTxPayload (..), InplaceDB (..), bpGenBlock,
+                       bpGenBlocks, bpGoToArbitraryState, getAllSecrets,
+                       satisfySlotCheck)
 import           Test.Pos.Block.Property
-    (blockPropertySpec)
+                       (blockPropertySpec)
 import           Test.Pos.Configuration
-    (HasStaticConfigurations, withStaticConfigurations)
+                       (HasStaticConfigurations, withStaticConfigurations)
 import           Test.Pos.Util.QuickCheck.Property
-    (splitIntoChunks, stopProperty)
+                       (splitIntoChunks, stopProperty)
 
 -- stack test cardano-sl --fast --test-arguments "-m Test.Pos.Block.Logic.Var"
 spec :: Spec

@@ -9,15 +9,15 @@ module Network.Discovery.Abstract (
     ) where
 
 import           Control.Exception
-    (Exception)
+                       (Exception)
 import           Data.Set
-    (Set)
+                       (Set)
 import           Data.Typeable
-    (Typeable)
+                       (Typeable)
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import           Network.Transport
-    (EndPointAddress)
+                       (EndPointAddress)
 
 -- Note: we'll need a way to be notified of new peers.
 

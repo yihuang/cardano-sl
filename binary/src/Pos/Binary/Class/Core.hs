@@ -38,23 +38,23 @@ import qualified Data.Binary as Binary
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BS.Lazy
 import           Data.Fixed
-    (Fixed (..), Nano)
+                       (Fixed (..), Nano)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Tagged
-    (Tagged (..))
+                       (Tagged (..))
 import qualified Data.Text as Text
 import           Data.Time.Units
-    (Microsecond, Millisecond)
+                       (Microsecond, Millisecond)
 import           Data.Typeable
-    (typeRep)
+                       (typeRep)
 import qualified Data.Vector as Vector
 import qualified Data.Vector.Generic as Vector.Generic
 import qualified GHC.Generics as G
 import           Serokell.Data.Memory.Units
-    (Byte, fromBytes, toBytes)
+                       (Byte, fromBytes, toBytes)
 
 -- | This function must match the one from 'Pos.Util.Util'. It is copied here
 -- to avoid a dependency and facilitate parallel builds.

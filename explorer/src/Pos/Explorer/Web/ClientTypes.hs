@@ -53,59 +53,61 @@ import qualified Prelude
 import           Universum
 
 import           Control.Arrow
-    ((&&&))
+                       ((&&&))
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Control.Monad.Error.Class
-    (throwError)
+                       (throwError)
 import qualified Data.ByteArray as BA
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import           Data.Fixed
-    (Micro, showFixed)
+                       (Micro, showFixed)
 import qualified Data.List.NonEmpty as NE
 import           Data.Time.Clock.POSIX
-    (POSIXTime)
+                       (POSIXTime)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 import           Serokell.Util.Base16 as SB16
 import           Servant.API
-    (FromHttpApiData (..))
+                       (FromHttpApiData (..))
 import           Test.QuickCheck
-    (Arbitrary (..))
+                       (Arbitrary (..))
 
 import           Pos.Binary
-    (biSize)
+                       (biSize)
 import           Pos.Block.Types
-    (Undo (..))
+                       (Undo (..))
 import           Pos.Core
-    (Address, Coin, EpochIndex, LocalSlotIndex, SlotId (..), StakeholderId,
-    Timestamp, addressF, coinToInteger, decodeTextAddress, gbHeader,
-    gbhConsensus, getEpochIndex, getSlotIndex, headerHash, mkCoin, prevBlockL,
-    sumCoins, timestampToPosix, unsafeAddCoin, unsafeGetCoin,
-    unsafeIntegerToCoin, unsafeSubCoin)
+                       (Address, Coin, EpochIndex, LocalSlotIndex, SlotId (..),
+                       StakeholderId, Timestamp, addressF, coinToInteger,
+                       decodeTextAddress, gbHeader, gbhConsensus,
+                       getEpochIndex, getSlotIndex, headerHash, mkCoin,
+                       prevBlockL, sumCoins, timestampToPosix, unsafeAddCoin,
+                       unsafeGetCoin, unsafeIntegerToCoin, unsafeSubCoin)
 import           Pos.Core.Block
-    (MainBlock, mainBlockSlot, mainBlockTxPayload, mcdSlot)
+                       (MainBlock, mainBlockSlot, mainBlockTxPayload, mcdSlot)
 import           Pos.Core.Txp
-    (Tx (..), TxId, TxOut (..), TxOutAux (..), TxUndo, txpTxs, _txOutputs)
+                       (Tx (..), TxId, TxOut (..), TxOutAux (..), TxUndo,
+                       txpTxs, _txOutputs)
 import           Pos.Crypto
-    (AbstractHash, Hash, HashAlgorithm, hash)
+                       (AbstractHash, Hash, HashAlgorithm, hash)
 import qualified Pos.GState as GS
 import qualified Pos.Lrc as Lrc
-    (getLeader)
+                       (getLeader)
 import           Pos.Merkle
-    (getMerkleRoot, mkMerkleTree, mtRoot)
+                       (getMerkleRoot, mkMerkleTree, mtRoot)
 
 import           Pos.Explorer.Core
-    (TxExtra (..))
+                       (TxExtra (..))
 import           Pos.Explorer.ExplorerMode
-    (ExplorerMode)
+                       (ExplorerMode)
 import           Pos.Explorer.ExtraContext
-    (HasExplorerCSLInterface (..))
+                       (HasExplorerCSLInterface (..))
 import           Pos.Explorer.TestUtil
-    (secretKeyToAddress)
+                       (secretKeyToAddress)
 -------------------------------------------------------------------------------------
 -- Hash types
 -------------------------------------------------------------------------------------

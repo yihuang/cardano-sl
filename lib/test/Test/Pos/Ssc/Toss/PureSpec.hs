@@ -8,29 +8,29 @@ import           Universum
 
 import qualified Crypto.Random as Rand
 import           Data.Default
-    (def)
+                       (def)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, Property, forAll, listOf, suchThat, (===))
+                       (Arbitrary (..), Gen, Property, forAll, listOf,
+                       suchThat, (===))
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Core
-    ()
-import           Pos.Arbitrary.Ssc
-    ()
+import           Pos.Arbitrary.Core ()
+import           Pos.Arbitrary.Ssc ()
 import           Pos.Core
-    (EpochOrSlot, HasConfiguration, InnerSharesMap, Opening, SignedCommitment,
-    StakeholderId, VssCertificate (..), addressHash)
+                       (EpochOrSlot, HasConfiguration, InnerSharesMap, Opening,
+                       SignedCommitment, StakeholderId, VssCertificate (..),
+                       addressHash)
 import qualified Pos.Ssc.Toss.Class as Toss
 import qualified Pos.Ssc.Toss.Pure as Toss
 import qualified Pos.Ssc.Types as Toss
 
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 
 spec :: Spec
 spec = withDefConfiguration $ describe "Toss" $ do

@@ -16,17 +16,18 @@ module Cardano.Wallet.API.Types
 import           Universum
 
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import           Data.Reflection
-    (Reifies (..))
+                       (Reifies (..))
 import           GHC.TypeLits
 import           Pos.Util.Servant
-    (ApiLoggingConfig (..), HasLoggingServer (..), LoggingApiRec)
+                       (ApiLoggingConfig (..), HasLoggingServer (..),
+                       LoggingApiRec)
 import qualified Servant.Server.Internal as SI
 
 import           Servant
 import           Servant.API.Sub
-    ((:>))
+                       ((:>))
 import           Servant.Client
 
 --

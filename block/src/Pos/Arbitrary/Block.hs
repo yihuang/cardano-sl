@@ -16,45 +16,47 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import qualified Prelude
 import           System.Random
-    (Random, mkStdGen, randomR)
+                       (Random, mkStdGen, randomR)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, choose, suchThat, vectorOf)
+                       (Arbitrary (..), Gen, choose, suchThat, vectorOf)
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
 import           Pos.Arbitrary.Core
-    (genSlotId)
+                       (genSlotId)
 import           Pos.Arbitrary.Delegation
-    (genDlgPayload)
+                       (genDlgPayload)
 import           Pos.Arbitrary.Ssc
-    (SscPayloadDependsOnSlot (..), genSscPayload, genSscPayloadForSlot)
+                       (SscPayloadDependsOnSlot (..), genSscPayload,
+                       genSscPayloadForSlot)
 import           Pos.Arbitrary.Update
-    (genUpdatePayload)
+                       (genUpdatePayload)
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import qualified Pos.Block.Base as T
 import qualified Pos.Block.Logic.Integrity as T
 import           Pos.Block.Slog.Types
-    (SlogUndo)
+                       (SlogUndo)
 import           Pos.Block.Types
-    (Undo (..))
+                       (Undo (..))
 import           Pos.Core
-    (GenesisHash (..), HasGenesisHash, HasProtocolConstants, HeaderHash,
-    epochSlots, genesisHash)
+                       (GenesisHash (..), HasGenesisHash, HasProtocolConstants,
+                       HeaderHash, epochSlots, genesisHash)
 import qualified Pos.Core as Core
 import qualified Pos.Core.Block as T
 import           Pos.Crypto
-    (ProtocolMagic, PublicKey, SecretKey, createPsk, hash, toPublic)
+                       (ProtocolMagic, PublicKey, SecretKey, createPsk, hash,
+                       toPublic)
 import           Pos.Crypto.Configuration
-    (HasProtocolMagic, protocolMagic)
+                       (HasProtocolMagic, protocolMagic)
 import           Pos.Data.Attributes
-    (areAttributesKnown)
+                       (areAttributesKnown)
 
 import           Test.Pos.Txp.Arbitrary
-    (genTxPayload)
+                       (genTxPayload)
 
 newtype BodyDependsOnSlot b = BodyDependsOnSlot
     { genBodyDepsOnSlot :: Core.SlotId -> Gen (T.Body b)

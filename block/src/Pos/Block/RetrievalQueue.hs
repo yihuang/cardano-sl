@@ -8,12 +8,12 @@ module Pos.Block.RetrievalQueue
 import           Universum
 
 import           Control.Concurrent.STM
-    (TBQueue)
+                       (TBQueue)
 
 import           Pos.Core.Block
-    (BlockHeader)
+                       (BlockHeader)
 import           Pos.Infra.Network.Types
-    (NodeId)
+                       (NodeId)
 
 -- | Task that is put in the block retrieval queue for the retrieval
 -- worker to perform.

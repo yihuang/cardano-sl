@@ -21,59 +21,64 @@ module Pos.Update.Logic.Local
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Concurrent.STM
-    (modifyTVar', readTVar, writeTVar)
+                       (modifyTVar', readTVar, writeTVar)
 import           Control.Lens
-    (views)
+                       (views)
 import           Control.Monad.Except
-    (runExceptT, throwError)
+                       (runExceptT, throwError)
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Formatting
-    (sformat, (%))
+                       (sformat, (%))
 import           System.Wlog
-    (WithLogger, logWarning)
+                       (WithLogger, logWarning)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Core
-    (BlockVersionData (bvdMaxBlockSize), HeaderHash, SlotId (..), slotIdF)
+                       (BlockVersionData (bvdMaxBlockSize), HeaderHash,
+                       SlotId (..), slotIdF)
 import           Pos.Core.Update
-    (UpId, UpdatePayload (..), UpdateProposal, UpdateVote (..))
+                       (UpId, UpdatePayload (..), UpdateProposal,
+                       UpdateVote (..))
 import           Pos.Crypto
-    (PublicKey, shortHashF)
+                       (PublicKey, shortHashF)
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import qualified Pos.DB.GState.Common as DB
 import           Pos.Infra.Reporting
-    (MonadReporting)
+                       (MonadReporting)
 import           Pos.Infra.StateLock
-    (StateLock)
+                       (StateLock)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 import           Pos.Update.Context
-    (UpdateContext (..))
+                       (UpdateContext (..))
 import qualified Pos.Update.DB as DB
 import           Pos.Update.MemState
-    (LocalVotes, MemPool (..), MemState (..), MemVar (mvState),
-    UpdateProposals, addToMemPool, withUSLock)
+                       (LocalVotes, MemPool (..), MemState (..),
+                       MemVar (mvState), UpdateProposals, addToMemPool,
+                       withUSLock)
 import           Pos.Update.Poll
-    (MonadPoll (deactivateProposal), MonadPollRead (getProposal), PollModifier,
-    PollVerFailure (..), evalPollT, execPollT, filterProposalsByThd,
-    getAdoptedBV, modifyPollModifier, normalizePoll, refreshPoll,
-    reportUnexpectedError, runDBPoll, runPollT, verifyAndApplyUSPayload)
+                       (MonadPoll (deactivateProposal),
+                       MonadPollRead (getProposal), PollModifier,
+                       PollVerFailure (..), evalPollT, execPollT,
+                       filterProposalsByThd, getAdoptedBV, modifyPollModifier,
+                       normalizePoll, refreshPoll, reportUnexpectedError,
+                       runDBPoll, runPollT, verifyAndApplyUSPayload)
 import           Pos.Update.Poll.Types
-    (canCombineVotes, psVotes)
+                       (canCombineVotes, psVotes)
 import           Pos.Util.Util
-    (HasLens (..), HasLens')
+                       (HasLens (..), HasLens')
 
 type USLocalLogicMode ctx m =
     ( MonadIO m

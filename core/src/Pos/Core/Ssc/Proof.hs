@@ -8,14 +8,14 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Fmt
-    (genericF)
+                       (genericF)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core.Common
-    (StakeholderId)
+                       (StakeholderId)
 import           Pos.Crypto
-    (Hash, hash)
+                       (Hash, hash)
 
 import           Pos.Core.Ssc.CommitmentsMap
 import           Pos.Core.Ssc.Opening

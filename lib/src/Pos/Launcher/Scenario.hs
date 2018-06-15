@@ -13,47 +13,47 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 import           Formatting
-    (bprint, build, int, sformat, shown, (%))
+                       (bprint, build, int, sformat, shown, (%))
 import           Mockable
-    (mapConcurrently)
+                       (mapConcurrently)
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 import           System.Wlog
-    (WithLogger, askLoggerName, logInfo)
+                       (WithLogger, askLoggerName, logInfo)
 
 import           Pos.Context
-    (getOurPublicKey)
+                       (getOurPublicKey)
 import           Pos.Core
-    (GenesisData (gdBootStakeholders, gdHeavyDelegation),
-    GenesisDelegation (..), GenesisWStakeholders (..), addressHash, gdFtsSeed,
-    genesisData)
+                       (GenesisData (gdBootStakeholders, gdHeavyDelegation),
+                       GenesisDelegation (..), GenesisWStakeholders (..),
+                       addressHash, gdFtsSeed, genesisData)
 import           Pos.Crypto
-    (pskDelegatePk)
+                       (pskDelegatePk)
 import qualified Pos.DB.BlockIndex as DB
 import qualified Pos.GState as GS
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Infra.Reporting
-    (reportError)
+                       (reportError)
 import           Pos.Infra.Slotting
-    (waitSystemStart)
+                       (waitSystemStart)
 import           Pos.Infra.Util.LogSafe
-    (logInfoS)
+                       (logInfoS)
 import           Pos.Launcher.Resource
-    (NodeResources (..))
+                       (NodeResources (..))
 import           Pos.Txp
-    (bootDustThreshold)
+                       (bootDustThreshold)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, curSoftwareVersion, lastKnownBlockVersion,
-    ourSystemTag)
+                       (HasUpdateConfiguration, curSoftwareVersion,
+                       lastKnownBlockVersion, ourSystemTag)
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, compileInfo)
+                       (HasCompileInfo, compileInfo)
 import           Pos.Worker
-    (allWorkers)
+                       (allWorkers)
 import           Pos.WorkMode.Class
-    (WorkMode)
+                       (WorkMode)
 
 -- | Entry point of full node.
 -- Initialization, running of workers, running of plugins.

@@ -7,14 +7,15 @@ module Pos.Infra.Ntp.Configuration
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
+                       (FromJSON (..), ToJSON (..), genericParseJSON,
+                       genericToJSON)
 import           Data.List.NonEmpty as NE
 import           Data.Time.Units
-    (fromMicroseconds)
+                       (fromMicroseconds)
 import           Ntp.Client
-    (NtpClientSettings (..))
+                       (NtpClientSettings (..))
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 
 data NtpConfiguration = NtpConfiguration
     {

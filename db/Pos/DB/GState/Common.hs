@@ -30,28 +30,27 @@ import           Universum
 import qualified Data.Text.Buildable
 import qualified Database.RocksDB as Rocks
 import           Formatting
-    (bprint, int, sformat, stext, (%))
+                       (bprint, int, sformat, stext, (%))
 
 import           Pos.Binary.Class
-    (Bi)
-import           Pos.Binary.Core
-    ()
+                       (Bi)
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (ChainDifficulty, HeaderHash)
+                       (ChainDifficulty, HeaderHash)
 import           Pos.Core.Configuration
-    (HasCoreConfiguration)
+                       (HasCoreConfiguration)
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 import           Pos.DB.BatchOp
-    (RocksBatchOp (..), dbWriteBatch')
+                       (RocksBatchOp (..), dbWriteBatch')
 import           Pos.DB.Class
-    (DBTag (GStateDB), MonadDB (dbDelete), MonadDBRead (..))
+                       (DBTag (GStateDB), MonadDB (dbDelete), MonadDBRead (..))
 import           Pos.DB.Error
-    (DBError (DBMalformed))
+                       (DBError (DBMalformed))
 import           Pos.DB.Functions
-    (dbGetBi, dbPutBi, dbSerializeValue)
+                       (dbGetBi, dbPutBi, dbSerializeValue)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 ----------------------------------------------------------------------------
 -- Common Helpers

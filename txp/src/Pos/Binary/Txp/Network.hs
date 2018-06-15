@@ -9,11 +9,11 @@ module Pos.Binary.Txp.Network
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..))
+                       (Bi (..))
 import           Pos.Infra.Communication.Types.Relay
-    (DataMsg (..))
+                       (DataMsg (..))
 import           Pos.Txp.Network.Types
-    (TxMsgContents (..))
+                       (TxMsgContents (..))
 
 ----------------------------------------------------------------------------
 -- Network

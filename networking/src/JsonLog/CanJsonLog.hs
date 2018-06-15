@@ -23,23 +23,23 @@ module JsonLog.CanJsonLog
     ) where
 
 import           Control.Monad.Reader
-    (ReaderT)
+                       (ReaderT)
 import           Control.Monad.State
-    (StateT)
+                       (StateT)
 import           Control.Monad.Trans.Class
-    (MonadTrans (..))
+                       (MonadTrans (..))
 import           Control.Monad.Trans.Identity
-    (IdentityT)
+                       (IdentityT)
 import           Control.Monad.Trans.Resource
-    (ResourceT)
+                       (ResourceT)
 import           Control.Monad.Writer
-    (WriterT)
+                       (WriterT)
 import           Data.Aeson.Types
-    (ToJSON)
+                       (ToJSON)
 import           Serokell.Util.Lens
-    (WrappedM (..))
+                       (WrappedM (..))
 import           System.Wlog.LoggerNameBox
-    (LoggerNameBox)
+                       (LoggerNameBox)
 
 -- | An instance of class @'CanJsonLog'@ supports the effect of
 -- JSON logging.

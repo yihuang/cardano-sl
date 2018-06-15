@@ -7,15 +7,15 @@ module Pos.Core.Txp.TxAux
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError)
+                       (MonadError)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (Format, bprint, build, later, (%))
+                       (Format, bprint, build, later, (%))
 import           Serokell.Util.Text
-    (listJsonIndent)
+                       (listJsonIndent)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 
 import           Pos.Core.Txp.Tx
 import           Pos.Core.Txp.TxWitness

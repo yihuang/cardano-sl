@@ -7,7 +7,7 @@
 module Main where
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Concurrent.Async
 import           Control.Concurrent.MVar
 import           Control.Monad
@@ -15,21 +15,21 @@ import           Data.IORef
 import           Data.Time.Clock.POSIX
 import           Data.Time.Units
 import           Data.Vector
-    (Vector, fromList)
+                       (Vector, fromList)
 import qualified Data.Vector as V
-    (length)
+                       (length)
 import           Data.Word
-    (Word32)
+                       (Word32)
 import           Network.QDisc.Fair
 import           Network.Transport.TCP
-    (QDisc (..), simpleOnePlaceQDisc, simpleUnboundedQDisc)
+                       (QDisc (..), simpleOnePlaceQDisc, simpleUnboundedQDisc)
 import           Statistics.Distribution
 import           Statistics.Distribution.Exponential
 import           Statistics.Distribution.Normal
 import           Statistics.Distribution.Uniform
 import qualified Statistics.Sample as Sample
 import           System.Environment
-    (getArgs)
+                       (getArgs)
 import           System.Random.MWC
 
 -- | A writer is determined by some continuous distribution giving the duration

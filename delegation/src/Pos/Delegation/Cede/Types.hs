@@ -14,18 +14,18 @@ module Pos.Delegation.Cede.Types
        ) where
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Universum
 
 import           Pos.Core
-    (ProxySKHeavy, StakeholderId, addressHash)
+                       (ProxySKHeavy, StakeholderId, addressHash)
 import           Pos.Crypto
-    (pskIssuerPk)
+                       (pskIssuerPk)
 import           Pos.Delegation.Types
-    (isRevokePsk)
+                       (isRevokePsk)
 
 -- | Action on delegation database, used commonly. Generalizes
 -- applications and rollbacks.

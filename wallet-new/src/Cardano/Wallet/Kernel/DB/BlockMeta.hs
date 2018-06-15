@@ -9,10 +9,10 @@ module Cardano.Wallet.Kernel.DB.BlockMeta (
 import           Universum
 
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 import qualified Data.Map.Strict as Map
 import           Data.SafeCopy
-    (base, deriveSafeCopy)
+                       (base, deriveSafeCopy)
 
 import qualified Pos.Core as Core
 

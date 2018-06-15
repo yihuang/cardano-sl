@@ -14,16 +14,17 @@ module Pos.Web.Api
 import           Universum
 
 import           Servant.API
-    ((:<|>), (:>), Capture, Get, JSON, PlainText, Post, QueryParam)
+                       ((:<|>), (:>), Capture, Get, JSON, PlainText, Post,
+                       QueryParam)
 
 import           Pos.Core
-    (EpochIndex, HeaderHash, SlotLeaders)
+                       (EpochIndex, HeaderHash, SlotLeaders)
 import           Pos.Core.Txp
-    (TxOut)
+                       (TxOut)
 import           Pos.Crypto
-    (PublicKey)
+                       (PublicKey)
 import           Pos.Web.Types
-    (CConfirmedProposalState)
+                       (CConfirmedProposalState)
 
 ----------------------------------------------------------------------------
 -- Base

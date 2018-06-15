@@ -45,61 +45,62 @@ module Node.Internal (
   ) where
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Concurrent.Async
 import           Control.Concurrent.MVar
 import           Control.Concurrent.STM
 import           Control.Exception
-    (Exception, SomeAsyncException, SomeException, bracket, catch, finally,
-    fromException, handle, mask, throwIO, try, uninterruptibleMask_)
+                       (Exception, SomeAsyncException, SomeException, bracket,
+                       catch, finally, fromException, handle, mask, throwIO,
+                       try, uninterruptibleMask_)
 import           Control.Monad
-    (forM_, mapM_, when)
+                       (forM_, mapM_, when)
 import           Data.Binary
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Builder as BS
 import qualified Data.ByteString.Builder.Extra as BS
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Foldable
-    (foldl', foldlM)
+                       (foldl', foldlM)
 import           Data.Hashable
-    (Hashable)
+                       (Hashable)
 import           Data.Int
-    (Int64)
+                       (Int64)
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Monoid
 import           Data.NonEmptySet
-    (NonEmptySet)
+                       (NonEmptySet)
 import qualified Data.NonEmptySet as NESet
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as Set
 import           Data.Text
-    (Text)
+                       (Text)
 import           Data.Time.Clock.POSIX
-    (getPOSIXTime)
+                       (getPOSIXTime)
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import qualified Network.Transport as NT
 import           Node.Message.Class
-    (Packing, Serializable (..), pack, unpack)
+                       (Packing, Serializable (..), pack, unpack)
 import           Node.Message.Decoder
-    (Decoder (..), DecoderStep (..), continueDecoding)
+                       (Decoder (..), DecoderStep (..), continueDecoding)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 import qualified System.Metrics.Distribution as Metrics
-    (Distribution)
+                       (Distribution)
 import qualified System.Metrics.Distribution as Metrics.Distribution
 import qualified System.Metrics.Gauge as Metrics
-    (Gauge)
+                       (Gauge)
 import qualified System.Metrics.Gauge as Metrics.Gauge
 import           System.Random
-    (Random, StdGen, random)
+                       (Random, StdGen, random)
 
 -- Copied from the old Mockable definition for Production.
 getCurrentTime :: IO Microsecond

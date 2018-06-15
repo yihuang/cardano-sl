@@ -7,14 +7,14 @@ module Pos.Core.Common.AddressHash
 import           Universum
 
 import           Crypto.Hash
-    (Blake2b_224, Digest, SHA3_256)
+                       (Blake2b_224, Digest, SHA3_256)
 import qualified Crypto.Hash as CryptoHash
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Crypto.Hashing
-    (AbstractHash (..))
+                       (AbstractHash (..))
 
 -- | Hash used to identify address.
 type AddressHash = AbstractHash Blake2b_224

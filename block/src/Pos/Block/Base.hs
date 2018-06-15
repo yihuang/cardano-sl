@@ -15,31 +15,33 @@ module Pos.Block.Base
 import           Universum
 
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 
-import           Pos.Block.BHelpers
-    ()
+import           Pos.Block.BHelpers ()
 import           Pos.Core
-    (BlockVersion, ChainDifficulty, EpochIndex, GenesisHash (..),
-    HasDifficulty (..), HasProtocolConstants, HeaderHash, LocalSlotIndex,
-    SlotId, SlotLeaders, SoftwareVersion, headerHash)
+                       (BlockVersion, ChainDifficulty, EpochIndex,
+                       GenesisHash (..), HasDifficulty (..),
+                       HasProtocolConstants, HeaderHash, LocalSlotIndex,
+                       SlotId, SlotLeaders, SoftwareVersion, headerHash)
 import           Pos.Core.Block
-    (BlockHeader, BlockSignature (..), GenericBlock (..), GenesisBlock,
-    GenesisBlockHeader, GenesisBody (..), GenesisConsensusData (..),
-    GenesisExtraBodyData (..), GenesisExtraHeaderData (..), MainBlock,
-    MainBlockHeader, MainBody (..), MainConsensusData (..),
-    MainExtraBodyData (..), MainExtraHeaderData (..), MainToSign (..),
-    mkGenericHeader)
+                       (BlockHeader, BlockSignature (..), GenericBlock (..),
+                       GenesisBlock, GenesisBlockHeader, GenesisBody (..),
+                       GenesisConsensusData (..), GenesisExtraBodyData (..),
+                       GenesisExtraHeaderData (..), MainBlock, MainBlockHeader,
+                       MainBody (..), MainConsensusData (..),
+                       MainExtraBodyData (..), MainExtraHeaderData (..),
+                       MainToSign (..), mkGenericHeader)
 import           Pos.Crypto
-    (ProtocolMagic, SecretKey, SignTag (..), hash, proxySign, sign, toPublic)
+                       (ProtocolMagic, SecretKey, SignTag (..), hash,
+                       proxySign, sign, toPublic)
 import           Pos.Data.Attributes
-    (mkAttributes)
+                       (mkAttributes)
 import           Pos.Delegation.Types
-    (ProxySKBlockInfo)
+                       (ProxySKBlockInfo)
 import           Pos.Ssc.Base
-    (defaultSscPayload)
+                       (defaultSscPayload)
 import           Pos.Txp.Base
-    (emptyTxPayload)
+                       (emptyTxPayload)
 
 ----------------------------------------------------------------------------
 -- Main smart constructors

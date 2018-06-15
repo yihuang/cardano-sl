@@ -9,60 +9,64 @@ module Test.Pos.Generator.Block.LrcSpec
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Exception.Safe
-    (try)
+                       (try)
 import           Control.Lens
-    (At (at), Index, _Right)
+                       (At (at), Index, _Right)
 import qualified Data.HashMap.Strict as HM
 import           Formatting
-    (build, int, sformat, (%))
+                       (build, int, sformat, (%))
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Gen, arbitrary, choose)
+                       (Gen, arbitrary, choose)
 import           Test.QuickCheck.Monadic
-    (pick)
+                       (pick)
 
 import           Pos.Binary.Class
-    (serialize')
+                       (serialize')
 import           Pos.Block.Logic
-    (applyBlocksUnsafe)
+                       (applyBlocksUnsafe)
 import qualified Pos.Block.Lrc as Lrc
 import           Pos.Block.Slog
-    (ShouldCallBListener (..))
+                       (ShouldCallBListener (..))
 import           Pos.Core
-    (Coin, EpochIndex, GenesisData (..), GenesisInitializer (..),
-    StakeholderId, TestnetBalanceOptions (..), addressHash, blkSecurityParam,
-    coinF, genesisData, genesisSecretKeysPoor, genesisSecretKeysRich)
+                       (Coin, EpochIndex, GenesisData (..),
+                       GenesisInitializer (..), StakeholderId,
+                       TestnetBalanceOptions (..), addressHash,
+                       blkSecurityParam, coinF, genesisData,
+                       genesisSecretKeysPoor, genesisSecretKeysRich)
 import           Pos.Core.Block
-    (mainBlockTxPayload)
+                       (mainBlockTxPayload)
 import           Pos.Core.Txp
-    (TxAux, mkTxPayload)
+                       (TxAux, mkTxPayload)
 import           Pos.Crypto
-    (SecretKey, toPublic)
+                       (SecretKey, toPublic)
 import qualified Pos.GState as GS
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 import qualified Pos.Lrc as Lrc
 import           Pos.Util.Util
-    (getKeys)
+                       (getKeys)
 
 import           Test.Pos.Block.Logic.Mode
-    (BlockProperty, TestParams (..), blockPropertyToProperty)
+                       (BlockProperty, TestParams (..),
+                       blockPropertyToProperty)
 import           Test.Pos.Block.Logic.Util
-    (EnableTxPayload (..), InplaceDB (..), bpGenBlock, bpGenBlocks)
+                       (EnableTxPayload (..), InplaceDB (..), bpGenBlock,
+                       bpGenBlocks)
 import           Test.Pos.Block.Property
-    (blockPropertySpec)
+                       (blockPropertySpec)
 import           Test.Pos.Configuration
-    (defaultTestBlockVersionData, withStaticConfigurations)
+                       (defaultTestBlockVersionData, withStaticConfigurations)
 import           Test.Pos.Util.QuickCheck
-    (maybeStopProperty, stopProperty)
+                       (maybeStopProperty, stopProperty)
 
 
 spec :: Spec

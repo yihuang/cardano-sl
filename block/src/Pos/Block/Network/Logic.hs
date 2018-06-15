@@ -16,72 +16,74 @@ module Pos.Block.Network.Logic
 import           Universum
 
 import           Control.Concurrent.STM
-    (isFullTBQueue, readTVar, writeTBQueue, writeTVar)
+                       (isFullTBQueue, readTVar, writeTBQueue, writeTVar)
 import           Control.Exception
-    (IOException)
+                       (IOException)
 import           Control.Exception.Safe
-    (Exception (..))
+                       (Exception (..))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as M
 import qualified Data.Text.Buildable as B
 import           Formatting
-    (bprint, build, sformat, shown, stext, (%))
+                       (bprint, build, sformat, shown, stext, (%))
 import           Mockable
-    (forConcurrently)
+                       (forConcurrently)
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import qualified System.Metrics.Gauge as Metrics
 import           System.Wlog
-    (logDebug, logInfo, logWarning)
+                       (logDebug, logInfo, logWarning)
 
-import           Pos.Binary.Txp
-    ()
+import           Pos.Binary.Txp ()
 import           Pos.Block.BlockWorkMode
-    (BlockWorkMode)
+                       (BlockWorkMode)
 import           Pos.Block.Error
-    (ApplyBlocksException)
+                       (ApplyBlocksException)
 import           Pos.Block.Logic
-    (ClassifyHeaderRes (..), classifyNewHeader, lcaWithMainChain,
-    verifyAndApplyBlocks)
+                       (ClassifyHeaderRes (..), classifyNewHeader,
+                       lcaWithMainChain, verifyAndApplyBlocks)
 import qualified Pos.Block.Logic as L
 import           Pos.Block.RetrievalQueue
-    (BlockRetrievalQueue, BlockRetrievalQueueTag, BlockRetrievalTask (..))
+                       (BlockRetrievalQueue, BlockRetrievalQueueTag,
+                       BlockRetrievalTask (..))
 import           Pos.Block.Types
-    (Blund, LastKnownHeaderTag)
+                       (Blund, LastKnownHeaderTag)
 import           Pos.Core
-    (HasHeaderHash (..), HeaderHash, gbHeader, headerHashG, isMoreDifficult,
-    prevBlockL)
+                       (HasHeaderHash (..), HeaderHash, gbHeader, headerHashG,
+                       isMoreDifficult, prevBlockL)
 import           Pos.Core.Block
-    (Block, BlockHeader, blockHeader)
+                       (Block, BlockHeader, blockHeader)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..), _NewestFirst, _OldestFirst)
+                       (NE, NewestFirst (..), OldestFirst (..), _NewestFirst,
+                       _OldestFirst)
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 import qualified Pos.DB.Block.Load as DB
 import           Pos.Exception
-    (cardanoExceptionFromException, cardanoExceptionToException)
+                       (cardanoExceptionFromException,
+                       cardanoExceptionToException)
 import           Pos.Infra.Communication.Protocol
-    (NodeId)
+                       (NodeId)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import qualified Pos.Infra.Diffusion.Types as Diffusion
-    (Diffusion (announceBlockHeader, requestTip))
+                       (Diffusion (announceBlockHeader, requestTip))
 import           Pos.Infra.Recovery.Info
-    (recoveryInProgress)
+                       (recoveryInProgress)
 import           Pos.Infra.Reporting.MemState
-    (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))
+                       (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))
 import           Pos.Infra.StateLock
-    (Priority (..), modifyStateLock)
+                       (Priority (..), modifyStateLock)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason (..), jlAdoptedBlock)
+                       (MemPoolModifyReason (..), jlAdoptedBlock)
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Pos.Util
-    (buildListBounds, multilineBounds, _neLast)
+                       (buildListBounds, multilineBounds, _neLast)
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 import           Pos.Util.Util
-    (lensOf)
+                       (lensOf)
 
 ----------------------------------------------------------------------------
 -- Exceptions

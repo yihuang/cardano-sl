@@ -8,25 +8,25 @@ module Cardano.Wallet.WalletLayer.Kernel
 import           Universum
 
 import           Data.Maybe
-    (fromJust)
+                       (fromJust)
 import           System.Wlog
-    (Severity (Debug))
+                       (Severity (Debug))
 
 import           Pos.Block.Types
-    (Blund, Undo (..))
+                       (Blund, Undo (..))
 
 import qualified Cardano.Wallet.Kernel as Kernel
 import           Cardano.Wallet.Kernel.DB.Resolved
-    (ResolvedBlock)
+                       (ResolvedBlock)
 import           Cardano.Wallet.Kernel.Diffusion
-    (WalletDiffusion (..))
+                       (WalletDiffusion (..))
 import           Cardano.Wallet.Kernel.Types
-    (RawResolvedBlock (..), fromRawResolvedBlock)
+                       (RawResolvedBlock (..), fromRawResolvedBlock)
 import           Cardano.Wallet.WalletLayer.Types
-    (ActiveWalletLayer (..), PassiveWalletLayer (..))
+                       (ActiveWalletLayer (..), PassiveWalletLayer (..))
 
 import           Pos.Core.Chrono
-    (OldestFirst (..))
+                       (OldestFirst (..))
 
 import qualified Cardano.Wallet.Kernel.Actions as Actions
 import qualified Data.Map.Strict as Map

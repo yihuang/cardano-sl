@@ -5,17 +5,17 @@ module Pos.Infra.Discovery.Model.Class
        ) where
 
 import           Data.Proxy
-    (Proxy)
+                       (Proxy)
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as Set
-    (toList)
+                       (toList)
 import           Mockable
-    (Mockable)
+                       (Mockable)
 import           Mockable.Concurrent
-    (Concurrently, forConcurrently)
+                       (Concurrently, forConcurrently)
 import           Pos.Infra.Communication.Protocol
-    (NodeId)
+                       (NodeId)
 import           Universum
 
 -- | Provides a set of known peers.

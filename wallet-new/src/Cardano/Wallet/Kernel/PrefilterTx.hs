@@ -14,25 +14,27 @@ import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Serokell.Util
-    (listJson, mapJson)
+                       (listJson, mapJson)
 
 import           Pos.Core
-    (Address (..))
+                       (Address (..))
 import           Pos.Core.Txp
-    (TxIn (..), TxOut (..), TxOutAux (..))
+                       (TxIn (..), TxOut (..), TxOutAux (..))
 import           Pos.Crypto
-    (EncryptedSecretKey)
+                       (EncryptedSecretKey)
 import           Pos.Txp.Toil.Types
-    (Utxo)
+                       (Utxo)
 import           Pos.Wallet.Web.Tracking.Decrypt
-    (WalletDecrCredentials, eskToWalletDecrCredentials, selectOwnAddresses)
+                       (WalletDecrCredentials, eskToWalletDecrCredentials,
+                       selectOwnAddresses)
 
 import           Cardano.Wallet.Kernel.DB.InDb
-    (fromDb)
+                       (fromDb)
 import           Cardano.Wallet.Kernel.DB.Resolved
-    (ResolvedBlock, ResolvedTx, rbTxs, rtxInputs, rtxOutputs)
+                       (ResolvedBlock, ResolvedTx, rbTxs, rtxInputs,
+                       rtxOutputs)
 
 {-------------------------------------------------------------------------------
  Pre-filter Tx Inputs and Outputs to those that belong to the given Wallet.

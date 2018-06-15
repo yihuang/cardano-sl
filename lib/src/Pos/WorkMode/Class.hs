@@ -13,74 +13,74 @@ module Pos.WorkMode.Class
 import           Universum
 
 import           Control.Monad.Trans.Control
-    (MonadBaseControl)
+                       (MonadBaseControl)
 import qualified Crypto.Random as Rand
 import           Mockable
-    (MonadMockable)
+                       (MonadMockable)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Block.BListener
-    (MonadBListener)
+                       (MonadBListener)
 import           Pos.Block.Configuration
-    (HasBlockConfiguration)
+                       (HasBlockConfiguration)
 import           Pos.Block.Slog
-    (HasSlogContext, HasSlogGState)
+                       (HasSlogContext, HasSlogGState)
 import           Pos.Block.Types
-    (MonadLastKnownHeader, MonadRecoveryHeader)
+                       (MonadLastKnownHeader, MonadRecoveryHeader)
 import           Pos.Configuration
-    (HasNodeConfiguration)
+                       (HasNodeConfiguration)
 import           Pos.Context
-    (BlockRetrievalQueue, BlockRetrievalQueueTag, HasSscContext, StartTime,
-    TxpGlobalSettings)
+                       (BlockRetrievalQueue, BlockRetrievalQueueTag,
+                       HasSscContext, StartTime, TxpGlobalSettings)
 import           Pos.Core
-    (HasConfiguration, HasPrimaryKey)
+                       (HasConfiguration, HasPrimaryKey)
 import           Pos.DB.Class
-    (MonadDB, MonadGState)
+                       (MonadDB, MonadGState)
 import           Pos.DB.Rocks
-    (MonadRealDB)
+                       (MonadRealDB)
 import           Pos.Delegation.Class
-    (MonadDelegation)
+                       (MonadDelegation)
 import           Pos.Delegation.Configuration
-    (HasDlgConfiguration)
+                       (HasDlgConfiguration)
 import           Pos.Infra.DHT.Real.Param
-    (KademliaParams)
+                       (KademliaParams)
 import           Pos.Infra.Network.Types
-    (HasNodeType, NetworkConfig)
+                       (HasNodeType, NetworkConfig)
 import           Pos.Infra.Recovery.Info
-    (MonadRecoveryInfo)
+                       (MonadRecoveryInfo)
 import           Pos.Infra.Reporting
-    (HasMisbehaviorMetrics, MonadReporting)
+                       (HasMisbehaviorMetrics, MonadReporting)
 import           Pos.Infra.Shutdown
-    (HasShutdownContext)
+                       (HasShutdownContext)
 import           Pos.Infra.Slotting.Class
-    (MonadSlots)
+                       (MonadSlots)
 import           Pos.Infra.StateLock
-    (StateLock, StateLockMetrics)
+                       (StateLock, StateLockMetrics)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason)
+                       (MemPoolModifyReason)
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog)
+                       (CanJsonLog)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Security.Params
-    (SecurityParams)
+                       (SecurityParams)
 import           Pos.Ssc
-    (HasSscConfiguration)
+                       (HasSscConfiguration)
 import           Pos.Ssc.Mem
-    (MonadSscMem)
+                       (MonadSscMem)
 import           Pos.Txp.MemState
-    (MempoolExt, MonadTxpLocal, MonadTxpMem)
+                       (MempoolExt, MonadTxpLocal, MonadTxpMem)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 import           Pos.Update.Context
-    (UpdateContext)
+                       (UpdateContext)
 import           Pos.Update.Params
-    (UpdateParams)
+                       (UpdateParams)
 import           Pos.Util
-    (HasLens, HasLens')
+                       (HasLens, HasLens')
 
 -- | Bunch of constraints to perform work for real world distributed system.
 type WorkMode ctx m

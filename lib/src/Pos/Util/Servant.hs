@@ -55,55 +55,55 @@ module Pos.Util.Servant
     ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Exception.Safe
-    (handleAny)
+                       (handleAny)
 import           Control.Lens
-    (Iso, iso, makePrisms)
+                       (Iso, iso, makePrisms)
 import           Control.Monad.Except
-    (ExceptT (..), MonadError (..))
+                       (ExceptT (..), MonadError (..))
 import           Data.Constraint
-    ((\\))
+                       ((\\))
 import           Data.Constraint.Forall
-    (Forall, inst)
+                       (Forall, inst)
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import           Data.Reflection
-    (Reifies (..), reflect)
+                       (Reifies (..), reflect)
 import qualified Data.Text as T
 import qualified Data.Text.Buildable
 import           Data.Time.Clock.POSIX
-    (getPOSIXTime)
+                       (getPOSIXTime)
 import           Formatting
-    (bprint, build, builder, fconst, formatToString, sformat, shown, stext,
-    string, (%))
+                       (bprint, build, builder, fconst, formatToString,
+                       sformat, shown, stext, string, (%))
 import           GHC.IO.Unsafe
-    (unsafePerformIO)
+                       (unsafePerformIO)
 import           GHC.TypeLits
-    (KnownSymbol, symbolVal)
+                       (KnownSymbol, symbolVal)
 import           Serokell.Util
-    (listJsonIndent)
+                       (listJsonIndent)
 import           Serokell.Util.ANSI
-    (Color (..), colorizeDull)
+                       (Color (..), colorizeDull)
 import           Servant.API
-    ((:<|>) (..), (:>), Capture, Description, QueryParam, ReflectMethod (..),
-    ReqBody, Summary, Verb)
+                       ((:<|>) (..), (:>), Capture, Description, QueryParam,
+                       ReflectMethod (..), ReqBody, Summary, Verb)
 import           Servant.Client
-    (Client, HasClient (..))
+                       (Client, HasClient (..))
 import           Servant.Client.Core
-    (RunClient)
+                       (RunClient)
 import           Servant.Server
-    (Handler (..), HasServer (..), ServantErr (..), Server)
+                       (Handler (..), HasServer (..), ServantErr (..), Server)
 import qualified Servant.Server.Internal as SI
 import           Servant.Swagger
-    (HasSwagger (toSwagger))
+                       (HasSwagger (toSwagger))
 import           System.Wlog
-    (LoggerName, LoggerNameBox, usingLoggerName)
+                       (LoggerName, LoggerNameBox, usingLoggerName)
 
 import           Pos.Infra.Util.LogSafe
-    (BuildableSafe, SecureLog, SecuredText, buildSafe, logInfoSP,
-    plainOrSecureF, secretOnlyF)
+                       (BuildableSafe, SecureLog, SecuredText, buildSafe,
+                       logInfoSP, plainOrSecureF, secretOnlyF)
 
 -------------------------------------------------------------------------
 -- Utility functions

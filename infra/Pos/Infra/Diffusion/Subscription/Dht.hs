@@ -7,23 +7,23 @@ import qualified Control.Concurrent.STM as STM
 import           Universum
 
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import qualified Network.Broadcast.OutboundQueue as OQ
 import           Network.Broadcast.OutboundQueue.Types
-    (Peers)
+                       (Peers)
 
 import           Pos.Infra.Communication.Protocol
-    (NodeId, SendActions)
+                       (NodeId, SendActions)
 import           Pos.Infra.DHT.Real.Real
-    (kademliaGetKnownPeers)
+                       (kademliaGetKnownPeers)
 import           Pos.Infra.DHT.Real.Types
-    (KademliaDHTInstance (..))
+                       (KademliaDHTInstance (..))
 import           Pos.Infra.Network.Types
-    (Bucket (..), NodeType, choosePeers)
+                       (Bucket (..), NodeType, choosePeers)
 import           Pos.Infra.Util.TimeWarp
-    (addressToNodeId)
+                       (addressToNodeId)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 
 
 -- | This worker will update the known peers every time the Kademlia peers

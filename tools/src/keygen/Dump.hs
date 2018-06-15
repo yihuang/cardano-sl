@@ -9,28 +9,29 @@ module Dump
 import           Universum
 
 import           Control.Lens
-    ((?~))
+                       ((?~))
 import qualified Data.Text as T
 import           Serokell.Util
-    (enumerate)
+                       (enumerate)
 import qualified Serokell.Util.Base64 as B64
 import           System.Directory
-    (createDirectoryIfMissing)
+                       (createDirectoryIfMissing)
 import           System.FilePath
-    ((</>))
+                       ((</>))
 import           System.Wlog
-    (WithLogger, logInfo)
+                       (WithLogger, logInfo)
 
 import           Pos.Core.Configuration
-    (HasGeneratedSecrets, generatedSecrets)
+                       (HasGeneratedSecrets, generatedSecrets)
 import           Pos.Core.Genesis
-    (GeneratedSecrets (..), PoorSecret (..), RichSecrets (..),
-    poorSecretToEncKey)
+                       (GeneratedSecrets (..), PoorSecret (..),
+                       RichSecrets (..), poorSecretToEncKey)
 import           Pos.Crypto
-    (SecretKey)
+                       (SecretKey)
 import           Pos.Util.UserSecret
-    (UserSecret, initializeUserSecret, mkGenesisWalletUserSecret,
-    takeUserSecret, usKeys, usPrimKey, usVss, usWallet, writeUserSecretRelease)
+                       (UserSecret, initializeUserSecret,
+                       mkGenesisWalletUserSecret, takeUserSecret, usKeys,
+                       usPrimKey, usVss, usWallet, writeUserSecretRelease)
 
 ----------------------------------------------------------------------------
 -- Dump individual secrets

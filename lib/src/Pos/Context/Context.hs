@@ -23,54 +23,56 @@ module Pos.Context.Context
 import           Universum
 
 import           Control.Lens
-    (lens, makeLensesWith)
+                       (lens, makeLensesWith)
 import           Data.Time.Clock
-    (UTCTime)
+                       (UTCTime)
 import           System.Wlog
-    (LoggerConfig)
+                       (LoggerConfig)
 
 import           Pos.Block.RetrievalQueue
-    (BlockRetrievalQueue, BlockRetrievalQueueTag)
+                       (BlockRetrievalQueue, BlockRetrievalQueueTag)
 import           Pos.Block.Slog
-    (HasSlogContext (..), HasSlogGState (..), SlogContext (..))
+                       (HasSlogContext (..), HasSlogGState (..),
+                       SlogContext (..))
 import           Pos.Block.Types
-    (LastKnownHeader, LastKnownHeaderTag, RecoveryHeader, RecoveryHeaderTag)
+                       (LastKnownHeader, LastKnownHeaderTag, RecoveryHeader,
+                       RecoveryHeaderTag)
 import           Pos.Communication.Types
-    (NodeId)
+                       (NodeId)
 import           Pos.Core
-    (HasPrimaryKey (..), Timestamp)
+                       (HasPrimaryKey (..), Timestamp)
 import           Pos.Infra.DHT.Real.Param
-    (KademliaParams)
+                       (KademliaParams)
 import           Pos.Infra.Network.Types
-    (NetworkConfig (..))
+                       (NetworkConfig (..))
 import           Pos.Infra.Reporting.MemState
-    (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))
+                       (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))
 import           Pos.Infra.Shutdown
-    (HasShutdownContext (..), ShutdownContext (..))
+                       (HasShutdownContext (..), ShutdownContext (..))
 import           Pos.Infra.Slotting
-    (HasSlottingVar (..), SimpleSlottingStateVar)
+                       (HasSlottingVar (..), SimpleSlottingStateVar)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 import           Pos.Infra.StateLock
-    (StateLock, StateLockMetrics)
+                       (StateLock, StateLockMetrics)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason (..))
+                       (MemPoolModifyReason (..))
 import           Pos.Launcher.Param
-    (BaseParams (..), NodeParams (..))
+                       (BaseParams (..), NodeParams (..))
 import           Pos.Lrc.Context
-    (LrcContext)
+                       (LrcContext)
 import           Pos.Ssc.Types
-    (HasSscContext (..), SscContext)
+                       (HasSscContext (..), SscContext)
 import           Pos.Txp.Settings
-    (TxpGlobalSettings)
+                       (TxpGlobalSettings)
 import           Pos.Update.Context
-    (UpdateContext)
+                       (UpdateContext)
 import           Pos.Util.Lens
-    (postfixLFields)
+                       (postfixLFields)
 import           Pos.Util.UserSecret
-    (HasUserSecret (..), UserSecret)
+                       (HasUserSecret (..), UserSecret)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 ----------------------------------------------------------------------------
 -- NodeContext

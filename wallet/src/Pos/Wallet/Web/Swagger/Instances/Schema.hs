@@ -9,37 +9,39 @@ module Pos.Wallet.Web.Swagger.Instances.Schema where
 import           Universum
 
 import           Control.Lens
-    (ix, mapped, (?~))
+                       (ix, mapped, (?~))
 import           Data.Aeson
-    (toJSON)
+                       (toJSON)
 import           Data.Swagger
-    (NamedSchema (..), SwaggerType (..), ToParamSchema (..), ToSchema (..),
-    declareNamedSchema, declareSchema, declareSchemaRef, defaultSchemaOptions,
-    description, example, format, genericDeclareNamedSchema, name, properties,
-    required, sketchSchema, type_)
+                       (NamedSchema (..), SwaggerType (..), ToParamSchema (..),
+                       ToSchema (..), declareNamedSchema, declareSchema,
+                       declareSchemaRef, defaultSchemaOptions, description,
+                       example, format, genericDeclareNamedSchema, name,
+                       properties, required, sketchSchema, type_)
 import           Data.Swagger.Internal.Schema
-    (named)
+                       (named)
 import qualified Data.Swagger.Lens as Swagger
 import           Data.Typeable
-    (Typeable, typeRep)
+                       (Typeable, typeRep)
 import           Data.Version
-    (Version)
+                       (Version)
 import           Servant.Multipart
-    (FileData (..))
+                       (FileData (..))
 
 import           Pos.Client.Txp.Util
-    (InputSelectionPolicy (..))
+                       (InputSelectionPolicy (..))
 import           Pos.Core
-    (ApplicationName, BlockCount (..), BlockVersion, ChainDifficulty, Coin,
-    SlotCount (..), SoftwareVersion, mkCoin)
+                       (ApplicationName, BlockCount (..), BlockVersion,
+                       ChainDifficulty, Coin, SlotCount (..), SoftwareVersion,
+                       mkCoin)
 import           Pos.Util.BackupPhrase
-    (BackupPhrase)
+                       (BackupPhrase)
 
 import qualified Pos.Wallet.Web.ClientTypes as CT
 import qualified Pos.Wallet.Web.Error.Types as ET
 
 import           Pos.Wallet.Web.Methods.Misc
-    (PendingTxsSummary, WalletStateSnapshot)
+                       (PendingTxsSummary, WalletStateSnapshot)
 
 -- | Instances we need to build Swagger-specification for 'walletApi':
 -- 'ToParamSchema' - for types in parameters ('Capture', etc.),

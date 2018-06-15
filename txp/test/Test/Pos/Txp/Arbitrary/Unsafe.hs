@@ -6,13 +6,12 @@ module Test.Pos.Txp.Arbitrary.Unsafe () where
 
 import           Universum
 
-import           Pos.Arbitrary.Core.Unsafe
-    ()
+import           Pos.Arbitrary.Core.Unsafe ()
 import           Pos.Core.Txp
-    (TxOut (..))
+                       (TxOut (..))
 
 import           Test.Pos.Util.QuickCheck.Arbitrary
-    (ArbitraryUnsafe (..))
+                       (ArbitraryUnsafe (..))
 
 instance ArbitraryUnsafe TxOut where
     arbitraryUnsafe = TxOut <$> arbitraryUnsafe <*> arbitraryUnsafe

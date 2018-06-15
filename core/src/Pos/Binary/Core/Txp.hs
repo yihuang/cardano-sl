@@ -11,16 +11,14 @@ import           Universum
 import qualified Data.ByteString.Lazy as LBS
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), decodeKnownCborDataItem,
-    decodeListLenCanonical, decodeUnknownCborDataItem, deriveSimpleBi,
-    encodeKnownCborDataItem, encodeListLen, encodeUnknownCborDataItem,
-    enforceSize, matchSize)
-import           Pos.Binary.Core.Common
-    ()
-import           Pos.Binary.Core.Script
-    ()
-import           Pos.Binary.Merkle
-    ()
+                       (Bi (..), Cons (..), Field (..),
+                       decodeKnownCborDataItem, decodeListLenCanonical,
+                       decodeUnknownCborDataItem, deriveSimpleBi,
+                       encodeKnownCborDataItem, encodeListLen,
+                       encodeUnknownCborDataItem, enforceSize, matchSize)
+import           Pos.Binary.Core.Common ()
+import           Pos.Binary.Core.Script ()
+import           Pos.Binary.Merkle ()
 import qualified Pos.Core.Common as Common
 import qualified Pos.Core.Txp as T
 

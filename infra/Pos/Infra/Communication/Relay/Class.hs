@@ -11,19 +11,20 @@ module Pos.Infra.Communication.Relay.Class
        ) where
 
 import           Node.Message.Class
-    (Message)
+                       (Message)
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Binary.Limit
-    (Limit (..))
+                       (Limit (..))
 import           Universum
 
 import           Pos.Infra.Communication.Types.Protocol
-    (EnqueueMsg, Msg, NodeId)
+                       (EnqueueMsg, Msg, NodeId)
 import           Pos.Infra.Communication.Types.Relay
-    (DataMsg, InvMsg, InvOrData, MempoolMsg, ReqMsg, ReqOrRes)
+                       (DataMsg, InvMsg, InvOrData, MempoolMsg, ReqMsg,
+                       ReqOrRes)
 import           Pos.Infra.Network.Types
-    (Origin)
+                       (Origin)
 
 -- | Data for general Inv/Req/Dat framework
 

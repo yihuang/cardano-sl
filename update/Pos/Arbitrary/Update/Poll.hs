@@ -10,34 +10,29 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 import           Test.QuickCheck
-    (Arbitrary (..))
+                       (Arbitrary (..))
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Core
-    ()
-import           Pos.Arbitrary.Slotting
-    ()
-import           Pos.Arbitrary.Update.Core
-    ()
-import           Pos.Binary.Core
-    ()
-import           Pos.Binary.Update
-    ()
+import           Pos.Arbitrary.Core ()
+import           Pos.Arbitrary.Slotting ()
+import           Pos.Arbitrary.Update.Core ()
+import           Pos.Binary.Core ()
+import           Pos.Binary.Update ()
 import           Pos.Core.Configuration
-    (HasProtocolConstants)
+                       (HasProtocolConstants)
 import           Pos.Crypto
-    (HasProtocolMagic)
+                       (HasProtocolMagic)
 import           Pos.Update.Poll.Modifier
-    (PollModifier (..))
+                       (PollModifier (..))
 import           Pos.Update.Poll.PollState
-    (PollState (..), psActivePropsIdx)
+                       (PollState (..), psActivePropsIdx)
 import           Pos.Update.Poll.Types
-    (BlockVersionState (..), ConfirmedProposalState (..),
-    DecidedProposalState (..), DpsExtra (..), PrevValue, ProposalState (..),
-    USUndo, UndecidedProposalState (..), UpsExtra (..))
-import           Test.Pos.Util.Modifier
-    ()
+                       (BlockVersionState (..), ConfirmedProposalState (..),
+                       DecidedProposalState (..), DpsExtra (..), PrevValue,
+                       ProposalState (..), USUndo, UndecidedProposalState (..),
+                       UpsExtra (..))
+import           Test.Pos.Util.Modifier ()
 
 instance Arbitrary UpsExtra where
     arbitrary = genericArbitrary

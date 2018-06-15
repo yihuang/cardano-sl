@@ -8,14 +8,15 @@ import           Universum
 
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Fixed
-    (Nano)
+                       (Nano)
 
 import           Pos.Binary.Class
-    (Bi (..), decode, decodeKnownCborDataItem, decodeUnknownCborDataItem,
-    encode, encodeKnownCborDataItem, encodeListLen, encodeUnknownCborDataItem,
-    enforceSize)
+                       (Bi (..), decode, decodeKnownCborDataItem,
+                       decodeUnknownCborDataItem, encode,
+                       encodeKnownCborDataItem, encodeListLen,
+                       encodeUnknownCborDataItem, enforceSize)
 import           Pos.Core.Common
-    (Coeff (..), TxFeePolicy (..), TxSizeLinear (..))
+                       (Coeff (..), TxFeePolicy (..), TxSizeLinear (..))
 
 instance Bi Coeff where
     encode (Coeff n) = encode n

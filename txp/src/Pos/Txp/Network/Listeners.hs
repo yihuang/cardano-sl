@@ -13,28 +13,27 @@ module Pos.Txp.Network.Listeners
        ) where
 
 import           Data.Tagged
-    (Tagged (..))
+                       (Tagged (..))
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Node.Message.Class
-    (Message)
+                       (Message)
 import           System.Wlog
-    (WithLogger, logInfo)
+                       (WithLogger, logInfo)
 import           Universum
 
-import           Pos.Binary.Txp
-    ()
+import           Pos.Binary.Txp ()
 import           Pos.Core.Txp
-    (TxAux (..), TxId)
+                       (TxAux (..), TxId)
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import qualified Pos.Infra.Communication.Relay as Relay
 import           Pos.Infra.Util.JsonLog.Events
-    (JLTxR (..))
+                       (JLTxR (..))
 import           Pos.Txp.MemState
-    (MempoolExt, MonadTxpLocal, MonadTxpMem, txpProcessTx)
+                       (MempoolExt, MonadTxpLocal, MonadTxpMem, txpProcessTx)
 import           Pos.Txp.Network.Types
-    (TxMsgContents (..))
+                       (TxMsgContents (..))
 
 -- Real tx processing
 -- CHECK: @handleTxDo

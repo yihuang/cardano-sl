@@ -3,7 +3,7 @@ module PSTypes
     ) where
 
 import           Language.PureScript.Bridge.TypeInfo
-    (PSType, TypeInfo (..))
+                       (PSType, TypeInfo (..))
 
 psPosixTime :: PSType
 psPosixTime = TypeInfo "" "Data.Time.NominalDiffTime" "NominalDiffTime" []

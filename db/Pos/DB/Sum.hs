@@ -17,25 +17,25 @@ module Pos.DB.Sum
 import           Universum
 
 import           Control.Monad.Trans.Resource
-    (MonadResource)
+                       (MonadResource)
 import           Data.Conduit
-    (ConduitT, transPipe)
+                       (ConduitT, transPipe)
 
 import qualified Database.RocksDB as Rocks
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core.Configuration
-    (HasCoreConfiguration)
+                       (HasCoreConfiguration)
 import           Pos.DB.Class
-    (DBIteratorClass (..), DBTag, IterType)
+                       (DBIteratorClass (..), DBTag, IterType)
 import           Pos.DB.Pure
-    (DBPureVar)
+                       (DBPureVar)
 import qualified Pos.DB.Pure as DB
 import           Pos.DB.Rocks
-    (NodeDBs)
+                       (NodeDBs)
 import qualified Pos.DB.Rocks as DB
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 data DBSum = RealDB NodeDBs | PureDB DBPureVar
 

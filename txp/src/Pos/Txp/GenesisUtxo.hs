@@ -13,14 +13,15 @@ import qualified Data.HashMap.Strict as HM
 import qualified Data.Map.Strict as Map
 
 import           Pos.Core
-    (Address, Coin, GenesisData (..), HasGenesisData, StakesMap, genesisData,
-    getGenesisAvvmBalances, getGenesisNonAvvmBalances, makeRedeemAddress)
+                       (Address, Coin, GenesisData (..), HasGenesisData,
+                       StakesMap, genesisData, getGenesisAvvmBalances,
+                       getGenesisNonAvvmBalances, makeRedeemAddress)
 import           Pos.Core.Txp
-    (TxIn (..), TxOut (..), TxOutAux (..))
+                       (TxIn (..), TxOut (..), TxOutAux (..))
 import           Pos.Crypto
-    (unsafeHash)
+                       (unsafeHash)
 import           Pos.Txp.Toil
-    (GenesisUtxo (..), utxoToStakes)
+                       (GenesisUtxo (..), utxoToStakes)
 
 
 genesisStakes :: HasGenesisData => StakesMap

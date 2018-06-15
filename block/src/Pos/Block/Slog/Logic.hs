@@ -24,64 +24,65 @@ module Pos.Block.Slog.Logic
 import           Universum
 
 import           Control.Lens
-    (_Wrapped)
+                       (_Wrapped)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.List.NonEmpty as NE
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Serokell.Util
-    (Color (Red), colorize)
+                       (Color (Red), colorize)
 import           Serokell.Util.Verify
-    (formatAllErrors, verResToMonadError)
+                       (formatAllErrors, verResToMonadError)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Block.BListener
-    (MonadBListener (..))
+                       (MonadBListener (..))
 import           Pos.Block.Logic.Integrity
-    (verifyBlocks)
+                       (verifyBlocks)
 import           Pos.Block.Slog.Context
-    (slogGetLastSlots, slogPutLastSlots)
+                       (slogGetLastSlots, slogPutLastSlots)
 import           Pos.Block.Slog.Types
-    (HasSlogGState)
+                       (HasSlogGState)
 import           Pos.Block.Types
-    (Blund, SlogUndo (..), Undo (..))
+                       (Blund, SlogUndo (..), Undo (..))
 import           Pos.Core
-    (BlockVersion (..), FlatSlotId, blkSecurityParam, difficultyL, epochIndexL,
-    flattenSlotId, headerHash, headerHashG, prevBlockL)
+                       (BlockVersion (..), FlatSlotId, blkSecurityParam,
+                       difficultyL, epochIndexL, flattenSlotId, headerHash,
+                       headerHashG, prevBlockL)
 import           Pos.Core.Block
-    (Block, genBlockLeaders, mainBlockSlot)
+                       (Block, genBlockLeaders, mainBlockSlot)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (getNewestFirst), OldestFirst (..), toOldestFirst,
-    _OldestFirst)
+                       (NE, NewestFirst (getNewestFirst), OldestFirst (..),
+                       toOldestFirst, _OldestFirst)
 import           Pos.DB
-    (SomeBatchOp (..))
+                       (SomeBatchOp (..))
 import           Pos.DB.Block
-    (putBlunds)
+                       (putBlunds)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class
-    (MonadDB (..), MonadDBRead)
+                       (MonadDB (..), MonadDBRead)
 import qualified Pos.DB.GState.Common as GS
-    (CommonOp (PutMaxSeenDifficulty, PutTip), getMaxSeenDifficulty)
+                       (CommonOp (PutMaxSeenDifficulty, PutTip),
+                       getMaxSeenDifficulty)
 import           Pos.Exception
-    (assertionFailed, reportFatalError)
+                       (assertionFailed, reportFatalError)
 import qualified Pos.GState.BlockExtra as GS
 import           Pos.Infra.Slotting
-    (MonadSlots (getCurrentSlot))
+                       (MonadSlots (getCurrentSlot))
 import           Pos.Lrc.Context
-    (HasLrcContext, lrcActionOnEpochReason)
+                       (HasLrcContext, lrcActionOnEpochReason)
 import qualified Pos.Lrc.DB as LrcDB
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, lastKnownBlockVersion)
+                       (HasUpdateConfiguration, lastKnownBlockVersion)
 import qualified Pos.Update.DB as GS
-    (getAdoptedBVFull)
+                       (getAdoptedBVFull)
 import           Pos.Util
-    (_neHead, _neLast)
+                       (_neHead, _neLast)
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 
 ----------------------------------------------------------------------------
 -- Helpers

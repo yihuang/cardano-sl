@@ -27,16 +27,16 @@ module Pos.Block.Configuration
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
+                       (FromJSON (..), ToJSON (..), genericParseJSON,
+                       genericToJSON)
 import           Data.Reflection
-    (Given (..), give)
+                       (Given (..), give)
 import           Data.Time.Units
-    (Microsecond, Second, convertUnit, fromMicroseconds)
+                       (Microsecond, Second, convertUnit, fromMicroseconds)
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 
-import           Pos.Aeson.Core
-    ()
+import           Pos.Aeson.Core ()
 
 type HasBlockConfiguration = Given BlockConfiguration
 

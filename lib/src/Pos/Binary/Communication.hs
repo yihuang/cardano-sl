@@ -14,25 +14,24 @@ import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), decodeKnownCborDataItem,
-    decodeUnknownCborDataItem, deriveSimpleBi, encodeKnownCborDataItem,
-    encodeListLen, encodeUnknownCborDataItem, enforceSize, serialize')
-import           Pos.Binary.Core
-    ()
-import           Pos.Block.BHelpers
-    ()
+                       (Bi (..), Cons (..), Field (..),
+                       decodeKnownCborDataItem, decodeUnknownCborDataItem,
+                       deriveSimpleBi, encodeKnownCborDataItem, encodeListLen,
+                       encodeUnknownCborDataItem, enforceSize, serialize')
+import           Pos.Binary.Core ()
+import           Pos.Block.BHelpers ()
 import           Pos.Block.Network
-    (MsgBlock (..), MsgGetBlocks (..), MsgGetHeaders (..), MsgHeaders (..),
-    MsgSerializedBlock (..))
+                       (MsgBlock (..), MsgGetBlocks (..), MsgGetHeaders (..),
+                       MsgHeaders (..), MsgSerializedBlock (..))
 import           Pos.Core
-    (BlockVersion, HeaderHash)
+                       (BlockVersion, HeaderHash)
 import           Pos.DB.Class
-    (Serialized (..))
+                       (Serialized (..))
 import           Pos.Infra.Communication.Types.Protocol
-    (HandlerSpec (..), HandlerSpecs, MsgSubscribe (..), MsgSubscribe1 (..),
-    VerInfo (..))
+                       (HandlerSpec (..), HandlerSpecs, MsgSubscribe (..),
+                       MsgSubscribe1 (..), VerInfo (..))
 import           Pos.Util.Util
-    (cborError)
+                       (cborError)
 
 -- TODO: move into each component
 

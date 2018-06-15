@@ -6,7 +6,7 @@ module Main where
 import           Universum
 
 import           Data.Typeable
-    (typeRep)
+                       (typeRep)
 import           Test.Hspec
 import           Test.Hspec.QuickCheck
 import           Test.QuickCheck

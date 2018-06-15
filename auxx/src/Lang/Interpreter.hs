@@ -9,18 +9,18 @@ module Lang.Interpreter
 import           Universum
 
 import           Control.Monad.Except
-    (throwError)
+                       (throwError)
 
 import           Lang.Argument
-    (ProcError, consumeArguments)
+                       (ProcError, consumeArguments)
 import           Lang.Command
-    (CommandProc (..))
+                       (CommandProc (..))
 import           Lang.Name
-    (Name)
+                       (Name)
 import           Lang.Syntax
-    (Expr (..), Lit (..), ProcCall (..))
+                       (Expr (..), Lit (..), ProcCall (..))
 import           Lang.Value
-    (Value (..))
+                       (Value (..))
 
 data EvalError = InvalidArguments Name ProcError
     deriving (Eq, Ord, Show)

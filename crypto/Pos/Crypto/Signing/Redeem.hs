@@ -9,19 +9,19 @@ module Pos.Crypto.Signing.Redeem
 import           Universum
 
 import           Crypto.Random
-    (MonadRandom, getRandomBytes)
+                       (MonadRandom, getRandomBytes)
 import qualified Data.ByteString as BS
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 
 import qualified Crypto.Sign.Ed25519 as Ed25519
 import           Pos.Binary.Class
-    (Bi, Raw)
+                       (Bi, Raw)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Crypto.Configuration
-    (ProtocolMagic)
+                       (ProtocolMagic)
 import           Pos.Crypto.Signing.Tag
-    (SignTag, signTag)
+                       (SignTag, signTag)
 import           Pos.Crypto.Signing.Types.Redeem
 
 ----------------------------------------------------------------------------

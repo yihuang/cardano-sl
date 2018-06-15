@@ -18,31 +18,31 @@ module Pos.Explorer.Socket.Util
     ) where
 
 import           Universum hiding
-    (on)
+                       (on)
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Monad.Reader
-    (MonadReader)
+                       (MonadReader)
 import           Control.Monad.State
-    (MonadState)
+                       (MonadState)
 import           Control.Monad.Trans
-    (MonadIO)
+                       (MonadIO)
 import           Data.Aeson.Types
-    (Array, FromJSON, ToJSON)
+                       (Array, FromJSON, ToJSON)
 import qualified Data.Map as M
 import           Data.Text
-    (Text)
+                       (Text)
 import           Data.Time.Units
-    (TimeUnit (..))
+                       (TimeUnit (..))
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Network.EngineIO.Wai
-    (WaiMonad)
+                       (WaiMonad)
 
 import qualified Network.SocketIO as S
 import           System.Wlog
-    (CanLog (..), WithLogger, logWarning)
+                       (CanLog (..), WithLogger, logWarning)
 
 -- * Provides type-safety for event names in some socket-io functions.
 

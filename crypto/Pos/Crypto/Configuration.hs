@@ -12,9 +12,9 @@ module Pos.Crypto.Configuration
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..))
+                       (FromJSON (..), ToJSON (..))
 import           Data.Reflection
-    (Given (..), give, given)
+                       (Given (..), give, given)
 
 -- | Magic number which should differ for different clusters. It's
 -- defined here, because it's used for signing. It also used for other

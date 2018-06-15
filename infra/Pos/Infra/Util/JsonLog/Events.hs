@@ -25,46 +25,47 @@ module Pos.Infra.Util.JsonLog.Events
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError)
+                       (MonadError)
 import           Control.Monad.Trans.Identity
-    (IdentityT (..))
+                       (IdentityT (..))
 import           Data.Aeson
-    (encode)
+                       (encode)
 import           Data.Aeson.TH
-    (deriveJSON)
+                       (deriveJSON)
 import           Data.Aeson.Types
-    (ToJSON)
+                       (ToJSON)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Ether
 import           Formatting
-    (sformat)
+                       (sformat)
 import           JsonLog.CanJsonLog
-    (CanJsonLog)
+                       (CanJsonLog)
 import           JsonLog.JsonLogT
-    (JsonLogConfig (..))
+                       (JsonLogConfig (..))
 import qualified JsonLog.JsonLogT as JL
 import           Mockable
-    (realTime)
+                       (realTime)
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Core
-    (EpochIndex (..), HasConfiguration, HeaderHash, SlotId (..), gbHeader,
-    gbhPrevBlock, getSlotIndex, headerHash, headerHashF, mkLocalSlotIndex)
+                       (EpochIndex (..), HasConfiguration, HeaderHash,
+                       SlotId (..), gbHeader, gbhPrevBlock, getSlotIndex,
+                       headerHash, headerHashF, mkLocalSlotIndex)
 import           Pos.Core.Block
-    (Block, mainBlockTxPayload)
+                       (Block, mainBlockTxPayload)
 import           Pos.Core.Block.Genesis
-    (genBlockEpoch)
+                       (genBlockEpoch)
 import           Pos.Core.Block.Main
-    (mainBlockSlot)
+                       (mainBlockSlot)
 import           Pos.Core.Txp
-    (txpTxs)
+                       (txpTxs)
 import           Pos.Crypto
-    (hash, hashHexF)
+                       (hash, hashHexF)
 import           Pos.Infra.Communication.Relay.Logic
-    (InvReqDataFlowLog)
+                       (InvReqDataFlowLog)
 
 type BlockId = Text
 type TxId = Text

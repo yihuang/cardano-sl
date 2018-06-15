@@ -7,19 +7,20 @@ module Client.Cardano.Wallet.Web.Endpoint.GetHistory
 import           Universum
 
 import           Bench.Cardano.Wallet.Random
-    (pickRandomElementFrom)
+                       (pickRandomElementFrom)
 import           Bench.Cardano.Wallet.Types
-    (BenchEndpoint (..), CompleteConfig (..), Response, ResponseReport (..),
-    Wallet (..), WalletAccount (..), WalletsConfig (..))
+                       (BenchEndpoint (..), CompleteConfig (..), Response,
+                       ResponseReport (..), Wallet (..), WalletAccount (..),
+                       WalletsConfig (..))
 import           Client.Cardano.Wallet.Web.Analyze
-    (analyzeResponseIfNeeded, checkResponse)
+                       (analyzeResponseIfNeeded, checkResponse)
 import           Client.Cardano.Wallet.Web.Api
-    (getHistory)
+                       (getHistory)
 import           Client.Cardano.Wallet.Web.Run
-    (runEndpointClient)
+                       (runEndpointClient)
 
 import           Pos.Wallet.Web.ClientTypes
-    (Addr, CHash (..), CId (..), CTx (..))
+                       (Addr, CHash (..), CId (..), CTx (..))
 
 -- | Run 'GetHistory' client. As a result we will get
 -- a list of transactions and size of a full history.

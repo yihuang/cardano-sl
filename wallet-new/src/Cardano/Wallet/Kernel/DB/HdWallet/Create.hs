@@ -13,9 +13,9 @@ module Cardano.Wallet.Kernel.DB.HdWallet.Create (
 import           Universum
 
 import           Control.Lens
-    (at, (.=))
+                       (at, (.=))
 import           Data.SafeCopy
-    (base, deriveSafeCopy)
+                       (base, deriveSafeCopy)
 
 import qualified Pos.Core as Core
 

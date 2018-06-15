@@ -6,7 +6,7 @@ module TransactionSpecs (transactionSpecs) where
 import           Universum
 
 import           Cardano.Wallet.API.V1.Errors hiding
-    (describe)
+                       (describe)
 import           Cardano.Wallet.Client.Http
 import           Control.Lens
 import qualified Pos.Core as Core

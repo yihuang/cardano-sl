@@ -8,14 +8,14 @@ module Pos.Core.Configuration.GenesisHash
        ) where
 
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import           Data.Reflection
-    (Given (..), give)
+                       (Given (..), give)
 
 import           Pos.Binary.Class
-    (Raw)
+                       (Raw)
 import           Pos.Crypto.Hashing
-    (Hash)
+                       (Hash)
 
 newtype GenesisHash = GenesisHash { getGenesisHash :: forall a . Hash a }
 

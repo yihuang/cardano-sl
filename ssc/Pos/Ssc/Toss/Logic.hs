@@ -9,48 +9,50 @@ module Pos.Ssc.Toss.Logic
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at)
+                       (at)
 import           Control.Monad.Except
-    (MonadError, runExceptT, throwError)
+                       (MonadError, runExceptT, throwError)
 import           Crypto.Random
-    (MonadRandom)
+                       (MonadRandom)
 import qualified Data.HashMap.Strict as HM
 import           System.Wlog
-    (logError)
+                       (logError)
 
 import           Pos.Core
-    (EpochIndex, EpochOrSlot (..), HasProtocolConstants, HasProtocolMagic,
-    IsMainHeader, LocalSlotIndex, SlotCount, SlotId (siSlot), StakeholderId,
-    VssCertificate, epochIndexL, epochOrSlot, getEpochOrSlot,
-    getVssCertificatesMap, headerSlotL, mkCoin, mkVssCertificatesMapSingleton,
-    slotSecurityParam)
+                       (EpochIndex, EpochOrSlot (..), HasProtocolConstants,
+                       HasProtocolMagic, IsMainHeader, LocalSlotIndex,
+                       SlotCount, SlotId (siSlot), StakeholderId,
+                       VssCertificate, epochIndexL, epochOrSlot,
+                       getEpochOrSlot, getVssCertificatesMap, headerSlotL,
+                       mkCoin, mkVssCertificatesMapSingleton,
+                       slotSecurityParam)
 import           Pos.Core.Chrono
-    (NewestFirst (..))
+                       (NewestFirst (..))
 import           Pos.Core.Ssc
-    (CommitmentsMap (..), InnerSharesMap, Opening, SignedCommitment,
-    SscPayload (..), checkSscPayload, getCommitmentsMap,
-    mkCommitmentsMapUnsafe, spVss)
+                       (CommitmentsMap (..), InnerSharesMap, Opening,
+                       SignedCommitment, SscPayload (..), checkSscPayload,
+                       getCommitmentsMap, mkCommitmentsMapUnsafe, spVss)
 import           Pos.Crypto.Configuration
-    (protocolMagic)
+                       (protocolMagic)
 import           Pos.Ssc.Error
-    (SscVerifyError (..))
+                       (SscVerifyError (..))
 import           Pos.Ssc.Functions
-    (verifySscPayload)
+                       (verifySscPayload)
 import           Pos.Ssc.Toss.Base
-    (checkPayload)
+                       (checkPayload)
 import           Pos.Ssc.Toss.Class
-    (MonadToss (..), MonadTossEnv (..))
+                       (MonadToss (..), MonadTossEnv (..))
 import           Pos.Ssc.Toss.Types
-    (TossModifier (..))
+                       (TossModifier (..))
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 import           Pos.Util.Some
-    (Some)
+                       (Some)
 import           Pos.Util.Util
-    (sortWithMDesc)
+                       (sortWithMDesc)
 
 -- | Verify 'SscPayload' with respect to data provided by
 -- MonadToss. If data is valid it is also applied.  Otherwise

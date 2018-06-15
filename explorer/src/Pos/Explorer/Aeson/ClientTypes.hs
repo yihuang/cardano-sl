@@ -10,24 +10,24 @@ module Pos.Explorer.Aeson.ClientTypes
 import           Universum
 
 import           Data.Aeson.Encoding
-    (unsafeToEncoding)
+                       (unsafeToEncoding)
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON, deriveToJSON)
+                       (defaultOptions, deriveJSON, deriveToJSON)
 import           Data.Aeson.Types
-    (ToJSON (..))
+                       (ToJSON (..))
 import qualified Data.ByteString.Builder as BS
-    (string8)
+                       (string8)
 import           Data.Fixed
-    (showFixed)
+                       (showFixed)
 
-import           Pos.Aeson
-    ()
+import           Pos.Aeson ()
 import           Pos.Explorer.Web.ClientTypes
-    (CAda (..), CAddress, CAddressSummary, CAddressType, CBlockEntry,
-    CBlockSummary, CCoin, CGenesisAddressInfo, CGenesisSummary, CHash,
-    CNetworkAddress, CTxBrief, CTxEntry, CTxId, CTxSummary)
+                       (CAda (..), CAddress, CAddressSummary, CAddressType,
+                       CBlockEntry, CBlockSummary, CCoin, CGenesisAddressInfo,
+                       CGenesisSummary, CHash, CNetworkAddress, CTxBrief,
+                       CTxEntry, CTxId, CTxSummary)
 import           Pos.Explorer.Web.Error
-    (ExplorerError)
+                       (ExplorerError)
 
 deriveJSON defaultOptions ''CHash
 deriveJSON defaultOptions ''CAddress

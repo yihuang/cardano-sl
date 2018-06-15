@@ -27,8 +27,7 @@ module Pos.Ssc
        , module Pos.Ssc.Worker
        ) where
 
-import           Pos.Binary.Ssc
-    ()
+import           Pos.Binary.Ssc ()
 import           Pos.Ssc.Base
 import           Pos.Ssc.Behavior
 import           Pos.Ssc.Configuration

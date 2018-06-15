@@ -10,11 +10,11 @@ module Data.NonEmptySet (
     ) where
 
 import           Data.Foldable
-    (foldrM)
+                       (foldrM)
 import           Data.List.NonEmpty
-    (NonEmpty ((:|)))
+                       (NonEmpty ((:|)))
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as S
 
 -- | A set (no duplicates) with at least one element.

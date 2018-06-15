@@ -18,7 +18,7 @@ module UTxO.Crypto (
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Universum
 
 import           Pos.Core

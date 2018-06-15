@@ -4,13 +4,13 @@ module Pos.Infra.Communication.Specs
        ) where
 
 import           Node.Message.Class
-    (Message (..))
+                       (Message (..))
 import           Universum
 
 import           Pos.Infra.Communication.Protocol
-    (OutSpecs, convH, toOutSpecs)
+                       (OutSpecs, convH, toOutSpecs)
 import           Pos.Infra.Communication.Types.Relay
-    (InvOrData, ReqOrRes)
+                       (InvOrData, ReqOrRes)
 
 -- FIXME (avieth)
 -- This looks to be misplaced and misnamed.

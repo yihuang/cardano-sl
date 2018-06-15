@@ -17,20 +17,20 @@ module Pos.Txp.Settings.Global
 import           Universum
 
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Core
-    (ComponentBlock)
+                       (ComponentBlock)
 import           Pos.Core.Chrono
-    (NE, NewestFirst, OldestFirst)
+                       (NE, NewestFirst, OldestFirst)
 import           Pos.Core.Txp
-    (TxPayload, TxpUndo)
+                       (TxPayload, TxpUndo)
 import           Pos.DB
-    (MonadDBRead, MonadGState, SomeBatchOp)
+                       (MonadDBRead, MonadGState, SomeBatchOp)
 import           Pos.Infra.Slotting
-    (MonadSlots)
+                       (MonadSlots)
 import           Pos.Txp.Toil.Failure
-    (ToilVerFailure)
+                       (ToilVerFailure)
 
 type TxpCommonMode m =
     ( WithLogger m

@@ -26,71 +26,73 @@ import qualified Cardano.Wallet.Kernel.Mode as Kernel
 import qualified Cardano.Wallet.LegacyServer as LegacyServer
 import qualified Cardano.Wallet.Server as Server
 import           Cardano.Wallet.Server.CLI
-    (NewWalletBackendParams (..), RunMode, WalletBackendParams (..),
-    isDebugMode, walletAcidInterval, walletDbOptions)
+                       (NewWalletBackendParams (..), RunMode,
+                       WalletBackendParams (..), isDebugMode,
+                       walletAcidInterval, walletDbOptions)
 import           Cardano.Wallet.WalletLayer
-    (ActiveWalletLayer, PassiveWalletLayer, bracketKernelActiveWallet)
+                       (ActiveWalletLayer, PassiveWalletLayer,
+                       bracketKernelActiveWallet)
 import qualified Pos.Wallet.Web.Error.Types as V0
 
 import           Control.Exception
-    (fromException)
+                       (fromException)
 import           Data.Aeson
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Mockable
 import           Network.HTTP.Types.Status
-    (badRequest400)
+                       (badRequest400)
 import           Network.Wai
-    (Application, Middleware, Response, responseLBS)
+                       (Application, Middleware, Response, responseLBS)
 import           Network.Wai.Handler.Warp
-    (defaultSettings, setOnExceptionResponse)
+                       (defaultSettings, setOnExceptionResponse)
 import           Network.Wai.Middleware.Cors
-    (cors, corsMethods, corsRequestHeaders, simpleCorsResourcePolicy,
-    simpleMethods)
+                       (cors, corsMethods, corsRequestHeaders,
+                       simpleCorsResourcePolicy, simpleMethods)
 import           Ntp.Client
-    (NtpStatus)
+                       (NtpStatus)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..))
+                       (Diffusion (..))
 import           Pos.Wallet.Web
-    (cleanupAcidStatePeriodically)
+                       (cleanupAcidStatePeriodically)
 import           Pos.Wallet.Web.Pending.Worker
-    (startPendingTxsResubmitter)
+                       (startPendingTxsResubmitter)
 import qualified Pos.Wallet.Web.Server.Runner as V0
 import           Pos.Wallet.Web.Sockets
-    (getWalletWebSockets, upgradeApplicationWS)
+                       (getWalletWebSockets, upgradeApplicationWS)
 import qualified Servant
 import           System.Wlog
-    (logInfo, modifyLoggerName, usingLoggerName)
+                       (logInfo, modifyLoggerName, usingLoggerName)
 
 import           Pos.Context
-    (HasNodeContext)
+                       (HasNodeContext)
 import           Pos.Util
-    (lensOf)
+                       (lensOf)
 
 import           Cardano.NodeIPC
-    (startNodeJsIPC)
+                       (startNodeJsIPC)
 import           Pos.Configuration
-    (walletProductionApi, walletTxCreationDisabled)
+                       (walletProductionApi, walletTxCreationDisabled)
 import           Pos.Infra.Shutdown.Class
-    (HasShutdownContext (shutdownContext))
+                       (HasShutdownContext (shutdownContext))
 import           Pos.Launcher.Configuration
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo)
+                       (HasCompileInfo)
 import           Pos.Wallet.Web.Mode
-    (WalletWebMode)
+                       (WalletWebMode)
 import           Pos.Wallet.Web.Server.Launcher
-    (walletDocumentationImpl, walletServeImpl)
+                       (walletDocumentationImpl, walletServeImpl)
 import           Pos.Wallet.Web.State
-    (askWalletDB)
+                       (askWalletDB)
 import           Pos.Wallet.Web.Tracking.Sync
-    (processSyncRequest)
+                       (processSyncRequest)
 import           Pos.Wallet.Web.Tracking.Types
-    (SyncQueue)
+                       (SyncQueue)
 import           Pos.Web
-    (serveWeb)
+                       (serveWeb)
 import           Pos.WorkMode
-    (WorkMode)
+                       (WorkMode)
 
 
 -- A @Plugin@ running in the monad @m@.

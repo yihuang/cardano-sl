@@ -7,29 +7,29 @@ module Pos.Ssc.Shares
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Crypto.Random
-    (drgNewSeed, seedNew, withDRG)
+                       (drgNewSeed, seedNew, withDRG)
 import qualified Data.HashMap.Strict as HM
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           System.Wlog
-    (WithLogger, launchNamedPureLog, logWarning)
+                       (WithLogger, launchNamedPureLog, logWarning)
 
 import           Pos.Binary.Class
-    (AsBinary, asBinary, fromBinary)
+                       (AsBinary, asBinary, fromBinary)
 import           Pos.Core.Common
-    (StakeholderId, addressHash)
+                       (StakeholderId, addressHash)
 import           Pos.Core.Ssc
-    (Commitment (..), getCommitmentsMap)
+                       (Commitment (..), getCommitmentsMap)
 import           Pos.Crypto
-    (DecShare, EncShare, VssKeyPair, VssPublicKey, decryptShare,
-    toVssPublicKey)
+                       (DecShare, EncShare, VssKeyPair, VssPublicKey,
+                       decryptShare, toVssPublicKey)
 import           Pos.Ssc.Mem
-    (MonadSscMem, SscGlobalQuery, sscRunGlobalQuery)
+                       (MonadSscMem, SscGlobalQuery, sscRunGlobalQuery)
 import           Pos.Ssc.Types
-    (sgsCommitments, sgsOpenings)
+                       (sgsCommitments, sgsOpenings)
 
 -- | Decrypt shares (in commitments) that are intended for us and that we can
 -- decrypt.

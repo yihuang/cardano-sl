@@ -17,50 +17,52 @@ module Pos.Wallet.Web.Methods.History
 import           Universum
 
 import           Control.Lens
-    (makePrisms)
+                       (makePrisms)
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as S
 import           Data.Time.Clock.POSIX
-    (POSIXTime, getPOSIXTime)
+                       (POSIXTime, getPOSIXTime)
 import           Formatting
-    (sformat, stext, (%))
+                       (sformat, stext, (%))
 import           Serokell.Util
-    (listChunkedJson, listJsonIndent)
+                       (listChunkedJson, listJsonIndent)
 import           System.Wlog
-    (WithLogger, logDebug)
+                       (WithLogger, logDebug)
 
 import           Pos.Client.Txp.History
-    (MonadTxHistory, TxHistoryEntry (..), txHistoryListToMap)
+                       (MonadTxHistory, TxHistoryEntry (..),
+                       txHistoryListToMap)
 import           Pos.Core
-    (Address, ChainDifficulty, timestampToPosix)
+                       (Address, ChainDifficulty, timestampToPosix)
 import           Pos.Core.Txp
-    (TxId)
+                       (TxId)
 import           Pos.Infra.Util.LogSafe
-    (logInfoSP, secureListF)
+                       (logInfoSP, secureListF)
 import           Pos.Util.Servant
-    (encodeCType)
+                       (encodeCType)
 import           Pos.Util.Util
-    (eitherToThrow)
+                       (eitherToThrow)
 import           Pos.Wallet.WalletMode
-    (MonadBlockchainInfo (..), getLocalHistory)
+                       (MonadBlockchainInfo (..), getLocalHistory)
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId (..), Addr, CId, CTx (..), CTxMeta (..), ScrollLimit,
-    ScrollOffset, Wal, addressToCId, mkCTx)
+                       (AccountId (..), Addr, CId, CTx (..), CTxMeta (..),
+                       ScrollLimit, ScrollOffset, Wal, addressToCId, mkCTx)
 import           Pos.Wallet.Web.Error
-    (WalletError (..))
+                       (WalletError (..))
 import           Pos.Wallet.Web.Methods.Logic
-    (MonadWalletLogicRead)
+                       (MonadWalletLogicRead)
 import           Pos.Wallet.Web.Pending
-    (PendingTx (..), ptxPoolInfo, _PtxApplying)
+                       (PendingTx (..), ptxPoolInfo, _PtxApplying)
 import           Pos.Wallet.Web.State
-    (AddressInfo (..), AddressLookupMode (Ever), WalletDB, WalletSnapshot,
-    addOnlyNewTxMetas, askWalletDB, getHistoryCache, getPendingTx, getTxMeta,
-    getWalletPendingTxs, getWalletSnapshot, wamAddress)
+                       (AddressInfo (..), AddressLookupMode (Ever), WalletDB,
+                       WalletSnapshot, addOnlyNewTxMetas, askWalletDB,
+                       getHistoryCache, getPendingTx, getTxMeta,
+                       getWalletPendingTxs, getWalletSnapshot, wamAddress)
 import           Pos.Wallet.Web.Util
-    (getAccountAddrsOrThrow, getWalletAccountIds, getWalletAddrs,
-    getWalletAddrsDetector)
+                       (getAccountAddrsOrThrow, getWalletAccountIds,
+                       getWalletAddrs, getWalletAddrsDetector)
 import           Servant.API.ContentTypes
-    (NoContent (..))
+                       (NoContent (..))
 
 
 type MonadWalletHistory ctx m =

@@ -16,30 +16,32 @@ module Pos.Client.CLI.NodeOptions
 import           Universum
 
 import           Data.Version
-    (showVersion)
+                       (showVersion)
 import           NeatInterpolation
-    (text)
+                       (text)
 import           Options.Applicative
-    (Parser, auto, execParser, footerDoc, fullDesc, header, help, helper, info,
-    infoOption, long, metavar, option, progDesc, strOption, switch, value)
+                       (Parser, auto, execParser, footerDoc, fullDesc, header,
+                       help, helper, info, infoOption, long, metavar, option,
+                       progDesc, strOption, switch, value)
 import           Text.PrettyPrint.ANSI.Leijen
-    (Doc)
+                       (Doc)
 
 import           Paths_cardano_sl
-    (version)
+                       (version)
 
 import           Pos.Client.CLI.Options
-    (CommonArgs (..), commonArgsParser, optionalJSONPath)
+                       (CommonArgs (..), commonArgsParser, optionalJSONPath)
 import           Pos.Infra.HealthCheck.Route53
-    (route53HealthCheckOption)
+                       (route53HealthCheckOption)
 import           Pos.Infra.Network.CLI
-    (NetworkConfigOpts, networkConfigOption)
+                       (NetworkConfigOpts, networkConfigOption)
 import           Pos.Infra.Statistics
-    (EkgParams, StatsdParams, ekgParamsOption, statsdParamsOption)
+                       (EkgParams, StatsdParams, ekgParamsOption,
+                       statsdParamsOption)
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress)
+                       (NetworkAddress)
 import           Pos.Util.CompileInfo
-    (CompileTimeInfo (..), HasCompileInfo, compileInfo)
+                       (CompileTimeInfo (..), HasCompileInfo, compileInfo)
 
 data CommonNodeArgs = CommonNodeArgs
     { dbPath                 :: !(Maybe FilePath)

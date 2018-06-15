@@ -15,38 +15,38 @@ module Pos.Ssc.Functions
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (to)
+                       (to)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.HashMap.Strict as HM
 import           Serokell.Util.Verify
-    (isVerSuccess)
+                       (isVerSuccess)
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (EpochIndex (..), HasGenesisData, HasProtocolConstants, HasProtocolMagic,
-    IsMainHeader, SlotId (..), StakeholderId, VssCertificatesMap,
-    genesisVssCerts, headerSlotL)
+                       (EpochIndex (..), HasGenesisData, HasProtocolConstants,
+                       HasProtocolMagic, IsMainHeader, SlotId (..),
+                       StakeholderId, VssCertificatesMap, genesisVssCerts,
+                       headerSlotL)
 import           Pos.Core.Slotting
-    (crucialSlot)
+                       (crucialSlot)
 import           Pos.Core.Ssc
-    (CommitmentsMap (getCommitmentsMap), SscPayload (..))
+                       (CommitmentsMap (getCommitmentsMap), SscPayload (..))
 import           Pos.Ssc.Base
-    (checkCertTTL, isCommitmentId, isOpeningId, isSharesId,
-    verifySignedCommitment, vssThreshold)
+                       (checkCertTTL, isCommitmentId, isOpeningId, isSharesId,
+                       verifySignedCommitment, vssThreshold)
 import           Pos.Ssc.Error
-    (SscVerifyError (..))
+                       (SscVerifyError (..))
 import           Pos.Ssc.Toss.Base
-    (verifyEntriesGuardM)
+                       (verifyEntriesGuardM)
 import           Pos.Ssc.Types
-    (SscGlobalState (..))
+                       (SscGlobalState (..))
 import qualified Pos.Ssc.VssCertData as VCD
 import           Pos.Util.Some
-    (Some)
+                       (Some)
 
 ----------------------------------------------------------------------------
 -- Simple predicates for SSC.Types

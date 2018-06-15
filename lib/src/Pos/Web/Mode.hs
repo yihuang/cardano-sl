@@ -9,31 +9,31 @@ module Pos.Web.Mode
 import           Universum
 
 import           Control.Lens
-    (makeLensesWith)
+                       (makeLensesWith)
 import qualified Control.Monad.Reader as Mtl
 import           Mockable
-    (Production)
+                       (Production)
 
 import           Pos.Context
-    (HasPrimaryKey (..), HasSscContext (..), NodeContext)
+                       (HasPrimaryKey (..), HasSscContext (..), NodeContext)
 import           Pos.Core.Configuration
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.DB
-    (NodeDBs)
+                       (NodeDBs)
 import           Pos.DB.Block
-    (dbGetSerBlockRealDefault, dbGetSerUndoRealDefault,
-    dbPutSerBlundsRealDefault)
+                       (dbGetSerBlockRealDefault, dbGetSerUndoRealDefault,
+                       dbPutSerBlundsRealDefault)
 import           Pos.DB.Class
-    (MonadDB (..), MonadDBRead (..))
+                       (MonadDB (..), MonadDBRead (..))
 import           Pos.DB.Rocks
-    (dbDeleteDefault, dbGetDefault, dbIterSourceDefault, dbPutDefault,
-    dbWriteBatchDefault)
+                       (dbDeleteDefault, dbGetDefault, dbIterSourceDefault,
+                       dbPutDefault, dbWriteBatchDefault)
 import           Pos.Txp
-    (GenericTxpLocalData, MempoolExt, TxpHolderTag)
+                       (GenericTxpLocalData, MempoolExt, TxpHolderTag)
 import           Pos.Util.Lens
-    (postfixLFields)
+                       (postfixLFields)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 data WebModeContext ext = WebModeContext
     { wmcNodeDBs      :: !NodeDBs

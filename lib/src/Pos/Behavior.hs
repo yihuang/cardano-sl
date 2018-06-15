@@ -8,12 +8,12 @@ import           Universum
 
 import qualified Data.Aeson as A
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 
 import           Pos.Security.Params
-    (SecurityParams)
+                       (SecurityParams)
 import           Pos.Ssc.Behavior
-    (SscBehavior)
+                       (SscBehavior)
 
 data BehaviorConfig = BehaviorConfig
     { bcSecurityParams :: !SecurityParams    -- ^ network

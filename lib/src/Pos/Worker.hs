@@ -10,30 +10,29 @@ module Pos.Worker
 import           Universum
 
 import           Pos.Block.Worker
-    (blkWorkers)
+                       (blkWorkers)
 -- Message instances.
-import           Pos.Communication.Message
-    ()
+import           Pos.Communication.Message ()
 import           Pos.Context
-    (NodeContext (..))
+                       (NodeContext (..))
 import           Pos.Delegation.Worker
-    (dlgWorkers)
+                       (dlgWorkers)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Infra.Network.CLI
-    (launchStaticConfigMonitoring)
+                       (launchStaticConfigMonitoring)
 import           Pos.Infra.Network.Types
-    (NetworkConfig (..))
+                       (NetworkConfig (..))
 import           Pos.Infra.Slotting
-    (logNewSlotWorker)
+                       (logNewSlotWorker)
 import           Pos.Launcher.Resource
-    (NodeResources (..))
+                       (NodeResources (..))
 import           Pos.Ssc.Worker
-    (sscWorkers)
+                       (sscWorkers)
 import           Pos.Update.Worker
-    (usWorkers)
+                       (usWorkers)
 import           Pos.WorkMode
-    (WorkMode)
+                       (WorkMode)
 
 -- | All, but in reality not all, workers used by full node.
 allWorkers

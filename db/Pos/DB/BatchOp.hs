@@ -15,14 +15,14 @@ import           Universum
 import qualified Data.Text.Buildable
 import qualified Database.RocksDB as Rocks
 import           Formatting
-    (bprint)
+                       (bprint)
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 
 import           Pos.DB.Class
-    (DBTag, MonadDB (dbWriteBatch))
+                       (DBTag, MonadDB (dbWriteBatch))
 import           Pos.DB.Rocks.Types
-    (DB (..))
+                       (DB (..))
 
 class RocksBatchOp a where
     toBatchOp :: a -> [Rocks.BatchOp]

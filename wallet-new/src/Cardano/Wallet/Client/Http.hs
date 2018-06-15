@@ -15,33 +15,35 @@ module Cardano.Wallet.Client.Http
 import           Universum
 
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Data.Aeson
-    (decode)
+                       (decode)
 import           Data.ByteString
-    (ByteString)
+                       (ByteString)
 import           Data.Default.Class
-    (Default (..))
+                       (Default (..))
 import           Data.X509
-    (CertificateChain, SignedCertificate)
+                       (CertificateChain, SignedCertificate)
 import           Data.X509.CertificateStore
-    (makeCertificateStore)
+                       (makeCertificateStore)
 import           Network.Connection
-    (TLSSettings (..))
+                       (TLSSettings (..))
 import           Network.HTTP.Client
-    (Manager, ManagerSettings, defaultManagerSettings, newManager)
+                       (Manager, ManagerSettings, defaultManagerSettings,
+                       newManager)
 import           Network.HTTP.Client.TLS
-    (mkManagerSettings)
+                       (mkManagerSettings)
 import           Network.TLS
-    (ClientHooks (..), ClientParams (..), Credentials (..), HostName, PrivKey,
-    Shared (..), Supported (..), credentialLoadX509, noSessionManager)
+                       (ClientHooks (..), ClientParams (..), Credentials (..),
+                       HostName, PrivKey, Shared (..), Supported (..),
+                       credentialLoadX509, noSessionManager)
 import           Network.TLS.Extra.Cipher
-    (ciphersuite_default)
+                       (ciphersuite_default)
 import           Servant
-    ((:<|>) (..), (:>))
+                       ((:<|>) (..), (:>))
 import           Servant.Client
-    (BaseUrl (..), ClientEnv (..), ClientM, Scheme (..), ServantError (..),
-    client, runClientM)
+                       (BaseUrl (..), ClientEnv (..), ClientM, Scheme (..),
+                       ServantError (..), client, runClientM)
 
 import qualified Cardano.Wallet.API.V1 as V1
 import           Cardano.Wallet.Client

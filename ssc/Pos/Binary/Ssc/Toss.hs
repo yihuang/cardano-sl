@@ -7,13 +7,15 @@ module Pos.Binary.Ssc.Toss
        ) where
 
 import           Pos.Binary.Class
-    (Cons (..), Field (..), deriveSimpleBi, deriveSimpleBiCxt)
+                       (Cons (..), Field (..), deriveSimpleBi,
+                       deriveSimpleBiCxt)
 import           Pos.Core.Ssc
-    (CommitmentsMap, OpeningsMap, SharesMap, VssCertificatesMap)
+                       (CommitmentsMap, OpeningsMap, SharesMap,
+                       VssCertificatesMap)
 import           Pos.Ssc.Toss.Types
-    (SscTag (..), TossModifier (..))
+                       (SscTag (..), TossModifier (..))
 import           Pos.Util.Util
-    (cborError)
+                       (cborError)
 
 deriveSimpleBi ''SscTag [
     Cons 'CommitmentMsg [],

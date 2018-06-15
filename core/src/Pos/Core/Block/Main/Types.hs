@@ -14,22 +14,23 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Fmt
-    (genericF)
+                       (genericF)
 import           Formatting
-    (bprint, build, builder, (%))
+                       (bprint, build, builder, (%))
 
 import           Pos.Core.Delegation
-    (DlgPayload)
+                       (DlgPayload)
 import           Pos.Core.Ssc
-    (SscPayload, SscProof)
+                       (SscPayload, SscProof)
 import           Pos.Core.Txp
-    (TxPayload, TxProof)
+                       (TxPayload, TxProof)
 import           Pos.Core.Update
-    (BlockVersion, SoftwareVersion, UpdatePayload, UpdateProof)
+                       (BlockVersion, SoftwareVersion, UpdatePayload,
+                       UpdateProof)
 import           Pos.Crypto
-    (Hash)
+                       (Hash)
 import           Pos.Data.Attributes
-    (Attributes, areAttributesKnown)
+                       (Attributes, areAttributesKnown)
 
 -- | Proof of everything contained in the payload.
 data MainProof = MainProof

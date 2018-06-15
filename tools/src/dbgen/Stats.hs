@@ -6,16 +6,17 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 import           Pos.Wallet.Web.State.Acidic
-    (GetWalletStorage (..), closeState, openState, query)
+                       (GetWalletStorage (..), closeState, openState, query)
 import           Pos.Wallet.Web.State.Storage
-    (WalletStorage (..))
+                       (WalletStorage (..))
 import           Serokell.AcidState.ExtendedState
-    (ExtendedState)
+                       (ExtendedState)
 import           Text.Printf
-    (printf)
+                       (printf)
 
 import           Rendering
-    (blankLine, bold, listOf, red, renderAccount, renderWallet, say)
+                       (blankLine, bold, listOf, red, renderAccount,
+                       renderWallet, say)
 
 {- For reference:
 

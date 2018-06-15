@@ -42,43 +42,46 @@ module Pos.Ssc.Base
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import qualified Crypto.Random as Rand
 import qualified Data.HashMap.Strict as HM
 import           Data.Ix
-    (inRange)
+                       (inRange)
 import qualified Data.List.NonEmpty as NE
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 import           Serokell.Util
-    (VerificationRes, verifyGeneric)
+                       (VerificationRes, verifyGeneric)
 
 import           Pos.Binary.Class
-    (asBinary, biSize, fromBinary)
-import           Pos.Binary.Core
-    ()
+                       (asBinary, biSize, fromBinary)
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (EpochIndex (..), LocalSlotIndex, SharedSeed (..), SlotCount, SlotId (..),
-    StakeholderId, addressHash, unsafeMkLocalSlotIndexExplicit)
+                       (EpochIndex (..), LocalSlotIndex, SharedSeed (..),
+                       SlotCount, SlotId (..), StakeholderId, addressHash,
+                       unsafeMkLocalSlotIndexExplicit)
 import           Pos.Core.Configuration
-    (HasProtocolConstants, protocolConstants, vssMaxTTL, vssMinTTL)
+                       (HasProtocolConstants, protocolConstants, vssMaxTTL,
+                       vssMinTTL)
 import           Pos.Core.Limits
-    (stripHashMap)
+                       (stripHashMap)
 import           Pos.Core.ProtocolConstants
-    (ProtocolConstants (..), pcSlotSecurityParam)
+                       (ProtocolConstants (..), pcSlotSecurityParam)
 import           Pos.Core.Ssc
-    (Commitment (..), CommitmentsMap (getCommitmentsMap), Opening (..),
-    SignedCommitment, SscPayload (..), VssCertificate (vcExpiryEpoch),
-    VssCertificatesMap (..), mkCommitmentsMapUnsafe)
+                       (Commitment (..), CommitmentsMap (getCommitmentsMap),
+                       Opening (..), SignedCommitment, SscPayload (..),
+                       VssCertificate (vcExpiryEpoch), VssCertificatesMap (..),
+                       mkCommitmentsMapUnsafe)
 import           Pos.Crypto
-    (ProtocolMagic, Secret, SecretKey, SignTag (SignCommitment), Threshold,
-    VssPublicKey, checkSig, genSharedSecret, getDhSecret, secretToDhSecret,
-    sign, toPublic, verifySecret)
+                       (ProtocolMagic, Secret, SecretKey,
+                       SignTag (SignCommitment), Threshold, VssPublicKey,
+                       checkSig, genSharedSecret, getDhSecret,
+                       secretToDhSecret, sign, toPublic, verifySecret)
 import           Pos.Crypto.Configuration
-    (HasProtocolMagic, protocolMagic)
+                       (HasProtocolMagic, protocolMagic)
 
 -- | Convert Secret to SharedSeed.
 secretToSharedSeed :: Secret -> SharedSeed

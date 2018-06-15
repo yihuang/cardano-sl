@@ -7,22 +7,23 @@ module Test.Pos.Core.SlottingSpec
 import           Universum
 
 import           Test.Hspec
-    (Expectation, Spec, anyErrorCall, describe)
+                       (Expectation, Spec, anyErrorCall, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (NonNegative (..), Positive (..), Property, (===), (==>))
+                       (NonNegative (..), Positive (..), Property, (===),
+                       (==>))
 
 import           Pos.Arbitrary.Core
-    (EoSToIntOverflow (..), UnreasonableEoS (..))
+                       (EoSToIntOverflow (..), UnreasonableEoS (..))
 import           Pos.Core
-    (EpochOrSlot, HasConfiguration, SlotId (..), flattenSlotId,
-    unflattenSlotId)
+                       (EpochOrSlot, HasConfiguration, SlotId (..),
+                       flattenSlotId, unflattenSlotId)
 
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 import           Test.Pos.Util.QuickCheck.Property
-    (shouldThrowException, (.=.))
+                       (shouldThrowException, (.=.))
 
 spec :: Spec
 spec = withDefConfiguration $ describe "Slotting" $ do

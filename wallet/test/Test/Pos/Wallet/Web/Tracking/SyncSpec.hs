@@ -11,41 +11,40 @@ import           Universum
 
 import qualified Data.HashSet as HS
 import           Data.List
-    (intersect, (\\))
+                       (intersect, (\\))
 import           Pos.Client.KeyStorage
-    (getSecretKeysPlain)
+                       (getSecretKeysPlain)
 import           Test.Hspec
-    (Spec, describe, xdescribe)
+                       (Spec, describe, xdescribe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Property, choose, oneof, sublistOf, suchThat, vectorOf,
-    (===))
+                       (Arbitrary (..), Property, choose, oneof, sublistOf,
+                       suchThat, vectorOf, (===))
 import           Test.QuickCheck.Monadic
-    (pick)
+                       (pick)
 
-import           Pos.Arbitrary.Wallet.Web.ClientTypes
-    ()
+import           Pos.Arbitrary.Wallet.Web.ClientTypes ()
 import           Pos.Block.Logic
-    (rollbackBlocks)
+                       (rollbackBlocks)
 import           Pos.Core
-    (Address, BlockCount (..), blkSecurityParam)
+                       (Address, BlockCount (..), blkSecurityParam)
 import           Pos.Core.Chrono
-    (nonEmptyOldestFirst, toNewestFirst)
+                       (nonEmptyOldestFirst, toNewestFirst)
 import           Pos.Crypto
-    (emptyPassphrase)
+                       (emptyPassphrase)
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 
 import qualified Pos.Wallet.Web.State as WS
 import           Pos.Wallet.Web.State.Storage
-    (WalletStorage (..))
+                       (WalletStorage (..))
 import           Pos.Wallet.Web.Tracking.Decrypt
-    (eskToWalletDecrCredentials)
+                       (eskToWalletDecrCredentials)
 import           Pos.Wallet.Web.Tracking.Sync
-    (evalChange, syncWalletWithBlockchain)
+                       (evalChange, syncWalletWithBlockchain)
 import           Pos.Wallet.Web.Tracking.Types
-    (newSyncRequest)
+                       (newSyncRequest)
 
 -- import           Pos.Wallet.Web.ClientTypes ()
 -- import qualified Pos.Wallet.Web.State.State as WS
@@ -54,15 +53,15 @@ import           Pos.Wallet.Web.Tracking.Types
 
 
 import           Test.Pos.Block.Logic.Util
-    (EnableTxPayload (..), InplaceDB (..))
+                       (EnableTxPayload (..), InplaceDB (..))
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 import           Test.Pos.Util.QuickCheck.Property
-    (assertProperty)
+                       (assertProperty)
 import           Test.Pos.Wallet.Web.Mode
-    (walletPropertySpec)
+                       (walletPropertySpec)
 import           Test.Pos.Wallet.Web.Util
-    (importSomeWallets, wpGenBlocks)
+                       (importSomeWallets, wpGenBlocks)
 
 spec :: Spec
 spec = withDefConfigurations $ \_ -> do

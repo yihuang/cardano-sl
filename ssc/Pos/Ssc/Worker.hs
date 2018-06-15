@@ -5,97 +5,99 @@ module Pos.Ssc.Worker
        ) where
 
 import           Universum hiding
-    (keys)
+                       (keys)
 
 import           Control.Concurrent.STM
-    (readTVar)
+                       (readTVar)
 import           Control.Lens
-    (at, each, partsOf, to, views)
+                       (at, each, partsOf, to, views)
 import           Control.Monad.Except
-    (runExceptT)
+                       (runExceptT)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List.NonEmpty as NE
 import           Data.Time.Units
-    (Microsecond, Millisecond, convertUnit)
+                       (Microsecond, Millisecond, convertUnit)
 import           Formatting
-    (build, ords, sformat, shown, (%))
+                       (build, ords, sformat, shown, (%))
 import           Mockable
-    (currentTime, delay)
-import           Serokell.Util.Exceptions
-    ()
+                       (currentTime, delay)
+import           Serokell.Util.Exceptions ()
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import qualified System.Metrics.Gauge as Metrics
 import qualified Test.QuickCheck as QC
 
-import           Pos.Arbitrary.Ssc
-    ()
+import           Pos.Arbitrary.Ssc ()
 import           Pos.Binary.Class
-    (AsBinary, asBinary, fromBinary)
-import           Pos.Binary.Ssc
-    ()
+                       (AsBinary, asBinary, fromBinary)
+import           Pos.Binary.Ssc ()
 import           Pos.Core
-    (EpochIndex, SlotId (..), StakeholderId, Timestamp (..),
-    VssCertificate (..), VssCertificatesMap (..), blkSecurityParam, bvdMpcThd,
-    getOurSecretKey, getOurStakeholderId, getSlotIndex, lookupVss, memberVss,
-    mkLocalSlotIndex, mkVssCertificate, slotSecurityParam, vssMaxTTL)
+                       (EpochIndex, SlotId (..), StakeholderId, Timestamp (..),
+                       VssCertificate (..), VssCertificatesMap (..),
+                       blkSecurityParam, bvdMpcThd, getOurSecretKey,
+                       getOurStakeholderId, getSlotIndex, lookupVss, memberVss,
+                       mkLocalSlotIndex, mkVssCertificate, slotSecurityParam,
+                       vssMaxTTL)
 import           Pos.Core.Ssc
-    (InnerSharesMap, Opening, SignedCommitment, getCommitmentsMap)
+                       (InnerSharesMap, Opening, SignedCommitment,
+                       getCommitmentsMap)
 import           Pos.Crypto
-    (SecretKey, VssKeyPair, VssPublicKey, randomNumber, runSecureRandom)
+                       (SecretKey, VssKeyPair, VssPublicKey, randomNumber,
+                       runSecureRandom)
 import           Pos.Crypto.Configuration
-    (protocolMagic)
+                       (protocolMagic)
 import           Pos.Crypto.SecretSharing
-    (toVssPublicKey)
+                       (toVssPublicKey)
 import           Pos.DB
-    (gsAdoptedBVData)
-import           Pos.Infra.Binary
-    ()
+                       (gsAdoptedBVData)
+import           Pos.Infra.Binary ()
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..))
+                       (Diffusion (..))
 import           Pos.Infra.Recovery.Info
-    (recoveryCommGuard)
+                       (recoveryCommGuard)
 import           Pos.Infra.Reporting.MemState
-    (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))
+                       (HasMisbehaviorMetrics (..), MisbehaviorMetrics (..))
 import           Pos.Infra.Slotting
-    (defaultOnNewSlotParams, getCurrentSlot, getSlotStartEmpatically,
-    onNewSlot)
+                       (defaultOnNewSlotParams, getCurrentSlot,
+                       getSlotStartEmpatically, onNewSlot)
 import           Pos.Infra.Util.LogSafe
-    (logDebugS, logErrorS, logInfoS, logWarningS)
+                       (logDebugS, logErrorS, logInfoS, logWarningS)
 import           Pos.Lrc.Consumer.Ssc
-    (getSscRichmen)
+                       (getSscRichmen)
 import           Pos.Lrc.Types
-    (RichmenStakes)
+                       (RichmenStakes)
 import           Pos.Ssc.Base
-    (genCommitmentAndOpening, isCommitmentIdx, isOpeningIdx, isSharesIdx,
-    mkSignedCommitment)
+                       (genCommitmentAndOpening, isCommitmentIdx, isOpeningIdx,
+                       isSharesIdx, mkSignedCommitment)
 import           Pos.Ssc.Behavior
-    (SscBehavior (..), SscOpeningParams (..), SscSharesParams (..))
+                       (SscBehavior (..), SscOpeningParams (..),
+                       SscSharesParams (..))
 import           Pos.Ssc.Configuration
-    (mpcSendInterval)
+                       (mpcSendInterval)
 import           Pos.Ssc.Functions
-    (hasCommitment, hasOpening, hasShares, vssThreshold)
+                       (hasCommitment, hasOpening, hasShares, vssThreshold)
 import           Pos.Ssc.Logic
-    (sscGarbageCollectLocalData, sscProcessCertificate, sscProcessCommitment,
-    sscProcessOpening, sscProcessShares)
+                       (sscGarbageCollectLocalData, sscProcessCertificate,
+                       sscProcessCommitment, sscProcessOpening,
+                       sscProcessShares)
 import           Pos.Ssc.Message
-    (SscTag (..))
+                       (SscTag (..))
 import           Pos.Ssc.Mode
-    (SscMode)
+                       (SscMode)
 import qualified Pos.Ssc.SecretStorage as SS
 import           Pos.Ssc.Shares
-    (getOurShares)
+                       (getOurShares)
 import           Pos.Ssc.State
-    (getGlobalCerts, getStableCerts, sscGetGlobalState)
+                       (getGlobalCerts, getStableCerts, sscGetGlobalState)
 import           Pos.Ssc.Toss
-    (computeParticipants, computeSharesDistrPure)
+                       (computeParticipants, computeSharesDistrPure)
 import           Pos.Ssc.Types
-    (HasSscContext (..), scBehavior, scParticipateSsc, scVssKeyPair,
-    sgsCommitments)
+                       (HasSscContext (..), scBehavior, scParticipateSsc,
+                       scVssKeyPair, sgsCommitments)
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 import           Pos.Util.Util
-    (getKeys, leftToPanic)
+                       (getKeys, leftToPanic)
 
 sscWorkers
   :: ( SscMode ctx m

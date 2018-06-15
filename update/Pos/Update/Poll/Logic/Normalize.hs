@@ -9,36 +9,36 @@ module Pos.Update.Poll.Logic.Normalize
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at, non)
+                       (at, non)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           System.Wlog
-    (logWarning)
+                       (logWarning)
 
 import           Pos.Core
-    (Coin, EpochIndex, SlotId (siEpoch), addressHash, applyCoinPortionUp,
-    mkCoin, unsafeAddCoin)
+                       (Coin, EpochIndex, SlotId (siEpoch), addressHash,
+                       applyCoinPortionUp, mkCoin, unsafeAddCoin)
 import           Pos.Core.Update
-    (UpId, UpdateProposal, UpdateProposals, UpdateVote (..),
-    bvdUpdateProposalThd)
+                       (UpId, UpdateProposal, UpdateProposals, UpdateVote (..),
+                       bvdUpdateProposalThd)
 import           Pos.Crypto
-    (PublicKey, hash)
+                       (PublicKey, hash)
 import           Pos.Update.Poll.Class
-    (MonadPoll (..), MonadPollRead (..))
+                       (MonadPoll (..), MonadPollRead (..))
 import           Pos.Update.Poll.Failure
-    (PollVerFailure (..))
+                       (PollVerFailure (..))
 import           Pos.Update.Poll.Logic.Apply
-    (verifyAndApplyProposal, verifyAndApplyVoteDo)
+                       (verifyAndApplyProposal, verifyAndApplyVoteDo)
 import           Pos.Update.Poll.Types
-    (DecidedProposalState (..), LocalVotes, ProposalState (..),
-    UndecidedProposalState (..))
+                       (DecidedProposalState (..), LocalVotes,
+                       ProposalState (..), UndecidedProposalState (..))
 import           Pos.Util.Util
-    (getKeys, sortWithMDesc)
+                       (getKeys, sortWithMDesc)
 
 -- | Normalize given proposals and votes with respect to current Poll
 -- state, i. e. apply all valid data and discard invalid data.  This

@@ -26,18 +26,18 @@ import           Universum
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Lens
-    ((<%=), (<>~))
+                       ((<%=), (<>~))
 import           Serokell.Util
-    (modifyTVarS)
+                       (modifyTVarS)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Crypto
-    (EncryptedSecretKey, PassPhrase, SecretKey, hash, runSecureRandom,
-    safeKeyGen)
+                       (EncryptedSecretKey, PassPhrase, SecretKey, hash,
+                       runSecureRandom, safeKeyGen)
 import           Pos.Util.UserSecret
-    (HasUserSecret (..), UserSecret, peekUserSecret, usKeys, usPrimKey,
-    writeUserSecret)
+                       (HasUserSecret (..), UserSecret, peekUserSecret, usKeys,
+                       usPrimKey, writeUserSecret)
 
 type KeyData = TVar UserSecret
 

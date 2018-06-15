@@ -10,14 +10,14 @@ import           Universum
 
 import qualified Control.Concurrent.STM as STM
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.DB
-    (MonadDBRead)
+                       (MonadDBRead)
 import           Pos.Infra.Slotting.Class
-    (MonadSlots)
+                       (MonadSlots)
 import           Pos.Ssc.Types
-    (SscState (..))
+                       (SscState (..))
 
 -- Reexports
 import           Pos.Ssc.State.Global

@@ -12,67 +12,69 @@ module Main where
 import           Universum
 
 import           Control.Concurrent.STM
-    (newTQueueIO)
+                       (newTQueueIO)
 import           Data.Default
-    (def)
+                       (def)
 import           Data.Maybe
-    (fromJust, isJust)
+                       (fromJust, isJust)
 import           Data.Time.Units
-    (fromMicroseconds)
+                       (fromMicroseconds)
 import           Mockable
-    (Production, runProduction)
+                       (Production, runProduction)
 import qualified Network.Transport.TCP as TCP
 import           Options.Generic
-    (getRecord)
+                       (getRecord)
 import           Pos.Client.CLI
-    (CommonArgs (..), CommonNodeArgs (..), NodeArgs (..), getNodeParams,
-    gtSscParams)
+                       (CommonArgs (..), CommonNodeArgs (..), NodeArgs (..),
+                       getNodeParams, gtSscParams)
 import           Pos.Core
-    (Timestamp (..))
+                       (Timestamp (..))
 import           Pos.DB.DB
-    (initNodeDBs)
+                       (initNodeDBs)
 import           Pos.DB.Rocks.Functions
-    (openNodeDBs)
+                       (openNodeDBs)
 import           Pos.DB.Rocks.Types
-    (NodeDBs)
+                       (NodeDBs)
 import           Pos.Infra.Network.CLI
-    (NetworkConfigOpts (..))
+                       (NetworkConfigOpts (..))
 import           Pos.Infra.Network.Types
-    (NetworkConfig (..), Topology (..), topologyDequeuePolicy,
-    topologyEnqueuePolicy, topologyFailurePolicy)
+                       (NetworkConfig (..), Topology (..),
+                       topologyDequeuePolicy, topologyEnqueuePolicy,
+                       topologyFailurePolicy)
 import           Pos.Infra.Reporting
-    (noReporter)
+                       (noReporter)
 import           Pos.Infra.Util.JsonLog.Events
-    (jsonLogConfigFromHandle)
+                       (jsonLogConfigFromHandle)
 import           Pos.Launcher
-    (ConfigurationOptions (..), HasConfigurations, NodeResources (..),
-    bracketNodeResources, defaultConfigurationOptions, npBehaviorConfig,
-    npUserSecret, withConfigurations)
+                       (ConfigurationOptions (..), HasConfigurations,
+                       NodeResources (..), bracketNodeResources,
+                       defaultConfigurationOptions, npBehaviorConfig,
+                       npUserSecret, withConfigurations)
 import           Pos.Txp
-    (txpGlobalSettings)
+                       (txpGlobalSettings)
 import           Pos.Util.UserSecret
-    (usVss)
+                       (usVss)
 import           Pos.Wallet.Web.Mode
-    (WalletWebModeContext (..))
+                       (WalletWebModeContext (..))
 import           Pos.Wallet.Web.State.Acidic
-    (closeState, openState)
+                       (closeState, openState)
 import           Pos.Wallet.Web.State.State
-    (WalletDB)
+                       (WalletDB)
 import           Pos.WorkMode
-    (RealModeContext (..))
+                       (RealModeContext (..))
 import           System.Wlog
-    (HasLoggerName (..), LoggerName (..))
+                       (HasLoggerName (..), LoggerName (..))
 
 import           CLI
-    (CLI (..))
+                       (CLI (..))
 import           Lib
-    (generateWalletDB, loadGenSpec)
+                       (generateWalletDB, loadGenSpec)
 import           Rendering
-    (bold, say)
+                       (bold, say)
 import           Stats
-    (showStatsAndExit, showStatsData)
+                       (showStatsAndExit, showStatsData)
 import           Types
-    (UberMonad)
+                       (UberMonad)
 
 defaultNetworkConfig :: Topology kademlia -> NetworkConfig kademlia
 defaultNetworkConfig ncTopology = NetworkConfig {

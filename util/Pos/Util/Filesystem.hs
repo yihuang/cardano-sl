@@ -12,25 +12,26 @@ module Pos.Util.Filesystem
        ) where
 
 import           Universum hiding
-    (last)
+                       (last)
 
 import           Control.Concurrent
-    (myThreadId)
+                       (myThreadId)
 import qualified Control.Exception.Safe as E
 import           Data.Char
-    (isAlphaNum)
+                       (isAlphaNum)
 import           Data.List
-    (last)
+                       (last)
 import           Data.Time
-    (getCurrentTime)
+                       (getCurrentTime)
 import qualified Prelude
 import           System.Directory
-    (canonicalizePath, createDirectory, doesDirectoryExist,
-    getTemporaryDirectory, listDirectory, removeDirectoryRecursive, removeFile)
+                       (canonicalizePath, createDirectory, doesDirectoryExist,
+                       getTemporaryDirectory, listDirectory,
+                       removeDirectoryRecursive, removeFile)
 import           System.FilePath
-    (normalise, pathSeparator, takeDirectory, (</>))
+                       (normalise, pathSeparator, takeDirectory, (</>))
 import           System.IO
-    (hClose, openTempFile)
+                       (hClose, openTempFile)
 
 -- | Lists all immediate children of the given directory, excluding "." and ".."
 -- Returns all the files inclusive of the initial `FilePath`.
@@ -78,7 +79,7 @@ directory :: FilePath -> FilePath
 directory "" = ""
 directory f = case last f of
     x | x == pathSeparator -> f
-    _ -> takeDirectory (normalise f)
+    _                      -> takeDirectory (normalise f)
 
 -- | Return the absolute and canonical path to the system temporary
 -- directory.

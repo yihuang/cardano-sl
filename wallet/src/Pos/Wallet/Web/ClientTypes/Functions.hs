@@ -13,32 +13,35 @@ module Pos.Wallet.Web.ClientTypes.Functions
 import           Universum
 
 import           Control.Monad.Error.Class
-    (throwError)
+                       (throwError)
 import qualified Data.List.NonEmpty as NE
 import           Data.Text
-    (Text)
+                       (Text)
 import           Formatting
-    (build, sformat)
+                       (build, sformat)
 
 import           Pos.Client.Txp.History
-    (TxHistoryEntry (..))
+                       (TxHistoryEntry (..))
 import           Pos.Core
-    (Address, ChainDifficulty, decodeTextAddress, makePubKeyAddressBoot,
-    sumCoins, unsafeAddCoin, unsafeIntegerToCoin)
+                       (Address, ChainDifficulty, decodeTextAddress,
+                       makePubKeyAddressBoot, sumCoins, unsafeAddCoin,
+                       unsafeIntegerToCoin)
 import           Pos.Core.Txp
-    (Tx (..), TxOut (..), txOutAddress, txOutValue)
+                       (Tx (..), TxOut (..), txOutAddress, txOutValue)
 import           Pos.Core.Update
-    (BlockVersionData (..), BlockVersionModifier (..), UpdateProposal (..))
+                       (BlockVersionData (..), BlockVersionModifier (..),
+                       UpdateProposal (..))
 import           Pos.Crypto
-    (EncryptedSecretKey, encToPublic)
+                       (EncryptedSecretKey, encToPublic)
 import           Pos.Update.Poll.Types
-    (ConfirmedProposalState (..), StakeholderVotes, isPositiveVote)
+                       (ConfirmedProposalState (..), StakeholderVotes,
+                       isPositiveVote)
 import           Pos.Util.Servant
-import           Pos.Wallet.Web.ClientTypes.Instances
-    ()
+import           Pos.Wallet.Web.ClientTypes.Instances ()
 import           Pos.Wallet.Web.ClientTypes.Types
-    (AccountId (..), Addr, CCoin, CHash (..), CId (..), CPtxCondition (..),
-    CTx (..), CTxMeta, CUpdateInfo (..), CWAddressMeta (..))
+                       (AccountId (..), Addr, CCoin, CHash (..), CId (..),
+                       CPtxCondition (..), CTx (..), CTxMeta, CUpdateInfo (..),
+                       CWAddressMeta (..))
 
 -- TODO: this is not completely safe. If someone changes
 -- implementation of Buildable Address. It should be probably more

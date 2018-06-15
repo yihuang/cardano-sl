@@ -12,40 +12,40 @@ import           Universum
 
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Default
-    (def)
+                       (def)
 import qualified Data.HashMap.Strict as HM
 import           Data.List
-    ((!!))
+                       ((!!))
 import           Formatting
-    (sformat, string, (%))
+                       (sformat, string, (%))
 import           System.Wlog
-    (CanLog, HasLoggerName, logDebug, logError, logInfo)
+                       (CanLog, HasLoggerName, logDebug, logError, logInfo)
 
 import           Pos.Binary
-    (Raw)
+                       (Raw)
 import           Pos.Client.KeyStorage
-    (getSecretKeysPlain)
+                       (getSecretKeysPlain)
 import           Pos.Client.Update.Network
-    (submitUpdateProposal, submitVote)
+                       (submitUpdateProposal, submitVote)
 import           Pos.Core
-    (protocolMagic)
+                       (protocolMagic)
 import           Pos.Crypto
-    (Hash, emptyPassphrase, hash, hashHexF, unsafeHash, withSafeSigner,
-    withSafeSigners)
+                       (Hash, emptyPassphrase, hash, hashHexF, unsafeHash,
+                       withSafeSigner, withSafeSigners)
 import           Pos.Exception
-    (reportFatalError)
+                       (reportFatalError)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..))
+                       (Diffusion (..))
 import           Pos.Update
-    (SystemTag, UpId, UpdateData (..), installerHash, mkUpdateProposalWSign,
-    mkUpdateVoteSafe)
+                       (SystemTag, UpId, UpdateData (..), installerHash,
+                       mkUpdateProposalWSign, mkUpdateVoteSafe)
 
 import           Lang.Value
-    (ProposeUpdateParams (..), ProposeUpdateSystem (..))
+                       (ProposeUpdateParams (..), ProposeUpdateSystem (..))
 import           Mode
-    (MonadAuxxMode)
+                       (MonadAuxxMode)
 import           Repl
-    (PrintAction)
+                       (PrintAction)
 
 ----------------------------------------------------------------------------
 -- Vote

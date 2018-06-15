@@ -3,18 +3,18 @@ module Statistics.Throughput
     ) where
 
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as M
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import           Graphics.Rendering.Chart
 import           Graphics.Rendering.Chart.Backend.Diagrams
-    (renderableToFile)
+                       (renderableToFile)
 import           Graphics.Rendering.Chart.Easy
 import           Graphics.Rendering.Chart.Grid
 
 import           Pos.Infra.Util.JsonLog.Events
-    (JLMemPool (..), MemPoolModifyReason (..))
+                       (JLMemPool (..), MemPoolModifyReason (..))
 import           Types
 import           Universum
 

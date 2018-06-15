@@ -7,6 +7,6 @@ module Pos.Wallet.Web.State
        ) where
 
 import           Pos.Wallet.Web.State.State hiding
-    (applyModifierToWallet, rollbackModifierFromWallet)
+                       (applyModifierToWallet, rollbackModifierFromWallet)
 import qualified Pos.Wallet.Web.State.Storage as Storage
 import           Pos.Wallet.Web.State.Util

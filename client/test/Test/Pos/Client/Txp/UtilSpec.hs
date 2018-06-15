@@ -14,45 +14,49 @@ import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Formatting
-    (build, hex, left, sformat, shown, (%), (%.))
+                       (build, hex, left, sformat, shown, (%), (%.))
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Discard (..), Gen, Testable, arbitrary, choose)
+                       (Discard (..), Gen, Testable, arbitrary, choose)
 import           Test.QuickCheck.Monadic
-    (forAllM, stop)
+                       (forAllM, stop)
 
 import           Pos.Client.Txp.Addresses
-    (MonadAddresses (..))
+                       (MonadAddresses (..))
 import           Pos.Client.Txp.Util
-    (InputSelectionPolicy (..), TxError (..), TxOutputs, TxWithSpendings,
-    createMTx, createRedemptionTx, isNotEnoughMoneyTxError)
+                       (InputSelectionPolicy (..), TxError (..), TxOutputs,
+                       TxWithSpendings, createMTx, createRedemptionTx,
+                       isNotEnoughMoneyTxError)
 import           Pos.Core
-    (Address, BlockVersionData (..), Coeff (..), TxFeePolicy (..),
-    TxSizeLinear (..), makePubKeyAddressBoot, makeRedeemAddress,
-    unsafeIntegerToCoin)
+                       (Address, BlockVersionData (..), Coeff (..),
+                       TxFeePolicy (..), TxSizeLinear (..),
+                       makePubKeyAddressBoot, makeRedeemAddress,
+                       unsafeIntegerToCoin)
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxId, TxIn (..), TxOut (..), TxOutAux (..))
+                       (Tx (..), TxAux (..), TxId, TxIn (..), TxOut (..),
+                       TxOutAux (..))
 import           Pos.Crypto
-    (RedeemSecretKey, SafeSigner, SecretKey, decodeHash, fakeSigner,
-    redeemToPublic, toPublic)
+                       (RedeemSecretKey, SafeSigner, SecretKey, decodeHash,
+                       fakeSigner, redeemToPublic, toPublic)
 import           Pos.DB
-    (gsAdoptedBVData)
+                       (gsAdoptedBVData)
 import           Pos.Txp
-    (Utxo)
+                       (Utxo)
 import           Pos.Util.Util
-    (leftToPanic)
+                       (leftToPanic)
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 
 import           Test.Pos.Client.Txp.Mode
-    (HasTxpConfigurations, TxpTestMode, TxpTestProperty, withBVData)
+                       (HasTxpConfigurations, TxpTestMode, TxpTestProperty,
+                       withBVData)
 import           Test.Pos.Util.QuickCheck.Arbitrary
-    (nonrepeating)
+                       (nonrepeating)
 import           Test.Pos.Util.QuickCheck.Property
-    (stopProperty)
+                       (stopProperty)
 
 ----------------------------------------------------------------------------
 -- Tests

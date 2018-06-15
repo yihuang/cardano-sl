@@ -27,28 +27,30 @@ module Pos.Infra.StateLock
 import           Universum
 
 import           Control.Monad.Catch
-    (MonadMask)
+                       (MonadMask)
 import           Data.Aeson.Types
-    (ToJSON (..), Value)
+                       (ToJSON (..), Value)
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import           JsonLog
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Mockable
-    (CurrentTime, Mockable, currentTime)
+                       (CurrentTime, Mockable, currentTime)
 import           System.Mem
-    (getAllocationCounter)
+                       (getAllocationCounter)
 import           System.Wlog
-    (LoggerNameBox, WithLogger, askLoggerName, usingLoggerName)
+                       (LoggerNameBox, WithLogger, askLoggerName,
+                       usingLoggerName)
 
 import           Pos.Core
-    (HeaderHash)
+                       (HeaderHash)
 import           Pos.Util.Concurrent
-    (modifyMVar, withMVar)
+                       (modifyMVar, withMVar)
 import           Pos.Util.Concurrent.PriorityLock
-    (Priority (..), PriorityLock, newPriorityLock, withPriorityLock)
+                       (Priority (..), PriorityLock, newPriorityLock,
+                       withPriorityLock)
 import           Pos.Util.Util
-    (HasLens', lensOf)
+                       (HasLens', lensOf)
 
 
 -- | A simple wrapper over 'MVar' which stores 'HeaderHash' (our

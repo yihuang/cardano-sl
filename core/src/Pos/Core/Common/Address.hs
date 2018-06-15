@@ -53,36 +53,37 @@ module Pos.Core.Common.Address
 import           Universum
 
 import           Control.Lens
-    (makePrisms)
+                       (makePrisms)
 import qualified Data.ByteString as BS
 import           Data.ByteString.Base58
-    (Alphabet (..), bitcoinAlphabet, decodeBase58, encodeBase58)
+                       (Alphabet (..), bitcoinAlphabet, decodeBase58,
+                       encodeBase58)
 import           Data.Hashable
-    (Hashable (..))
+                       (Hashable (..))
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (Format, bprint, build, builder, later, (%))
+                       (Format, bprint, build, builder, later, (%))
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Binary.Class
-    (Bi, biSize)
+                       (Bi, biSize)
 import qualified Pos.Binary.Class as Bi
-import           Pos.Core.Common.Coin
-    ()
+import           Pos.Core.Common.Coin ()
 import           Pos.Core.Constants
-    (accountGenesisIndex, wAddressGenesisIndex)
+                       (accountGenesisIndex, wAddressGenesisIndex)
 import           Pos.Crypto.Hashing
-    (hashHexF)
+                       (hashHexF)
 import           Pos.Crypto.HD
-    (HDAddressPayload, HDPassphrase, ShouldCheckPassphrase (..),
-    deriveHDPassphrase, deriveHDPublicKey, deriveHDSecretKey,
-    packHDAddressAttr)
+                       (HDAddressPayload, HDPassphrase,
+                       ShouldCheckPassphrase (..), deriveHDPassphrase,
+                       deriveHDPublicKey, deriveHDSecretKey, packHDAddressAttr)
 import           Pos.Crypto.Signing
-    (EncryptedSecretKey, PassPhrase, PublicKey, RedeemPublicKey, SecretKey,
-    deterministicKeyGen, emptyPassphrase, encToPublic, noPassEncrypt)
+                       (EncryptedSecretKey, PassPhrase, PublicKey,
+                       RedeemPublicKey, SecretKey, deterministicKeyGen,
+                       emptyPassphrase, encToPublic, noPassEncrypt)
 import           Pos.Data.Attributes
-    (Attributes (..), attrData, mkAttributes)
+                       (Attributes (..), attrData, mkAttributes)
 
 import           Pos.Core.Common.AddrAttributes
 import           Pos.Core.Common.AddressHash

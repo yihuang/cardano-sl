@@ -10,59 +10,60 @@ module Pos.Update.Download
 import           Universum
 
 import           Control.Exception.Safe
-    (handleAny)
+                       (handleAny)
 import           Control.Lens
-    (views)
+                       (views)
 import           Control.Monad.Except
-    (ExceptT (..), throwError)
+                       (ExceptT (..), throwError)
 import qualified Data.ByteArray as BA
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.HashMap.Strict as HM
 import           Formatting
-    (build, sformat, stext, (%))
+                       (build, sformat, stext, (%))
 import           Network.HTTP.Client
-    (Manager, newManager)
+                       (Manager, newManager)
 import           Network.HTTP.Client.TLS
-    (tlsManagerSettings)
+                       (tlsManagerSettings)
 import           Network.HTTP.Simple
-    (getResponseBody, getResponseStatus, getResponseStatusCode, httpLBS,
-    parseRequest, setRequestManager)
+                       (getResponseBody, getResponseStatus,
+                       getResponseStatusCode, httpLBS, parseRequest,
+                       setRequestManager)
 import qualified Serokell.Util.Base16 as B16
 import           Serokell.Util.Text
-    (listJsonIndent, mapJson)
+                       (listJsonIndent, mapJson)
 import           System.Directory
-    (doesFileExist)
+                       (doesFileExist)
 import           System.Wlog
-    (WithLogger, logDebug, logInfo, logWarning)
+                       (WithLogger, logDebug, logInfo, logWarning)
 
 import           Pos.Binary.Class
-    (Raw)
-import           Pos.Binary.Update
-    ()
+                       (Raw)
+import           Pos.Binary.Update ()
 import           Pos.Core.Update
-    (SoftwareVersion (..), UpdateData (..), UpdateProposal (..))
+                       (SoftwareVersion (..), UpdateData (..),
+                       UpdateProposal (..))
 import           Pos.Crypto
-    (Hash, castHash, hash)
+                       (Hash, castHash, hash)
 import           Pos.Exception
-    (reportFatalError)
+                       (reportFatalError)
 import           Pos.Infra.Reporting
-    (reportOrLogW)
+                       (reportOrLogW)
 import           Pos.Update.Configuration
-    (curSoftwareVersion, ourSystemTag)
+                       (curSoftwareVersion, ourSystemTag)
 import           Pos.Update.Context
-    (UpdateContext (..))
+                       (UpdateContext (..))
 import           Pos.Update.DB.Misc
-    (isUpdateInstalled)
+                       (isUpdateInstalled)
 import           Pos.Update.Mode
-    (UpdateMode)
+                       (UpdateMode)
 import           Pos.Update.Params
-    (UpdateParams (..))
+                       (UpdateParams (..))
 import           Pos.Update.Poll.Types
-    (ConfirmedProposalState (..))
+                       (ConfirmedProposalState (..))
 import           Pos.Util.Concurrent
-    (withMVar)
+                       (withMVar)
 import           Pos.Util.Util
-    (HasLens (..), (<//>))
+                       (HasLens (..), (<//>))
 
 -- | Compute hash of installer, this is hash is 'udPkgHash' from 'UpdateData'.
 --

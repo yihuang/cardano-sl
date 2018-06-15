@@ -12,51 +12,50 @@ module Test.Pos.Crypto.Arbitrary
        ) where
 
 import           Universum hiding
-    (keys)
+                       (keys)
 
 import           Control.Monad
-    (zipWithM)
+                       (zipWithM)
 import qualified Data.ByteArray as ByteArray
 import           Data.List.NonEmpty
-    (fromList)
+                       (fromList)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, elements, oneof, vector)
+                       (Arbitrary (..), Gen, elements, oneof, vector)
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
 import           Pos.Binary.Class
-    (AsBinary (..), AsBinaryClass (..), Bi, Raw)
+                       (AsBinary (..), AsBinaryClass (..), Bi, Raw)
 import           Pos.Crypto.Configuration
-    (HasProtocolMagic, ProtocolMagic (..), protocolMagic)
+                       (HasProtocolMagic, ProtocolMagic (..), protocolMagic)
 import           Pos.Crypto.Hashing
-    (AHash (..), AbstractHash (..), HashAlgorithm, WithHash (..),
-    unsafeCheatingHashCoerce, withHash)
+                       (AHash (..), AbstractHash (..), HashAlgorithm,
+                       WithHash (..), unsafeCheatingHashCoerce, withHash)
 import           Pos.Crypto.HD
-    (HDAddressPayload, HDPassphrase (..))
+                       (HDAddressPayload, HDPassphrase (..))
 import           Pos.Crypto.Random
-    (deterministic, randomNumberInRange)
+                       (deterministic, randomNumberInRange)
 import           Pos.Crypto.SecretSharing
-    (DecShare, EncShare, Secret, SecretProof, Threshold, VssKeyPair,
-    VssPublicKey, decryptShare, genSharedSecret, toVssPublicKey, vssKeyGen)
+                       (DecShare, EncShare, Secret, SecretProof, Threshold,
+                       VssKeyPair, VssPublicKey, decryptShare, genSharedSecret,
+                       toVssPublicKey, vssKeyGen)
 import           Pos.Crypto.Signing
-    (EncryptedSecretKey (..), PassPhrase, ProxyCert, ProxySecretKey,
-    ProxySignature, PublicKey, SecretKey, SignTag (..), Signature, Signed,
-    createProxyCert, createPsk, keyGen, mkSigned, noPassEncrypt, proxySign,
-    sign, signEncoded, toPublic)
+                       (EncryptedSecretKey (..), PassPhrase, ProxyCert,
+                       ProxySecretKey, ProxySignature, PublicKey, SecretKey,
+                       SignTag (..), Signature, Signed, createProxyCert,
+                       createPsk, keyGen, mkSigned, noPassEncrypt, proxySign,
+                       sign, signEncoded, toPublic)
 import           Pos.Crypto.Signing.Redeem
-    (RedeemPublicKey, RedeemSecretKey, RedeemSignature, redeemKeyGen,
-    redeemSign)
+                       (RedeemPublicKey, RedeemSecretKey, RedeemSignature,
+                       redeemKeyGen, redeemSign)
 
-import           Pos.Util.Orphans
-    ()
+import           Pos.Util.Orphans ()
 
-import           Test.Pos.Util.Orphans
-    ()
+import           Test.Pos.Util.Orphans ()
 import           Test.Pos.Util.QuickCheck.Arbitrary
-    (Nonrepeating (..), arbitraryUnsafe, runGen, sublistN)
+                       (Nonrepeating (..), arbitraryUnsafe, runGen, sublistN)
 
-import           Test.Pos.Crypto.Arbitrary.Unsafe
-    ()
+import           Test.Pos.Crypto.Arbitrary.Unsafe ()
 
 deriving instance Arbitrary ProtocolMagic
 

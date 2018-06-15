@@ -11,61 +11,62 @@ module Pos.Generator.Block.Logic
 import           Universum
 
 import           Control.Lens
-    (at, ix, _Wrapped)
+                       (at, ix, _Wrapped)
 import           Control.Monad.Random.Strict
-    (RandT, mapRandT)
+                       (RandT, mapRandT)
 import           Data.Default
-    (Default)
+                       (Default)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           System.Random
-    (RandomGen (..))
+                       (RandomGen (..))
 import           System.Wlog
-    (logWarning)
+                       (logWarning)
 
 import           Pos.AllSecrets
-    (HasAllSecrets (..), unInvSecretsMap)
+                       (HasAllSecrets (..), unInvSecretsMap)
 import           Pos.Block.Base
-    (mkGenesisBlock)
+                       (mkGenesisBlock)
 import           Pos.Block.Logic
-    (applyBlocksUnsafe, createMainBlockInternal, normalizeMempool,
-    verifyBlocksPrefix)
+                       (applyBlocksUnsafe, createMainBlockInternal,
+                       normalizeMempool, verifyBlocksPrefix)
 import           Pos.Block.Lrc
-    (lrcSingleShot)
+                       (lrcSingleShot)
 import           Pos.Block.Slog
-    (ShouldCallBListener (..))
+                       (ShouldCallBListener (..))
 import           Pos.Block.Types
-    (Blund)
-import           Pos.Communication.Message
-    ()
+                       (Blund)
+import           Pos.Communication.Message ()
 import           Pos.Core
-    (EpochOrSlot (..), SlotId (..), addressHash, epochIndexL, getEpochOrSlot,
-    getSlotIndex, protocolMagic)
+                       (EpochOrSlot (..), SlotId (..), addressHash,
+                       epochIndexL, getEpochOrSlot, getSlotIndex,
+                       protocolMagic)
 import           Pos.Core.Block
-    (Block)
+                       (Block)
 import           Pos.Crypto
-    (pskDelegatePk)
+                       (pskDelegatePk)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.Delegation.Logic
-    (getDlgTransPsk)
+                       (getDlgTransPsk)
 import           Pos.Delegation.Types
-    (ProxySKBlockInfo)
+                       (ProxySKBlockInfo)
 import           Pos.Generator.Block.Error
-    (BlockGenError (..))
+                       (BlockGenError (..))
 import           Pos.Generator.Block.Mode
-    (BlockGenMode, BlockGenRandMode, MonadBlockGen, MonadBlockGenInit,
-    mkBlockGenContext, usingPrimaryKey, withCurrentSlot)
+                       (BlockGenMode, BlockGenRandMode, MonadBlockGen,
+                       MonadBlockGenInit, mkBlockGenContext, usingPrimaryKey,
+                       withCurrentSlot)
 import           Pos.Generator.Block.Param
-    (BlockGenParams, HasBlockGenParams (..))
+                       (BlockGenParams, HasBlockGenParams (..))
 import           Pos.Generator.Block.Payload
-    (genPayload)
+                       (genPayload)
 import           Pos.Lrc.Context
-    (lrcActionOnEpochReason)
+                       (lrcActionOnEpochReason)
 import qualified Pos.Lrc.DB as LrcDB
 import           Pos.Txp
-    (MempoolExt, MonadTxpLocal, TxpGlobalSettings)
+                       (MempoolExt, MonadTxpLocal, TxpGlobalSettings)
 import           Pos.Util
-    (HasLens', maybeThrow, _neHead)
+                       (HasLens', maybeThrow, _neHead)
 
 ----------------------------------------------------------------------------
 -- Block generation

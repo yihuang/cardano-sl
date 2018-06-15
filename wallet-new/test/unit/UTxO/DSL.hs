@@ -73,30 +73,31 @@ module UTxO.DSL (
   ) where
 
 import           Control.Exception
-    (throw)
+                       (throw)
 import           Control.Monad.Except
-    (MonadError (..))
+                       (MonadError (..))
 import           Data.Foldable
-    (Foldable (..), foldr, sum)
+                       (Foldable (..), foldr, sum)
 import           Data.List
-    (tail)
+                       (tail)
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as Set
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, sformat, (%))
+                       (bprint, build, sformat, (%))
 import           Pos.Core.Chrono
-    (NewestFirst (NewestFirst), OldestFirst (getOldestFirst))
+                       (NewestFirst (NewestFirst),
+                       OldestFirst (getOldestFirst))
 import           Prelude
-    (Show (..))
+                       (Show (..))
 import           Serokell.Util
-    (listJson, mapJson)
+                       (listJson, mapJson)
 import           Universum hiding
-    (Foldable, foldr, sum, tail, toList)
+                       (Foldable, foldr, sum, tail, toList)
 
 import           Util
 import           Util.Validated

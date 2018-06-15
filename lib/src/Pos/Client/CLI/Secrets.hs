@@ -10,21 +10,22 @@ module Pos.Client.CLI.Secrets
 import           Universum
 
 import           Control.Lens
-    (ix)
+                       (ix)
 import           Crypto.Random
-    (MonadRandom)
+                       (MonadRandom)
 import           System.Wlog
-    (WithLogger, logInfo)
+                       (WithLogger, logInfo)
 
 import           Pos.Core
-    (HasConfiguration, RichSecrets (..), genesisSecretsRich)
+                       (HasConfiguration, RichSecrets (..), genesisSecretsRich)
 import           Pos.Crypto
-    (SecretKey, VssKeyPair, keyGen, runSecureRandom, vssKeyGen)
+                       (SecretKey, VssKeyPair, keyGen, runSecureRandom,
+                       vssKeyGen)
 import           Pos.Util.UserSecret
-    (UserSecret, usPrimKey, usVss, writeUserSecret)
+                       (UserSecret, usPrimKey, usVss, writeUserSecret)
 
 import           Pos.Client.CLI.NodeOptions
-    (CommonNodeArgs (..))
+                       (CommonNodeArgs (..))
 
 -- | This function prepares 'UserSecret' for later usage by node. It
 -- ensures that primary key and VSS key are present in

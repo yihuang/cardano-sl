@@ -9,26 +9,28 @@ module Pos.Wallet.Aeson.WalletBackup
 import           Universum
 
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..), Value (..), object, withArray, withObject,
-    withText, (.:), (.=))
+                       (FromJSON (..), ToJSON (..), Value (..), object,
+                       withArray, withObject, withText, (.:), (.=))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.SemVer as V
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import qualified Serokell.Util.Base64 as B64
 
 import qualified Pos.Binary as Bi
 import           Pos.Crypto
-    (EncryptedSecretKey (..), SecretKey (..))
+                       (EncryptedSecretKey (..), SecretKey (..))
 import           Pos.Util.Util
-    (aesonError, toAesonError)
+                       (aesonError, toAesonError)
 import           Pos.Wallet.Web.Backup
-    (AccountMetaBackup (..), TotalBackup (..), WalletBackup (..),
-    WalletMetaBackup (..), currentBackupFormatVersion)
+                       (AccountMetaBackup (..), TotalBackup (..),
+                       WalletBackup (..), WalletMetaBackup (..),
+                       currentBackupFormatVersion)
 import           Pos.Wallet.Web.ClientTypes
-    (CAccountMeta (..), CWalletAssurance (..), CWalletMeta (..))
+                       (CAccountMeta (..), CWalletAssurance (..),
+                       CWalletMeta (..))
 
 data IndexedAccountMeta = IndexedAccountMeta Int AccountMetaBackup
 

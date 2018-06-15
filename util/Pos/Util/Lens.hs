@@ -14,12 +14,12 @@ module Pos.Util.Lens
        ) where
 
 import           Data.List
-    (init, last)
+                       (init, last)
 import           Universum hiding
-    (init, last)
+                       (init, last)
 
 import           Control.Lens
-    (LensRules, lensField, lensRules, mappingNamer)
+                       (LensRules, lensField, lensRules, mappingNamer)
 
 -- | Lens for the head of 'NonEmpty'.
 --

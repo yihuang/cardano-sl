@@ -9,17 +9,18 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 import           Serokell.Data.Memory.Units
-    (fromBytes)
+                       (fromBytes)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (arbitrary, choose, counterexample, forAll, property, (===))
+                       (arbitrary, choose, counterexample, forAll, property,
+                       (===))
 
 import qualified Pos.Binary.Class as Bi
 import           Pos.Core.Limits
-    (stripHashMap)
+                       (stripHashMap)
 
 spec :: Spec
 spec = describe "Limits" $ do

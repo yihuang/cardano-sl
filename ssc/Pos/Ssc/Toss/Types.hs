@@ -13,17 +13,18 @@ module Pos.Ssc.Toss.Types
        ) where
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import qualified Data.Text.Buildable as Buildable
 import           Universum
 
 import           Pos.Core
-    (HasProtocolConstants, LocalSlotIndex, SlotId, VssCertificatesMap)
+                       (HasProtocolConstants, LocalSlotIndex, SlotId,
+                       VssCertificatesMap)
 import           Pos.Core.Ssc
-    (CommitmentsMap, OpeningsMap, SharesMap)
+                       (CommitmentsMap, OpeningsMap, SharesMap)
 import           Pos.Ssc.Base
-    (isCommitmentId, isCommitmentIdx, isOpeningId, isOpeningIdx, isSharesId,
-    isSharesIdx)
+                       (isCommitmentId, isCommitmentIdx, isOpeningId,
+                       isOpeningIdx, isSharesId, isSharesIdx)
 
 -- | Tag corresponding to SSC data.
 data SscTag

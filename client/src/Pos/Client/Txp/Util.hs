@@ -42,62 +42,66 @@ module Pos.Client.Txp.Util
        ) where
 
 import           Universum hiding
-    (keys, tail)
+                       (keys, tail)
 
 import           Control.Lens
-    (makeLenses, (%=), (.=))
+                       (makeLenses, (%=), (.=))
 import           Control.Monad.Except
-    (ExceptT, MonadError (throwError), runExceptT)
+                       (ExceptT, MonadError (throwError), runExceptT)
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import           Data.Fixed
-    (Fixed, HasResolution)
+                       (Fixed, HasResolution)
 import qualified Data.HashSet as HS
 import           Data.List
-    (partition, tail)
+                       (partition, tail)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import qualified Data.Semigroup as S
 import qualified Data.Set as Set
 import qualified Data.Text.Buildable
 import           Data.Traversable
-    (for)
+                       (for)
 import qualified Data.Vector as V
 import           Formatting
-    (bprint, build, sformat, stext, (%))
+                       (bprint, build, sformat, stext, (%))
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 
 import           Pos.Binary
-    (biSize)
+                       (biSize)
 import           Pos.Client.Txp.Addresses
-    (MonadAddresses (..))
+                       (MonadAddresses (..))
 import           Pos.Core
-    (Address, Coin, StakeholderId, TxFeePolicy (..), TxSizeLinear (..),
-    bvdTxFeePolicy, calculateTxSizeLinear, coinToInteger, integerToCoin,
-    isRedeemAddress, mkCoin, protocolMagic, sumCoins, txSizeLinearMinValue,
-    unsafeIntegerToCoin, unsafeSubCoin)
+                       (Address, Coin, StakeholderId, TxFeePolicy (..),
+                       TxSizeLinear (..), bvdTxFeePolicy,
+                       calculateTxSizeLinear, coinToInteger, integerToCoin,
+                       isRedeemAddress, mkCoin, protocolMagic, sumCoins,
+                       txSizeLinearMinValue, unsafeIntegerToCoin,
+                       unsafeSubCoin)
 import           Pos.Core.Configuration
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.Crypto
-    (RedeemSecretKey, SafeSigner, SignTag (SignRedeemTx, SignTx),
-    deterministicKeyGen, fakeSigner, hash, redeemSign, redeemToPublic,
-    safeSign, safeToPublic)
+                       (RedeemSecretKey, SafeSigner,
+                       SignTag (SignRedeemTx, SignTx), deterministicKeyGen,
+                       fakeSigner, hash, redeemSign, redeemToPublic, safeSign,
+                       safeToPublic)
 import           Pos.Data.Attributes
-    (mkAttributes)
+                       (mkAttributes)
 import           Pos.DB
-    (MonadGState, gsAdoptedBVData)
+                       (MonadGState, gsAdoptedBVData)
 import           Pos.Infra.Util.LogSafe
-    (SecureLog, buildUnsecure)
+                       (SecureLog, buildUnsecure)
 import           Pos.Script
-    (Script)
+                       (Script)
 import           Pos.Script.Examples
-    (multisigRedeemer, multisigValidator)
+                       (multisigRedeemer, multisigValidator)
 import           Pos.Txp
-    (Tx (..), TxAux (..), TxFee (..), TxIn (..), TxInWitness (..), TxOut (..),
-    TxOutAux (..), TxSigData (..), Utxo)
+                       (Tx (..), TxAux (..), TxFee (..), TxIn (..),
+                       TxInWitness (..), TxOut (..), TxOutAux (..),
+                       TxSigData (..), Utxo)
 import           Test.QuickCheck
-    (Arbitrary (..), elements)
+                       (Arbitrary (..), elements)
 
 type TxInputs = NonEmpty TxIn
 type TxOwnedInputs owner = NonEmpty (owner, TxIn)

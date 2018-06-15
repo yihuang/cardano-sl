@@ -5,46 +5,46 @@ module Test.Pos.Ssc.VssCertDataSpec
        ) where
 
 import           Universum hiding
-    (empty, filter, id, keys)
+                       (empty, filter, id, keys)
 
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Data.List.Extra
-    (nubOrdOn)
+                       (nubOrdOn)
 import qualified Data.Set as S
 import           Data.Tuple
-    (swap)
+                       (swap)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, Property, choose, conjoin, counterexample, suchThat,
-    vectorOf, (.&&.), (==>))
+                       (Arbitrary (..), Gen, Property, choose, conjoin,
+                       counterexample, suchThat, vectorOf, (.&&.), (==>))
 
-import           Pos.Arbitrary.Core
-    ()
-import           Pos.Arbitrary.Ssc
-    ()
+import           Pos.Arbitrary.Core ()
+import           Pos.Arbitrary.Ssc ()
 import           Pos.Core
-    (EpochIndex (..), EpochOrSlot (..), HasConfiguration, SlotId (..),
-    VssCertificate (..), getCertId, getVssCertificatesMap, mkVssCertificate,
-    slotSecurityParam)
+                       (EpochIndex (..), EpochOrSlot (..), HasConfiguration,
+                       SlotId (..), VssCertificate (..), getCertId,
+                       getVssCertificatesMap, mkVssCertificate,
+                       slotSecurityParam)
 import           Pos.Core.Chrono
-    (NewestFirst (..))
+                       (NewestFirst (..))
 import           Pos.Core.Slotting
-    (flattenEpochOrSlot, unflattenSlotId)
+                       (flattenEpochOrSlot, unflattenSlotId)
 import           Pos.Crypto
-    (protocolMagic)
+                       (protocolMagic)
 import           Pos.Ssc
-    (SscGlobalState (..), VssCertData (..), delete, empty, expiryEoS, filter,
-    insert, keys, lookup, member, rollbackSsc, runPureToss, setLastKnownSlot,
-    sgsVssCertificates)
+                       (SscGlobalState (..), VssCertData (..), delete, empty,
+                       expiryEoS, filter, insert, keys, lookup, member,
+                       rollbackSsc, runPureToss, setLastKnownSlot,
+                       sgsVssCertificates)
 
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 import           Test.Pos.Util.QuickCheck.Property
-    (qcIsJust)
+                       (qcIsJust)
 
 spec :: Spec
 spec = withDefConfiguration $ describe "Ssc.VssCertData" $ do

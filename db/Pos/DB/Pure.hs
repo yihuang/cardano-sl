@@ -38,27 +38,28 @@ module Pos.DB.Pure
 import           Universum
 
 import           Control.Lens
-    (at, makeLenses)
+                       (at, makeLenses)
 import qualified Data.ByteString as BS
 import           Data.Conduit
-    (ConduitT)
+                       (ConduitT)
 import qualified Data.Conduit.List as CL
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Database.RocksDB as Rocks
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core
-    (HasCoreConfiguration, HeaderHash)
+                       (HasCoreConfiguration, HeaderHash)
 import           Pos.DB.Class
-    (DBIteratorClass (..), DBTag (..), IterType, iterKeyPrefix)
+                       (DBIteratorClass (..), DBTag (..), IterType,
+                       iterKeyPrefix)
 import           Pos.DB.Functions
-    (processIterEntry)
+                       (processIterEntry)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 -- | Bytestring to Bytestring mapping mimicking rocks kv storage.
 type DBPureMap = Map ByteString ByteString

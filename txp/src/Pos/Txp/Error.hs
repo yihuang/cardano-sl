@@ -5,14 +5,15 @@ module Pos.Txp.Error
        ) where
 
 import           Control.Exception.Safe
-    (Exception (..))
+                       (Exception (..))
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, stext, (%))
+                       (bprint, stext, (%))
 import           Universum
 
 import           Pos.Exception
-    (cardanoExceptionFromException, cardanoExceptionToException)
+                       (cardanoExceptionFromException,
+                       cardanoExceptionToException)
 
 data TxpError
     = TxpInternalError !Text

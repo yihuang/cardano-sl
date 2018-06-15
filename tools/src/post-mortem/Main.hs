@@ -1,22 +1,22 @@
 -- | Post-mortem tool main.
 
 import           Universum hiding
-    (last)
+                       (last)
 
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import           Data.Csv as C
-    (encode)
+                       (encode)
 import           Data.List
-    (last)
+                       (last)
 import qualified Data.Map.Strict as M
 import           System.FilePath
 import           System.IO
-    (hPutStrLn)
+                       (hPutStrLn)
 import           Text.Printf
-    (hPrintf)
+                       (hPrintf)
 
 import           Pos.Util.Util
-    (histogram)
+                       (histogram)
 
 import           Options
 import           Statistics

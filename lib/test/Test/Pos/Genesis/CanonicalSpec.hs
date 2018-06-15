@@ -7,20 +7,19 @@ module Test.Pos.Genesis.CanonicalSpec
 import           Universum
 
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess)
+                       (modifyMaxSuccess)
 
-import           Pos.Arbitrary.Core
-    ()
+import           Pos.Arbitrary.Core ()
 import           Pos.Core.Genesis
-    (GenesisAvvmBalances, GenesisData, GenesisDelegation,
-    GenesisProtocolConstants, GenesisWStakeholders)
+                       (GenesisAvvmBalances, GenesisData, GenesisDelegation,
+                       GenesisProtocolConstants, GenesisWStakeholders)
 
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 import           Test.Pos.Helpers
-    (canonicalJsonTest)
+                       (canonicalJsonTest)
 
 spec :: Spec
 spec = withDefConfiguration $ describe "Genesis" $ modifyMaxSuccess (const 10) $ do

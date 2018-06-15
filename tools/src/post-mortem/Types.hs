@@ -7,7 +7,7 @@ module Types
     ) where
 
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import           Universum
 
 type TxHash = Text

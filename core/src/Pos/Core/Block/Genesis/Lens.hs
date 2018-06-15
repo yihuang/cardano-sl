@@ -39,21 +39,22 @@ module Pos.Core.Block.Genesis.Lens
 import           Universum
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 
 import           Pos.Core.Block.Blockchain
-    (gbBody, gbExtra, gbHeader, gbPrevBlock, gbhBodyProof, gbhConsensus,
-    gbhExtra, gbhPrevBlock)
+                       (gbBody, gbExtra, gbHeader, gbPrevBlock, gbhBodyProof,
+                       gbhConsensus, gbhExtra, gbhPrevBlock)
 import           Pos.Core.Block.Genesis.Types
-    (GenesisBody (..), GenesisBodyAttributes, GenesisConsensusData (..),
-    GenesisExtraBodyData (..), GenesisExtraHeaderData (..),
-    GenesisHeaderAttributes, GenesisProof (..))
+                       (GenesisBody (..), GenesisBodyAttributes,
+                       GenesisConsensusData (..), GenesisExtraBodyData (..),
+                       GenesisExtraHeaderData (..), GenesisHeaderAttributes,
+                       GenesisProof (..))
 import           Pos.Core.Block.Union.Types
-    (GenesisBlock, GenesisBlockHeader, HeaderHash)
+                       (GenesisBlock, GenesisBlockHeader, HeaderHash)
 import           Pos.Core.Common
-    (ChainDifficulty, SlotLeaders)
+                       (ChainDifficulty, SlotLeaders)
 import           Pos.Core.Slotting
-    (EpochIndex (..))
+                       (EpochIndex (..))
 
 ----------------------------------------------------------------------------
 -- Extra types

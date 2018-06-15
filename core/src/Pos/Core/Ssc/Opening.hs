@@ -5,9 +5,9 @@ module Pos.Core.Ssc.Opening
 import           Universum
 
 import           Pos.Binary.Class
-    (AsBinary)
+                       (AsBinary)
 import           Pos.Crypto
-    (Secret)
+                       (Secret)
 
 -- | Opening reveals secret.
 newtype Opening = Opening

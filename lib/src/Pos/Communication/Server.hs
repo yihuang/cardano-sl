@@ -5,7 +5,7 @@ module Pos.Communication.Server
        ) where
 
 import           System.Wlog
-    (LoggerName)
+                       (LoggerName)
 
 -- | Logger name for server.
 serverLoggerName :: LoggerName

@@ -32,35 +32,37 @@ module Pos.Util.Orphans
 import           Universum
 
 import           Control.Monad.IO.Unlift
-    (MonadUnliftIO (..), UnliftIO (..), unliftIO, withUnliftIO)
+                       (MonadUnliftIO (..), UnliftIO (..), unliftIO,
+                       withUnliftIO)
 import           Control.Monad.Trans.Identity
-    (IdentityT (..))
+                       (IdentityT (..))
 import           Control.Monad.Trans.Lift.Local
-    (LiftLocal (..))
+                       (LiftLocal (..))
 import           Control.Monad.Trans.Resource
-    (MonadResource (..), ResourceT, transResourceT)
+                       (MonadResource (..), ResourceT, transResourceT)
 import qualified Crypto.Random as Rand
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..))
+                       (FromJSON (..), ToJSON (..))
 import           Data.Hashable
-    (Hashable (hashWithSalt))
+                       (Hashable (hashWithSalt))
 import qualified Data.HashMap.Strict as HM
 import           Data.Tagged
-    (Tagged (Tagged))
+                       (Tagged (Tagged))
 import           Data.Text.Buildable
-    (build)
+                       (build)
 import           Data.Time.Units
-    (Attosecond, Day, Femtosecond, Fortnight, Hour, Microsecond, Millisecond,
-    Minute, Nanosecond, Picosecond, Second, Week, toMicroseconds)
+                       (Attosecond, Day, Femtosecond, Fortnight, Hour,
+                       Microsecond, Millisecond, Minute, Nanosecond,
+                       Picosecond, Second, Week, toMicroseconds)
 import           Data.Typeable
-    (typeRep)
+                       (typeRep)
 import qualified Ether
 import qualified Formatting as F
 import qualified Language.Haskell.TH.Syntax as TH
 import           Serokell.Data.Memory.Units
-    (Byte, fromBytes, toBytes)
+                       (Byte, fromBytes, toBytes)
 import           System.Wlog
-    (CanLog, HasLoggerName (..), LoggerNameBox (..))
+                       (CanLog, HasLoggerName (..), LoggerNameBox (..))
 
 ----------------------------------------------------------------------------
 -- Orphan miscellaneous instances

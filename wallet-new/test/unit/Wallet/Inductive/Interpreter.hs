@@ -14,10 +14,10 @@ import           Universum
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Pos.Core.Chrono
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 
 import           Util.Validated
 import           UTxO.DSL

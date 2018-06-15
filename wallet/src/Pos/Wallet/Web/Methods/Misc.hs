@@ -32,66 +32,68 @@ module Pos.Wallet.Web.Methods.Misc
 import           Universum
 
 import           Data.Aeson
-    (encode)
+                       (encode)
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON)
+                       (defaultOptions, deriveJSON)
 import qualified Data.Text.Buildable
 import           Data.Time.Units
-    (Second, toMicroseconds)
+                       (Second, toMicroseconds)
 import           Formatting
-    (bprint, build, sformat, (%))
+                       (bprint, build, sformat, (%))
 import           Mockable
-    (Delay, LowLevelAsync, Mockables, async, delay)
+                       (Delay, LowLevelAsync, Mockables, async, delay)
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 import           Servant.API.ContentTypes
-    (MimeRender (..), NoContent (..), OctetStream)
+                       (MimeRender (..), NoContent (..), OctetStream)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Ntp.Client
-    (NtpStatus (..))
+                       (NtpStatus (..))
 
 import           Pos.Client.KeyStorage
-    (MonadKeys (..), deleteAllSecretKeys)
+                       (MonadKeys (..), deleteAllSecretKeys)
 import           Pos.Configuration
-    (HasNodeConfiguration)
+                       (HasNodeConfiguration)
 import           Pos.Core
-    (HasConfiguration, SlotId, SoftwareVersion (..))
+                       (HasConfiguration, SlotId, SoftwareVersion (..))
 import           Pos.Crypto
-    (hashHexF)
+                       (hashHexF)
 import           Pos.Infra.Shutdown
-    (HasShutdownContext, triggerShutdown)
+                       (HasShutdownContext, triggerShutdown)
 import           Pos.Infra.Slotting
-    (MonadSlots, getCurrentSlotBlocking)
+                       (MonadSlots, getCurrentSlotBlocking)
 import           Pos.Infra.Util.LogSafe
-    (logInfoUnsafeP)
+                       (logInfoUnsafeP)
 import           Pos.Txp
-    (TxId, TxIn, TxOut)
+                       (TxId, TxIn, TxOut)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, curSoftwareVersion)
+                       (HasUpdateConfiguration, curSoftwareVersion)
 import           Pos.Util
-    (maybeThrow)
+                       (maybeThrow)
 import           Pos.Util.Servant
-    (HasTruncateLogPolicy (..))
-import           Pos.Wallet.Aeson.ClientTypes
-    ()
-import           Pos.Wallet.Aeson.Storage
-    ()
+                       (HasTruncateLogPolicy (..))
+import           Pos.Wallet.Aeson.ClientTypes ()
+import           Pos.Wallet.Aeson.Storage ()
 import           Pos.Wallet.WalletMode
-    (MonadBlockchainInfo, MonadUpdates, applyLastUpdate, connectedPeers,
-    localChainDifficulty, networkChainDifficulty)
+                       (MonadBlockchainInfo, MonadUpdates, applyLastUpdate,
+                       connectedPeers, localChainDifficulty,
+                       networkChainDifficulty)
 import           Pos.Wallet.Web.ClientTypes
-    (Addr, CId (..), CProfile (..), CPtxCondition, CTxId (..),
-    CUpdateInfo (..), SyncProgress (..), cIdToAddress)
+                       (Addr, CId (..), CProfile (..), CPtxCondition,
+                       CTxId (..), CUpdateInfo (..), SyncProgress (..),
+                       cIdToAddress)
 import           Pos.Wallet.Web.Error
-    (WalletError (..))
+                       (WalletError (..))
 import           Pos.Wallet.Web.State
-    (WalletDbReader, WalletSnapshot, askWalletDB, askWalletSnapshot,
-    cancelApplyingPtxs, cancelSpecificApplyingPtx, getNextUpdate, getProfile,
-    removeNextUpdate, resetFailedPtxs, setProfile, testReset)
+                       (WalletDbReader, WalletSnapshot, askWalletDB,
+                       askWalletSnapshot, cancelApplyingPtxs,
+                       cancelSpecificApplyingPtx, getNextUpdate, getProfile,
+                       removeNextUpdate, resetFailedPtxs, setProfile,
+                       testReset)
 import           Pos.Wallet.Web.Util
-    (decodeCTypeOrFail, testOnlyEndpoint)
+                       (decodeCTypeOrFail, testOnlyEndpoint)
 
 ----------------------------------------------------------------------------
 -- Profile

@@ -11,32 +11,33 @@ module Main
 import           Universum
 
 import           Data.Maybe
-    (fromJust)
+                       (fromJust)
 import           Mockable
-    (Production (..), runProduction)
+                       (Production (..), runProduction)
 import           System.Wlog
-    (LoggerName, logInfo)
+                       (LoggerName, logInfo)
 
-import           Pos.Binary
-    ()
+import           Pos.Binary ()
 import           Pos.Client.CLI
-    (CommonNodeArgs (..), NodeArgs (..), SimpleNodeArgs (..))
+                       (CommonNodeArgs (..), NodeArgs (..),
+                       SimpleNodeArgs (..))
 import qualified Pos.Client.CLI as CLI
 import           Pos.Infra.Ntp.Configuration
-    (NtpConfiguration)
+                       (NtpConfiguration)
 import           Pos.Launcher
-    (HasConfigurations, NodeParams (..), loggerBracket, runNodeReal,
-    withConfigurations)
+                       (HasConfigurations, NodeParams (..), loggerBracket,
+                       runNodeReal, withConfigurations)
 import           Pos.Ssc.Types
-    (SscParams)
+                       (SscParams)
 import           Pos.Update.Worker
-    (updateTriggerWorker)
+                       (updateTriggerWorker)
 import           Pos.Util
-    (logException)
+                       (logException)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
+                       (HasCompileInfo, retrieveCompileTimeInfo,
+                       withCompileInfo)
 import           Pos.Util.UserSecret
-    (usVss)
+                       (usVss)
 
 loggerName :: LoggerName
 loggerName = "node"

@@ -5,15 +5,15 @@ module Pos.Aeson.Update
     ) where
 
 import           Data.Aeson
-    (FromJSON (..))
+                       (FromJSON (..))
 import           Data.Aeson.TH
-    (deriveToJSON)
+                       (deriveToJSON)
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 import           Universum
 
 import           Pos.Core.Update
-    (SystemTag (..))
+                       (SystemTag (..))
 
 instance FromJSON SystemTag where
     parseJSON v = SystemTag <$> parseJSON v

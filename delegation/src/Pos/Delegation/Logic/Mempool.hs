@@ -20,43 +20,44 @@ module Pos.Delegation.Logic.Mempool
 import           Universum
 
 import           Control.Lens
-    (at, uses, (%=), (+=), (-=), (.=))
+                       (at, uses, (%=), (+=), (-=), (.=))
 import qualified Data.Cache.LRU as LRU
 import qualified Data.HashMap.Strict as HM
 import           Mockable
-    (CurrentTime, Mockable, currentTime)
+                       (CurrentTime, Mockable, currentTime)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Core
-    (ProxySKHeavy, addressHash, bvdMaxBlockSize, epochIndexL, headerHash)
+                       (ProxySKHeavy, addressHash, bvdMaxBlockSize,
+                       epochIndexL, headerHash)
 import           Pos.Crypto
-    (ProxySecretKey (..), PublicKey)
+                       (ProxySecretKey (..), PublicKey)
 import           Pos.DB
-    (MonadDBRead, MonadGState)
+                       (MonadDBRead, MonadGState)
 import qualified Pos.DB as DB
 import           Pos.Delegation.Cede
-    (CheckForCycle (..), cmPskMods, dlgVerifyPskHeavy, emptyCedeModifier,
-    evalMapCede, pskToDlgEdgeAction)
+                       (CheckForCycle (..), cmPskMods, dlgVerifyPskHeavy,
+                       emptyCedeModifier, evalMapCede, pskToDlgEdgeAction)
 import           Pos.Delegation.Class
-    (DlgMemPool, MonadDelegation, dwMessageCache, dwPoolSize, dwProxySKPool,
-    dwTip)
+                       (DlgMemPool, MonadDelegation, dwMessageCache,
+                       dwPoolSize, dwProxySKPool, dwTip)
 import           Pos.Delegation.Logic.Common
-    (DelegationStateAction, runDelegationStateAction)
+                       (DelegationStateAction, runDelegationStateAction)
 import           Pos.Delegation.Types
-    (DlgPayload (..), isRevokePsk)
+                       (DlgPayload (..), isRevokePsk)
 import           Pos.Infra.StateLock
-    (StateLock, withStateLockNoMetrics)
+                       (StateLock, withStateLockNoMetrics)
 import           Pos.Lrc.Consumer.Delegation
-    (getDlgRichmen)
+                       (getDlgRichmen)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Util
-    (HasLens', microsecondsToUTC)
+                       (HasLens', microsecondsToUTC)
 import           Pos.Util.Concurrent.PriorityLock
-    (Priority (..))
+                       (Priority (..))
 
 ----------------------------------------------------------------------------
 -- Delegation mempool

@@ -8,12 +8,12 @@ import           Universum
 
 import qualified Data.Aeson as A
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 
 import           Pos.Util.Util
-    (toAesonError)
+                       (toAesonError)
 
 ----------------------------------------------------------------------------
 -- Types for the behavior config

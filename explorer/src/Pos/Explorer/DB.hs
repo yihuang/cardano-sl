@@ -27,57 +27,57 @@ module Pos.Explorer.DB
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at, non)
+                       (at, non)
 import           Control.Monad.Trans.Resource
-    (ResourceT)
+                       (ResourceT)
 import           Data.Conduit
-    (ConduitT, mapOutput, runConduitRes, (.|))
+                       (ConduitT, mapOutput, runConduitRes, (.|))
 import qualified Data.Conduit.List as CL
 import           Data.List
-    (groupBy)
+                       (groupBy)
 import           Data.Map
-    (fromList)
+                       (fromList)
 import qualified Data.Map as M
 import qualified Database.RocksDB as Rocks
 import           Formatting
-    (sformat, (%))
+                       (sformat, (%))
 import           Serokell.Util
-    (Color (Red), colorize, mapJson)
+                       (Color (Red), colorize, mapJson)
 import           System.Wlog
-    (WithLogger, logError)
+                       (WithLogger, logError)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Binary.Class
-    (serialize')
+                       (serialize')
 import           Pos.Core
-    (Address, Coin, EpochIndex (..), HasConfiguration, HeaderHash,
-    coinToInteger, unsafeAddCoin)
+                       (Address, Coin, EpochIndex (..), HasConfiguration,
+                       HeaderHash, coinToInteger, unsafeAddCoin)
 import           Pos.Core.Chrono
-    (NewestFirst (..))
+                       (NewestFirst (..))
 import           Pos.Core.Txp
-    (Tx, TxId, TxOut (..), TxOutAux (..))
+                       (Tx, TxId, TxOut (..), TxOutAux (..))
 import           Pos.DB
-    (DBError (..), DBIteratorClass (..), DBTag (GStateDB), MonadDB,
-    MonadDBRead (dbGet), RocksBatchOp (..), dbIterSource, dbSerializeValue,
-    encodeWithKeyPrefix)
+                       (DBError (..), DBIteratorClass (..), DBTag (GStateDB),
+                       MonadDB, MonadDBRead (dbGet), RocksBatchOp (..),
+                       dbIterSource, dbSerializeValue, encodeWithKeyPrefix)
 import           Pos.DB.DB
-    (initNodeDBs)
+                       (initNodeDBs)
 import           Pos.DB.GState.Common
-    (gsGetBi, gsPutBi, writeBatchGState)
+                       (gsGetBi, gsPutBi, writeBatchGState)
 import           Pos.Explorer.Core
-    (AddrHistory, TxExtra (..))
+                       (AddrHistory, TxExtra (..))
 import           Pos.Txp.DB
-    (getAllPotentiallyHugeUtxo, utxoSource)
+                       (getAllPotentiallyHugeUtxo, utxoSource)
 import           Pos.Txp.GenesisUtxo
-    (genesisUtxo)
+                       (genesisUtxo)
 import           Pos.Txp.Toil
-    (GenesisUtxo (..), utxoF, utxoToAddressCoinPairs)
+                       (GenesisUtxo (..), utxoF, utxoToAddressCoinPairs)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 
 

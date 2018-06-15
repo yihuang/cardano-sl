@@ -13,18 +13,18 @@ module Pos.Crypto.Encryption
        ) where
 
 import           Universum hiding
-    (init)
+                       (init)
 
 import           Crypto.Cipher.AES
-    (AES256)
+                       (AES256)
 import           Crypto.Cipher.Types
-    (BlockCipher (..), cipherInit, ctrCombine, nullIV)
+                       (BlockCipher (..), cipherInit, ctrCombine, nullIV)
 import           Crypto.Error
-    (CryptoError, eitherCryptoError)
+                       (CryptoError, eitherCryptoError)
 import           Crypto.Hash
-    (Blake2b_256, Digest, hash)
+                       (Blake2b_256, Digest, hash)
 import           Data.ByteArray
-    (convert)
+                       (convert)
 import qualified Data.Text.Encoding as TE
 
 ----------------------------------------------------------------------------

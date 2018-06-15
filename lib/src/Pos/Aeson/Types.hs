@@ -5,10 +5,10 @@ module Pos.Aeson.Types
        ) where
 
 import           Data.Aeson.TH
-    (defaultOptions, deriveToJSON)
+                       (defaultOptions, deriveToJSON)
 
 import           Pos.Web.Types
-    (SscStage)
+                       (SscStage)
 
 -- NOTE: some of these types are used on frontend (PureScript).
 -- We are automatically deriving instances there and they are

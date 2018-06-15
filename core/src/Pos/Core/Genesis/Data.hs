@@ -5,11 +5,11 @@ module Pos.Core.Genesis.Data
 import           Universum
 
 import           Pos.Core.Common
-    (SharedSeed)
+                       (SharedSeed)
 import           Pos.Core.Slotting
-    (Timestamp)
+                       (Timestamp)
 import           Pos.Core.Update
-    (BlockVersionData)
+                       (BlockVersionData)
 
 import           Pos.Core.Genesis.AvvmBalances
 import           Pos.Core.Genesis.Delegation

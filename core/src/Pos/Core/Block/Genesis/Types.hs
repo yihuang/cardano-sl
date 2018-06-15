@@ -14,16 +14,16 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 
 import           Pos.Core.Common
-    (ChainDifficulty, SlotLeaders)
+                       (ChainDifficulty, SlotLeaders)
 import           Pos.Core.Slotting
-    (EpochIndex (..))
+                       (EpochIndex (..))
 import           Pos.Crypto
-    (Hash)
+                       (Hash)
 import           Pos.Data.Attributes
-    (Attributes, areAttributesKnown)
+                       (Attributes, areAttributesKnown)
 
 -- [CSL-199]: maybe we should use ADS.
 -- | Proof of GenesisBody is just a hash of slot leaders list.

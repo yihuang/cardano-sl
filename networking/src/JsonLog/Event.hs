@@ -40,13 +40,13 @@ module JsonLog.Event
     ) where
 
 import           Control.Monad.IO.Class
-    (MonadIO)
+                       (MonadIO)
 import           Data.Aeson
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 
 import           Mockable.CurrentTime
-    (realTime)
+                       (realTime)
 
 -- | A /typed/ JSON log events.
 data JLTimed a = JLTimed

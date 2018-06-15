@@ -5,58 +5,61 @@ module Main
 import           Universum
 
 import           Control.Exception.Safe
-    (handle)
+                       (handle)
 import           Data.Maybe
-    (fromMaybe)
+                       (fromMaybe)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Mockable
-    (Production (..), runProduction)
+                       (Production (..), runProduction)
 import qualified Network.Transport.TCP as TCP
-    (TCPAddr (..))
+                       (TCPAddr (..))
 import qualified System.IO.Temp as Temp
 import           System.Wlog
-    (LoggerName, logInfo)
+                       (LoggerName, logInfo)
 
 import qualified Pos.Client.CLI as CLI
 import           Pos.Context
-    (NodeContext (..))
+                       (NodeContext (..))
 import           Pos.Core
-    (ConfigurationError)
+                       (ConfigurationError)
 import           Pos.DB.DB
-    (initNodeDBs)
+                       (initNodeDBs)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion, hoistDiffusion)
+                       (Diffusion, hoistDiffusion)
 import           Pos.Infra.Network.Types
-    (NetworkConfig (..), Topology (..), topologyDequeuePolicy,
-    topologyEnqueuePolicy, topologyFailurePolicy)
+                       (NetworkConfig (..), Topology (..),
+                       topologyDequeuePolicy, topologyEnqueuePolicy,
+                       topologyFailurePolicy)
 import           Pos.Infra.Ntp.Configuration
-    (NtpConfiguration)
+                       (NtpConfiguration)
 import           Pos.Launcher
-    (HasConfigurations, NodeParams (..), NodeResources (..),
-    bracketNodeResources, loggerBracket, lpConsoleLog, runNode, runRealMode,
-    withConfigurations)
+                       (HasConfigurations, NodeParams (..), NodeResources (..),
+                       bracketNodeResources, loggerBracket, lpConsoleLog,
+                       runNode, runRealMode, withConfigurations)
 import           Pos.Txp
-    (txpGlobalSettings)
+                       (txpGlobalSettings)
 import           Pos.Util
-    (logException)
+                       (logException)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
+                       (HasCompileInfo, retrieveCompileTimeInfo,
+                       withCompileInfo)
 import           Pos.Util.Config
-    (ConfigurationException (..))
+                       (ConfigurationException (..))
 import           Pos.Util.UserSecret
-    (usVss)
+                       (usVss)
 import           Pos.WorkMode
-    (EmptyMempoolExt, RealMode)
+                       (EmptyMempoolExt, RealMode)
 
 import           AuxxOptions
-    (AuxxAction (..), AuxxOptions (..), AuxxStartMode (..), getAuxxOptions)
+                       (AuxxAction (..), AuxxOptions (..), AuxxStartMode (..),
+                       getAuxxOptions)
 import           Mode
-    (AuxxContext (..), AuxxMode, realModeToAuxx)
+                       (AuxxContext (..), AuxxMode, realModeToAuxx)
 import           Plugin
-    (auxxPlugin, rawExec)
+                       (auxxPlugin, rawExec)
 import           Repl
-    (PrintAction, WithCommandAction (..), withAuxxRepl)
+                       (PrintAction, WithCommandAction (..), withAuxxRepl)
 
 loggerName :: LoggerName
 loggerName = "auxx"

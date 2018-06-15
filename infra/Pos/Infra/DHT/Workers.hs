@@ -9,38 +9,37 @@ import           Universum
 
 import qualified Data.ByteString.Lazy as BSL
 import           Formatting
-    (sformat, (%))
+                       (sformat, (%))
 import           Mockable
-    (Async, Delay, Mockable)
+                       (Async, Delay, Mockable)
 import           Network.Kademlia
-    (takeSnapshot)
+                       (takeSnapshot)
 import           System.Wlog
-    (WithLogger, logNotice)
+                       (WithLogger, logNotice)
 
 import           Pos.Binary.Class
-    (serialize)
+                       (serialize)
 import           Pos.Core
-    (HasProtocolConstants)
+                       (HasProtocolConstants)
 import           Pos.Core.Slotting
-    (flattenSlotId, slotIdF)
-import           Pos.Infra.Binary.DHTModel
-    ()
+                       (flattenSlotId, slotIdF)
+import           Pos.Infra.Binary.DHTModel ()
 import           Pos.Infra.DHT.Constants
-    (kademliaDumpInterval)
+                       (kademliaDumpInterval)
 import           Pos.Infra.DHT.Real.Types
-    (KademliaDHTInstance (..))
+                       (KademliaDHTInstance (..))
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Infra.Recovery.Info
-    (MonadRecoveryInfo, recoveryCommGuard)
+                       (MonadRecoveryInfo, recoveryCommGuard)
 import           Pos.Infra.Reporting
-    (MonadReporting)
+                       (MonadReporting)
 import           Pos.Infra.Shutdown
-    (HasShutdownContext)
+                       (HasShutdownContext)
 import           Pos.Infra.Slotting.Class
-    (MonadSlots)
+                       (MonadSlots)
 import           Pos.Infra.Slotting.Util
-    (defaultOnNewSlotParams, onNewSlot)
+                       (defaultOnNewSlotParams, onNewSlot)
 
 type DhtWorkMode ctx m =
     ( WithLogger m

@@ -8,21 +8,21 @@ module Pos.Security.Params
 import           Universum
 
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Types as A
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 import qualified Text.Parsec as Parsec
 
 import           Pos.Core.Common
-    (StakeholderId)
+                       (StakeholderId)
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress, addrParser)
+                       (NetworkAddress, addrParser)
 import           Pos.Util.Util
-    (aesonError, toAesonError)
+                       (aesonError, toAesonError)
 
 -- | Network attack settings (a part of the behavior config).
 --

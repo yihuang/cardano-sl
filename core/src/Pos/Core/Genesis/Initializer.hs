@@ -8,12 +8,12 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Fmt
-    (genericF)
+                       (genericF)
 import           Formatting
-    (bprint, build, fixed, int, (%))
+                       (bprint, build, fixed, int, (%))
 
 import           Pos.Core.Common
-    (CoinPortion)
+                       (CoinPortion)
 
 -- | This data type contains various options which determine genesis
 -- stakes, balanaces, heavy delegation, etc.

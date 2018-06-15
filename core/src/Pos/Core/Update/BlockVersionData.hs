@@ -7,18 +7,17 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Data.Time.Units
-    (Millisecond)
+                       (Millisecond)
 import           Formatting
-    (bprint, build, int, (%))
+                       (bprint, build, int, (%))
 import           Serokell.Data.Memory.Units
-    (Byte, memory)
+                       (Byte, memory)
 
 import           Pos.Core.Common
-    (CoinPortion, ScriptVersion, TxFeePolicy)
+                       (CoinPortion, ScriptVersion, TxFeePolicy)
 import           Pos.Core.Slotting
-    (EpochIndex, FlatSlotId, isBootstrapEra)
-import           Pos.Util.Orphans
-    ()
+                       (EpochIndex, FlatSlotId, isBootstrapEra)
+import           Pos.Util.Orphans ()
 
 import           Pos.Core.Update.SoftforkRule
 

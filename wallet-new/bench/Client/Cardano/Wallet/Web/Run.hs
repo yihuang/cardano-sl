@@ -7,26 +7,27 @@ module Client.Cardano.Wallet.Web.Run
 import           Universum
 
 import           Servant.Client
-    (ClientEnv (..), ClientM, runClientM)
+                       (ClientEnv (..), ClientM, runClientM)
 import           Servant.Client.Core
-    (BaseUrl (..), Scheme (..))
+                       (BaseUrl (..), Scheme (..))
 
 import           Data.Default
-    (def)
+                       (def)
 import           Network.Connection
-    (TLSSettings (..))
+                       (TLSSettings (..))
 import           Network.HTTP.Client
-    (Manager, newManager)
+                       (Manager, newManager)
 import           Network.HTTP.Client.TLS
-    (mkManagerSettings)
+                       (mkManagerSettings)
 import           Network.TLS
-    (ClientParams (..), credentialLoadX509FromMemory, defaultParamsClient,
-    onCertificateRequest, onServerCertificate, supportedCiphers)
+                       (ClientParams (..), credentialLoadX509FromMemory,
+                       defaultParamsClient, onCertificateRequest,
+                       onServerCertificate, supportedCiphers)
 import           Network.TLS.Extra.Cipher
-    (ciphersuite_default)
+                       (ciphersuite_default)
 
 import           Bench.Cardano.Wallet.Types
-    (CompleteConfig (..))
+                       (CompleteConfig (..))
 
 -- | Run client for particular endpoint. It is assumed that
 -- node is already running, with enabled Wallet Web API.

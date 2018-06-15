@@ -12,27 +12,27 @@ import           Universum
 import qualified Data.Aeson as A
 import qualified Data.ByteString.Lazy as BSL
 import           Formatting
-    (sformat, stext, (%))
+                       (sformat, stext, (%))
 
 import           Pos.Util
-    (HasLens (..))
+                       (HasLens (..))
 import           Pos.Wallet.Web.Backup
-    (TotalBackup (..), getWalletBackup)
+                       (TotalBackup (..), getWalletBackup)
 import           Pos.Wallet.Web.ClientTypes
-    (CFilePath (..), CId, CWallet, Wal)
+                       (CFilePath (..), CId, CWallet, Wal)
 import           Pos.Wallet.Web.Error
-    (WalletError (..))
+                       (WalletError (..))
 import qualified Pos.Wallet.Web.Methods.Logic as L
 import           Pos.Wallet.Web.Methods.Restore
-    (restoreWalletFromBackup)
+                       (restoreWalletFromBackup)
 import           Pos.Wallet.Web.State.State
-    (askWalletSnapshot)
+                       (askWalletSnapshot)
 import           Pos.Wallet.Web.Tracking.Types
-    (SyncQueue)
+                       (SyncQueue)
 import           Servant.API.ContentTypes
-    (NoContent (..))
+                       (NoContent (..))
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 type MonadWalletBackup ctx m = ( L.MonadWalletLogic ctx m
                                , MonadUnliftIO m

@@ -11,9 +11,9 @@ module Pos.Core.Context.PrimaryKey
 import           Universum
 
 import           Pos.Core.Common
-    (StakeholderId, addressHash)
+                       (StakeholderId, addressHash)
 import           Pos.Crypto
-    (PublicKey, SecretKey, toPublic)
+                       (PublicKey, SecretKey, toPublic)
 
 -- | Access to primary key of the node.
 class HasPrimaryKey ctx where

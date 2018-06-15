@@ -27,15 +27,16 @@ module Pos.Ssc.Mem
 import           Universum
 
 import           Control.Monad.Morph
-    (hoist)
+                       (hoist)
 import qualified Crypto.Random as Rand
 import           System.Wlog
-    (NamedPureLogger, WithLogger, launchNamedPureLog)
+                       (NamedPureLogger, WithLogger, launchNamedPureLog)
 
 import           Pos.Ssc.Types
-    (SscGlobalState, SscLocalData, SscState, sscGlobal, sscLocal)
+                       (SscGlobalState, SscLocalData, SscState, sscGlobal,
+                       sscLocal)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 ----------------------------------------------------------------------------
 -- MonadSscMem

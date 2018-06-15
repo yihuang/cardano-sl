@@ -3,20 +3,20 @@ module Cardano.Wallet.API.V1.LegacyHandlers.Settings where
 import           Universum
 
 import           Cardano.Wallet.API.Response
-    (WalletResponse, single)
+                       (WalletResponse, single)
 import           Cardano.Wallet.API.V1.Migration
 import qualified Cardano.Wallet.API.V1.Settings as Settings
 import           Cardano.Wallet.API.V1.Types as V1
 import qualified Data.Text as T
 import           Paths_cardano_sl_wallet_new
-    (version)
+                       (version)
 
 import           Pos.Update.Configuration
-    (curSoftwareVersion)
+                       (curSoftwareVersion)
 import           Pos.Util.CompileInfo
-    (compileInfo, ctiGitRevision)
+                       (compileInfo, ctiGitRevision)
 import           Pos.Wallet.WalletMode
-    (MonadBlockchainInfo, blockchainSlotDuration)
+                       (MonadBlockchainInfo, blockchainSlotDuration)
 import           Servant
 
 -- | All the @Servant@ handlers for settings-specific operations.

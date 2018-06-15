@@ -8,17 +8,18 @@
 module Test.Pos.Util.Orphans where
 
 import           Control.Monad.Reader.Class
-    (MonadReader (..))
+                       (MonadReader (..))
 import qualified Crypto.Random as Rand
 
 import           Data.Time.Units
-    (Microsecond, Millisecond, Second, TimeUnit (..), convertUnit)
+                       (Microsecond, Millisecond, Second, TimeUnit (..),
+                       convertUnit)
 
 import           Test.QuickCheck
-    (Arbitrary, Gen)
+                       (Arbitrary, Gen)
 import qualified Test.QuickCheck as QC
 import           Test.QuickCheck.Monadic
-    (PropertyM (..))
+                       (PropertyM (..))
 
 import           Universum
 

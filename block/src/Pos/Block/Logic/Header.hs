@@ -17,62 +17,63 @@ module Pos.Block.Logic.Header
        ) where
 
 import           Universum hiding
-    (elems)
+                       (elems)
 
 import           Control.Lens
-    (to)
+                       (to)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import           Control.Monad.Trans.Maybe
-    (MaybeT (MaybeT), runMaybeT)
+                       (MaybeT (MaybeT), runMaybeT)
 import qualified Data.List as List
-    (last)
+                       (last)
 import qualified Data.List.NonEmpty as NE
-    (toList)
+                       (toList)
 import qualified Data.Text as T
 import           Formatting
-    (build, int, sformat, (%))
+                       (build, int, sformat, (%))
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import           Serokell.Util.Verify
-    (VerificationRes (..), isVerSuccess)
+                       (VerificationRes (..), isVerSuccess)
 import           System.Wlog
-    (WithLogger, logDebug)
+                       (WithLogger, logDebug)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Block.Logic.Integrity
-    (VerifyHeaderParams (..), verifyHeader, verifyHeaders)
+                       (VerifyHeaderParams (..), verifyHeader, verifyHeaders)
 import           Pos.Block.Logic.Util
-    (lcaWithMainChain)
+                       (lcaWithMainChain)
 import           Pos.Core
-    (BlockCount, EpochOrSlot (..), HeaderHash, SlotId (..), blkSecurityParam,
-    bvdMaxHeaderSize, difficultyL, epochIndexL, epochOrSlotG,
-    getChainDifficulty, getEpochOrSlot, headerHash, headerHashG, headerSlotL,
-    prevBlockL)
+                       (BlockCount, EpochOrSlot (..), HeaderHash, SlotId (..),
+                       blkSecurityParam, bvdMaxHeaderSize, difficultyL,
+                       epochIndexL, epochOrSlotG, getChainDifficulty,
+                       getEpochOrSlot, headerHash, headerHashG, headerSlotL,
+                       prevBlockL)
 import           Pos.Core.Block
-    (BlockHeader (..))
+                       (BlockHeader (..))
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..), toNewestFirst, toOldestFirst,
-    _NewestFirst, _OldestFirst)
+                       (NE, NewestFirst (..), OldestFirst (..), toNewestFirst,
+                       toOldestFirst, _NewestFirst, _OldestFirst)
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import           Pos.DB
-    (MonadDBRead)
+                       (MonadDBRead)
 import qualified Pos.DB.Block.Load as DB
 import qualified Pos.DB.BlockIndex as DB
 import qualified Pos.DB.GState.Common as GS
-    (getTip)
+                       (getTip)
 import           Pos.Delegation.Cede
-    (dlgVerifyHeader, runDBCede)
+                       (dlgVerifyHeader, runDBCede)
 import qualified Pos.GState.BlockExtra as GS
 import           Pos.Infra.Slotting.Class
-    (MonadSlots (getCurrentSlot))
+                       (MonadSlots (getCurrentSlot))
 import qualified Pos.Lrc.DB as LrcDB
 import qualified Pos.Update.DB as GS
-    (getAdoptedBVFull)
+                       (getAdoptedBVFull)
 import           Pos.Util
-    (buildListBounds, _neHead, _neLast)
+                       (buildListBounds, _neHead, _neLast)
 
 -- | Result of single (new) header classification.
 data ClassifyHeaderRes

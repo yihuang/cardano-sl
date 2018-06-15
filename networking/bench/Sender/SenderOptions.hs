@@ -8,20 +8,20 @@ module SenderOptions
        ) where
 
 import           Data.Int
-    (Int64)
+                       (Int64)
 import           Data.Monoid
-    ((<>))
+                       ((<>))
 import           Data.String
-    (fromString)
+                       (fromString)
 import           Data.Word
-    (Word16)
+                       (Word16)
 import           Options.Applicative.Simple
-    (Parser, auto, help, long, metavar, option, optional, readerError, short,
-    showDefault, some, strOption, value)
+                       (Parser, auto, help, long, metavar, option, optional,
+                       readerError, short, showDefault, some, strOption, value)
 import           Pos.Util.OptParse
-    (fromParsec)
+                       (fromParsec)
 import           Serokell.Util.Parse
-    (connection)
+                       (connection)
 
 data Args = Args
     { logConfig    :: !(Maybe FilePath)

@@ -6,15 +6,15 @@ module Main where
 import           Universum
 
 import           Data.Swagger
-    (Swagger)
+                       (Swagger)
 import           Options.Applicative
 
 import           Cardano.Wallet.API
-    (devAPI, v0API, v1API)
+                       (devAPI, v0API, v1API)
 import           Pos.Core
-    (ApplicationName (..), SoftwareVersion (..))
+                       (ApplicationName (..), SoftwareVersion (..))
 import           Pos.Util.CompileInfo
-    (CompileTimeInfo, retrieveCompileTimeInfo)
+                       (CompileTimeInfo, retrieveCompileTimeInfo)
 
 import qualified Cardano.Wallet.API.V1.Swagger as Swagger
 import qualified Data.Aeson as Aeson

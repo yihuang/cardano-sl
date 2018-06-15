@@ -8,14 +8,14 @@ module Pos.Core.Update.SoftwareVersion
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError)
+                       (MonadError)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, int, stext, (%))
+                       (bprint, int, stext, (%))
 import qualified Prelude
 
 import           Pos.Util.Some
-    (Some, liftLensSome)
+                       (Some, liftLensSome)
 
 import           Pos.Core.Update.ApplicationName
 

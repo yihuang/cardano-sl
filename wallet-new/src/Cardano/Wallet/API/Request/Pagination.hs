@@ -15,19 +15,19 @@ module Cardano.Wallet.API.Request.Pagination (
 import           Universum
 
 import           Control.Lens
-    (at, ix, (?~))
+                       (at, ix, (?~))
 import           Data.Aeson
-    (Value (Number))
+                       (Value (Number))
 import           Data.Aeson.TH
 import qualified Data.Char as Char
 import           Data.Default
 import           Data.Swagger as S
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import qualified Serokell.Aeson.Options as Serokell
 import           Test.QuickCheck
-    (Arbitrary (..), choose, getPositive)
+                       (Arbitrary (..), choose, getPositive)
 import           Web.HttpApiData
 
 -- | A `Page` is used in paginated endpoints to request access to a particular
@@ -43,8 +43,8 @@ instance Arbitrary Page where
 instance FromHttpApiData Page where
     parseQueryParam qp = case parseQueryParam qp of
         Right (p :: Int) | p < 1 -> Left "A page number cannot be less than 1."
-        Right (p :: Int) -> Right (Page p)
-        Left e           -> Left e
+        Right (p :: Int)         -> Right (Page p)
+        Left e                   -> Left e
 
 instance ToHttpApiData Page where
     toQueryParam (Page p) = fromString (show p)

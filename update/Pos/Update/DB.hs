@@ -40,56 +40,57 @@ module Pos.Update.DB
 import           Universum
 
 import           Control.Lens
-    (at)
+                       (at)
 import           Control.Monad.Trans.Resource
-    (ResourceT)
+                       (ResourceT)
 import           Data.Conduit
-    (ConduitT, mapOutput, runConduitRes, (.|))
+                       (ConduitT, mapOutput, runConduitRes, (.|))
 import qualified Data.Conduit.List as CL
 import           Data.Time.Units
-    (Microsecond, convertUnit)
+                       (Microsecond, convertUnit)
 import qualified Database.RocksDB as Rocks
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Binary.Class
-    (serialize')
-import           Pos.Binary.Update
-    ()
+                       (serialize')
+import           Pos.Binary.Update ()
 import           Pos.Core
-    (ApplicationName, BlockVersion, ChainDifficulty, HasCoreConfiguration,
-    NumSoftwareVersion, SlotId, SoftwareVersion (..), StakeholderId,
-    TimeDiff (..), epochSlots)
+                       (ApplicationName, BlockVersion, ChainDifficulty,
+                       HasCoreConfiguration, NumSoftwareVersion, SlotId,
+                       SoftwareVersion (..), StakeholderId, TimeDiff (..),
+                       epochSlots)
 import           Pos.Core.Configuration
-    (genesisBlockVersionData)
+                       (genesisBlockVersionData)
 import           Pos.Core.Update
-    (BlockVersionData (..), UpId, UpdateProposal (..))
+                       (BlockVersionData (..), UpId, UpdateProposal (..))
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import           Pos.DB
-    (DBIteratorClass (..), DBTag (..), IterType, MonadDB, MonadDBRead (..),
-    RocksBatchOp (..), dbSerializeValue, encodeWithKeyPrefix)
+                       (DBIteratorClass (..), DBTag (..), IterType, MonadDB,
+                       MonadDBRead (..), RocksBatchOp (..), dbSerializeValue,
+                       encodeWithKeyPrefix)
 import           Pos.DB.Error
-    (DBError (DBMalformed))
+                       (DBError (DBMalformed))
 import           Pos.DB.GState.Common
-    (gsGetBi, writeBatchGState)
-import           Pos.Infra.Binary
-    ()
+                       (gsGetBi, writeBatchGState)
+import           Pos.Infra.Binary ()
 import           Pos.Infra.Slotting.Types
-    (EpochSlottingData (..), SlottingData, createInitSlottingData)
+                       (EpochSlottingData (..), SlottingData,
+                       createInitSlottingData)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, ourAppName, ourSystemTag)
+                       (HasUpdateConfiguration, ourAppName, ourSystemTag)
 import           Pos.Update.Constants
-    (genesisBlockVersion, genesisSoftwareVersions)
+                       (genesisBlockVersion, genesisSoftwareVersions)
 import           Pos.Update.Poll.Types
-    (BlockVersionState (..), ConfirmedProposalState (..),
-    DecidedProposalState (dpsDifficulty), ProposalState (..),
-    UndecidedProposalState (upsSlot), bvsIsConfirmed, cpsSoftwareVersion,
-    psProposal)
+                       (BlockVersionState (..), ConfirmedProposalState (..),
+                       DecidedProposalState (dpsDifficulty),
+                       ProposalState (..), UndecidedProposalState (upsSlot),
+                       bvsIsConfirmed, cpsSoftwareVersion, psProposal)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 ----------------------------------------------------------------------------
 -- Getters

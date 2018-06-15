@@ -30,27 +30,28 @@ import           Universum
 
 import qualified Cardano.Crypto.Wallet as CC
 import           Crypto.Random
-    (MonadRandom, getRandomBytes)
+                       (MonadRandom, getRandomBytes)
 import           Data.ByteArray
-    (ScrubbedBytes)
+                       (ScrubbedBytes)
 import qualified Data.ByteString as BS
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 
 import           Pos.Binary.Class
-    (Bi, Raw)
+                       (Bi, Raw)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Crypto.Configuration
-    (ProtocolMagic)
+                       (ProtocolMagic)
 import           Pos.Crypto.Signing.Check
-    (checkSig, checkSigRaw, validateProxySecretKey, verifyProxyCert)
+                       (checkSig, checkSigRaw, validateProxySecretKey,
+                       verifyProxyCert)
 import           Pos.Crypto.Signing.Tag
-    (signTag)
+                       (signTag)
 import           Pos.Crypto.Signing.Types.Signing
 import           Pos.Crypto.Signing.Types.Tag
-    (SignTag)
+                       (SignTag)
 
 ----------------------------------------------------------------------------
 -- Keys, key generation & printing & decoding

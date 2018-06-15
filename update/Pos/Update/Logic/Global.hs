@@ -12,47 +12,50 @@ module Pos.Update.Logic.Global
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError, runExceptT)
+                       (MonadError, runExceptT)
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import           System.Wlog
-    (WithLogger, modifyLoggerName)
+                       (WithLogger, modifyLoggerName)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Core
-    (ApplicationName, BlockVersion, ComponentBlock (..), HasCoreConfiguration,
-    HasProtocolConstants, HasProtocolMagic, NumSoftwareVersion,
-    SoftwareVersion (..), StakeholderId, addressHash, blockVersionL,
-    epochIndexL, headerHashG, headerLeaderKeyL, headerSlotL)
+                       (ApplicationName, BlockVersion, ComponentBlock (..),
+                       HasCoreConfiguration, HasProtocolConstants,
+                       HasProtocolMagic, NumSoftwareVersion,
+                       SoftwareVersion (..), StakeholderId, addressHash,
+                       blockVersionL, epochIndexL, headerHashG,
+                       headerLeaderKeyL, headerSlotL)
 import           Pos.Core.Chrono
-    (NE, NewestFirst, OldestFirst)
+                       (NE, NewestFirst, OldestFirst)
 import           Pos.Core.Update
-    (BlockVersionData, UpId, UpdatePayload)
+                       (BlockVersionData, UpId, UpdatePayload)
 import qualified Pos.DB.BatchOp as DB
 import qualified Pos.DB.Class as DB
 import           Pos.Exception
-    (reportFatalError)
+                       (reportFatalError)
 import           Pos.Infra.Reporting
-    (MonadReporting)
+                       (MonadReporting)
 import           Pos.Infra.Slotting
-    (MonadSlotsData, slottingVar)
+                       (MonadSlotsData, slottingVar)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, lastKnownBlockVersion)
+                       (HasUpdateConfiguration, lastKnownBlockVersion)
 import           Pos.Update.DB
-    (UpdateOp (..))
+                       (UpdateOp (..))
 import           Pos.Update.Poll
-    (BlockVersionState, ConfirmedProposalState, DBPoll, MonadPoll,
-    PollModifier (..), PollT, PollVerFailure, ProposalState, USUndo,
-    canCreateBlockBV, execPollT, execRollT, getAdoptedBV, processGenesisBlock,
-    recordBlockIssuance, reportUnexpectedError, rollbackUS, runDBPoll,
-    runPollT, verifyAndApplyUSPayload)
+                       (BlockVersionState, ConfirmedProposalState, DBPoll,
+                       MonadPoll, PollModifier (..), PollT, PollVerFailure,
+                       ProposalState, USUndo, canCreateBlockBV, execPollT,
+                       execRollT, getAdoptedBV, processGenesisBlock,
+                       recordBlockIssuance, reportUnexpectedError, rollbackUS,
+                       runDBPoll, runPollT, verifyAndApplyUSPayload)
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 import qualified Pos.Util.Modifier as MM
 
 ----------------------------------------------------------------------------

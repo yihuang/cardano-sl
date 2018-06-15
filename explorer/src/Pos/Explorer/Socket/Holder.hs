@@ -32,21 +32,21 @@ module Pos.Explorer.Socket.Holder
 import           Universum
 
 import           Control.Lens
-    (makeClassy, makePrisms)
+                       (makeClassy, makePrisms)
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import           Network.EngineIO
-    (SocketId)
+                       (SocketId)
 import           Network.SocketIO
-    (Socket)
+                       (Socket)
 
 import           Serokell.Util.Concurrent
-    (modifyTVarS)
+                       (modifyTVarS)
 import           System.Wlog
-    (NamedPureLogger, WithLogger, launchNamedPureLog)
+                       (NamedPureLogger, WithLogger, launchNamedPureLog)
 
 import           Pos.Core
-    (Address)
+                       (Address)
 
 data ExplorerSocket
     = ProdSocket Socket

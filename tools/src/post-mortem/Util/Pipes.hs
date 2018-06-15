@@ -4,9 +4,9 @@ module Util.Pipes
     ) where
 
 import           Control.Foldl
-    (Fold (..))
+                       (Fold (..))
 import           Data.Attoparsec.ByteString
-    (IResult (..), Parser, Result, parse)
+                       (IResult (..), Parser, Result, parse)
 import           Pipes
 import qualified Pipes.Prelude as P
 

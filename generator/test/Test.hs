@@ -1,12 +1,12 @@
 import           Universum
 
 import           Test.Hspec
-    (hspec)
+                       (hspec)
 
 import           Spec
-    (spec)
+                       (spec)
 import           Test.Pos.Configuration
-    (defaultTestConf)
+                       (defaultTestConf)
 
 main :: IO ()
 main = do

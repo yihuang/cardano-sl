@@ -22,28 +22,29 @@ module Pos.Core.Configuration.Core
 import           Universum
 
 import           Data.Reflection
-    (Given (..), give)
+                       (Given (..), give)
 
 import qualified Data.HashMap.Strict as HM
 import           Pos.Binary.Class
-    (Raw)
+                       (Raw)
 import           Pos.Core.Common
-    (Coeff (..), SharedSeed (..), TxFeePolicy (..), TxSizeLinear (..),
-    unsafeCoinPortionFromDouble)
+                       (Coeff (..), SharedSeed (..), TxFeePolicy (..),
+                       TxSizeLinear (..), unsafeCoinPortionFromDouble)
 import           Pos.Core.Genesis
-    (FakeAvvmOptions (..), GenesisAvvmBalances (..), GenesisInitializer (..),
-    GenesisProtocolConstants (..), GenesisSpec (..),
-    TestnetBalanceOptions (..), noGenesisDelegation)
+                       (FakeAvvmOptions (..), GenesisAvvmBalances (..),
+                       GenesisInitializer (..), GenesisProtocolConstants (..),
+                       GenesisSpec (..), TestnetBalanceOptions (..),
+                       noGenesisDelegation)
 import           Pos.Core.ProtocolConstants
-    (VssMaxTTL (..), VssMinTTL (..))
+                       (VssMaxTTL (..), VssMinTTL (..))
 import           Pos.Core.Slotting
-    (EpochIndex (..))
+                       (EpochIndex (..))
 import           Pos.Core.Update
-    (BlockVersionData (..), SoftforkRule (..))
+                       (BlockVersionData (..), SoftforkRule (..))
 import           Pos.Crypto
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 import           Pos.Crypto.Hashing
-    (Hash)
+                       (Hash)
 
 data GenesisConfiguration
       -- | Genesis from a 'GenesisSpec'.

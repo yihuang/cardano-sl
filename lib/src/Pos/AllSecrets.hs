@@ -18,22 +18,22 @@ module Pos.AllSecrets
 import           Universum
 
 import           Control.Lens.TH
-    (makeClassy)
+                       (makeClassy)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, int, (%))
+                       (bprint, int, (%))
 import           Serokell.Util
-    (listJson, mapJson)
+                       (listJson, mapJson)
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (AddrSpendingData (..), Address, IsBootstrapEraAddr (..), StakeholderId,
-    addressHash, checkAddrSpendingData, makePubKeyAddress,
-    makePubKeyAddressBoot)
+                       (AddrSpendingData (..), Address,
+                       IsBootstrapEraAddr (..), StakeholderId, addressHash,
+                       checkAddrSpendingData, makePubKeyAddress,
+                       makePubKeyAddressBoot)
 import           Pos.Crypto
-    (PublicKey, SecretKey, toPublic)
+                       (PublicKey, SecretKey, toPublic)
 
 -- | This map effectively provides inverse of 'hash' and
 -- 'toPublic' functions. It's quite useful in tests and block

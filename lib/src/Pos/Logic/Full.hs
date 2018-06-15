@@ -7,94 +7,99 @@ module Pos.Logic.Full
     ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at, to)
+                       (at, to)
 import qualified Data.HashMap.Strict as HM
 import           Data.Tagged
-    (Tagged (..), tagWith)
+                       (Tagged (..), tagWith)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           System.Wlog
-    (WithLogger, logDebug)
+                       (WithLogger, logDebug)
 
 import           Pos.Block.BlockWorkMode
-    (BlockWorkMode)
+                       (BlockWorkMode)
 import           Pos.Block.Configuration
-    (HasBlockConfiguration)
+                       (HasBlockConfiguration)
 import qualified Pos.Block.Logic as Block
 import qualified Pos.Block.Network as Block
 import           Pos.Block.Types
-    (RecoveryHeader, RecoveryHeaderTag)
+                       (RecoveryHeader, RecoveryHeaderTag)
 import           Pos.Communication
-    (NodeId)
+                       (NodeId)
 import           Pos.Core
-    (Block, BlockHeader, BlockVersionData, HasConfiguration, HeaderHash,
-    ProxySKHeavy, StakeholderId, TxAux (..), addressHash, getCertId, lookupVss)
+                       (Block, BlockHeader, BlockVersionData, HasConfiguration,
+                       HeaderHash, ProxySKHeavy, StakeholderId, TxAux (..),
+                       addressHash, getCertId, lookupVss)
 import           Pos.Core.Chrono
-    (NE, NewestFirst, OldestFirst)
+                       (NE, NewestFirst, OldestFirst)
 import           Pos.Core.Ssc
-    (getCommitmentsMap)
+                       (getCommitmentsMap)
 import           Pos.Core.Update
-    (UpdateProposal (..), UpdateVote (..))
+                       (UpdateProposal (..), UpdateVote (..))
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import qualified Pos.DB.Block as DB
-    (getTipBlock)
+                       (getTipBlock)
 import qualified Pos.DB.BlockIndex as DB
-    (getHeader, getTipHeader)
+                       (getHeader, getTipHeader)
 import           Pos.DB.Class
-    (MonadBlockDBRead, MonadDBRead, MonadGState (..), SerializedBlock)
+                       (MonadBlockDBRead, MonadDBRead, MonadGState (..),
+                       SerializedBlock)
 import qualified Pos.DB.Class as DB
-    (MonadDBRead (dbGetSerBlock))
+                       (MonadDBRead (dbGetSerBlock))
 import           Pos.Delegation.Listeners
-    (DlgListenerConstraint)
+                       (DlgListenerConstraint)
 import qualified Pos.Delegation.Listeners as Delegation
-    (handlePsk)
+                       (handlePsk)
 import           Pos.Infra.Slotting
-    (MonadSlots)
+                       (MonadSlots)
 import           Pos.Infra.Util.JsonLog.Events
-    (JLTxR)
+                       (JLTxR)
 import           Pos.Logic.Types
-    (KeyVal (..), Logic (..))
+                       (KeyVal (..), Logic (..))
 import           Pos.Recovery
-    (MonadRecoveryInfo)
+                       (MonadRecoveryInfo)
 import qualified Pos.Recovery as Recovery
 import           Pos.Security.Params
-    (SecurityParams)
+                       (SecurityParams)
 import           Pos.Security.Util
-    (shouldIgnorePkAddress)
+                       (shouldIgnorePkAddress)
 import           Pos.Ssc.Logic
-    (sscIsDataUseful, sscProcessCertificate, sscProcessCommitment,
-    sscProcessOpening, sscProcessShares)
+                       (sscIsDataUseful, sscProcessCertificate,
+                       sscProcessCommitment, sscProcessOpening,
+                       sscProcessShares)
 import           Pos.Ssc.Mem
-    (sscRunLocalQuery)
+                       (sscRunLocalQuery)
 import           Pos.Ssc.Message
-    (MCCommitment (..), MCOpening (..), MCShares (..), MCVssCertificate (..))
+                       (MCCommitment (..), MCOpening (..), MCShares (..),
+                       MCVssCertificate (..))
 import           Pos.Ssc.Toss
-    (SscTag (..), TossModifier, tmCertificates, tmCommitments, tmOpenings,
-    tmShares)
+                       (SscTag (..), TossModifier, tmCertificates,
+                       tmCommitments, tmOpenings, tmShares)
 import           Pos.Ssc.Types
-    (ldModifier)
+                       (ldModifier)
 import           Pos.Txp
-    (MemPool (..))
+                       (MemPool (..))
 import           Pos.Txp.MemState
-    (getMemPool, withTxpLocalData)
+                       (getMemPool, withTxpLocalData)
 import           Pos.Txp.Network.Listeners
-    (TxpMode)
+                       (TxpMode)
 import qualified Pos.Txp.Network.Listeners as Txp
-    (handleTxDo)
+                       (handleTxDo)
 import           Pos.Txp.Network.Types
-    (TxMsgContents (..))
+                       (TxMsgContents (..))
 import qualified Pos.Update.Logic.Local as Update
-    (getLocalProposalNVotes, getLocalVote, isProposalNeeded, isVoteNeeded)
+                       (getLocalProposalNVotes, getLocalVote, isProposalNeeded,
+                       isVoteNeeded)
 import           Pos.Update.Mode
-    (UpdateMode)
+                       (UpdateMode)
 import qualified Pos.Update.Network.Listeners as Update
-    (handleProposal, handleVote)
+                       (handleProposal, handleVote)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 -- The full logic layer uses existing pieces from the former monolithic
 -- approach, in which there was no distinction between networking and

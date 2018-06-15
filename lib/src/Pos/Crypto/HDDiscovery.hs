@@ -7,24 +7,25 @@ module Pos.Crypto.HDDiscovery
        ) where
 
 import           Universum hiding
-    (safeHead)
+                       (safeHead)
 
 import           Data.Conduit
-    (mapOutput, runConduitRes, (.|))
+                       (mapOutput, runConduitRes, (.|))
 import qualified Data.Conduit.List as CL
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Core
-    (AddrAttributes (..), Address (..), addrAttributesUnwrapped)
+                       (AddrAttributes (..), Address (..),
+                       addrAttributesUnwrapped)
 import           Pos.Core.Txp
-    (toaOut, txOutAddress)
+                       (toaOut, txOutAddress)
 import           Pos.Crypto.HD
-    (HDAddressPayload, HDPassphrase, unpackHDAddressAttr)
+                       (HDAddressPayload, HDPassphrase, unpackHDAddressAttr)
 import           Pos.DB.Class
-    (DBTag (GStateDB), MonadDBRead, dbIterSource)
+                       (DBTag (GStateDB), MonadDBRead, dbIterSource)
 import           Pos.Txp.DB
-    (UtxoIter)
+                       (UtxoIter)
 
 discoverHDAddress ::
        (MonadDBRead m, MonadUnliftIO m)

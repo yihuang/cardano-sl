@@ -25,14 +25,14 @@ import           Universum
 import qualified Data.Aeson as AE
 import qualified Data.Text as T
 import           System.Environment
-    (lookupEnv)
+                       (lookupEnv)
 import qualified Text.Parser.Char as P
 import qualified Text.Parser.Combinators as P
 import qualified Text.Parser.Token as P
 import qualified Text.Trifecta as P
 
 import           Launcher.Logging
-    (reportErrorDefault)
+                       (reportErrorDefault)
 
 -- * Environment variable parsing and substitution for the launcher configuration file,
 --   typically launcher-config.yaml.

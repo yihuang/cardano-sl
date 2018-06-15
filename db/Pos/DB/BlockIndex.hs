@@ -10,17 +10,17 @@ module Pos.DB.BlockIndex
 import           Universum
 
 import           Data.ByteArray
-    (convert)
+                       (convert)
 
 import qualified Database.RocksDB as Rocks
 import           Pos.Core
-    (BlockHeader, HeaderHash, headerHash)
+                       (BlockHeader, HeaderHash, headerHash)
 import           Pos.DB.Class
-    (DBTag (BlockIndexDB), MonadBlockDBRead, MonadDB (..))
+                       (DBTag (BlockIndexDB), MonadBlockDBRead, MonadDB (..))
 import           Pos.DB.Functions
-    (dbGetBi, dbSerializeValue)
+                       (dbGetBi, dbSerializeValue)
 import           Pos.DB.GState.Common
-    (getTipSomething)
+                       (getTipSomething)
 
 -- | Returns header of block that was requested from Block DB.
 getHeader

@@ -11,43 +11,44 @@ module Pos.Txp.Toil.Utxo.Functions
 import           Universum
 
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Control.Monad.Except
-    (throwError)
+                       (throwError)
 import qualified Data.List.NonEmpty as NE
 import           Formatting
-    (int, sformat, (%))
+                       (int, sformat, (%))
 import           Serokell.Util
-    (allDistinct, enumerate)
+                       (allDistinct, enumerate)
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (AddrType (..), Address (..), integerToCoin, isRedeemAddress,
-    isUnknownAddressType, sumCoins)
+                       (AddrType (..), Address (..), integerToCoin,
+                       isRedeemAddress, isUnknownAddressType, sumCoins)
 import           Pos.Core.Common
-    (checkPubKeyAddress, checkRedeemAddress, checkScriptAddress)
+                       (checkPubKeyAddress, checkRedeemAddress,
+                       checkScriptAddress)
 import           Pos.Core.Txp
-    (Tx (..), TxAttributes, TxAux (..), TxIn (..), TxInWitness (..),
-    TxOut (..), TxOutAux (..), TxSigData (..), TxUndo, TxWitness,
-    isTxInUnknown)
+                       (Tx (..), TxAttributes, TxAux (..), TxIn (..),
+                       TxInWitness (..), TxOut (..), TxOutAux (..),
+                       TxSigData (..), TxUndo, TxWitness, isTxInUnknown)
 import           Pos.Crypto
-    (SignTag (SignRedeemTx, SignTx), WithHash (..), checkSig, hash,
-    redeemCheckSig)
+                       (SignTag (SignRedeemTx, SignTx), WithHash (..),
+                       checkSig, hash, redeemCheckSig)
 import           Pos.Crypto.Configuration
-    (HasProtocolMagic, protocolMagic)
+                       (HasProtocolMagic, protocolMagic)
 import           Pos.Data.Attributes
-    (Attributes (attrRemain), areAttributesKnown)
+                       (Attributes (attrRemain), areAttributesKnown)
 import           Pos.Script
-    (Script (..), isKnownScriptVersion, txScriptCheck)
+                       (Script (..), isKnownScriptVersion, txScriptCheck)
 import           Pos.Txp.Toil.Failure
-    (ToilVerFailure (..), TxOutVerFailure (..), WitnessVerFailure (..))
+                       (ToilVerFailure (..), TxOutVerFailure (..),
+                       WitnessVerFailure (..))
 import           Pos.Txp.Toil.Monad
-    (UtxoM, utxoDel, utxoGet, utxoPut)
+                       (UtxoM, utxoDel, utxoGet, utxoPut)
 import           Pos.Txp.Toil.Types
-    (TxFee (..))
+                       (TxFee (..))
 import           Pos.Util
-    (liftEither)
+                       (liftEither)
 
 ----------------------------------------------------------------------------
 -- Verification

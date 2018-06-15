@@ -8,21 +8,21 @@ module Test.Pos.Wallet.Web.Methods.LogicSpec
 import           Universum
 
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Wallet.Web.Methods.Logic
-    (getAccounts, getWallets)
+                       (getAccounts, getWallets)
 
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 import           Test.Pos.Util.QuickCheck.Property
-    (stopProperty)
+                       (stopProperty)
 import           Test.Pos.Wallet.Web.Mode
-    (WalletProperty)
+                       (WalletProperty)
 
 -- TODO remove HasCompileInfo when MonadWalletWebMode will be splitted.
 spec :: Spec

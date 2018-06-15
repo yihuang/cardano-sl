@@ -5,12 +5,12 @@ module Pos.Binary.Core.Address (encodeAddr, encodeAddrCRC32) where
 import           Universum
 
 import           Codec.CBOR.Encoding
-    (Encoding)
+                       (Encoding)
 
 import           Pos.Binary.Class
-    (Bi (..), encodeCrcProtected)
+                       (Bi (..), encodeCrcProtected)
 import           Pos.Core.Common
-    (Address (..))
+                       (Address (..))
 
 ----------------------------------------------------------------------------
 -- Helper types serialization

@@ -5,7 +5,7 @@ module Pos.Core.Common.Coeff
 import           Universum
 
 import           Data.Fixed
-    (Fixed (..), Nano, showFixed)
+                       (Fixed (..), Nano, showFixed)
 import qualified Data.Text.Buildable as Buildable
 
 -- | A fractional coefficient of fixed precision.

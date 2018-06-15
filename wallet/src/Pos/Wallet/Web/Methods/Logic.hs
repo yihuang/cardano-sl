@@ -34,68 +34,77 @@ module Pos.Wallet.Web.Methods.Logic
 import           Universum
 
 import           Crypto.Random
-    (MonadRandom)
+                       (MonadRandom)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Set as S
 import           Data.Time.Clock.POSIX
-    (getPOSIXTime)
+                       (getPOSIXTime)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Servant.API.ContentTypes
-    (NoContent (..))
+                       (NoContent (..))
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Client.KeyStorage
-    (MonadKeys (..), MonadKeysRead, addSecretKey, deleteSecretKeyBy)
+                       (MonadKeys (..), MonadKeysRead, addSecretKey,
+                       deleteSecretKeyBy)
 import           Pos.Core
-    (Address, Coin, mkCoin, sumCoins, unsafeIntegerToCoin)
+                       (Address, Coin, mkCoin, sumCoins, unsafeIntegerToCoin)
 import           Pos.Core.Configuration
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.Crypto
-    (PassPhrase, changeEncPassphrase, checkPassMatches, emptyPassphrase)
+                       (PassPhrase, changeEncPassphrase, checkPassMatches,
+                       emptyPassphrase)
 import           Pos.Infra.Slotting
-    (MonadSlots)
+                       (MonadSlots)
 import           Pos.Txp
-    (GenericTxpLocalData, MonadTxpMem, TxAux, TxId, UndoMap,
-    applyUtxoModToAddrCoinMap, getLocalTxs, getLocalUndos, withTxpLocalData)
+                       (GenericTxpLocalData, MonadTxpMem, TxAux, TxId, UndoMap,
+                       applyUtxoModToAddrCoinMap, getLocalTxs, getLocalUndos,
+                       withTxpLocalData)
 import           Pos.Util
-    (maybeThrow)
+                       (maybeThrow)
 import qualified Pos.Util.Modifier as MM
 import           Pos.Util.Servant
-    (encodeCType)
-import           Pos.Wallet.Aeson
-    ()
+                       (encodeCType)
+import           Pos.Wallet.Aeson ()
 import           Pos.Wallet.WalletMode
-    (WalletMempoolExt)
+                       (WalletMempoolExt)
 import           Pos.Wallet.Web.Account
-    (AddrGenSeed, findKey, genUniqueAccountId, genUniqueAddress, getSKById)
+                       (AddrGenSeed, findKey, genUniqueAccountId,
+                       genUniqueAddress, getSKById)
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId (..), CAccount (..), CAccountInit (..), CAccountMeta (..),
-    CAddress (..), CId, CWallet (..), CWalletMeta (..), Wal, encToCId, mkCCoin)
+                       (AccountId (..), CAccount (..), CAccountInit (..),
+                       CAccountMeta (..), CAddress (..), CId, CWallet (..),
+                       CWalletMeta (..), Wal, encToCId, mkCCoin)
 import           Pos.Wallet.Web.Error
-    (WalletError (..))
+                       (WalletError (..))
 import           Pos.Wallet.Web.State
-    (AddressInfo (..), AddressLookupMode (Deleted, Ever, Existing),
-    CustomAddressType (ChangeAddr, UsedAddr), WAddressMeta, WalletDbReader,
-    WalletSnapshot, addWAddress, askWalletDB, askWalletSnapshot,
-    createAccountWithAddress, createWallet, doesAccountExist, getAccountIds,
-    getWalletAddresses, getWalletBalancesAndUtxo, getWalletMetaIncludeUnready,
-    getWalletPassLU, getWalletSnapshot, isCustomAddress, removeAccount,
-    removeWallet, setAccountMeta, setWalletMeta, setWalletPassLU,
-    setWalletReady, wamAccount, wamAddress, wamWalletId)
+                       (AddressInfo (..),
+                       AddressLookupMode (Deleted, Ever, Existing),
+                       CustomAddressType (ChangeAddr, UsedAddr), WAddressMeta,
+                       WalletDbReader, WalletSnapshot, addWAddress,
+                       askWalletDB, askWalletSnapshot,
+                       createAccountWithAddress, createWallet,
+                       doesAccountExist, getAccountIds, getWalletAddresses,
+                       getWalletBalancesAndUtxo, getWalletMetaIncludeUnready,
+                       getWalletPassLU, getWalletSnapshot, isCustomAddress,
+                       removeAccount, removeWallet, setAccountMeta,
+                       setWalletMeta, setWalletPassLU, setWalletReady,
+                       wamAccount, wamAddress, wamWalletId)
 import           Pos.Wallet.Web.State.Storage
-    (WalletInfo (..), getWalletInfos)
+                       (WalletInfo (..), getWalletInfos)
 import           Pos.Wallet.Web.Tracking
-    (BlockLockMode, CAccModifier (..), CachedCAccModifier, sortedInsertions,
-    txMempoolToModifier)
+                       (BlockLockMode, CAccModifier (..), CachedCAccModifier,
+                       sortedInsertions, txMempoolToModifier)
 import           Pos.Wallet.Web.Tracking.Decrypt
-    (eskToWalletDecrCredentials)
+                       (eskToWalletDecrCredentials)
 import           Pos.Wallet.Web.Tracking.Modifier
-    (IndexedMapModifier (..))
+                       (IndexedMapModifier (..))
 import           Pos.Wallet.Web.Util
-    (decodeCTypeOrFail, getAccountAddrsOrThrow, getAccountMetaOrThrow,
-    getWalletAccountIds, getWalletAddrMetas)
+                       (decodeCTypeOrFail, getAccountAddrsOrThrow,
+                       getAccountMetaOrThrow, getWalletAccountIds,
+                       getWalletAddrMetas)
 
 type MonadWalletLogicRead ctx m =
     ( MonadIO m

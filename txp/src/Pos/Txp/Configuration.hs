@@ -13,11 +13,12 @@ module Pos.Txp.Configuration
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
+                       (FromJSON (..), ToJSON (..), genericParseJSON,
+                       genericToJSON)
 import           Data.Reflection
-    (Given (..), give)
+                       (Given (..), give)
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 
 
 type HasTxpConfiguration = Given TxpConfiguration

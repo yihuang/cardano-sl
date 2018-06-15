@@ -7,9 +7,9 @@ module Pos.Infra.Shutdown.Class
 import           Universum
 
 import           Control.Lens.Lens
-    (lens)
+                       (lens)
 import           Pos.Infra.Shutdown.Types
-    (ShutdownContext)
+                       (ShutdownContext)
 
 class HasShutdownContext ctx where
     shutdownContext :: Lens' ctx ShutdownContext

@@ -7,56 +7,56 @@ module Test.Pos.Block.Logic.CreationSpec
 import           Universum
 
 import           Data.Default
-    (def)
+                       (def)
 import           Serokell.Data.Memory.Units
-    (Byte, Gigabyte, convertUnit, fromBytes)
+                       (Byte, Gigabyte, convertUnit, fromBytes)
 import           Test.Hspec
-    (Spec, describe, runIO)
+                       (Spec, describe, runIO)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Gen, Property, Testable, arbitrary, choose, counterexample, elements,
-    forAll, generate, listOf, listOf1, oneof, property)
+                       (Gen, Property, Testable, arbitrary, choose,
+                       counterexample, elements, forAll, generate, listOf,
+                       listOf1, oneof, property)
 
-import           Pos.Arbitrary.Block
-    ()
+import           Pos.Arbitrary.Block ()
 import           Pos.Arbitrary.Delegation
-    (genDlgPayload)
+                       (genDlgPayload)
 import           Pos.Arbitrary.Ssc
-    (commitmentMapEpochGen, vssCertificateEpochGen)
+                       (commitmentMapEpochGen, vssCertificateEpochGen)
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Block.Logic
-    (RawPayload (..), createMainBlockPure)
-import qualified Pos.Communication
-    ()
+                       (RawPayload (..), createMainBlockPure)
+import qualified Pos.Communication ()
 import           Pos.Core
-    (BlockVersionData (bvdMaxBlockSize), HasConfiguration, SlotId (..),
-    blkSecurityParam, genesisBlockVersionData, mkVssCertificatesMapLossy,
-    protocolConstants, protocolMagic, unsafeMkLocalSlotIndex)
+                       (BlockVersionData (bvdMaxBlockSize), HasConfiguration,
+                       SlotId (..), blkSecurityParam, genesisBlockVersionData,
+                       mkVssCertificatesMapLossy, protocolConstants,
+                       protocolMagic, unsafeMkLocalSlotIndex)
 import           Pos.Core.Block
-    (BlockHeader, MainBlock)
+                       (BlockHeader, MainBlock)
 import           Pos.Core.Ssc
-    (SscPayload (..))
+                       (SscPayload (..))
 import           Pos.Core.Txp
-    (TxAux)
+                       (TxAux)
 import           Pos.Core.Update
-    (UpdatePayload (..))
+                       (UpdatePayload (..))
 import           Pos.Crypto
-    (SecretKey)
+                       (SecretKey)
 import           Pos.Delegation
-    (DlgPayload, ProxySKBlockInfo)
+                       (DlgPayload, ProxySKBlockInfo)
 import           Pos.Ssc.Base
-    (defaultSscPayload)
+                       (defaultSscPayload)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 
 import           Test.Pos.Configuration
-    (withDefConfiguration, withDefUpdateConfiguration)
+                       (withDefConfiguration, withDefUpdateConfiguration)
 import           Test.Pos.Txp.Arbitrary
-    (GoodTx, goodTxToTxAux)
+                       (GoodTx, goodTxToTxAux)
 import           Test.Pos.Util.QuickCheck
-    (SmallGenerator (..), makeSmall)
+                       (SmallGenerator (..), makeSmall)
 
 spec :: Spec
 spec = withDefConfiguration $ withDefUpdateConfiguration $

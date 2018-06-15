@@ -16,24 +16,25 @@ module Pos.Core.Ssc.VssCertificate
 import           Universum
 
 import           Control.Lens
-    (makeLensesFor)
+                       (makeLensesFor)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import           Data.Hashable
-    (Hashable (..))
+                       (Hashable (..))
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, int, (%))
+                       (bprint, build, int, (%))
 import           Pos.Core.Common
-    (StakeholderId, addressHash)
+                       (StakeholderId, addressHash)
 
 import           Pos.Binary.Class
-    (AsBinary, Bi)
+                       (AsBinary, Bi)
 import           Pos.Core.Slotting
-    (EpochIndex)
+                       (EpochIndex)
 import           Pos.Crypto
-    (ProtocolMagic, PublicKey, SecretKey, SignTag (SignVssCert), Signature,
-    VssPublicKey, checkSig, sign, toPublic)
+                       (ProtocolMagic, PublicKey, SecretKey,
+                       SignTag (SignVssCert), Signature, VssPublicKey,
+                       checkSig, sign, toPublic)
 
 -- | VssCertificate allows VssPublicKey to participate in MPC. Each
 -- stakeholder should create a Vss keypair, sign VSS public key with signing

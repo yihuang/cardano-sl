@@ -36,35 +36,35 @@ module Pos.Crypto.SecretSharing
 import           Universum
 
 import           Crypto.Random
-    (MonadRandom)
+                       (MonadRandom)
 import qualified Crypto.SCRAPE as Scrape
 import qualified Data.Binary as Binary
 import qualified Data.ByteString as BS
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import           Data.Hashable
-    (Hashable (hashWithSalt))
+                       (Hashable (hashWithSalt))
 import           Data.HashMap.Strict
-    (HashMap)
+                       (HashMap)
 import qualified Data.HashMap.Strict as HM
 import           Data.List
-    (zipWith3)
+                       (zipWith3)
 import qualified Data.List.NonEmpty as NE
 import           Data.Text.Buildable
-    (Buildable)
+                       (Buildable)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, int, sformat, stext, (%))
+                       (bprint, int, sformat, stext, (%))
 
 import           Pos.Binary.Class
-    (AsBinary (..), AsBinaryClass (..), Bi (..), Cons (..), Field (..),
-    cborError, decodeFull', deriveSimpleBi, serialize')
+                       (AsBinary (..), AsBinaryClass (..), Bi (..), Cons (..),
+                       Field (..), cborError, decodeFull', deriveSimpleBi,
+                       serialize')
 import           Pos.Crypto.Hashing
-    (hash, shortHashF)
-import           Pos.Crypto.Orphans
-    ()
+                       (hash, shortHashF)
+import           Pos.Crypto.Orphans ()
 import           Pos.Crypto.Random
-    (deterministic)
+                       (deterministic)
 
 ----------------------------------------------------------------------------
 -- Keys

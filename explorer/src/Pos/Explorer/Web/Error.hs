@@ -6,7 +6,7 @@ module Pos.Explorer.Web.Error
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, stext, (%))
+                       (bprint, stext, (%))
 import           Universum
 
 newtype ExplorerError =

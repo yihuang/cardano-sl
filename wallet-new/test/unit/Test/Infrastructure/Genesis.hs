@@ -6,15 +6,15 @@ module Test.Infrastructure.Genesis (
 import           Universum
 
 import qualified Data.List
-    (head)
+                       (head)
 
 import           UTxO.Context
 import           UTxO.DSL
 
 import           Pos.Core
-    (TxSizeLinear)
+                       (TxSizeLinear)
 import           Test.Infrastructure.Generator
-    (estimateCardanoFee)
+                       (estimateCardanoFee)
 
 {-------------------------------------------------------------------------------
   Convenient access to some values in the Cardano genesis block

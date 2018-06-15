@@ -3,7 +3,7 @@ module Pos.Core.Common.StakeholderId
        ) where
 
 import           Pos.Crypto.Signing
-    (PublicKey)
+                       (PublicKey)
 
 import           Pos.Core.Common.AddressHash
 

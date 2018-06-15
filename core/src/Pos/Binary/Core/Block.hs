@@ -9,27 +9,22 @@ module Pos.Binary.Core.Block
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), deriveSimpleBi, encodeListLen,
-    encodeListLen, enforceSize)
-import           Pos.Binary.Core.Delegation
-    ()
-import           Pos.Binary.Core.Slotting
-    ()
-import           Pos.Binary.Core.Ssc
-    ()
-import           Pos.Binary.Core.Txp
-    ()
-import           Pos.Binary.Core.Update
-    ()
+                       (Bi (..), Cons (..), Field (..), deriveSimpleBi,
+                       encodeListLen, encodeListLen, enforceSize)
+import           Pos.Binary.Core.Delegation ()
+import           Pos.Binary.Core.Slotting ()
+import           Pos.Binary.Core.Ssc ()
+import           Pos.Binary.Core.Txp ()
+import           Pos.Binary.Core.Update ()
 import qualified Pos.Core.Block.Genesis.Types as BC
 import qualified Pos.Core.Block.Main.Types as BC
 import qualified Pos.Core.Block.Union.Types as BC
 import           Pos.Core.Update
-    (BlockVersion, SoftwareVersion)
+                       (BlockVersion, SoftwareVersion)
 import           Pos.Crypto
-    (Hash)
+                       (Hash)
 import           Pos.Util.Util
-    (cborError)
+                       (cborError)
 
 ----------------------------------------------------------------------------
 -- MainBlock

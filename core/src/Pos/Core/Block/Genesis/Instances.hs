@@ -10,27 +10,30 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, int, sformat, stext, (%))
+                       (bprint, build, int, sformat, stext, (%))
 import           Serokell.Util
-    (Color (Magenta), colorize)
+                       (Color (Magenta), colorize)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core.Block.Blockchain
-    (GenericBlock (..), GenericBlockHeader (..), gbHeader, gbhConsensus)
+                       (GenericBlock (..), GenericBlockHeader (..), gbHeader,
+                       gbhConsensus)
 import           Pos.Core.Block.Genesis.Lens
-    (gcdDifficulty, gcdEpoch)
+                       (gcdDifficulty, gcdEpoch)
 import           Pos.Core.Block.Genesis.Types
-    (GenesisBody (..), GenesisConsensusData (..))
+                       (GenesisBody (..), GenesisConsensusData (..))
 import           Pos.Core.Block.Union.Types
-    (BlockHeader (..), GenesisBlock, GenesisBlockHeader, HasHeaderHash (..),
-    HeaderHash, IsGenesisHeader, IsHeader, blockHeaderHash)
+                       (BlockHeader (..), GenesisBlock, GenesisBlockHeader,
+                       HasHeaderHash (..), HeaderHash, IsGenesisHeader,
+                       IsHeader, blockHeaderHash)
 import           Pos.Core.Common
-    (HasDifficulty (..), slotLeadersF)
+                       (HasDifficulty (..), slotLeadersF)
 import           Pos.Core.Slotting
-    (EpochOrSlot (..), HasEpochIndex (..), HasEpochOrSlot (..))
+                       (EpochOrSlot (..), HasEpochIndex (..),
+                       HasEpochOrSlot (..))
 import           Pos.Crypto
-    (hashHexF)
+                       (hashHexF)
 
 instance NFData GenesisBlock
 

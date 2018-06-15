@@ -7,24 +7,24 @@ module Pos.Wallet.Web.State.Util
 import           Universum
 
 import           Data.Acid
-    (createArchive, createCheckpoint)
+                       (createArchive, createCheckpoint)
 import           Data.Time.Units
-    (Second, TimeUnit)
+                       (Second, TimeUnit)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Mockable
-    (Delay, Mockable, delay)
+                       (Delay, Mockable, delay)
 import           Serokell.AcidState.ExtendedState
-    (ExtendedState (..), extendedStateToAcid)
+                       (ExtendedState (..), extendedStateToAcid)
 import           System.Directory
-    (getModificationTime, listDirectory, removeFile)
+                       (getModificationTime, listDirectory, removeFile)
 import           System.FilePath
-    ((</>))
+                       ((</>))
 import           System.Wlog
-    (WithLogger, logDebug, logError)
+                       (WithLogger, logDebug, logError)
 
 import           Pos.Wallet.Web.State.State
-    (WalletDB)
+                       (WalletDB)
 
 type MonadAcidCleanup ctx m =
     ( MonadIO m

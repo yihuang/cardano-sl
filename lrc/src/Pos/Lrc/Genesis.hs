@@ -9,14 +9,14 @@ import           Universum
 import qualified Data.HashMap.Strict as HM
 
 import           Pos.Core
-    (GenesisData (..), HasGenesisData, HasProtocolConstants, SharedSeed (..),
-    SlotLeaders, genesisData)
+                       (GenesisData (..), HasGenesisData, HasProtocolConstants,
+                       SharedSeed (..), SlotLeaders, genesisData)
 import           Pos.Lrc.Fts
-    (followTheSatoshi)
+                       (followTheSatoshi)
 import           Pos.Txp.GenesisUtxo
-    (genesisUtxo)
+                       (genesisUtxo)
 import           Pos.Txp.Toil
-    (GenesisUtxo (..), Utxo, utxoToStakes)
+                       (GenesisUtxo (..), Utxo, utxoToStakes)
 
 
 -- | Compute leaders of the 0-th epoch from initial shared seed and stake distribution.

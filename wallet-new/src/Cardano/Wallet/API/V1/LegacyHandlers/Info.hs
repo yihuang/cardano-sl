@@ -3,24 +3,24 @@ module Cardano.Wallet.API.V1.LegacyHandlers.Info where
 import           Universum
 
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Cardano.Wallet.API.Response
-    (WalletResponse, single)
+                       (WalletResponse, single)
 import qualified Cardano.Wallet.API.V1.Info as Info
 import           Cardano.Wallet.API.V1.Migration
 import           Cardano.Wallet.API.V1.Types as V1
 
 import           Mockable
-    (MonadMockable)
+                       (MonadMockable)
 import           Ntp.Client
-    (NtpStatus)
+                       (NtpStatus)
 import           Pos.Infra.Diffusion.Subscription.Status
-    (ssMap)
+                       (ssMap)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..))
+                       (Diffusion (..))
 import           Pos.Wallet.WalletMode
-    (MonadBlockchainInfo)
+                       (MonadBlockchainInfo)
 import           Servant
 
 import qualified Pos.Core as Core

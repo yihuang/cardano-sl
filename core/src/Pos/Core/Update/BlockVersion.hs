@@ -7,11 +7,11 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, shown)
+                       (bprint, shown)
 import qualified Prelude
 
 import           Pos.Util.Some
-    (Some, liftLensSome)
+                       (Some, liftLensSome)
 
 -- | Communication protocol version.
 data BlockVersion = BlockVersion

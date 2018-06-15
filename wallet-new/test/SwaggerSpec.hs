@@ -8,35 +8,29 @@ import qualified Prelude
 
 import           Data.String.Conv
 import           Data.Swagger
-import           Pos.Wallet.Aeson.ClientTypes
-    ()
+import           Pos.Wallet.Aeson.ClientTypes ()
 import           Servant.API.ContentTypes
-import           Servant.Swagger.Test
-    ()
+import           Servant.Swagger.Test ()
 import           Test.Hspec
 import           Test.Hspec.QuickCheck
-import           Test.QuickCheck.Instances
-    ()
+import           Test.QuickCheck.Instances ()
 
 import           Cardano.Wallet.API.Response
-    (ValidJSON)
+                       (ValidJSON)
 import qualified Cardano.Wallet.API.V1 as V1
-import           Cardano.Wallet.API.V1.Swagger
-    ()
-import           Cardano.Wallet.Orphans.Aeson
-    ()
-import           Cardano.Wallet.Orphans.Arbitrary
-    ()
+import           Cardano.Wallet.API.V1.Swagger ()
+import           Cardano.Wallet.Orphans.Aeson ()
+import           Cardano.Wallet.Orphans.Arbitrary ()
 
 -- for vendored code
 import           Data.Aeson
-    (ToJSON)
+                       (ToJSON)
 import           Servant.Swagger.Internal.Test
-    (props)
+                       (props)
 import           Servant.Swagger.Internal.TypeLevel
-    (BodyTypes, Every, TMap)
+                       (BodyTypes, Every, TMap)
 import           Test.QuickCheck
-    (Arbitrary)
+                       (Arbitrary)
 
 -- Syntethic instances and orphans to be able to use `validateEveryToJSON`.
 -- In the future, hopefully, we will never need these.

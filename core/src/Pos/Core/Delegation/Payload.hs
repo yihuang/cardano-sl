@@ -6,19 +6,20 @@ module Pos.Core.Delegation.Payload
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError, throwError)
+                       (MonadError, throwError)
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, int, (%))
+                       (bprint, int, (%))
 import           Serokell.Util
-    (allDistinct, listJson)
+                       (allDistinct, listJson)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Crypto
-    (ProtocolMagic, ProxySecretKey (..), validateProxySecretKey)
+                       (ProtocolMagic, ProxySecretKey (..),
+                       validateProxySecretKey)
 
 import           Pos.Core.Delegation.HeavyDlgIndex
 

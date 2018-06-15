@@ -22,13 +22,14 @@ module Pos.Configuration
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..), genericParseJSON, genericToJSON)
+                       (FromJSON (..), ToJSON (..), genericParseJSON,
+                       genericToJSON)
 import           Data.Reflection
-    (Given (..), give)
+                       (Given (..), give)
 import           Data.Time.Units
-    (Microsecond, Second, fromMicroseconds)
+                       (Microsecond, Second, fromMicroseconds)
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 
 type HasNodeConfiguration = Given NodeConfiguration
 

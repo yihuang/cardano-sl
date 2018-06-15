@@ -13,58 +13,58 @@ module Pos.Client.CLI.Util
        ) where
 
 import           Universum hiding
-    (try)
+                       (try)
 
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Yaml as Yaml
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Mockable
-    (CurrentTime, Mockable, currentTime)
+                       (CurrentTime, Mockable, currentTime)
 import           System.Wlog
-    (LoggerConfig (..), WithLogger, logInfo, parseLoggerConfig, productionB)
+                       (LoggerConfig (..), WithLogger, logInfo,
+                       parseLoggerConfig, productionB)
 import           Text.Parsec
-    (parserFail, try)
+                       (parserFail, try)
 import qualified Text.Parsec.Char as P
 import qualified Text.Parsec.Text as P
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Block.Configuration
-    (blockConfiguration)
+                       (blockConfiguration)
 import           Pos.Client.CLI.NodeOptions
-    (CommonNodeArgs (..))
+                       (CommonNodeArgs (..))
 import           Pos.Client.CLI.Options
-    (configurationOptions)
+                       (configurationOptions)
 import           Pos.Configuration
-    (nodeConfiguration)
+                       (nodeConfiguration)
 import           Pos.Core
-    (StakeholderId, Timestamp (..))
+                       (StakeholderId, Timestamp (..))
 import           Pos.Core.Configuration
-    (HasConfiguration, canonicalGenesisJson, coreConfiguration, genesisData,
-    prettyGenesisJson)
+                       (HasConfiguration, canonicalGenesisJson,
+                       coreConfiguration, genesisData, prettyGenesisJson)
 import           Pos.Core.Genesis
-    (gdStartTime)
+                       (gdStartTime)
 import           Pos.Crypto
-    (decodeAbstractHash)
+                       (decodeAbstractHash)
 import           Pos.Delegation.Configuration
-    (dlgConfiguration)
+                       (dlgConfiguration)
 import           Pos.Infra.Ntp.Configuration
-    (NtpConfiguration)
+                       (NtpConfiguration)
 import           Pos.Infra.Util.TimeWarp
-    (addrParser)
+                       (addrParser)
 import           Pos.Launcher.Configuration
-    (Configuration (..), HasConfigurations)
+                       (Configuration (..), HasConfigurations)
 import           Pos.Security.Params
-    (AttackTarget (..), AttackType (..))
+                       (AttackTarget (..), AttackType (..))
 import           Pos.Ssc.Configuration
-    (sscConfiguration)
+                       (sscConfiguration)
 import           Pos.Txp.Configuration
-    (txpConfiguration)
+                       (txpConfiguration)
 import           Pos.Update.Configuration
-    (updateConfiguration)
+                       (updateConfiguration)
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 
 printFlags :: WithLogger m => m ()
 printFlags = do

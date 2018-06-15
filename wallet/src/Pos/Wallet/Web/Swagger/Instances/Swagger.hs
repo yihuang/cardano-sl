@@ -9,11 +9,11 @@ module Pos.Wallet.Web.Swagger.Instances.Swagger where
 import           Universum
 
 import           Servant
-    ((:>))
+                       ((:>))
 import           Servant.Multipart
-    (MultipartForm)
+                       (MultipartForm)
 import           Servant.Swagger
-    (HasSwagger (..))
+                       (HasSwagger (..))
 
 instance HasSwagger api => HasSwagger (MultipartForm a :> api) where
     toSwagger Proxy = toSwagger $ Proxy @api

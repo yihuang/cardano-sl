@@ -6,12 +6,12 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Serokell.Util
-    (mapJson)
+                       (mapJson)
 
 import           Pos.Core.Common
-    (StakeholderId)
+                       (StakeholderId)
 
 -- | Wrapper around weighted stakeholders map to be used in genesis
 -- core data.

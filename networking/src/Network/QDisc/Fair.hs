@@ -10,14 +10,14 @@ module Network.QDisc.Fair (
     ) where
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Concurrent.STM
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import           Network.Transport
-    (EndPointAddress)
+                       (EndPointAddress)
 import           Network.Transport.TCP
-    (QDisc (..))
+                       (QDisc (..))
 
 -- | Make a fair 'QDisc'. It's called fair, but it can also be unfair if you
 --   want it to be, by having some 'EndPointAddress's delay before writing.

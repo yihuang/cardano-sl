@@ -6,9 +6,9 @@ module Pos.Core.Common.SlotLeaders
 import           Universum
 
 import           Formatting
-    (Format, bprint, later)
+                       (Format, bprint, later)
 import           Serokell.Util
-    (enumerate, listChunkedJson, pairBuilder)
+                       (enumerate, listChunkedJson, pairBuilder)
 
 import           Pos.Core.Common.StakeholderId
 

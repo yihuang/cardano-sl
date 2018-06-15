@@ -6,14 +6,13 @@ module Pos.Binary.Explorer () where
 
 import           Universum
 
-import           Pos.Binary
-    ()
+import           Pos.Binary ()
 import           Pos.Binary.Class
-    (Cons (..), Field (..), deriveSimpleBi)
+                       (Cons (..), Field (..), deriveSimpleBi)
 import           Pos.Core
-    (HeaderHash, Timestamp, TxUndo)
+                       (HeaderHash, Timestamp, TxUndo)
 import           Pos.Explorer.Core.Types
-    (TxExtra (..))
+                       (TxExtra (..))
 
 deriveSimpleBi ''TxExtra [
     Cons 'TxExtra [

@@ -14,33 +14,33 @@
 module Main where
 
 import           Control.Concurrent
-    (ThreadId, forkIO, killThread, threadDelay)
+                       (ThreadId, forkIO, killThread, threadDelay)
 import           Control.Exception
-    (finally, throwIO)
+                       (finally, throwIO)
 import           Control.Monad
-    (forM, forM_, when)
+                       (forM, forM_, when)
 import           Data.Binary
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as B8
 import           Data.Functor.Contravariant
-    (contramap)
+                       (contramap)
 import qualified Data.Set as S
 import           Data.Void
-    (Void, absurd)
+                       (Void, absurd)
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import           Network.Discovery.Abstract
 import qualified Network.Discovery.Transport.Kademlia as K
 import           Network.Transport
-    (Transport (..))
+                       (Transport (..))
 import qualified Network.Transport.TCP as TCP
 import           Node
 import           Node.Message.Binary
-    (BinaryP, binaryPacking)
+                       (BinaryP, binaryPacking)
 import           Pos.Util.Trace
-    (stdoutTrace)
+                       (stdoutTrace)
 import           System.Environment
-    (getArgs)
+                       (getArgs)
 import           System.Random
 
 data Pong = Pong BS.ByteString

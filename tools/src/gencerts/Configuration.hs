@@ -12,26 +12,26 @@ module Configuration
 import           Universum
 
 import           Control.Monad
-    ((>=>))
+                       ((>=>))
 import           Data.Aeson
-    (FromJSON (..))
+                       (FromJSON (..))
 import           Data.ASN1.OID
-    (OIDable (..))
+                       (OIDable (..))
 import           Data.List
-    (stripPrefix)
+                       (stripPrefix)
 import           Data.Semigroup
-    ((<>))
+                       ((<>))
 import           Data.String
-    (fromString)
+                       (fromString)
 import           Data.X509
 import           Data.X509.Validation
-    (ValidationChecks (..), defaultChecks)
+                       (ValidationChecks (..), defaultChecks)
 import           Data.Yaml
-    (decodeFileEither, parseMonad, withObject)
+                       (decodeFileEither, parseMonad, withObject)
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import           System.IO
-    (FilePath)
+                       (FilePath)
 
 import qualified Data.Aeson as Aeson
 import qualified Data.Aeson.Types as Aeson

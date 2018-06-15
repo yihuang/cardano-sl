@@ -32,52 +32,54 @@ module Pos.Ssc.Toss.Base
        ) where
 
 import           Universum hiding
-    (id, keys)
+                       (id, keys)
 
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import           Control.Monad.ST
-    (ST, runST)
+                       (ST, runST)
 import           Crypto.Random
-    (MonadRandom)
+                       (MonadRandom)
 import           Data.Array.MArray
-    (newArray, readArray, writeArray)
+                       (newArray, readArray, writeArray)
 import           Data.Array.ST
-    (STUArray)
+                       (STUArray)
 import           Data.Containers
-    (ContainerKey, SetContainer (notMember))
+                       (ContainerKey, SetContainer (notMember))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import qualified Data.List.NonEmpty as NE
 import           Data.STRef
-    (newSTRef, readSTRef, writeSTRef)
+                       (newSTRef, readSTRef, writeSTRef)
 import           Formatting
-    (ords, sformat, (%))
+                       (ords, sformat, (%))
 import           System.Wlog
-    (logWarning)
+                       (logWarning)
 
 import           Pos.Binary.Class
-    (AsBinary, fromBinary)
+                       (AsBinary, fromBinary)
 import           Pos.Core
-    (CoinPortion, EpochIndex, StakeholderId, VssCertificatesMap (..),
-    addressHash, bvdMpcThd, coinPortionDenominator, getCoinPortion, lookupVss,
-    memberVss, unsafeGetCoin, vcSigningKey, vcVssKey)
+                       (CoinPortion, EpochIndex, StakeholderId,
+                       VssCertificatesMap (..), addressHash, bvdMpcThd,
+                       coinPortionDenominator, getCoinPortion, lookupVss,
+                       memberVss, unsafeGetCoin, vcSigningKey, vcVssKey)
 import           Pos.Core.Ssc
-    (Commitment (..), CommitmentsMap (getCommitmentsMap), InnerSharesMap,
-    Opening (..), OpeningsMap, SharesDistribution, SharesMap, SignedCommitment,
-    SscPayload (..), commShares, getCommShares, spVss)
+                       (Commitment (..), CommitmentsMap (getCommitmentsMap),
+                       InnerSharesMap, Opening (..), OpeningsMap,
+                       SharesDistribution, SharesMap, SignedCommitment,
+                       SscPayload (..), commShares, getCommShares, spVss)
 import           Pos.Crypto
-    (DecShare, verifyDecShare, verifyEncShares)
+                       (DecShare, verifyDecShare, verifyEncShares)
 import           Pos.Lrc.Types
-    (RichmenSet, RichmenStakes)
+                       (RichmenSet, RichmenStakes)
 import           Pos.Ssc.Base
-    (verifyOpening, vssThreshold)
+                       (verifyOpening, vssThreshold)
 import           Pos.Ssc.Error
-    (SscVerifyError (..))
+                       (SscVerifyError (..))
 import           Pos.Ssc.Toss.Class
-    (MonadToss (..), MonadTossEnv (..), MonadTossRead (..))
+                       (MonadToss (..), MonadTossEnv (..), MonadTossRead (..))
 import           Pos.Util.Util
-    (getKeys)
+                       (getKeys)
 
 ----------------------------------------------------------------------------
 -- Trivial getters (proper interface of MonadTossRead)

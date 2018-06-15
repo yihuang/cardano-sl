@@ -21,73 +21,72 @@ module Pos.Launcher.Resource
 import           Universum
 
 import           Control.Concurrent.STM
-    (newEmptyTMVarIO, newTBQueueIO)
+                       (newEmptyTMVarIO, newTBQueueIO)
 import           Data.Default
-    (Default)
+                       (Default)
 import qualified Data.Time as Time
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Mockable
-    (Production (..))
+                       (Production (..))
 import           System.IO
-    (BufferMode (..), Handle, hClose, hSetBuffering)
+                       (BufferMode (..), Handle, hClose, hSetBuffering)
 import qualified System.Metrics as Metrics
 import           System.Wlog
-    (LoggerConfig (..), WithLogger, consoleActionB, defaultHandleAction,
-    logDebug, logInfo, maybeLogsDirB, productionB, removeAllHandlers,
-    setupLogging, showTidB)
+                       (LoggerConfig (..), WithLogger, consoleActionB,
+                       defaultHandleAction, logDebug, logInfo, maybeLogsDirB,
+                       productionB, removeAllHandlers, setupLogging, showTidB)
 
-import           Pos.Binary
-    ()
+import           Pos.Binary ()
 import           Pos.Block.Configuration
-    (HasBlockConfiguration)
+                       (HasBlockConfiguration)
 import           Pos.Block.Slog
-    (mkSlogContext)
+                       (mkSlogContext)
 import           Pos.Client.CLI.Util
-    (readLoggerConfig)
+                       (readLoggerConfig)
 import           Pos.Configuration
 import           Pos.Context
-    (ConnectedPeers (..), NodeContext (..), StartTime (..))
+                       (ConnectedPeers (..), NodeContext (..), StartTime (..))
 import           Pos.Core
-    (HasConfiguration, Timestamp, gdStartTime, genesisData)
+                       (HasConfiguration, Timestamp, gdStartTime, genesisData)
 import           Pos.DB
-    (MonadDBRead, NodeDBs)
+                       (MonadDBRead, NodeDBs)
 import           Pos.DB.Rocks
-    (closeNodeDBs, openNodeDBs)
+                       (closeNodeDBs, openNodeDBs)
 import           Pos.Delegation
-    (DelegationVar, HasDlgConfiguration, mkDelegationVar)
+                       (DelegationVar, HasDlgConfiguration, mkDelegationVar)
 import qualified Pos.GState as GS
 import           Pos.Infra.DHT.Real
-    (KademliaParams (..))
+                       (KademliaParams (..))
 import           Pos.Infra.Network.Types
-    (NetworkConfig (..))
+                       (NetworkConfig (..))
 import           Pos.Infra.Reporting
-    (initializeMisbehaviorMetrics)
+                       (initializeMisbehaviorMetrics)
 import           Pos.Infra.Shutdown.Types
-    (ShutdownContext (..))
+                       (ShutdownContext (..))
 import           Pos.Infra.Slotting
-    (SimpleSlottingStateVar, mkSimpleSlottingStateVar)
+                       (SimpleSlottingStateVar, mkSimpleSlottingStateVar)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 import           Pos.Infra.StateLock
-    (newStateLock)
+                       (newStateLock)
 import           Pos.Launcher.Param
-    (BaseParams (..), LoggingParams (..), NodeParams (..))
+                       (BaseParams (..), LoggingParams (..), NodeParams (..))
 import           Pos.Lrc.Context
-    (LrcContext (..), mkLrcSyncData)
+                       (LrcContext (..), mkLrcSyncData)
 import           Pos.Ssc
-    (SscParams, SscState, createSscContext, mkSscState)
+                       (SscParams, SscState, createSscContext, mkSscState)
 import           Pos.Txp
-    (GenericTxpLocalData (..), TxpGlobalSettings, mkTxpLocalData,
-    recordTxpMetrics)
+                       (GenericTxpLocalData (..), TxpGlobalSettings,
+                       mkTxpLocalData, recordTxpMetrics)
 
 import           Pos.Launcher.Mode
-    (InitMode, InitModeContext (..), runInitMode)
+                       (InitMode, InitModeContext (..), runInitMode)
 import           Pos.Update.Context
-    (mkUpdateContext)
+                       (mkUpdateContext)
 import qualified Pos.Update.DB as GState
 import           Pos.Util
-    (bracketWithLogging, newInitFuture)
+                       (bracketWithLogging, newInitFuture)
 
 #ifdef linux_HOST_OS
 import qualified System.Systemd.Daemon as Systemd

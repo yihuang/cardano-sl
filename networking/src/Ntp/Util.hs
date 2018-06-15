@@ -15,23 +15,25 @@ module Ntp.Util
     ) where
 
 import           Control.Exception
-    (IOException, catch)
+                       (IOException, catch)
 import           Control.Monad.Trans
-    (MonadIO (..))
+                       (MonadIO (..))
 import           Control.Monad.Trans.Control
-    (MonadBaseControl (..))
+                       (MonadBaseControl (..))
 import           Data.List
-    (find, sortOn)
+                       (find, sortOn)
 import           Data.Time.Clock.POSIX
-    (getPOSIXTime)
+                       (getPOSIXTime)
 import           Data.Time.Units
-    (Microsecond, fromMicroseconds)
+                       (Microsecond, fromMicroseconds)
 import           Network.Socket
-    (AddrInfo, AddrInfoFlag (AI_ADDRCONFIG, AI_PASSIVE),
-    Family (AF_INET, AF_INET6), PortNumber (..), SockAddr (..), Socket,
-    SocketOption (ReuseAddr), SocketType (Datagram), aNY_PORT, addrAddress,
-    addrFamily, addrFlags, addrSocketType, bind, defaultHints, defaultProtocol,
-    getAddrInfo, setSocketOption, socket)
+                       (AddrInfo, AddrInfoFlag (AI_ADDRCONFIG, AI_PASSIVE),
+                       Family (AF_INET, AF_INET6), PortNumber (..),
+                       SockAddr (..), Socket, SocketOption (ReuseAddr),
+                       SocketType (Datagram), aNY_PORT, addrAddress,
+                       addrFamily, addrFlags, addrSocketType, bind,
+                       defaultHints, defaultProtocol, getAddrInfo,
+                       setSocketOption, socket)
 
 ntpPort :: PortNumber
 ntpPort = 123

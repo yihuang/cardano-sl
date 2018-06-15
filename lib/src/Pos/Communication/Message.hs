@@ -7,24 +7,25 @@ module Pos.Communication.Message
 import           Universum
 
 import           Data.Tagged
-    (Tagged)
+                       (Tagged)
 import           Node.Message.Class
-    (Message (..))
+                       (Message (..))
 
 import           Pos.Block.Network
-    (MsgBlock, MsgGetBlocks, MsgGetHeaders, MsgHeaders)
+                       (MsgBlock, MsgGetBlocks, MsgGetHeaders, MsgHeaders)
 import           Pos.Core
-    (ProxySKHeavy)
+                       (ProxySKHeavy)
 import           Pos.Core.Update
-    (UpdateProposal, UpdateVote)
+                       (UpdateProposal, UpdateVote)
 import           Pos.Infra.Communication.Types.Protocol
-    (MsgSubscribe, MsgSubscribe1)
+                       (MsgSubscribe, MsgSubscribe1)
 import           Pos.Infra.Communication.Types.Relay
-    (DataMsg, InvMsg, InvOrData, MempoolMsg, ReqMsg, ReqOrRes)
+                       (DataMsg, InvMsg, InvOrData, MempoolMsg, ReqMsg,
+                       ReqOrRes)
 import           Pos.Ssc.Message
-    (MCCommitment, MCOpening, MCShares, MCVssCertificate)
+                       (MCCommitment, MCOpening, MCShares, MCVssCertificate)
 import           Pos.Txp.Network.Types
-    (TxMsgContents)
+                       (TxMsgContents)
 
 -- Why?
 instance Message Void where

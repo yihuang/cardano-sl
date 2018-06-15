@@ -16,19 +16,19 @@ module Test.Pos.Util.QuickCheck.Arbitrary
 import           Universum
 
 import           Data.ByteString
-    (pack)
+                       (pack)
 import qualified Data.ByteString.Lazy as BL
-    (ByteString, pack)
+                       (ByteString, pack)
 import           Data.List.NonEmpty
-    (NonEmpty ((:|)))
+                       (NonEmpty ((:|)))
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, listOf, scale, shuffle, vector)
+                       (Arbitrary (..), Gen, listOf, scale, shuffle, vector)
 import           Test.QuickCheck.Gen
-    (unGen)
+                       (unGen)
 import           Test.QuickCheck.Random
-    (mkQCGen)
+                       (mkQCGen)
 
 -- import           Pos.Crypto.Random (randomNumberInRange)
 

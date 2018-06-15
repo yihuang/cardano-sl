@@ -7,13 +7,14 @@ import           Universum
 
 
 import           Pos.Core
-    (StakeholderId)
+                       (StakeholderId)
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress)
+                       (NetworkAddress)
 import           Pos.Security.Params
-    (AttackTarget (..), AttackType (..), SecurityParams (..))
+                       (AttackTarget (..), AttackType (..),
+                       SecurityParams (..))
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 shouldIgnoreAddress
     :: (MonadReader ctx m, HasLens SecurityParams ctx SecurityParams)

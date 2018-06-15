@@ -9,9 +9,9 @@ module Node.Conversation
     ) where
 
 import           Data.ByteString.Lazy
-    (ByteString)
+                       (ByteString)
 import           Data.Word
-    (Word32)
+                       (Word32)
 import qualified Node.Internal as LL
 import           Node.Message.Class
 

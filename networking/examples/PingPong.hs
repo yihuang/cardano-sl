@@ -14,29 +14,29 @@
 module Main where
 
 import           Control.Concurrent
-    (forkIO, killThread, threadDelay)
+                       (forkIO, killThread, threadDelay)
 import           Control.Concurrent.Async
-    (forConcurrently)
+                       (forConcurrently)
 import           Control.Exception
-    (throwIO)
+                       (throwIO)
 import           Data.Binary
-    (Binary)
+                       (Binary)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as B8
 import           Data.Data
-    (Data)
+                       (Data)
 import           Data.Functor.Contravariant
-    (contramap)
+                       (contramap)
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import           Network.Transport
-    (closeTransport)
+                       (closeTransport)
 import qualified Network.Transport.TCP as TCP
 import           Node
 import           Node.Message.Binary
-    (BinaryP, binaryPacking)
+                       (BinaryP, binaryPacking)
 import           Pos.Util.Trace
-    (stdoutTrace)
+                       (stdoutTrace)
 import           System.Random
 
 -- | Type for messages from the workers to the listeners.

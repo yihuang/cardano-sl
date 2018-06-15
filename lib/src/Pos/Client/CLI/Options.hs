@@ -22,25 +22,25 @@ module Pos.Client.CLI.Options
 import           Universum
 
 import           Data.Default
-    (def)
+                       (def)
 import           Data.Time.Units
-    (fromMicroseconds)
+                       (fromMicroseconds)
 import qualified Options.Applicative as Opt
 import           Options.Applicative.Builder.Internal
-    (HasMetavar, HasName)
+                       (HasMetavar, HasName)
 import           Pos.Util.OptParse
-    (fromParsec)
+                       (fromParsec)
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Communication
-    (NodeId)
+                       (NodeId)
 import           Pos.Core
-    (Timestamp (..))
+                       (Timestamp (..))
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress, addrParser, addrParserNoWildcard, addressToNodeId)
+                       (NetworkAddress, addrParser, addrParserNoWildcard,
+                       addressToNodeId)
 import           Pos.Launcher.Configuration
-    (ConfigurationOptions (..))
+                       (ConfigurationOptions (..))
 
 data CommonArgs = CommonArgs
     { logConfig            :: !(Maybe FilePath)

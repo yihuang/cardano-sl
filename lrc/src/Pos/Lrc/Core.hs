@@ -7,20 +7,20 @@ module Pos.Lrc.Core
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Data.Conduit
-    (ConduitT, await)
+                       (ConduitT, await)
 import qualified Data.Conduit.List as CL
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 
 import           Pos.Core.Common
-    (Coin, StakeholderId, mkCoin, unsafeAddCoin)
+                       (Coin, StakeholderId, mkCoin, unsafeAddCoin)
 import           Pos.Lrc.Types
-    (RichmenSet, RichmenStakes)
+                       (RichmenSet, RichmenStakes)
 import           Pos.Util.Util
-    (getKeys)
+                       (getKeys)
 
 
 -- | Function helper for delegated richmen. Iterates @Delegate ->

@@ -16,32 +16,33 @@ module Pos.Core.Ssc.VssCertificatesMap
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (makeWrapped)
+                       (makeWrapped)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Data.List.Extra
-    (nubOrdOn)
+                       (nubOrdOn)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Serokell.Util
-    (allDistinct)
+                       (allDistinct)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core.Common
-    (StakeholderId)
+                       (StakeholderId)
 import           Pos.Core.Slotting
-    (EpochIndex)
+                       (EpochIndex)
 import           Pos.Crypto
-    (ProtocolMagic)
+                       (ProtocolMagic)
 
 import           Pos.Core.Ssc.VssCertificate
-    (VssCertificate (..), checkVssCertificate, getCertId, toCertPair)
+                       (VssCertificate (..), checkVssCertificate, getCertId,
+                       toCertPair)
 
 -- | VssCertificatesMap contains all valid certificates collected
 -- during some period of time.

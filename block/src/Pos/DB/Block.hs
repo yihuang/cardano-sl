@@ -34,60 +34,59 @@ module Pos.DB.Block
 import           Universum
 
 import           Control.Exception.Safe
-    (handle)
+                       (handle)
 import           Control.Lens
-    (at)
+                       (at)
 import qualified Data.ByteString as BS
-    (hPut, readFile)
+                       (hPut, readFile)
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import           Formatting
-    (formatToString)
+                       (formatToString)
 import           System.Directory
-    (createDirectoryIfMissing, doesFileExist, removeFile)
+                       (createDirectoryIfMissing, doesFileExist, removeFile)
 import           System.FilePath
-    ((</>))
+                       ((</>))
 import           System.IO
-    (IOMode (WriteMode), hClose, hFlush, openBinaryFile)
+                       (IOMode (WriteMode), hClose, hFlush, openBinaryFile)
 import           System.IO.Error
-    (IOError, isDoesNotExistError)
+                       (IOError, isDoesNotExistError)
 
-import           Pos.Binary.Block.Types
-    ()
+import           Pos.Binary.Block.Types ()
 import           Pos.Binary.Class
-    (decodeFull', serialize')
-import           Pos.Binary.Core
-    ()
-import           Pos.Block.BHelpers
-    ()
+                       (decodeFull', serialize')
+import           Pos.Binary.Core ()
+import           Pos.Block.BHelpers ()
 import           Pos.Block.Types
-    (Blund, SlogUndo (..), Undo (..))
+                       (Blund, SlogUndo (..), Undo (..))
 import           Pos.Core
-    (HeaderHash, headerHash)
+                       (HeaderHash, headerHash)
 import           Pos.Core.Block
-    (Block, GenesisBlock)
+                       (Block, GenesisBlock)
 import qualified Pos.Core.Block as CB
 import           Pos.Crypto
-    (hashHexF)
+                       (hashHexF)
 import           Pos.DB.BlockIndex
-    (deleteHeaderIndex, putHeadersIndex)
+                       (deleteHeaderIndex, putHeadersIndex)
 import           Pos.DB.Class
-    (MonadDB (..), MonadDBRead (..), Serialized (..), SerializedBlock,
-    SerializedBlund, SerializedUndo, getBlock, getDeserialized)
+                       (MonadDB (..), MonadDBRead (..), Serialized (..),
+                       SerializedBlock, SerializedBlund, SerializedUndo,
+                       getBlock, getDeserialized)
 import           Pos.DB.Error
-    (DBError (..))
+                       (DBError (..))
 import           Pos.DB.GState.Common
-    (getTipSomething)
+                       (getTipSomething)
 import           Pos.DB.Pure
-    (DBPureVar, MonadPureDB, atomicModifyIORefPure, pureBlocksStorage)
+                       (DBPureVar, MonadPureDB, atomicModifyIORefPure,
+                       pureBlocksStorage)
 import           Pos.DB.Rocks
-    (MonadRealDB, blockDataDir, getNodeDBs)
+                       (MonadRealDB, blockDataDir, getNodeDBs)
 import           Pos.DB.Sum
-    (MonadDBSum, eitherDB)
+                       (MonadDBSum, eitherDB)
 import           Pos.Delegation.Types
-    (DlgUndo (..))
+                       (DlgUndo (..))
 import           Pos.Util.Util
-    (HasLens (..), eitherToThrow)
+                       (HasLens (..), eitherToThrow)
 
 ----------------------------------------------------------------------------
 -- BlockDB related methods

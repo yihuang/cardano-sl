@@ -13,27 +13,26 @@ module Pos.Core.Block.Union.Instances
 import           Universum
 
 import           Control.Lens
-    (Getter, choosing, lens, to)
+                       (Getter, choosing, lens, to)
 import qualified Data.Text.Buildable as Buildable
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core.Block.Blockchain
-    (GenericBlock (..))
-import           Pos.Core.Block.Genesis
-    ()
-import           Pos.Core.Block.Main
-    ()
+                       (GenericBlock (..))
+import           Pos.Core.Block.Genesis ()
+import           Pos.Core.Block.Main ()
 import           Pos.Core.Block.Union.Types
-    (Block, BlockHeader (..), HasHeaderHash (..), HasPrevBlock (..),
-    IsGenesisHeader, IsHeader, IsMainHeader (..), blockHeaderHash,
-    choosingBlockHeader)
+                       (Block, BlockHeader (..), HasHeaderHash (..),
+                       HasPrevBlock (..), IsGenesisHeader, IsHeader,
+                       IsMainHeader (..), blockHeaderHash, choosingBlockHeader)
 import           Pos.Core.Common
-    (HasDifficulty (..))
+                       (HasDifficulty (..))
 import           Pos.Core.Slotting
-    (EpochOrSlot (..), HasEpochIndex (..), HasEpochOrSlot (..))
+                       (EpochOrSlot (..), HasEpochIndex (..),
+                       HasEpochOrSlot (..))
 import           Pos.Util.Some
-    (Some)
+                       (Some)
 
 ----------------------------------------------------------------------------
 -- Buildable

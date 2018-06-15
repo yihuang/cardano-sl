@@ -53,9 +53,9 @@ module Mockable.Concurrent (
 import           Universum
 
 import           Control.Exception
-    (AsyncException (..), Exception)
+                       (AsyncException (..), Exception)
 import           Data.Time.Units
-    (TimeUnit)
+                       (TimeUnit)
 import           Mockable.Class
 
 ----------------------------------------------------------------------------

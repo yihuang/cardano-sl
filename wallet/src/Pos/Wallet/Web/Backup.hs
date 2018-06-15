@@ -12,24 +12,25 @@ import           Universum
 import qualified Data.HashMap.Strict as HM
 import qualified Data.SemVer as V
 import           Test.QuickCheck
-    (Arbitrary (..), elements)
+                       (Arbitrary (..), elements)
 
 import           Pos.Crypto
-    (EncryptedSecretKey)
+                       (EncryptedSecretKey)
 import           Pos.Crypto.Signing.Safe
-    (emptyPassphrase, safeKeyGen)
+                       (emptyPassphrase, safeKeyGen)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 import           Pos.Wallet.Web.Account
-    (AccountMode, getSKById)
+                       (AccountMode, getSKById)
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId (..), CAccountMeta (..), CId, CWalletMeta (..), Wal)
+                       (AccountId (..), CAccountMeta (..), CId,
+                       CWalletMeta (..), Wal)
 import           Pos.Wallet.Web.Error
-    (WalletError (..))
+                       (WalletError (..))
 import           Pos.Wallet.Web.State
-    (WalletSnapshot, getAccountMeta, getWalletMeta)
+                       (WalletSnapshot, getAccountMeta, getWalletMeta)
 import           Pos.Wallet.Web.Util
-    (getWalletAccountIds)
+                       (getWalletAccountIds)
 
 currentBackupFormatVersion :: V.Version
 currentBackupFormatVersion = V.initial & V.major .~ 1

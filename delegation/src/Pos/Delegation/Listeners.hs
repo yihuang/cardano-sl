@@ -11,36 +11,35 @@ module Pos.Delegation.Listeners
 import           Universum
 
 import           Formatting
-    (build, sformat, shown, (%))
+                       (build, sformat, shown, (%))
 import           Mockable
-    (CurrentTime, Delay, Mockable)
+                       (CurrentTime, Delay, Mockable)
 import           System.Wlog
-    (WithLogger, logDebug, logWarning)
+                       (WithLogger, logDebug, logWarning)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
-import           Pos.Binary.Delegation
-    ()
+import           Pos.Binary.Delegation ()
 import           Pos.Core
-    (ProxySKHeavy)
+                       (ProxySKHeavy)
 import           Pos.DB.Class
-    (MonadBlockDBRead, MonadGState)
+                       (MonadBlockDBRead, MonadGState)
 import           Pos.Delegation.Class
-    (MonadDelegation)
+                       (MonadDelegation)
 import           Pos.Delegation.Configuration
-    (HasDlgConfiguration)
+                       (HasDlgConfiguration)
 import           Pos.Delegation.Logic
-    (PskHeavyVerdict (..), processProxySKHeavy)
+                       (PskHeavyVerdict (..), processProxySKHeavy)
 import           Pos.Infra.Communication.Protocol
-    (Message)
+                       (Message)
 import           Pos.Infra.Communication.Relay
-    (DataMsg)
+                       (DataMsg)
 import           Pos.Infra.StateLock
-    (StateLock)
+                       (StateLock)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Util
-    (HasLens')
+                       (HasLens')
 
 -- Message constraints we need to be defined.
 type DlgMessageConstraint

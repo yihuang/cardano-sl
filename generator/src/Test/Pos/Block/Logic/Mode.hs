@@ -45,96 +45,107 @@ module Test.Pos.Block.Logic.Mode
 import           Universum
 
 import           Control.Lens
-    (lens, makeClassy, makeLensesWith)
+                       (lens, makeClassy, makeLensesWith)
 import           Data.Default
-    (def)
+                       (def)
 import qualified Data.Map as Map
 import qualified Data.Text.Buildable
 import           Data.Time.Units
-    (TimeUnit (..))
+                       (TimeUnit (..))
 import           Formatting
-    (bprint, build, formatToString, shown, (%))
+                       (bprint, build, formatToString, shown, (%))
 import           Mockable
-    (Production, currentTime, runProduction)
+                       (Production, currentTime, runProduction)
 import qualified Prelude
 import           System.Wlog
-    (HasLoggerName (..), LoggerName)
+                       (HasLoggerName (..), LoggerName)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, Property, forAll, ioProperty)
+                       (Arbitrary (..), Gen, Property, forAll, ioProperty)
 import           Test.QuickCheck.Monadic
-    (PropertyM, monadic)
+                       (PropertyM, monadic)
 import           Test.QuickCheck.Property
-    (Testable)
+                       (Testable)
 
 import           Pos.AllSecrets
-    (AllSecrets (..), HasAllSecrets (..), mkAllSecretsSimple)
+                       (AllSecrets (..), HasAllSecrets (..),
+                       mkAllSecretsSimple)
 import           Pos.Block.BListener
-    (MonadBListener (..), onApplyBlocksStub, onRollbackBlocksStub)
+                       (MonadBListener (..), onApplyBlocksStub,
+                       onRollbackBlocksStub)
 import           Pos.Block.Slog
-    (HasSlogGState (..), mkSlogGState)
+                       (HasSlogGState (..), mkSlogGState)
 import           Pos.Core
-    (BlockVersionData, CoreConfiguration (..), GenesisConfiguration (..),
-    GenesisInitializer (..), GenesisSpec (..), HasConfiguration,
-    HasProtocolConstants, SlotId, Timestamp (..), genesisSecretKeys,
-    withGenesisSpec)
+                       (BlockVersionData, CoreConfiguration (..),
+                       GenesisConfiguration (..), GenesisInitializer (..),
+                       GenesisSpec (..), HasConfiguration,
+                       HasProtocolConstants, SlotId, Timestamp (..),
+                       genesisSecretKeys, withGenesisSpec)
 import           Pos.Core.Configuration
-    (HasGenesisBlockVersionData, withGenesisBlockVersionData)
+                       (HasGenesisBlockVersionData,
+                       withGenesisBlockVersionData)
 import           Pos.DB
-    (DBPure, MonadDB (..), MonadDBRead (..), MonadGState (..))
+                       (DBPure, MonadDB (..), MonadDBRead (..),
+                       MonadGState (..))
 import qualified Pos.DB as DB
 import qualified Pos.DB.Block as DB
 import           Pos.DB.DB
-    (gsAdoptedBVDataDefault, initNodeDBs)
+                       (gsAdoptedBVDataDefault, initNodeDBs)
 import           Pos.DB.Pure
-    (DBPureVar, newDBPureVar)
+                       (DBPureVar, newDBPureVar)
 import           Pos.Delegation
-    (DelegationVar, HasDlgConfiguration, mkDelegationVar)
+                       (DelegationVar, HasDlgConfiguration, mkDelegationVar)
 import           Pos.Generator.Block
-    (BlockGenMode)
+                       (BlockGenMode)
 import           Pos.Generator.BlockEvent
-    (SnapshotId)
+                       (SnapshotId)
 import qualified Pos.GState as GS
 import           Pos.Infra.Network.Types
-    (HasNodeType (..), NodeType (..))
+                       (HasNodeType (..), NodeType (..))
 import           Pos.Infra.Reporting
-    (HasMisbehaviorMetrics (..), MonadReporting (..))
+                       (HasMisbehaviorMetrics (..), MonadReporting (..))
 import           Pos.Infra.Slotting
-    (HasSlottingVar (..), MonadSimpleSlotting, MonadSlots (..),
-    SimpleSlottingMode, SimpleSlottingStateVar, currentTimeSlottingSimple,
-    getCurrentSlotBlockingSimple, getCurrentSlotBlockingSimple',
-    getCurrentSlotInaccurateSimple, getCurrentSlotInaccurateSimple',
-    getCurrentSlotSimple, getCurrentSlotSimple', mkSimpleSlottingStateVar)
+                       (HasSlottingVar (..), MonadSimpleSlotting,
+                       MonadSlots (..), SimpleSlottingMode,
+                       SimpleSlottingStateVar, currentTimeSlottingSimple,
+                       getCurrentSlotBlockingSimple,
+                       getCurrentSlotBlockingSimple',
+                       getCurrentSlotInaccurateSimple,
+                       getCurrentSlotInaccurateSimple', getCurrentSlotSimple,
+                       getCurrentSlotSimple', mkSimpleSlottingStateVar)
 import           Pos.Infra.Slotting.MemState
-    (MonadSlotsData)
+                       (MonadSlotsData)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 import           Pos.Launcher.Configuration
-    (Configuration (..), HasConfigurations)
+                       (Configuration (..), HasConfigurations)
 import           Pos.Lrc
-    (LrcContext (..), mkLrcSyncData)
+                       (LrcContext (..), mkLrcSyncData)
 import           Pos.Ssc
-    (SscMemTag, SscState, mkSscState)
+                       (SscMemTag, SscState, mkSscState)
 import           Pos.Txp
-    (GenericTxpLocalData, MempoolExt, MonadTxpLocal (..), TxpGlobalSettings,
-    TxpHolderTag, mkTxpLocalData, txNormalize, txProcessTransactionNoLock,
-    txpGlobalSettings)
+                       (GenericTxpLocalData, MempoolExt, MonadTxpLocal (..),
+                       TxpGlobalSettings, TxpHolderTag, mkTxpLocalData,
+                       txNormalize, txProcessTransactionNoLock,
+                       txpGlobalSettings)
 import           Pos.Update.Context
-    (UpdateContext, mkUpdateContext)
+                       (UpdateContext, mkUpdateContext)
 import           Pos.Util
-    (newInitFuture, postfixLFields, postfixLFields2)
+                       (newInitFuture, postfixLFields, postfixLFields2)
 import           Pos.Util.CompileInfo
-    (withCompileInfo)
+                       (withCompileInfo)
 import           Pos.Util.LoggerName
-    (HasLoggerName' (..), askLoggerNameDefault, modifyLoggerNameDefault)
+                       (HasLoggerName' (..), askLoggerNameDefault,
+                       modifyLoggerNameDefault)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 import           Pos.WorkMode
-    (EmptyMempoolExt)
+                       (EmptyMempoolExt)
 
 import           Test.Pos.Block.Logic.Emulation
-    (Emulation (..), runEmulation, sudoLiftIO)
+                       (Emulation (..), runEmulation, sudoLiftIO)
 import           Test.Pos.Configuration
-    (defaultTestBlockVersionData, defaultTestConf, defaultTestGenesisSpec)
+                       (defaultTestBlockVersionData, defaultTestConf,
+                       defaultTestGenesisSpec)
 
 ----------------------------------------------------------------------------
 -- Parameters

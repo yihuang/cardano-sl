@@ -6,16 +6,16 @@ module QueryMethods where
 import           Universum
 
 import           Pos.Wallet.Web.Methods.Logic
-    (getWallets)
+                       (getWallets)
 import           Text.Printf
-    (printf)
+                       (printf)
 
 import           Lib
-    (timed)
+                       (timed)
 import           Rendering
-    (say)
+                       (say)
 import           Types
-    (Method (..), UberMonad)
+                       (Method (..), UberMonad)
 
 queryMethods :: Maybe Method -> UberMonad ()
 queryMethods Nothing = say "No valid method read from the CLI."

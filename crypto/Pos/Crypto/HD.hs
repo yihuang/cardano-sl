@@ -21,28 +21,29 @@ module Pos.Crypto.HD
        ) where
 
 import           Cardano.Crypto.Wallet
-    (DerivationScheme (..), deriveXPrv, deriveXPub, unXPub)
+                       (DerivationScheme (..), deriveXPrv, deriveXPub, unXPub)
 import qualified Crypto.Cipher.ChaChaPoly1305 as C
 import           Crypto.Error
 import           Crypto.Hash
-    (SHA512 (..))
+                       (SHA512 (..))
 import qualified Crypto.KDF.PBKDF2 as PBKDF2
 import qualified Crypto.MAC.Poly1305 as Poly
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..))
+                       (FromJSON (..), ToJSON (..))
 import           Data.ByteArray as BA
-    (convert)
+                       (convert)
 import           Data.ByteString.Char8 as B
 import           Serokell.Util.Base64
-    (JsonByteString (..))
+                       (JsonByteString (..))
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..), decodeFull', serialize')
+                       (Bi (..), decodeFull', serialize')
 import           Pos.Crypto.Scrypt
-    (EncryptedPass)
+                       (EncryptedPass)
 import           Pos.Crypto.Signing.Types
-    (EncryptedSecretKey (..), PassPhrase, PublicKey (..), checkPassMatches)
+                       (EncryptedSecretKey (..), PassPhrase, PublicKey (..),
+                       checkPassMatches)
 
 -- | Passphrase is a hash of root public key.
 data HDPassphrase = HDPassphrase !ByteString

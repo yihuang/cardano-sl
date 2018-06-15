@@ -14,28 +14,29 @@ module Pos.Wallet.Web.Pending.Util
 import           Universum
 
 import           Control.Lens
-    ((*=), (+=), (+~), (<<*=), (<<.=))
+                       ((*=), (+=), (+~), (<<*=), (<<.=))
 import           Data.Reflection
-    (give)
+                       (give)
 import qualified Data.Set as Set
 
 import           Pos.Client.Txp.Util
-    (PendingAddresses (..))
+                       (PendingAddresses (..))
 import           Pos.Core
-    (ProtocolConstants (..))
+                       (ProtocolConstants (..))
 import           Pos.Core.Chrono
-    (OldestFirst (..))
+                       (OldestFirst (..))
 import           Pos.Core.Common
-    (Address)
+                       (Address)
 import           Pos.Core.Slotting
-    (FlatSlotId, SlotId, flatSlotId)
+                       (FlatSlotId, SlotId, flatSlotId)
 import           Pos.Crypto
-    (WithHash (..))
+                       (WithHash (..))
 import           Pos.Txp
-    (Tx (..), TxAux (..), TxOut (..), topsortTxs)
+                       (Tx (..), TxAux (..), TxOut (..), topsortTxs)
 import           Pos.Wallet.Web.Pending.Types
-    (PendingTx (..), PtxCondition (..), PtxSubmitTiming (..), pstNextDelay,
-    pstNextSlot, ptxPeerAck, ptxSubmitTiming)
+                       (PendingTx (..), PtxCondition (..),
+                       PtxSubmitTiming (..), pstNextDelay, pstNextSlot,
+                       ptxPeerAck, ptxSubmitTiming)
 
 mkPtxSubmitTiming :: ProtocolConstants -> SlotId -> PtxSubmitTiming
 mkPtxSubmitTiming pc creationSlot = give pc $

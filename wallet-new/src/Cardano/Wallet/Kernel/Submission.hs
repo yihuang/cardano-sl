@@ -48,39 +48,39 @@ module Cardano.Wallet.Kernel.Submission (
     ) where
 
 import           Universum hiding
-    (elems)
+                       (elems)
 
 import           Control.Lens
-    (Getter, to)
+                       (Getter, to)
 import           Control.Lens.TH
 import           Data.IntMap.Strict
-    (IntMap)
+                       (IntMap)
 import qualified Data.IntMap.Strict as IntMap
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map.Strict as M
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as Set
 import           Data.Text.Buildable
-    (build)
+                       (build)
 import           Formatting
-    (bprint, sformat, (%))
+                       (bprint, sformat, (%))
 import qualified Formatting as F
 import           Pos.Crypto.Hashing
-    (WithHash (..))
+                       (WithHash (..))
 import           Pos.Txp.Topsort
-    (topsortTxs)
+                       (topsortTxs)
 import qualified Prelude
 import           Serokell.Util.Text
-    (listJsonIndent, mapBuilder, pairF)
+                       (listJsonIndent, mapBuilder, pairF)
 import           Test.QuickCheck
 
 import           Cardano.Wallet.Kernel.DB.InDb
-    (fromDb)
+                       (fromDb)
 import           Cardano.Wallet.Kernel.DB.Spec
-    (Pending (..), emptyPending, pendingTransactions, removePending,
-    unionPending)
+                       (Pending (..), emptyPending, pendingTransactions,
+                       removePending, unionPending)
 import qualified Pos.Core as Core
 
 -- | Wallet Submission Layer

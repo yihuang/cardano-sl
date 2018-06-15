@@ -6,47 +6,48 @@ module Test.Spec.Submission (
   ) where
 
 import           Universum hiding
-    (elems)
+                       (elems)
 
 import           Cardano.Wallet.Kernel.DB.InDb
-    (fromDb)
+                       (fromDb)
 import           Cardano.Wallet.Kernel.DB.Spec
-    (Pending (..), emptyPending, pendingTransactions, removePending)
+                       (Pending (..), emptyPending, pendingTransactions,
+                       removePending)
 import           Cardano.Wallet.Kernel.Submission
 import           Control.Exception
-    (toException)
+                       (toException)
 import           Control.Lens
-    (to)
+                       (to)
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map as M
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as S
 import           Data.Text.Buildable
-    (build)
+                       (build)
 import qualified Data.Vector as V
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import qualified Formatting as F
 import qualified Pos.Core as Core
 import           Pos.Crypto.Hashing
-    (hash)
+                       (hash)
 import           Pos.Data.Attributes
-    (Attributes (..), UnparsedFields (..))
+                       (Attributes (..), UnparsedFields (..))
 import           Serokell.Util.Text
-    (listJsonIndent)
+                       (listJsonIndent)
 import qualified Test.Pos.Txp.Arbitrary as Core
 
 import           Test.QuickCheck
-    (Gen, Property, arbitrary, choose, conjoin, forAll, listOf, shuffle,
-    vectorOf, (===))
+                       (Gen, Property, arbitrary, choose, conjoin, forAll,
+                       listOf, shuffle, vectorOf, (===))
 import           Test.QuickCheck.Property
-    (counterexample, exception, property)
+                       (counterexample, exception, property)
 import           Util
-    (disjoint)
+                       (disjoint)
 import           Util.Buildable
-    (ShowThroughBuild (..))
+                       (ShowThroughBuild (..))
 import           Util.Buildable.Hspec
 
 {-# ANN module ("HLint: ignore Reduce duplication" :: Text) #-}

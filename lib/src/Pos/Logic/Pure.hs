@@ -9,54 +9,57 @@ import           Universum
 
 import qualified Data.ByteString as BS
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import           Data.Default
-    (def)
+                       (def)
 
 import           Pos.Binary.Class
-    (serialize')
+                       (serialize')
 import           Pos.Core
-    (ApplicationName (..), Block, BlockHeader (..), BlockVersion (..),
-    BlockVersionData (..), ExtraBodyData, ExtraHeaderData, GenericBlock (..),
-    GenericBlockHeader (..), HeaderHash, SoftforkRule (..),
-    SoftwareVersion (..), StakeholderId, TxFeePolicy (..),
-    unsafeCoinPortionFromDouble)
+                       (ApplicationName (..), Block, BlockHeader (..),
+                       BlockVersion (..), BlockVersionData (..), ExtraBodyData,
+                       ExtraHeaderData, GenericBlock (..),
+                       GenericBlockHeader (..), HeaderHash, SoftforkRule (..),
+                       SoftwareVersion (..), StakeholderId, TxFeePolicy (..),
+                       unsafeCoinPortionFromDouble)
 import           Pos.Core.Block
-    (BlockHeaderAttributes, BlockSignature (..), MainBlock, MainBlockHeader,
-    MainBlockchain, MainBody (..), MainConsensusData (..),
-    MainExtraBodyData (..), MainExtraHeaderData (..), MainProof (..))
+                       (BlockHeaderAttributes, BlockSignature (..), MainBlock,
+                       MainBlockHeader, MainBlockchain, MainBody (..),
+                       MainConsensusData (..), MainExtraBodyData (..),
+                       MainExtraHeaderData (..), MainProof (..))
 import           Pos.Core.Chrono
-    (NewestFirst (..), OldestFirst (..))
+                       (NewestFirst (..), OldestFirst (..))
 import           Pos.Core.Common
-    (BlockCount (..), ChainDifficulty (..))
+                       (BlockCount (..), ChainDifficulty (..))
 import           Pos.Core.Delegation
-    (DlgPayload (..))
+                       (DlgPayload (..))
 import           Pos.Core.Slotting
-    (EpochIndex (..), LocalSlotIndex (..), SlotId (..))
+                       (EpochIndex (..), LocalSlotIndex (..), SlotId (..))
 import           Pos.Core.Ssc
-    (SscPayload (..), SscProof (..), VssCertificatesMap (..))
+                       (SscPayload (..), SscProof (..),
+                       VssCertificatesMap (..))
 import           Pos.Core.Txp
-    (TxProof (..))
+                       (TxProof (..))
 import           Pos.Core.Update
-    (UpdatePayload (..), UpdateProof)
+                       (UpdatePayload (..), UpdateProof)
 import           Pos.Crypto.Configuration
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 import           Pos.Crypto.Hashing
-    (Hash, unsafeMkAbstractHash)
+                       (Hash, unsafeMkAbstractHash)
 import           Pos.Crypto.Signing
-    (PublicKey (..), SecretKey (..), Signature (..), deterministicKeyGen,
-    signRaw)
+                       (PublicKey (..), SecretKey (..), Signature (..),
+                       deterministicKeyGen, signRaw)
 import           Pos.Data.Attributes
-    (Attributes (..), UnparsedFields (..))
+                       (Attributes (..), UnparsedFields (..))
 import           Pos.DB.Class
-    (Serialized (..), SerializedBlock)
+                       (Serialized (..), SerializedBlock)
 import           Pos.Merkle
-    (MerkleRoot (..))
+                       (MerkleRoot (..))
 import           Pos.Txp.Base
-    (emptyTxPayload)
+                       (emptyTxPayload)
 
 import           Pos.Logic.Types
-    (KeyVal (..), Logic (..))
+                       (KeyVal (..), Logic (..))
 
 -- | Serves up a single (invalid but well-formed) block and block header for
 -- any request.

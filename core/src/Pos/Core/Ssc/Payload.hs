@@ -4,31 +4,31 @@ module Pos.Core.Ssc.Payload
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Monad.Except
-    (MonadError)
+                       (MonadError)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.Buildable as Buildable
 import           Data.Text.Lazy.Builder
-    (Builder)
+                       (Builder)
 import           Formatting
-    (Format, bprint, int, (%))
+                       (Format, bprint, int, (%))
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core.Slotting
-    (EpochIndex)
+                       (EpochIndex)
 import           Pos.Crypto
-    (ProtocolMagic, shortHashF)
+                       (ProtocolMagic, shortHashF)
 
 import           Pos.Core.Ssc.CommitmentsMap
 import           Pos.Core.Ssc.OpeningsMap
 import           Pos.Core.Ssc.SharesMap
 import           Pos.Core.Ssc.VssCertificate
-    (VssCertificate (vcExpiryEpoch))
+                       (VssCertificate (vcExpiryEpoch))
 import           Pos.Core.Ssc.VssCertificatesMap
 
 -- | Payload included into blocks.

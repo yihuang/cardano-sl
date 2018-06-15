@@ -9,15 +9,15 @@ import           Universum
 import qualified Data.Text as T
 
 import           Pos.Util.Justify
-    (leftAlign)
+                       (leftAlign)
 
 import           Lang.Argument
-    (ArgCardinality (..), SomeArgCardinality (..), TypeName (..),
-    getParameters)
+                       (ArgCardinality (..), SomeArgCardinality (..),
+                       TypeName (..), getParameters)
 import           Lang.Command
-    (CommandProc (..), UnavailableCommand (..))
+                       (CommandProc (..), UnavailableCommand (..))
 import           Lang.Name
-    (Name)
+                       (Name)
 
 commandHelp :: CommandProc m -> Text
 commandHelp CommandProc{..} =

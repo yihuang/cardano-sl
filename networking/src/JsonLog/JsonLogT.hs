@@ -29,57 +29,57 @@ module JsonLog.JsonLogT
     ) where
 
 import           Control.Concurrent.MVar
-    (MVar, withMVar)
+                       (MVar, withMVar)
 import           Control.Monad.Base
-    (MonadBase)
+                       (MonadBase)
 import           Control.Monad.Fix
-    (MonadFix)
+                       (MonadFix)
 import           Control.Monad.IO.Class
-    (MonadIO (..))
+                       (MonadIO (..))
 import           Control.Monad.Morph
-    (MFunctor (..))
+                       (MFunctor (..))
 import           Control.Monad.Trans.Class
-    (MonadTrans)
+                       (MonadTrans)
 import           Control.Monad.Trans.Control
-    (MonadBaseControl (..))
+                       (MonadBaseControl (..))
 import           Control.Monad.Trans.Lift.Local
-    (LiftLocal)
+                       (LiftLocal)
 import           Control.Monad.Trans.Reader
-    (ReaderT (..))
+                       (ReaderT (..))
 import           Data.Aeson
-    (ToJSON, encode)
+                       (ToJSON, encode)
 import           Data.ByteString.Lazy
-    (hPut)
+                       (hPut)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Serokell.Util.Lens
-    (WrappedM (..))
+                       (WrappedM (..))
 import           System.IO
-    (Handle)
+                       (Handle)
 import           System.Wlog
-    (CanLog, HasLoggerName (..), WithLogger, logWarning)
+                       (CanLog, HasLoggerName (..), WithLogger, logWarning)
 import           Universum
 
 import           JsonLog.CanJsonLog
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           JsonLog.Event
-    (JLTimedEvent, timedIO, toEvent)
+                       (JLTimedEvent, timedIO, toEvent)
 import           Mockable.Channel
-    (Channel, ChannelT)
+                       (Channel, ChannelT)
 import           Mockable.Class
-    (Mockable (..))
+                       (Mockable (..))
 import           Mockable.Concurrent
-    (Async, Concurrently, Delay, Fork, Promise, ThreadId)
+                       (Async, Concurrently, Delay, Fork, Promise, ThreadId)
 import           Mockable.CurrentTime
-    (CurrentTime)
+                       (CurrentTime)
 import           Mockable.Instances
-    (liftMockableWrappedM)
+                       (liftMockableWrappedM)
 import           Mockable.Metrics
-    (Counter, Distribution, Gauge, Metrics)
+                       (Counter, Distribution, Gauge, Metrics)
 import           Mockable.SharedAtomic
-    (SharedAtomic, SharedAtomicT)
+                       (SharedAtomic, SharedAtomicT)
 import           Mockable.SharedExclusive
-    (SharedExclusive, SharedExclusiveT)
+                       (SharedExclusive, SharedExclusiveT)
 
 data JsonLogConfig
     = JsonLogDisabled

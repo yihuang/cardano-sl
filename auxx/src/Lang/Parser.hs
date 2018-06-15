@@ -8,26 +8,28 @@ module Lang.Parser
 import           Universum
 
 import           Control.Applicative.Combinators.NonEmpty
-    (sepBy1)
+                       (sepBy1)
 import           Control.Lens
-    (Getting)
+                       (Getting)
 import           Data.Loc
-    (Span)
+                       (Span)
 import           Data.Monoid
-    (First)
+                       (First)
 import           Text.Earley
-    (Grammar, Parser, Prod, Report, fullParses, parser, rule, terminal, (<?>))
+                       (Grammar, Parser, Prod, Report, fullParses, parser,
+                       rule, terminal, (<?>))
 
 import           Lang.Lexer
-    (BracketSide, Token, getFilePath', tokenize, _BracketSideClosing,
-    _BracketSideOpening, _TokenAddress, _TokenBlockVersion, _TokenFilePath,
-    _TokenHash, _TokenKey, _TokenName, _TokenNumber, _TokenParenthesis,
-    _TokenPublicKey, _TokenSemicolon, _TokenSoftwareVersion,
-    _TokenStakeholderId, _TokenString)
+                       (BracketSide, Token, getFilePath', tokenize,
+                       _BracketSideClosing, _BracketSideOpening, _TokenAddress,
+                       _TokenBlockVersion, _TokenFilePath, _TokenHash,
+                       _TokenKey, _TokenName, _TokenNumber, _TokenParenthesis,
+                       _TokenPublicKey, _TokenSemicolon, _TokenSoftwareVersion,
+                       _TokenStakeholderId, _TokenString)
 import           Lang.Name
-    (Name)
+                       (Name)
 import           Lang.Syntax
-    (Arg (..), Expr (..), Lit (..), ProcCall (..))
+                       (Arg (..), Expr (..), Lit (..), ProcCall (..))
 
 tok :: Getting (First a) Token a -> Prod r e (s, Token) a
 tok p = terminal (preview $ _2 . p)

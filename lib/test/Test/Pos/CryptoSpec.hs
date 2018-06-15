@@ -5,45 +5,45 @@ module Test.Pos.CryptoSpec
        ) where
 
 import           Crypto.Hash
-    (Blake2b_224, Blake2b_256)
+                       (Blake2b_224, Blake2b_256)
 import qualified Data.ByteString as BS
 import qualified Data.HashMap.Strict as HM
 import           Formatting
-    (sformat)
+                       (sformat)
 import           Prelude
-    ((!!))
+                       ((!!))
 import           Test.Hspec
-    (Expectation, Spec, describe, it, shouldBe)
+                       (Expectation, Spec, describe, it, shouldBe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, Property, ioProperty, property, vector, (===), (==>))
+                       (Arbitrary (..), Gen, Property, ioProperty, property,
+                       vector, (===), (==>))
 import           Test.QuickCheck.Monadic
-    (assert, monadicIO, run)
+                       (assert, monadicIO, run)
 import           Universum
 
 import           Pos.Binary
-    (AsBinary, Bi)
+                       (AsBinary, Bi)
 import           Pos.Communication.Limits
-    (mlAbstractHash, mlDecShare, mlEncShare, mlPublicKey, mlSecret,
-    mlSignature, mlVssPublicKey)
+                       (mlAbstractHash, mlDecShare, mlEncShare, mlPublicKey,
+                       mlSecret, mlSignature, mlVssPublicKey)
 import           Pos.Core
-    (HasConfiguration, protocolMagic)
+                       (HasConfiguration, protocolMagic)
 import qualified Pos.Crypto as Crypto
-import           Pos.SafeCopy
-    ()
-import           Pos.Ssc
-    ()
+import           Pos.SafeCopy ()
+import           Pos.Ssc ()
 
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 import           Test.Pos.Crypto.Arbitrary
-    (SharedSecrets (..))
+                       (SharedSecrets (..))
 
 import           Test.Pos.Binary.Helpers
-    (msgLenLimitedTest, safeCopyEncodeDecode, safeCopyTest, serDeserId)
+                       (msgLenLimitedTest, safeCopyEncodeDecode, safeCopyTest,
+                       serDeserId)
 import           Test.Pos.Util.QuickCheck.Property
-    (qcIsLeft, (.=.))
+                       (qcIsLeft, (.=.))
 
 
 

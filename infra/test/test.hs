@@ -1,11 +1,11 @@
 import           Prelude
-    (IO)
+                       (IO)
 
 import           Test.Hspec
-    (hspec)
+                       (hspec)
 
 import           Spec
-    (spec)
+                       (spec)
 
 main :: IO ()
 main =

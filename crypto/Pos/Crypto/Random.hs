@@ -10,16 +10,16 @@ module Pos.Crypto.Random
        ) where
 
 import           Crypto.Number.Basic
-    (numBytes)
+                       (numBytes)
 import           Crypto.Number.Serialize
-    (os2ip)
+                       (os2ip)
 import           Crypto.OpenSSL.Random
-    (randBytes)
+                       (randBytes)
 import           Crypto.Random
-    (ChaChaDRG, MonadPseudoRandom, MonadRandom, drgNewSeed, getRandomBytes,
-    seedFromInteger, withDRG)
+                       (ChaChaDRG, MonadPseudoRandom, MonadRandom, drgNewSeed,
+                       getRandomBytes, seedFromInteger, withDRG)
 import qualified Data.ByteArray as ByteArray
-    (convert)
+                       (convert)
 import           Universum
 
 -- | Generate a cryptographically random 'ByteString' of specific length.

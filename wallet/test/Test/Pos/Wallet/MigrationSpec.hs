@@ -13,36 +13,35 @@ module Test.Pos.Wallet.MigrationSpec (spec) where
 import           Universum
 
 import           Control.Arrow
-    ((***))
+                       ((***))
 import           Control.DeepSeq
-    (force)
+                       (force)
 import           Data.Default
-    (def)
+                       (def)
 import qualified Data.HashMap.Strict as HM
 import           Data.SafeCopy
 import           Test.Hspec
-    (Spec, describe, it, shouldNotBe)
+                       (Spec, describe, it, shouldNotBe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSize, prop)
+                       (modifyMaxSize, prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Property, oneof, (===))
+                       (Arbitrary (..), Property, oneof, (===))
 
-import           Pos.Arbitrary.Core
-    ()
+import           Pos.Arbitrary.Core ()
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId (..), Addr, CAccountMeta (..), CCoin (..), CHash (..), CId (..),
-    CProfile (..), CTxId (..), CTxMeta (..), CUpdateInfo (..),
-    CWAddressMeta (..), CWalletAssurance (..), CWalletMeta (..), Wal)
+                       (AccountId (..), Addr, CAccountMeta (..), CCoin (..),
+                       CHash (..), CId (..), CProfile (..), CTxId (..),
+                       CTxMeta (..), CUpdateInfo (..), CWAddressMeta (..),
+                       CWalletAssurance (..), CWalletMeta (..), Wal)
 import           Pos.Wallet.Web.ClientTypes.Functions
-    (addressToCId)
+                       (addressToCId)
 import           Pos.Wallet.Web.State.Acidic
-    (openState)
+                       (openState)
 import           Pos.Wallet.Web.State.State
-    (askWalletSnapshot)
+                       (askWalletSnapshot)
 import           Pos.Wallet.Web.State.Storage
 
-import           Test.Pos.Txp.Arbitrary
-    ()
+import           Test.Pos.Txp.Arbitrary ()
 
 --------------------------------------------------------------------------------
 -- Reverse migrations

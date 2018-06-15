@@ -19,23 +19,23 @@ module Pos.Ssc.Message
 import           Universum
 
 import           Control.Lens
-    (makePrisms)
+                       (makePrisms)
 import           Data.Tagged
-    (Tagged)
+                       (Tagged)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Node.Message.Class
-    (Message)
+                       (Message)
 
 import           Pos.Core
-    (StakeholderId, VssCertificate, addressHash, getCertId)
+                       (StakeholderId, VssCertificate, addressHash, getCertId)
 import           Pos.Core.Ssc
-    (InnerSharesMap, Opening, SignedCommitment)
+                       (InnerSharesMap, Opening, SignedCommitment)
 import           Pos.Infra.Communication.Types.Relay
-    (InvOrData, ReqMsg, ReqOrRes)
+                       (InvOrData, ReqMsg, ReqOrRes)
 import           Pos.Ssc.Toss.Types
-    (SscTag (..))
+                       (SscTag (..))
 
 class HasSscTag a where
     toSscTag :: a -> SscTag

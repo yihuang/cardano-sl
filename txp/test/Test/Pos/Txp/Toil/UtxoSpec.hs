@@ -5,59 +5,63 @@ module Test.Pos.Txp.Toil.UtxoSpec
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Monad.Except
-    (runExceptT)
+                       (runExceptT)
 import           Data.List.NonEmpty
-    (NonEmpty ((:|)))
+                       (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import qualified Data.Text.Buildable as B
 import qualified Data.Vector as V
-    (fromList)
+                       (fromList)
 import           Fmt
-    (blockListF', genericF, nameF, (+|), (|+))
+                       (blockListF', genericF, nameF, (+|), (|+))
 import           Serokell.Util
-    (allDistinct)
+                       (allDistinct)
 import           Test.Hspec
-    (Expectation, Spec, describe, expectationFailure, it)
+                       (Expectation, Spec, describe, expectationFailure, it)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Property, arbitrary, counterexample, (==>))
+                       (Property, arbitrary, counterexample, (==>))
 
 import           Pos.Core
-    (HasConfiguration, addressHash, checkPubKeyAddress,
-    defaultCoreConfiguration, makePubKeyAddressBoot, makeScriptAddress, mkCoin,
-    sumCoins, withGenesisSpec)
+                       (HasConfiguration, addressHash, checkPubKeyAddress,
+                       defaultCoreConfiguration, makePubKeyAddressBoot,
+                       makeScriptAddress, mkCoin, sumCoins, withGenesisSpec)
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxIn (..), TxInWitness (..), TxOut (..),
-    TxOutAux (..), TxSigData (..), TxWitness, isTxInUnknown)
+                       (Tx (..), TxAux (..), TxIn (..), TxInWitness (..),
+                       TxOut (..), TxOutAux (..), TxSigData (..), TxWitness,
+                       isTxInUnknown)
 import           Pos.Crypto
-    (SignTag (SignTx), checkSig, fakeSigner, hash, protocolMagic, toPublic,
-    unsafeHash, withHash)
+                       (SignTag (SignTx), checkSig, fakeSigner, hash,
+                       protocolMagic, toPublic, unsafeHash, withHash)
 import           Pos.Data.Attributes
-    (mkAttributes)
+                       (mkAttributes)
 import           Pos.Script
-    (PlutusError (..), Script)
+                       (PlutusError (..), Script)
 import           Pos.Script.Examples
-    (alwaysSuccessValidator, badIntRedeemer, goodIntRedeemer,
-    goodIntRedeemerWithBlah, goodStdlibRedeemer, idValidator, intValidator,
-    intValidatorWithBlah, multisigRedeemer, multisigValidator,
-    shaStressRedeemer, sigStressRedeemer, stdlibValidator)
+                       (alwaysSuccessValidator, badIntRedeemer,
+                       goodIntRedeemer, goodIntRedeemerWithBlah,
+                       goodStdlibRedeemer, idValidator, intValidator,
+                       intValidatorWithBlah, multisigRedeemer,
+                       multisigValidator, shaStressRedeemer, sigStressRedeemer,
+                       stdlibValidator)
 import           Pos.Txp
-    (ToilVerFailure (..), Utxo, VTxContext (..), VerifyTxUtxoRes,
-    WitnessVerFailure (..), applyTxToUtxo, evalUtxoM, execUtxoM, utxoGet,
-    utxoToLookup, verifyTxUtxo)
+                       (ToilVerFailure (..), Utxo, VTxContext (..),
+                       VerifyTxUtxoRes, WitnessVerFailure (..), applyTxToUtxo,
+                       evalUtxoM, execUtxoM, utxoGet, utxoToLookup,
+                       verifyTxUtxo)
 import qualified Pos.Util.Modifier as MM
 
 import           Test.Pos.Txp.Arbitrary
-    (BadSigsTx (..), DoubleInputTx (..), GoodTx (..))
+                       (BadSigsTx (..), DoubleInputTx (..), GoodTx (..))
 import           Test.Pos.Util.QuickCheck.Arbitrary
-    (SmallGenerator (..), nonrepeating, runGen)
+                       (SmallGenerator (..), nonrepeating, runGen)
 import           Test.Pos.Util.QuickCheck.Property
-    (qcIsLeft, qcIsRight)
+                       (qcIsLeft, qcIsRight)
 
 ----------------------------------------------------------------------------
 -- Spec

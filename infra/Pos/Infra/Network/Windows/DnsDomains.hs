@@ -7,9 +7,9 @@ module Pos.Network.Windows.DnsDomains
 import           Universum
 
 import           Foreign.C
-    (CString, peekCString)
+                       (CString, peekCString)
 import           Foreign.Marshal.Utils
-    (maybePeek)
+                       (maybePeek)
 
 
 -- | Returns @nullPtr@ on failure.

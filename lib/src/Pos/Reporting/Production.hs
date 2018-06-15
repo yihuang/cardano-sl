@@ -9,21 +9,21 @@ module Pos.Reporting.Production
 import           Universum
 
 import           Pos.Core
-    (ProtocolMagic)
+                       (ProtocolMagic)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Infra.Reporting
-    (Reporter (..))
+                       (Reporter (..))
 import           Pos.Infra.Reporting.Http
-    (reportNode)
+                       (reportNode)
 import           Pos.Infra.Reporting.NodeInfo
-    (extendWithNodeInfo)
+                       (extendWithNodeInfo)
 import           Pos.Infra.Reporting.Wlog
-    (LoggerConfig, withWlogTempFile)
+                       (LoggerConfig, withWlogTempFile)
 import           Pos.Util.CompileInfo
-    (CompileTimeInfo)
+                       (CompileTimeInfo)
 import           Pos.Util.Trace
-    (Severity, Trace)
+                       (Severity, Trace)
 
 data ProductionReporterParams = ProductionReporterParams
     { prpServers         :: ![Text]

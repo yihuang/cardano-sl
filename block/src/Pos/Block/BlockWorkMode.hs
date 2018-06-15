@@ -10,48 +10,50 @@ module Pos.Block.BlockWorkMode
 import           Universum
 
 import           Data.Default
-    (Default)
+                       (Default)
 import           Mockable
-    (Delay, Mockables, SharedAtomic)
+                       (Delay, Mockables, SharedAtomic)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Block.Configuration
-    (HasBlockConfiguration)
+                       (HasBlockConfiguration)
 import           Pos.Block.Lrc
-    (LrcModeFull)
+                       (LrcModeFull)
 import           Pos.Block.Network.Types
-    (MsgBlock, MsgGetBlocks, MsgGetHeaders, MsgHeaders)
+                       (MsgBlock, MsgGetBlocks, MsgGetHeaders, MsgHeaders)
 import           Pos.Block.RetrievalQueue
-    (BlockRetrievalQueue, BlockRetrievalQueueTag)
+                       (BlockRetrievalQueue, BlockRetrievalQueueTag)
 import           Pos.Block.Slog
-    (HasSlogContext)
+                       (HasSlogContext)
 import           Pos.Block.Types
-    (LastKnownHeader, LastKnownHeaderTag, RecoveryHeader, RecoveryHeaderTag)
+                       (LastKnownHeader, LastKnownHeaderTag, RecoveryHeader,
+                       RecoveryHeaderTag)
 import           Pos.Core.Context
-    (HasPrimaryKey)
+                       (HasPrimaryKey)
 import           Pos.Infra.Communication.Protocol
-    (Message)
+                       (Message)
 import           Pos.Infra.Recovery.Info
-    (MonadRecoveryInfo)
+                       (MonadRecoveryInfo)
 import           Pos.Infra.Shutdown.Class
-    (HasShutdownContext)
+                       (HasShutdownContext)
 import           Pos.Infra.StateLock
-    (StateLock, StateLockMetrics)
+                       (StateLock, StateLockMetrics)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason)
+                       (MemPoolModifyReason)
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog)
+                       (CanJsonLog)
 import           Pos.Security.Params
-    (SecurityParams)
+                       (SecurityParams)
 import           Pos.Txp
-    (GenericTxpLocalData, MempoolExt, MonadTxpLocal, TxpHolderTag)
+                       (GenericTxpLocalData, MempoolExt, MonadTxpLocal,
+                       TxpHolderTag)
 import           Pos.Update.Context
-    (UpdateContext)
+                       (UpdateContext)
 import           Pos.Util.Util
-    (HasLens, HasLens')
+                       (HasLens, HasLens')
 
 -- | These instances are implemented in @Pos.Binary.Communication@,
 -- @Pos.Communication.Message@ and @Pos.Communication.Limits@, which

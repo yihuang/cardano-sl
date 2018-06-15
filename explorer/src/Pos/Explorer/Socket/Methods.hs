@@ -54,66 +54,68 @@ module Pos.Explorer.Socket.Methods
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at, ix, lens, non, (.=), _Just)
+                       (at, ix, lens, non, (.=), _Just)
 import           Control.Monad.State
-    (MonadState)
+                       (MonadState)
 import           Data.Aeson
-    (ToJSON)
+                       (ToJSON)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Set as S
 import           Formatting
-    (sformat, shown, stext, (%))
+                       (sformat, shown, stext, (%))
 import           Network.EngineIO
-    (SocketId)
+                       (SocketId)
 import           Network.SocketIO
-    (Socket, socketId)
+                       (Socket, socketId)
 import qualified Pos.Block.Logic as DB
 import           Pos.Block.Types
-    (Blund)
+                       (Blund)
 import           Pos.Core
-    (Address, HeaderHash)
+                       (Address, HeaderHash)
 import           Pos.Core.Block
-    (Block, mainBlockTxPayload)
+                       (Block, mainBlockTxPayload)
 import           Pos.Core.Chrono
-    (getOldestFirst)
+                       (getOldestFirst)
 import           Pos.Core.Txp
-    (Tx (..), TxOut (..), TxOutAux (..), txOutAddress, txpTxs)
+                       (Tx (..), TxOut (..), TxOutAux (..), txOutAddress,
+                       txpTxs)
 import           Pos.Crypto
-    (hash, withHash)
+                       (hash, withHash)
 import           Pos.DB.Block
-    (getBlund)
+                       (getBlund)
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import           Pos.Explorer.Core
-    (TxExtra (..))
+                       (TxExtra (..))
 import qualified Pos.Explorer.DB as DB
 import qualified Pos.GState as DB
 import           Pos.Util
-    (maybeThrow)
+                       (maybeThrow)
 import           System.Wlog
-    (WithLogger, logDebug, logWarning, modifyLoggerName)
+                       (WithLogger, logDebug, logWarning, modifyLoggerName)
 
-import           Pos.Explorer.Aeson.ClientTypes
-    ()
+import           Pos.Explorer.Aeson.ClientTypes ()
 import           Pos.Explorer.ExplorerMode
-    (ExplorerMode)
+                       (ExplorerMode)
 import           Pos.Explorer.Socket.Holder
-    (ClientContext, ConnectionsState, ExplorerSocket (..), ExplorerSockets,
-    ccAddress, ccConnection, csAddressSubscribers, csBlocksPageSubscribers,
-    csClients, csEpochsLastPageSubscribers, csTxsSubscribers, mkClientContext,
-    _ProdSocket)
+                       (ClientContext, ConnectionsState, ExplorerSocket (..),
+                       ExplorerSockets, ccAddress, ccConnection,
+                       csAddressSubscribers, csBlocksPageSubscribers,
+                       csClients, csEpochsLastPageSubscribers,
+                       csTxsSubscribers, mkClientContext, _ProdSocket)
 import           Pos.Explorer.Socket.Util
-    (EventName (..), emitTo)
+                       (EventName (..), emitTo)
 import           Pos.Explorer.Web.ClientTypes
-    (CAddress, CTxBrief, CTxEntry (..), EpochIndex (..), TxInternal (..),
-    fromCAddress, toTxBrief)
+                       (CAddress, CTxBrief, CTxEntry (..), EpochIndex (..),
+                       TxInternal (..), fromCAddress, toTxBrief)
 import           Pos.Explorer.Web.Error
-    (ExplorerError (..))
+                       (ExplorerError (..))
 import           Pos.Explorer.Web.Server
-    (getBlocksLastPage, getEpochPage, getEpochPagesOrThrow, topsortTxsOrFail)
+                       (getBlocksLastPage, getEpochPage, getEpochPagesOrThrow,
+                       topsortTxsOrFail)
 
 
 -- * Event names

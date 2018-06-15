@@ -8,22 +8,23 @@ module Pos.Infra.Slotting.Impl.Util
 import           Universum
 
 import           Data.Time.Units
-    (Microsecond, convertUnit)
+                       (Microsecond, convertUnit)
 
 import           Pos.Core.Configuration
-    (HasProtocolConstants, epochSlots)
+                       (HasProtocolConstants, epochSlots)
 import           Pos.Core.Slotting
-    (EpochIndex, LocalSlotIndex, SlotId (..), Timestamp (..),
-    addTimeDiffToTimestamp, flattenEpochIndex, mkLocalSlotIndex,
-    unflattenSlotId)
+                       (EpochIndex, LocalSlotIndex, SlotId (..),
+                       Timestamp (..), addTimeDiffToTimestamp,
+                       flattenEpochIndex, mkLocalSlotIndex, unflattenSlotId)
 import           Pos.Util.Util
-    (leftToPanic)
+                       (leftToPanic)
 
 import           Pos.Infra.Slotting.MemState
-    (MonadSlotsData, getSystemStartM, withSlottingVarAtomM)
+                       (MonadSlotsData, getSystemStartM, withSlottingVarAtomM)
 import           Pos.Infra.Slotting.Types
-    (EpochSlottingData (..), SlottingData, getAllEpochIndices,
-    getCurrentEpochIndex, getNextEpochSlottingData, lookupEpochSlottingData)
+                       (EpochSlottingData (..), SlottingData,
+                       getAllEpochIndices, getCurrentEpochIndex,
+                       getNextEpochSlottingData, lookupEpochSlottingData)
 
 -- | Approximate current slot using outdated slotting data.
 approxSlotUsingOutdated

@@ -3,12 +3,12 @@ module Util.Safe
     ) where
 
 import           Pipes.Safe
-    (runSafeT)
+                       (runSafeT)
 import           Pipes.Safe.Prelude
-    (withFile)
+                       (withFile)
 
 import           Universum hiding
-    (withFile)
+                       (withFile)
 
 runWithFile :: (MonadIO m, MonadMask m) =>  FilePath -> IOMode -> (Handle -> m r) -> m r
 runWithFile fp mode f = runSafeT $ withFile fp mode $ lift . f

@@ -24,7 +24,7 @@ import qualified Wallet.Rollback.Basic as Roll
 import qualified Wallet.Rollback.Full as Full
 
 import           Pos.Core
-    (Coeff (..), TxSizeLinear (..))
+                       (Coeff (..), TxSizeLinear (..))
 
 {-------------------------------------------------------------------------------
   Pure wallet tests

@@ -72,15 +72,17 @@ module Pos.Wallet.Web.State.Acidic
 import           Universum
 
 import           Data.Acid
-    (EventResult, EventState, QueryEvent, UpdateEvent, makeAcidic)
+                       (EventResult, EventState, QueryEvent, UpdateEvent,
+                       makeAcidic)
 import           Data.Default
-    (def)
+                       (def)
 import           Serokell.AcidState.ExtendedState
-    (ExtendedState, closeExtendedState, openLocalExtendedState,
-    openMemoryExtendedState, queryExtended, tidyExtendedState, updateExtended)
+                       (ExtendedState, closeExtendedState,
+                       openLocalExtendedState, openMemoryExtendedState,
+                       queryExtended, tidyExtendedState, updateExtended)
 
 import           Pos.Wallet.Web.State.Storage
-    (WalletStorage)
+                       (WalletStorage)
 import           Pos.Wallet.Web.State.Storage as WS
 import           Pos.Wallet.Web.State.Transactions as WST
 

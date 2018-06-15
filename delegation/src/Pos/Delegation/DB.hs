@@ -47,36 +47,39 @@ module Pos.Delegation.DB
 import           Universum
 
 import           Control.Lens
-    (at, non)
+                       (at, non)
 import           Control.Monad.Trans.Resource
-    (ResourceT)
+                       (ResourceT)
 import           Data.Conduit
-    (ConduitT, mapOutput, runConduitRes, (.|))
+                       (ConduitT, mapOutput, runConduitRes, (.|))
 import qualified Data.Conduit.List as CL
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import qualified Database.RocksDB as Rocks
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Binary.Class
-    (serialize')
+                       (serialize')
 import           Pos.Core
-    (HasCoreConfiguration, ProxySKHeavy, StakeholderId, addressHash)
+                       (HasCoreConfiguration, ProxySKHeavy, StakeholderId,
+                       addressHash)
 import           Pos.Core.Genesis
-    (GenesisDelegation (..))
+                       (GenesisDelegation (..))
 import           Pos.Crypto
-    (ProxySecretKey (..), PublicKey)
+                       (ProxySecretKey (..), PublicKey)
 import           Pos.DB
-    (RocksBatchOp (..), dbSerializeValue, encodeWithKeyPrefix)
+                       (RocksBatchOp (..), dbSerializeValue,
+                       encodeWithKeyPrefix)
 import           Pos.DB.Class
-    (DBIteratorClass (..), DBTag (..), MonadDB, MonadDBRead (..))
+                       (DBIteratorClass (..), DBTag (..), MonadDB,
+                       MonadDBRead (..))
 import           Pos.DB.GState.Common
-    (gsGetBi, writeBatchGState)
+                       (gsGetBi, writeBatchGState)
 import           Pos.Delegation.Cede.Types
-    (DlgEdgeAction (..))
+                       (DlgEdgeAction (..))
 import           Pos.Delegation.Types
-    (isRevokePsk)
+                       (isRevokePsk)
 
 ----------------------------------------------------------------------------
 -- Getters/direct accessors

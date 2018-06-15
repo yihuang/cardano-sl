@@ -15,35 +15,34 @@ module Test.Pos.Binary.Cbor.CborSpec
 import           Universum
 
 import           Data.Bits
-    (shiftL)
+                       (shiftL)
 import qualified Data.ByteString as BS
 import           Data.Fixed
-    (Nano)
+                       (Nano)
 import           Data.Time.Units
-    (Microsecond, Millisecond)
+                       (Microsecond, Millisecond)
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 import           Test.Hspec
-    (Arg, Expectation, Spec, SpecWith, describe, it, shouldBe)
+                       (Arg, Expectation, Spec, SpecWith, describe, it,
+                       shouldBe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSize, modifyMaxSuccess, prop)
+                       (modifyMaxSize, modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Arbitrary (..), choose, oneof, sized, (===))
+                       (Arbitrary (..), choose, oneof, sized, (===))
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericShrink)
-import           Test.QuickCheck.Instances
-    ()
+                       (genericShrink)
+import           Test.QuickCheck.Instances ()
 
 import qualified Codec.CBOR.FlatTerm as CBOR
 
 import           Pos.Binary.Class
 import           Test.Pos.Binary.Helpers
-    (U, binaryTest, extensionProperty)
+                       (U, binaryTest, extensionProperty)
 import qualified Test.Pos.Cbor.RefImpl as R
-import           Test.Pos.Util.Orphans
-    ()
+import           Test.Pos.Util.Orphans ()
 import           Test.Pos.Util.QuickCheck.Property
-    (expectationError)
+                       (expectationError)
 
 -- | Wrapper for Integer with Arbitrary instance that can generate "proper" big
 -- integers, i.e. ones that don't fit in Int64. This really needs to be fixed

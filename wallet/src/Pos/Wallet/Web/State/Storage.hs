@@ -107,48 +107,50 @@ module Pos.Wallet.Web.State.Storage
 import           Universum
 
 import           Control.Arrow
-    ((***))
+                       ((***))
 import           Control.Lens
-    (at, has, ix, lens, makeClassy, makeLenses, non', to, toListOf, traversed,
-    (%=), (+=), (.=), (<<.=), (?=), _Empty, _Just, _head)
+                       (at, has, ix, lens, makeClassy, makeLenses, non', to,
+                       toListOf, traversed, (%=), (+=), (.=), (<<.=), (?=),
+                       _Empty, _Just, _head)
 import           Control.Monad.State.Class
-    (get, put)
+                       (get, put)
 import           Data.Default
-    (Default, def)
+                       (Default, def)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Map as M
 import           Data.SafeCopy
-    (Migrate (..), base, deriveSafeCopySimple, extension)
+                       (Migrate (..), base, deriveSafeCopySimple, extension)
 import qualified Data.Text.Buildable
 import           Data.Time.Clock.POSIX
-    (POSIXTime)
+                       (POSIXTime)
 import           Formatting
-    ((%))
+                       ((%))
 import qualified Formatting as F
 import           Pos.Client.Txp.History
-    (TxHistoryEntry, txHistoryListToMap)
+                       (TxHistoryEntry, txHistoryListToMap)
 import           Pos.Core
-    (Address, BlockCount (..), ChainDifficulty (..), HeaderHash,
-    ProtocolConstants (..), SlotId, Timestamp, VssMaxTTL (..), VssMinTTL (..))
+                       (Address, BlockCount (..), ChainDifficulty (..),
+                       HeaderHash, ProtocolConstants (..), SlotId, Timestamp,
+                       VssMaxTTL (..), VssMinTTL (..))
 import           Pos.Core.Txp
-    (TxAux, TxId)
-import           Pos.SafeCopy
-    ()
+                       (TxAux, TxId)
+import           Pos.SafeCopy ()
 import           Pos.Txp
-    (AddrCoinMap, Utxo, UtxoModifier, applyUtxoModToAddrCoinMap,
-    utxoToAddressCoinMap)
+                       (AddrCoinMap, Utxo, UtxoModifier,
+                       applyUtxoModToAddrCoinMap, utxoToAddressCoinMap)
 import           Pos.Util.BackupPhrase
-    (BackupPhrase)
+                       (BackupPhrase)
 import qualified Pos.Util.Modifier as MM
 import qualified Pos.Wallet.Web.ClientTypes as WebTypes
 import           Pos.Wallet.Web.Pending.Types
-    (PendingTx (..), PtxCondition, PtxSubmitTiming (..), ptxCond,
-    ptxSubmitTiming, _PtxCreating)
+                       (PendingTx (..), PtxCondition, PtxSubmitTiming (..),
+                       ptxCond, ptxSubmitTiming, _PtxCreating)
 import           Pos.Wallet.Web.Pending.Util
-    (cancelApplyingPtx, incPtxSubmitTimingPure, mkPtxSubmitTiming,
-    ptxMarkAcknowledgedPure, resetFailedPtx)
+                       (cancelApplyingPtx, incPtxSubmitTimingPure,
+                       mkPtxSubmitTiming, ptxMarkAcknowledgedPure,
+                       resetFailedPtx)
 import           Serokell.Util
-    (zoom')
+                       (zoom')
 
 -- | Type alias for indices which are used to maintain order
 -- in which addresses were created.

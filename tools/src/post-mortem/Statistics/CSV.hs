@@ -4,17 +4,17 @@ module Statistics.CSV
     ) where
 
 import           Control.Monad.Random
-    (MonadRandom (..), evalRandT)
+                       (MonadRandom (..), evalRandT)
 import qualified Data.Text as T
 import           System.IO
-    (hPutStrLn)
+                       (hPutStrLn)
 import           System.Random
-    (mkStdGen)
+                       (mkStdGen)
 
 import           Pos.Infra.Util.JsonLog.Events
-    (JLMemPool (..), MemPoolModifyReason (..))
+                       (JLMemPool (..), MemPoolModifyReason (..))
 import           Statistics.Focus
-    (Focus (..))
+                       (Focus (..))
 import           Types
 import           Universum
 

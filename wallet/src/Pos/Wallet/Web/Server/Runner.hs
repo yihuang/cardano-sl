@@ -18,54 +18,55 @@ import           Universum
 
 import qualified Control.Exception.Safe as E
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Control.Monad.Reader as Mtl
 import           Mockable
-    (Production (..), runProduction)
+                       (Production (..), runProduction)
 import           Network.Wai
-    (Application)
+                       (Application)
 import           Ntp.Client
-    (NtpStatus)
+                       (NtpStatus)
 import           Servant.Server
-    (Handler)
+                       (Handler)
 import           System.Wlog
-    (logInfo, usingLoggerName)
+                       (logInfo, usingLoggerName)
 
 import           Cardano.NodeIPC
-    (startNodeJsIPC)
+                       (startNodeJsIPC)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion, hoistDiffusion)
+                       (Diffusion, hoistDiffusion)
 import           Pos.Infra.Shutdown.Class
-    (HasShutdownContext (shutdownContext))
+                       (HasShutdownContext (shutdownContext))
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress)
+                       (NetworkAddress)
 import           Pos.Launcher.Configuration
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Launcher.Resource
-    (NodeResources (..))
+                       (NodeResources (..))
 import           Pos.Launcher.Runner
-    (runRealMode)
+                       (runRealMode)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo)
+                       (HasCompileInfo)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 import           Pos.Wallet.WalletMode
-    (WalletMempoolExt)
+                       (WalletMempoolExt)
 import           Pos.Wallet.Web.Methods
-    (addInitialRichAccount)
+                       (addInitialRichAccount)
 import           Pos.Wallet.Web.Mode
-    (WalletWebMode, WalletWebModeContext (..), WalletWebModeContextTag,
-    realModeToWalletWebMode, walletWebModeToRealMode)
+                       (WalletWebMode, WalletWebModeContext (..),
+                       WalletWebModeContextTag, realModeToWalletWebMode,
+                       walletWebModeToRealMode)
 import           Pos.Wallet.Web.Server.Launcher
-    (walletApplication, walletServeImpl, walletServer)
+                       (walletApplication, walletServeImpl, walletServer)
 import           Pos.Wallet.Web.Sockets
-    (ConnectionsVar, launchNotifier)
+                       (ConnectionsVar, launchNotifier)
 import           Pos.Wallet.Web.State
-    (WalletDB)
+                       (WalletDB)
 import           Pos.Wallet.Web.Tracking.Types
-    (SyncQueue)
+                       (SyncQueue)
 import           Pos.Web
-    (TlsParams)
+                       (TlsParams)
 
 -- | 'WalletWebMode' runner.
 runWRealMode

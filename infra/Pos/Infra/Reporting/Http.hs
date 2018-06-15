@@ -9,42 +9,41 @@ module Pos.Infra.Reporting.Http
 import           Universum
 
 import           Control.Exception
-    (Exception (..))
+                       (Exception (..))
 import           Control.Exception.Safe
-    (catchAny, try)
+                       (catchAny, try)
 import           Data.Aeson
-    (encode)
+                       (encode)
 import qualified Data.List.NonEmpty as NE
 import           Data.Time.Clock
-    (getCurrentTime)
+                       (getCurrentTime)
 import           Formatting
-    (sformat, shown, string, (%))
+                       (sformat, shown, string, (%))
 import           Network.HTTP.Client
-    (httpLbs, newManager, parseUrlThrow)
+                       (httpLbs, newManager, parseUrlThrow)
 import qualified Network.HTTP.Client.MultipartFormData as Form
 import           Network.HTTP.Client.TLS
-    (tlsManagerSettings)
+                       (tlsManagerSettings)
 import           Pos.ReportServer.Report
-    (ReportInfo (..), ReportType (..))
+                       (ReportInfo (..), ReportType (..))
 import           System.FilePath
-    (takeFileName)
+                       (takeFileName)
 import           System.Info
-    (arch, os)
+                       (arch, os)
 
 import           Paths_cardano_sl_infra
-    (version)
+                       (version)
 import           Pos.Crypto
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 import           Pos.Infra.Reporting.Exceptions
-    (ReportingError (..))
-import           Pos.Infra.Reporting.MemState
-    ()
+                       (ReportingError (..))
+import           Pos.Infra.Reporting.MemState ()
 import           Pos.Util.CompileInfo
-    (CompileTimeInfo)
+                       (CompileTimeInfo)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 import           Pos.Util.Util
-    ((<//>))
+                       ((<//>))
 
 
 -- | Given optional log file and report type, sends reports to URI

@@ -5,9 +5,9 @@ module Pos.Lrc.RichmenComponent
 import           Universum
 
 import           Pos.Core.Common
-    (CoinPortion)
+                       (CoinPortion)
 import           Pos.Lrc.Types
-    (FullRichmenData)
+                       (FullRichmenData)
 
 data RichmenComponent richmenData = RichmenComponent
     { rcToData            :: FullRichmenData -> richmenData

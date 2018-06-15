@@ -5,7 +5,7 @@ module UTxO.Bootstrap (
   ) where
 
 import           Data.Bifunctor
-    (bimap)
+                       (bimap)
 import qualified Data.Set as Set
 import           Universum
 

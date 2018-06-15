@@ -31,90 +31,97 @@ module Pos.Explorer.Web.Server
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at)
+                       (at)
 import qualified Data.ByteString as BS
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe
-    (fromMaybe)
+                       (fromMaybe)
 import qualified Data.Vector as V
 import           Formatting
-    (build, int, sformat, (%))
+                       (build, int, sformat, (%))
 import           Network.Wai
-    (Application)
+                       (Application)
 import           Network.Wai.Middleware.RequestLogger
-    (logStdoutDev)
+                       (logStdoutDev)
 
 import qualified Serokell.Util.Base64 as B64
 import           Servant.Generic
-    (AsServerT, toServant)
+                       (AsServerT, toServant)
 import           Servant.Server
-    (Server, ServerT, serve)
+                       (Server, ServerT, serve)
 import           System.Wlog
-    (logDebug)
+                       (logDebug)
 
 import           Pos.Crypto
-    (WithHash (..), hash, redeemPkBuild, withHash)
+                       (WithHash (..), hash, redeemPkBuild, withHash)
 
 import           Pos.DB.Block
-    (getBlund)
+                       (getBlund)
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Block.Types
-    (Blund, Undo)
+                       (Blund, Undo)
 import           Pos.Core
-    (AddrType (..), Address (..), Coin, EpochIndex, HeaderHash, Timestamp,
-    coinToInteger, difficultyL, gbHeader, gbhConsensus, getChainDifficulty,
-    isUnknownAddressType, makeRedeemAddress, siEpoch, siSlot, sumCoins,
-    timestampToPosix, unsafeAddCoin, unsafeIntegerToCoin, unsafeSubCoin)
+                       (AddrType (..), Address (..), Coin, EpochIndex,
+                       HeaderHash, Timestamp, coinToInteger, difficultyL,
+                       gbHeader, gbhConsensus, getChainDifficulty,
+                       isUnknownAddressType, makeRedeemAddress, siEpoch,
+                       siSlot, sumCoins, timestampToPosix, unsafeAddCoin,
+                       unsafeIntegerToCoin, unsafeSubCoin)
 import           Pos.Core.Block
-    (Block, MainBlock, mainBlockSlot, mainBlockTxPayload, mcdSlot)
+                       (Block, MainBlock, mainBlockSlot, mainBlockTxPayload,
+                       mcdSlot)
 import           Pos.Core.Chrono
-    (NewestFirst (..))
+                       (NewestFirst (..))
 import           Pos.Core.Txp
-    (Tx (..), TxAux, TxId, TxOutAux (..), taTx, txOutValue, txpTxs, _txOutputs)
+                       (Tx (..), TxAux, TxId, TxOutAux (..), taTx, txOutValue,
+                       txpTxs, _txOutputs)
 import           Pos.Infra.Slotting
-    (MonadSlots (..), getSlotStart)
+                       (MonadSlots (..), getSlotStart)
 import           Pos.Txp
-    (MonadTxpMem, TxMap, getLocalTxs, getMemPool, mpLocalTxs, topsortTxs,
-    withTxpLocalData)
+                       (MonadTxpMem, TxMap, getLocalTxs, getMemPool,
+                       mpLocalTxs, topsortTxs, withTxpLocalData)
 import           Pos.Util
-    (divRoundUp, maybeThrow)
+                       (divRoundUp, maybeThrow)
 import           Pos.Web
-    (serveImpl)
+                       (serveImpl)
 
-import           Pos.Explorer.Aeson.ClientTypes
-    ()
+import           Pos.Explorer.Aeson.ClientTypes ()
 import           Pos.Explorer.Core
-    (TxExtra (..))
+                       (TxExtra (..))
 import           Pos.Explorer.DB
-    (Page, defaultPageSize, getAddrBalance, getAddrHistory,
-    getLastTransactions, getTxExtra, getUtxoSum)
+                       (Page, defaultPageSize, getAddrBalance, getAddrHistory,
+                       getLastTransactions, getTxExtra, getUtxoSum)
 import           Pos.Explorer.ExplorerMode
-    (ExplorerMode)
+                       (ExplorerMode)
 import           Pos.Explorer.ExtraContext
-    (HasExplorerCSLInterface (..), HasGenesisRedeemAddressInfo (..))
+                       (HasExplorerCSLInterface (..),
+                       HasGenesisRedeemAddressInfo (..))
 import           Pos.Explorer.Web.Api
-    (ExplorerApi, ExplorerApiRecord (..), explorerApi)
+                       (ExplorerApi, ExplorerApiRecord (..), explorerApi)
 import           Pos.Explorer.Web.ClientTypes
-    (Byte, CAda (..), CAddress (..), CAddressSummary (..), CAddressType (..),
-    CAddressesFilter (..), CBlockEntry (..), CBlockSummary (..),
-    CGenesisAddressInfo (..), CGenesisSummary (..), CHash, CTxBrief (..),
-    CTxEntry (..), CTxId (..), CTxSummary (..), TxInternal (..),
-    convertTxOutputs, convertTxOutputsMB, fromCAddress, fromCHash, fromCTxId,
-    getEpochIndex, getSlotIndex, mkCCoin, mkCCoinMB, tiToTxEntry, toBlockEntry,
-    toBlockSummary, toCAddress, toCHash, toCTxId, toTxBrief)
+                       (Byte, CAda (..), CAddress (..), CAddressSummary (..),
+                       CAddressType (..), CAddressesFilter (..),
+                       CBlockEntry (..), CBlockSummary (..),
+                       CGenesisAddressInfo (..), CGenesisSummary (..), CHash,
+                       CTxBrief (..), CTxEntry (..), CTxId (..),
+                       CTxSummary (..), TxInternal (..), convertTxOutputs,
+                       convertTxOutputsMB, fromCAddress, fromCHash, fromCTxId,
+                       getEpochIndex, getSlotIndex, mkCCoin, mkCCoinMB,
+                       tiToTxEntry, toBlockEntry, toBlockSummary, toCAddress,
+                       toCHash, toCTxId, toTxBrief)
 import           Pos.Explorer.Web.Error
-    (ExplorerError (..))
+                       (ExplorerError (..))
 
 
 

@@ -14,12 +14,13 @@ import           Universum
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, sformat, stext, (%))
+                       (bprint, build, sformat, stext, (%))
 import           System.Wlog
-    (WithLogger, logDebug)
+                       (WithLogger, logDebug)
 
 import           Pos.Core
-    (HasProtocolConstants, SlotCount, SlotId, slotIdF, slotSecurityParam)
+                       (HasProtocolConstants, SlotCount, SlotId, slotIdF,
+                       slotSecurityParam)
 
 -- | An algebraic data type which represents how well we are
 -- synchronized with the network.

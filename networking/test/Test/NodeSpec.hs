@@ -13,48 +13,50 @@ module Test.NodeSpec
 
 
 import           Control.Concurrent.Async
-    (wait, withAsync)
+                       (wait, withAsync)
 import           Control.Concurrent.MVar
-    (newEmptyMVar, putMVar, readMVar, takeMVar)
+                       (newEmptyMVar, putMVar, readMVar, takeMVar)
 import           Control.Concurrent.STM.TVar
-    (TVar, newTVarIO)
+                       (TVar, newTVarIO)
 import           Control.Exception
-    (catch, throwIO)
+                       (catch, throwIO)
 import           Control.Lens
-    (sans, (%=), (&~), (.=))
+                       (sans, (%=), (&~), (.=))
 import           Control.Monad
-    (forM_, unless, when)
+                       (forM_, unless, when)
 import           Control.Monad.IO.Class
-    (liftIO)
+                       (liftIO)
 import qualified Data.Set as S
 import           Network.QDisc.Fair
-    (fairQDisc)
+                       (fairQDisc)
 import qualified Network.Transport as NT
-    (Transport, address, closeEndPoint, closeTransport, newEndPoint, receive)
+                       (Transport, address, closeEndPoint, closeTransport,
+                       newEndPoint, receive)
 import           Network.Transport.TCP
-    (simpleOnePlaceQDisc, simpleUnboundedQDisc)
+                       (simpleOnePlaceQDisc, simpleUnboundedQDisc)
 import           System.Random
-    (newStdGen)
+                       (newStdGen)
 import           Test.Hspec
-    (Spec, afterAll_, describe, runIO)
+                       (Spec, afterAll_, describe, runIO)
 import           Test.Hspec.Core.Spec
-    (SpecM)
+                       (SpecM)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Property, ioProperty)
+                       (Property, ioProperty)
 import           Test.QuickCheck.Modifiers
-    (NonEmptyList (..), getNonEmpty)
+                       (NonEmptyList (..), getNonEmpty)
 
 import           Node
 import           Node.Message.Binary
-    (binaryPacking)
+                       (binaryPacking)
 import           Pos.Util.Trace
-    (wlogTrace)
+                       (wlogTrace)
 import           Test.Util
-    (HeavyParcel (..), Parcel (..), Payload (..), TestState, deliveryTest,
-    expected, makeInMemoryTransport, makeTCPTransport, mkTestState,
-    modifyTestState, receiveAll, sendAll, timeout)
+                       (HeavyParcel (..), Parcel (..), Payload (..), TestState,
+                       deliveryTest, expected, makeInMemoryTransport,
+                       makeTCPTransport, mkTestState, modifyTestState,
+                       receiveAll, sendAll, timeout)
 
 spec :: Spec
 spec = describe "Node" $ modifyMaxSuccess (const 50) $ do

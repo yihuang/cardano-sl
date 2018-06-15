@@ -8,39 +8,37 @@ module Pos.Diffusion.Full.Txp
        ) where
 
 import           Data.Tagged
-    (Tagged)
+                       (Tagged)
 import qualified Network.Broadcast.OutboundQueue as OQ
 import           Universum
 
-import           Pos.Binary.Communication
-    ()
-import           Pos.Binary.Core
-    ()
-import           Pos.Binary.Txp
-    ()
+import           Pos.Binary.Communication ()
+import           Pos.Binary.Core ()
+import           Pos.Binary.Txp ()
 import           Pos.Communication.Limits
-    (mlTxMsgContents)
-import           Pos.Communication.Message
-    ()
+                       (mlTxMsgContents)
+import           Pos.Communication.Message ()
 import           Pos.Core.Txp
-    (TxAux (..), TxId)
+                       (TxAux (..), TxId)
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import           Pos.Infra.Communication.Protocol
-    (EnqueueMsg, MkListeners, MsgType (..), NodeId, Origin (..), OutSpecs)
+                       (EnqueueMsg, MkListeners, MsgType (..), NodeId,
+                       Origin (..), OutSpecs)
 import           Pos.Infra.Communication.Relay
-    (InvReqDataParams (..), MempoolParams (..), Relay (..), invReqDataFlowTK,
-    invReqMsgType, relayListeners, relayPropagateOut, resOk)
+                       (InvReqDataParams (..), MempoolParams (..), Relay (..),
+                       invReqDataFlowTK, invReqMsgType, relayListeners,
+                       relayPropagateOut, resOk)
 import           Pos.Infra.Network.Types
-    (Bucket)
+                       (Bucket)
 import           Pos.Logic.Types
-    (Logic (..))
+                       (Logic (..))
 import qualified Pos.Logic.Types as KV
-    (KeyVal (..))
+                       (KeyVal (..))
 import           Pos.Txp.Network.Types
-    (TxMsgContents (..))
+                       (TxMsgContents (..))
 import           Pos.Util.Trace
-    (Severity, Trace)
+                       (Severity, Trace)
 
 -- | Send Tx to given addresses.
 -- Returns 'True' if any peer accepted and applied this transaction.

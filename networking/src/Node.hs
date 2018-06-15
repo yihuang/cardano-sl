@@ -54,35 +54,37 @@ module Node (
 
 import           Control.Concurrent.STM
 import           Control.Exception
-    (Exception (..), SomeException, catch, mask, throwIO)
+                       (Exception (..), SomeException, catch, mask, throwIO)
 import           Control.Monad
-    (unless, when)
+                       (unless, when)
 import qualified Data.ByteString as BS
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as M
 import           Data.Proxy
-    (Proxy (..))
+                       (Proxy (..))
 import qualified Data.Text as T
 import           Data.Typeable
-    (Typeable)
+                       (Typeable)
 import           Data.Word
-    (Word32)
+                       (Word32)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import qualified Network.Transport as NT
 import           Node.Conversation
 import           Node.Internal
-    (ChannelIn, ChannelOut)
+                       (ChannelIn, ChannelOut)
 import qualified Node.Internal as LL
 import           Node.Message.Class
-    (Message (..), MessageCode, Packing, Serializable (..), pack, unpack)
+                       (Message (..), MessageCode, Packing, Serializable (..),
+                       pack, unpack)
 import           Node.Message.Decoder
-    (ByteOffset, Decoder (..), DecoderStep (..), continueDecoding)
+                       (ByteOffset, Decoder (..), DecoderStep (..),
+                       continueDecoding)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 import           System.Random
-    (StdGen)
+                       (StdGen)
 
 
 data Node = Node {

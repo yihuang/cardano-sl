@@ -27,23 +27,23 @@ import           Universum
 import qualified Database.RocksDB as Rocks
 
 import           Pos.Binary.Class
-    (Bi)
-import           Pos.Binary.Core
-    ()
+                       (Bi)
+import           Pos.Binary.Core ()
 import           Pos.Core.Configuration
-    (HasCoreConfiguration)
+                       (HasCoreConfiguration)
 import           Pos.Core.Slotting
-    (EpochIndex)
+                       (EpochIndex)
 import           Pos.DB
-    (dbSerializeValue)
+                       (dbSerializeValue)
 import           Pos.DB.Class
-    (DBTag (LrcDB), MonadDB (dbDelete, dbWriteBatch), MonadDBRead (dbGet))
+                       (DBTag (LrcDB), MonadDB (dbDelete, dbWriteBatch),
+                       MonadDBRead (dbGet))
 import           Pos.DB.Error
-    (DBError (DBMalformed))
+                       (DBError (DBMalformed))
 import           Pos.DB.Functions
-    (dbGetBi, dbPutBi)
+                       (dbGetBi, dbPutBi)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 ----------------------------------------------------------------------------
 -- Common Helpers

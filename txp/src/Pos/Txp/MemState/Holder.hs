@@ -10,14 +10,14 @@ module Pos.Txp.MemState.Holder
 import           Universum
 
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import           Pos.DB.GState.Common
-    (getTip)
+                       (getTip)
 import           Pos.Txp.MemState.Types
-    (GenericTxpLocalData (..))
+                       (GenericTxpLocalData (..))
 
 ----------------------------------------------------------------------------
 -- Holder

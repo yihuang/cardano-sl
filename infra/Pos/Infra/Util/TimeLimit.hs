@@ -18,18 +18,18 @@ module Pos.Infra.Util.TimeLimit
 import           Universum
 
 import           Data.Time.Units
-    (Microsecond, Second, convertUnit)
+                       (Microsecond, Second, convertUnit)
 import           Formatting
-    (sformat, shown, stext, (%))
+                       (sformat, shown, stext, (%))
 import           Mockable
-    (Async, Delay, Mockable, delay, withAsyncWithUnmask)
+                       (Async, Delay, Mockable, delay, withAsyncWithUnmask)
 import           System.Wlog
-    (WithLogger, logWarning)
+                       (WithLogger, logWarning)
 
 import           Pos.Crypto.Random
-    (randomNumber)
+                       (randomNumber)
 import           Pos.Infra.Util.LogSafe
-    (logWarningS)
+                       (logWarningS)
 
 -- | Data type to represent waiting strategy for printing warnings
 -- if action take too much time.

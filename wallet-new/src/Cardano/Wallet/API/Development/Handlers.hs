@@ -5,7 +5,7 @@ module Cardano.Wallet.API.Development.Handlers
 import           Universum
 
 import           Cardano.Wallet.Server.CLI
-    (RunMode (..))
+                       (RunMode (..))
 
 import           Servant
 

@@ -9,16 +9,17 @@ import           Universum
 
 import           Network.Kademlia as K
 import           Network.Kademlia.HashNodeId
-    (HashId (..))
+                       (HashId (..))
 import           Network.Kademlia.Instance
-    (BanState)
+                       (BanState)
 import           Network.Kademlia.Tree as K
 import           Network.Kademlia.Types as K
 
 import           Pos.Binary.Class
-    (Bi (..), encodeListLen, enforceSize, genericDecode, genericEncode)
+                       (Bi (..), encodeListLen, enforceSize, genericDecode,
+                       genericEncode)
 import           Pos.Infra.DHT.Model.Types
-    (DHTData (..), DHTKey (..))
+                       (DHTData (..), DHTKey (..))
 
 instance Bi DHTKey where
     encode (DHTKey (HashId bs)) = encode bs

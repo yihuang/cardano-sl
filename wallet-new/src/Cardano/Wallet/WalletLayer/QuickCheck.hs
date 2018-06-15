@@ -8,14 +8,13 @@ module Cardano.Wallet.WalletLayer.QuickCheck
 import           Universum
 
 import           Cardano.Wallet.Kernel.Diffusion
-    (WalletDiffusion (..))
-import           Cardano.Wallet.Orphans.Arbitrary
-    ()
+                       (WalletDiffusion (..))
+import           Cardano.Wallet.Orphans.Arbitrary ()
 import           Cardano.Wallet.WalletLayer.Types
-    (ActiveWalletLayer (..), PassiveWalletLayer (..))
+                       (ActiveWalletLayer (..), PassiveWalletLayer (..))
 
 import           Test.QuickCheck
-    (Arbitrary, arbitrary, generate)
+                       (Arbitrary, arbitrary, generate)
 
 -- | Initialize the passive wallet.
 -- The passive wallet cannot send new transactions.

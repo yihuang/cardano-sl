@@ -22,45 +22,45 @@ module Pos.Lrc.DB.Richmen
 import           Universum
 
 import           Data.Conduit
-    (runConduitPure, (.|))
+                       (runConduitPure, (.|))
 import qualified Data.Conduit.List as CL
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 
 import           Pos.Binary.Class
-    (Bi)
-import           Pos.Binary.Core
-    ()
+                       (Bi)
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (Coin, CoinPortion, ProxySKHeavy, StakeholderId, addressHash,
-    applyCoinPortionUp, gdHeavyDelegation, genesisData, sumCoins,
-    unGenesisDelegation, unsafeIntegerToCoin)
+                       (Coin, CoinPortion, ProxySKHeavy, StakeholderId,
+                       addressHash, applyCoinPortionUp, gdHeavyDelegation,
+                       genesisData, sumCoins, unGenesisDelegation,
+                       unsafeIntegerToCoin)
 import           Pos.Crypto
-    (pskDelegatePk)
+                       (pskDelegatePk)
 import           Pos.DB.Class
-    (MonadDB)
+                       (MonadDB)
 import           Pos.Lrc.Consumer.Delegation
-    (tryGetDlgRichmen)
+                       (tryGetDlgRichmen)
 import qualified Pos.Lrc.Consumer.Delegation as Dlg
-    (richmenComponent)
+                       (richmenComponent)
 import           Pos.Lrc.Consumer.Ssc
-    (tryGetSscRichmen)
+                       (tryGetSscRichmen)
 import qualified Pos.Lrc.Consumer.Ssc as Ssc
-    (richmenComponent)
+                       (richmenComponent)
 import           Pos.Lrc.Consumer.Update
-    (tryGetUSRichmen)
+                       (tryGetUSRichmen)
 import qualified Pos.Lrc.Consumer.Update as Update
-    (richmenComponent)
+                       (richmenComponent)
 import           Pos.Lrc.Core
-    (findDelegationStakes, findRichmenStakes)
+                       (findDelegationStakes, findRichmenStakes)
 import           Pos.Lrc.DB.RichmenBase
-    (getRichmen, putRichmen)
+                       (getRichmen, putRichmen)
 import           Pos.Lrc.RichmenComponent
-    (RichmenComponent (..))
+                       (RichmenComponent (..))
 import           Pos.Lrc.Types
-    (FullRichmenData)
+                       (FullRichmenData)
 import           Pos.Txp.GenesisUtxo
-    (genesisStakes)
+                       (genesisStakes)
 
 ----------------------------------------------------------------------------
 -- Initialization

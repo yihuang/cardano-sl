@@ -65,36 +65,36 @@ module Pos.Infra.Util.LogSafe
 import           Universum
 
 import           Control.Monad.Trans
-    (MonadTrans)
+                       (MonadTrans)
 import           Data.Foldable
-    (Foldable, length, null)
+                       (Foldable, length, null)
 import           Data.List
-    (isSuffixOf)
+                       (isSuffixOf)
 import           Data.Reflection
-    (Reifies (..), reify)
+                       (Reifies (..), reify)
 import qualified Data.Text.Buildable
 import           Data.Text.Lazy.Builder
-    (Builder)
+                       (Builder)
 import           Formatting
-    (bprint, build, fconst, later, mapf, (%))
+                       (bprint, build, fconst, later, mapf, (%))
 import           Formatting.Internal
-    (Format (..))
+                       (Format (..))
 import qualified Language.Haskell.TH as TH
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 import           System.Wlog
-    (CanLog (..), HasLoggerName (..), Severity (..), logMCond)
+                       (CanLog (..), HasLoggerName (..), Severity (..),
+                       logMCond)
 import           System.Wlog.LogHandler
-    (LogHandlerTag (HandlerFilelike))
+                       (LogHandlerTag (HandlerFilelike))
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (Timestamp, TxId)
+                       (Timestamp, TxId)
 import           Pos.Core.Common
-    (Address, Coin)
+                       (Address, Coin)
 import           Pos.Crypto
-    (PassPhrase)
+                       (PassPhrase)
 
 ----------------------------------------------------------------------------
 -- Logging

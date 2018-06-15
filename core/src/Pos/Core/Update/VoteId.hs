@@ -9,15 +9,15 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 
 import           Pos.Crypto
-    (PublicKey)
+                       (PublicKey)
 
 import           Pos.Core.Update.Proposal
-    (UpId)
+                       (UpId)
 import           Pos.Core.Update.Vote
-    (UpdateVote (..))
+                       (UpdateVote (..))
 
 type VoteId = (UpId, PublicKey, Bool)
 

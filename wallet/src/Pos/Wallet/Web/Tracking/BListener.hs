@@ -14,58 +14,62 @@ module Pos.Wallet.Web.Tracking.BListener
 import           Universum
 
 import           Control.Lens
-    (to)
+                       (to)
 import qualified Data.List.NonEmpty as NE
 import           Data.Time.Units
-    (convertUnit)
+                       (convertUnit)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           System.Wlog
-    (HasLoggerName (modifyLoggerName), WithLogger)
+                       (HasLoggerName (modifyLoggerName), WithLogger)
 
 import           Pos.Block.BListener
-    (MonadBListener (..))
+                       (MonadBListener (..))
 import           Pos.Block.Types
-    (Blund, undoTx)
+                       (Blund, undoTx)
 import           Pos.Core
-    (HeaderHash, Timestamp, difficultyL, headerSlotL, prevBlockL)
+                       (HeaderHash, Timestamp, difficultyL, headerSlotL,
+                       prevBlockL)
 import           Pos.Core.Block
-    (BlockHeader (..), blockHeader, getBlockHeader, mainBlockTxPayload)
+                       (BlockHeader (..), blockHeader, getBlockHeader,
+                       mainBlockTxPayload)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..))
+                       (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.Core.Txp
-    (TxAux (..), TxUndo)
+                       (TxAux (..), TxUndo)
 import           Pos.DB.BatchOp
-    (SomeBatchOp)
+                       (SomeBatchOp)
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import qualified Pos.GState as GS
 import           Pos.Infra.Reporting
-    (MonadReporting, reportOrLogE)
+                       (MonadReporting, reportOrLogE)
 import           Pos.Infra.Slotting
-    (MonadSlots, MonadSlotsData, getCurrentEpochSlotDuration, getSlotStartPure,
-    getSystemStartM)
+                       (MonadSlots, MonadSlotsData,
+                       getCurrentEpochSlotDuration, getSlotStartPure,
+                       getSystemStartM)
 import           Pos.Infra.Util.LogSafe
-    (buildSafe, logInfoSP, logWarningSP, secretOnlyF, secure)
+                       (buildSafe, logInfoSP, logWarningSP, secretOnlyF,
+                       secure)
 import           Pos.Infra.Util.TimeLimit
-    (CanLogInParallel, logWarningWaitInf)
+                       (CanLogInParallel, logWarningWaitInf)
 import           Pos.Txp.Base
-    (flattenTxPayload)
+                       (flattenTxPayload)
 import           Pos.Wallet.Web.Tracking.Decrypt
-    (eskToWalletDecrCredentials)
+                       (eskToWalletDecrCredentials)
 
 import           Pos.Wallet.Web.Account
-    (AccountMode, getSKById)
+                       (AccountMode, getSKById)
 import           Pos.Wallet.Web.ClientTypes
-    (CId, Wal)
+                       (CId, Wal)
 import qualified Pos.Wallet.Web.State as WS
 import           Pos.Wallet.Web.Tracking.Modifier
-    (CAccModifier (..))
+                       (CAccModifier (..))
 import           Pos.Wallet.Web.Tracking.Sync
-    (applyModifierToWallet, rollbackModifierFromWallet, trackingApplyTxs,
-    trackingRollbackTxs)
+                       (applyModifierToWallet, rollbackModifierFromWallet,
+                       trackingApplyTxs, trackingRollbackTxs)
 import           Pos.Wallet.Web.Tracking.Types
-    (TrackingOperation (..))
+                       (TrackingOperation (..))
 
 
 walletGuard ::

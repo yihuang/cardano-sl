@@ -12,11 +12,11 @@ import           Universum
 
 import qualified Control.Monad.Catch as Catch
 import           Mockable
-    (runProduction)
+                       (runProduction)
 import           Servant
 
 import           Pos.Wallet.Web.Mode
-    (WalletWebMode, WalletWebModeContext)
+                       (WalletWebMode, WalletWebModeContext)
 
 -- | Temporary monad to handle the migration from the V0 & V1 stacks.
 type MonadV1   = WalletWebMode

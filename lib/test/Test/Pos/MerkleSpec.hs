@@ -8,22 +8,21 @@ module Test.Pos.MerkleSpec
 import           Universum
 
 import qualified Data.Foldable as Foldable
-    (length, toList)
+                       (length, toList)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Property, (===))
+                       (Property, (===))
 
 import           Pos.Binary
-    (Bi)
+                       (Bi)
 import           Pos.Merkle
-    (mkMerkleTree)
-import           Pos.SafeCopy
-    ()
+                       (mkMerkleTree)
+import           Pos.SafeCopy ()
 import           Test.Pos.Binary.Helpers
-    (safeCopyEncodeDecode)
+                       (safeCopyEncodeDecode)
 
 spec :: Spec
 spec = describe "Merkle" $ do

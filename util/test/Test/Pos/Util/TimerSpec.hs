@@ -2,21 +2,21 @@ module Test.Pos.Util.TimerSpec
     ( spec) where
 
 import           Control.Concurrent.Async
-    (async)
+                       (async)
 import           Control.Concurrent.STM
-    (newTVarIO, readTVar, retry, writeTVar)
+                       (newTVarIO, readTVar, retry, writeTVar)
 import           Data.Time.Clock.POSIX
-    (POSIXTime, getPOSIXTime)
+                       (POSIXTime, getPOSIXTime)
 import           Data.Time.Units
-    (Microsecond, fromMicroseconds, toMicroseconds)
+                       (Microsecond, fromMicroseconds, toMicroseconds)
 import           Test.Hspec
-    (Spec, describe, it)
+                       (Spec, describe, it)
 import           Test.QuickCheck
-    (Gen, Property, choose, property)
+                       (Gen, Property, choose, property)
 import           Test.QuickCheck.Monadic
-    (assert, forAllM, monadicIO, run)
+                       (assert, forAllM, monadicIO, run)
 import           Universum hiding
-    (newTVarIO)
+                       (newTVarIO)
 
 import           Pos.Util.Timer
 

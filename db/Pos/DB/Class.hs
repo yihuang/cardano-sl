@@ -52,26 +52,25 @@ module Pos.DB.Class
 import           Universum
 
 import           Control.Monad.Trans
-    (MonadTrans (..))
+                       (MonadTrans (..))
 import           Control.Monad.Trans.Resource
-    (ResourceT, transResourceT)
+                       (ResourceT, transResourceT)
 import           Data.Conduit
-    (ConduitT, transPipe)
+                       (ConduitT, transPipe)
 import qualified Database.RocksDB as Rocks
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Binary.Class
-    (Bi, decodeFull')
-import           Pos.Binary.Core
-    ()
+                       (Bi, decodeFull')
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (Block, BlockHeader, BlockVersionData (..), EpochIndex, HasConfiguration,
-    HeaderHash, isBootstrapEra)
+                       (Block, BlockHeader, BlockVersionData (..), EpochIndex,
+                       HasConfiguration, HeaderHash, isBootstrapEra)
 import           Pos.DB.Error
-    (DBError (DBMalformed))
+                       (DBError (DBMalformed))
 import           Pos.Util.Util
-    (eitherToThrow)
+                       (eitherToThrow)
 
 ----------------------------------------------------------------------------
 -- Pure

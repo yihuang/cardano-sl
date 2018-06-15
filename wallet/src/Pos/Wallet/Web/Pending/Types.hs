@@ -29,25 +29,26 @@ module Pos.Wallet.Web.Pending.Types
 import           Universum
 
 import           Control.Lens
-    (makeLenses, makePrisms)
+                       (makeLenses, makePrisms)
 import qualified Data.Text.Buildable
 import           Data.Text.Lazy.Builder
-    (Builder)
+                       (Builder)
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 
 import           Pos.Client.Txp.History
-    (TxHistoryEntry)
+                       (TxHistoryEntry)
 import           Pos.Core.Common
-    (ChainDifficulty)
+                       (ChainDifficulty)
 import           Pos.Core.Slotting
-    (FlatSlotId, SlotId)
+                       (FlatSlotId, SlotId)
 import           Pos.Core.Txp
-    (TxAux, TxId)
+                       (TxAux, TxId)
 import           Pos.Infra.Util.LogSafe
-    (LogSecurityLevel, SecureLog, getSecureLog, secure, unsecure)
+                       (LogSecurityLevel, SecureLog, getSecureLog, secure,
+                       unsecure)
 import           Pos.Wallet.Web.ClientTypes.Types
-    (CId, Wal)
+                       (CId, Wal)
 
 -- | Required information about block where given pending transaction is sited
 type PtxBlockInfo = ChainDifficulty

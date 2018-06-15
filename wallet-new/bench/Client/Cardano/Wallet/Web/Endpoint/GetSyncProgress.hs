@@ -7,16 +7,17 @@ module Client.Cardano.Wallet.Web.Endpoint.GetSyncProgress
 import           Universum
 
 import           Bench.Cardano.Wallet.Types
-    (BenchEndpoint (..), CompleteConfig (..), Response, ResponseReport (..))
+                       (BenchEndpoint (..), CompleteConfig (..), Response,
+                       ResponseReport (..))
 import           Client.Cardano.Wallet.Web.Analyze
-    (analyzeResponseIfNeeded, checkResponse)
+                       (analyzeResponseIfNeeded, checkResponse)
 import           Client.Cardano.Wallet.Web.Api
-    (getSyncProgress)
+                       (getSyncProgress)
 import           Client.Cardano.Wallet.Web.Run
-    (runEndpointClient)
+                       (runEndpointClient)
 
 import           Pos.Wallet.Web.ClientTypes
-    (SyncProgress (..))
+                       (SyncProgress (..))
 
 -- | Run 'GetSyncProgress' client. As a result we will get a list of wallets.
 getSyncProgressIO :: CompleteConfig -> IO ()

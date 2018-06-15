@@ -20,50 +20,51 @@ module Pos.Infra.Diffusion.Subscription.Common
     ) where
 
 import           Universum hiding
-    (mask)
+                       (mask)
 
 import           Control.Concurrent.Async
-    (concurrently)
+                       (concurrently)
 import           Control.Concurrent.MVar
-    (modifyMVar)
+                       (modifyMVar)
 import           Control.Exception
-    (mask)
+                       (mask)
 import qualified Control.Exception.Safe as Safe
-    (try)
+                       (try)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import           Data.Time.Units
-    (Millisecond, fromMicroseconds)
+                       (Millisecond, fromMicroseconds)
 import qualified Network.Broadcast.OutboundQueue as OQ
 import           Network.Broadcast.OutboundQueue.Types
-    (removePeer, simplePeers)
+                       (removePeer, simplePeers)
 
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Node.Message.Class
-    (Message)
+                       (Message)
 import           System.Clock
-    (Clock (Monotonic), TimeSpec, getTime, toNanoSecs)
+                       (Clock (Monotonic), TimeSpec, getTime, toNanoSecs)
 import           System.Wlog
-    (Severity (..))
+                       (Severity (..))
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Infra.Communication.Listener
-    (listenerConv)
+                       (listenerConv)
 import           Pos.Infra.Communication.Protocol
-    (Conversation (..), ConversationActions (..), ListenerSpec, MkListeners,
-    MsgSubscribe (..), MsgSubscribe1 (..), NodeId, OutSpecs, SendActions,
-    constantListeners, mlMsgSubscribe, mlMsgSubscribe1, recvLimited,
-    withConnectionTo)
+                       (Conversation (..), ConversationActions (..),
+                       ListenerSpec, MkListeners, MsgSubscribe (..),
+                       MsgSubscribe1 (..), NodeId, OutSpecs, SendActions,
+                       constantListeners, mlMsgSubscribe, mlMsgSubscribe1,
+                       recvLimited, withConnectionTo)
 import           Pos.Infra.Diffusion.Subscription.Status
-    (SubscriptionStates)
+                       (SubscriptionStates)
 import qualified Pos.Infra.Diffusion.Subscription.Status as Status
-    (subscribed, subscribing, terminated)
+                       (subscribed, subscribing, terminated)
 import           Pos.Infra.Network.Types
-    (Bucket (..), NodeType)
+                       (Bucket (..), NodeType)
 import           Pos.Util.Trace
-    (Trace, traceWith)
+                       (Trace, traceWith)
 
 
 -- | While holding the MVar, update the outbound queue bucket with the new

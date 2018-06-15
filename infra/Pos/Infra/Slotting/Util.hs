@@ -27,37 +27,38 @@ module Pos.Infra.Slotting.Util
 import           Universum
 
 import           Data.Time.Units
-    (Millisecond, fromMicroseconds)
+                       (Millisecond, fromMicroseconds)
 import           Formatting
-    (int, sformat, shown, stext, (%))
+                       (int, sformat, shown, stext, (%))
 import           Mockable
-    (Async, Delay, Mockable, delay, timeout)
+                       (Async, Delay, Mockable, delay, timeout)
 import           System.Wlog
-    (WithLogger, logDebug, logInfo, logNotice, logWarning, modifyLoggerName)
+                       (WithLogger, logDebug, logInfo, logNotice, logWarning,
+                       modifyLoggerName)
 
 import           Pos.Core
-    (FlatSlotId, HasProtocolConstants, LocalSlotIndex, SlotId (..),
-    Timestamp (..), flattenSlotId, slotIdF)
+                       (FlatSlotId, HasProtocolConstants, LocalSlotIndex,
+                       SlotId (..), Timestamp (..), flattenSlotId, slotIdF)
 import           Pos.Infra.Recovery.Info
-    (MonadRecoveryInfo, recoveryInProgress)
+                       (MonadRecoveryInfo, recoveryInProgress)
 import           Pos.Infra.Reporting.Methods
-    (MonadReporting, reportOrLogE)
+                       (MonadReporting, reportOrLogE)
 import           Pos.Infra.Shutdown
-    (HasShutdownContext)
+                       (HasShutdownContext)
 import           Pos.Infra.Slotting.Class
-    (MonadSlots (..))
+                       (MonadSlots (..))
 import           Pos.Infra.Slotting.Error
-    (SlottingError (..))
+                       (SlottingError (..))
 import           Pos.Infra.Slotting.Impl.Util
-    (slotFromTimestamp)
+                       (slotFromTimestamp)
 import           Pos.Infra.Slotting.MemState
-    (MonadSlotsData, getCurrentNextEpochSlottingDataM, getEpochSlottingDataM,
-    getSystemStartM)
+                       (MonadSlotsData, getCurrentNextEpochSlottingDataM,
+                       getEpochSlottingDataM, getSystemStartM)
 import           Pos.Infra.Slotting.Types
-    (EpochSlottingData (..), SlottingData, computeSlotStart,
-    lookupEpochSlottingData)
+                       (EpochSlottingData (..), SlottingData, computeSlotStart,
+                       lookupEpochSlottingData)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 
 -- | Get flat id of current slot based on MonadSlots.

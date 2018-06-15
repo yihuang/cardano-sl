@@ -11,19 +11,19 @@ module Cardano.Wallet.API.Development.LegacyHandlers
     ) where
 
 import           Control.Monad.Catch
-    (MonadThrow)
+                       (MonadThrow)
 import           Universum
 
 import qualified Cardano.Wallet.API.Development as Dev
 import           Cardano.Wallet.API.Development.Helpers
-    (developmentOnly)
+                       (developmentOnly)
 import           Cardano.Wallet.API.Response
-    (WalletResponse, single)
+                       (WalletResponse, single)
 import           Cardano.Wallet.API.V1.Migration
 import           Cardano.Wallet.API.V1.Types
-    (V1 (..))
+                       (V1 (..))
 import           Cardano.Wallet.Server.CLI
-    (RunMode (..))
+                       (RunMode (..))
 
 import qualified Pos.Client.KeyStorage as V0
 import qualified Pos.Wallet.Web.Methods.Misc as V0

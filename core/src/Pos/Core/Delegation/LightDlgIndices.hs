@@ -8,14 +8,14 @@ import           Universum
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint)
+                       (bprint)
 import           Serokell.Util
-    (pairF)
+                       (pairF)
 
 import           Pos.Core.Slotting
-    (EpochIndex)
+                       (EpochIndex)
 import           Pos.Crypto
-    (ProxySecretKey (..), ProxySignature)
+                       (ProxySecretKey (..), ProxySignature)
 
 -- Notice: light delegation was removed as part of CSL-1856 and should
 -- be reworked later. Though some parts of it are left to support

@@ -19,11 +19,11 @@ module Launcher.Logging
 where
 
 import           System.Directory
-    (createDirectoryIfMissing)
+                       (createDirectoryIfMissing)
 import           System.Environment
-    (getEnv)
+                       (getEnv)
 import           System.FilePath
-    ((</>))
+                       ((</>))
 import           Universum
 
 getDefaultLogDir :: IO FilePath

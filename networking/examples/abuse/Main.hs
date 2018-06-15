@@ -4,21 +4,21 @@
 {-# LANGUAGE StandaloneDeriving #-}
 
 import           Control.Monad
-    (unless)
+                       (unless)
 import           Control.Monad.IO.Class
-    (liftIO)
+                       (liftIO)
 import           Data.Binary
-    (Binary)
+                       (Binary)
 import           Data.ByteString
-    (ByteString)
+                       (ByteString)
 import qualified Data.ByteString as BS
 import           Data.String
-    (fromString)
+                       (fromString)
 import           Data.Time.Units
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import           Mockable.Concurrent
-    (async, cancel, delay, wait)
+                       (async, cancel, delay, wait)
 import           Mockable.Production
 import           Mockable.SharedAtomic
 import           Network.Transport.Abstract
@@ -28,11 +28,11 @@ import qualified Network.Transport.TCP as TCP
 import           Node
 import           Node.Message
 import           Node.Util.Monitor
-    (startMonitor)
+                       (startMonitor)
 import           System.Environment
-    (getArgs)
+                       (getArgs)
 import           System.Random
-    (mkStdGen)
+                       (mkStdGen)
 
 -- |
 -- = Abuse demonstration number 1.

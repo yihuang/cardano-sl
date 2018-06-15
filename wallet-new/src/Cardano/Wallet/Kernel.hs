@@ -31,37 +31,38 @@ module Cardano.Wallet.Kernel (
   ) where
 
 import           Universum hiding
-    (State, init)
+                       (State, init)
 
 import           Control.Lens.TH
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
-    (fromJust)
+                       (fromJust)
 import qualified Data.Set as Set
 
 import           System.Wlog
-    (Severity (..))
+                       (Severity (..))
 
 import           Cardano.Wallet.Kernel.DB.Resolved
-    (ResolvedBlock)
+                       (ResolvedBlock)
 import           Cardano.Wallet.Kernel.Diffusion
-    (WalletDiffusion (..))
+                       (WalletDiffusion (..))
 import           Cardano.Wallet.Kernel.PrefilterTx
-    (PrefilteredBlock (..), ourUtxo, prefilterBlock)
+                       (PrefilteredBlock (..), ourUtxo, prefilterBlock)
 import           Cardano.Wallet.Kernel.Types
-    (txUtxo)
+                       (txUtxo)
 
 import           Pos.Core
-    (TxAux, sumCoins)
+                       (TxAux, sumCoins)
 import           Pos.Core.Chrono
-    (OldestFirst)
+                       (OldestFirst)
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxId, TxIn (..), TxOut (..), TxOutAux (..))
+                       (Tx (..), TxAux (..), TxId, TxIn (..), TxOut (..),
+                       TxOutAux (..))
 import           Pos.Crypto
-    (EncryptedSecretKey, hash)
+                       (EncryptedSecretKey, hash)
 import           Pos.Txp
-    (Utxo)
+                       (Utxo)
 
 -- import           Cardano.Wallet.Orphans ()
 

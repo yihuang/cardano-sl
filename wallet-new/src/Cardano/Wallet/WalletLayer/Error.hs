@@ -12,10 +12,10 @@ import           Universum
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, stext, (%))
+                       (bprint, stext, (%))
 
 import           Cardano.Wallet.API.V1.Types
-    (AccountIndex, WalletId)
+                       (AccountIndex, WalletId)
 
 
 data WalletLayerError

@@ -31,131 +31,139 @@ import           Universum
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Lens
-    (lens, makeClassy, makeLensesWith)
+                       (lens, makeClassy, makeLensesWith)
 import           Data.Default
-    (def)
+                       (def)
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, formatToString, (%))
+                       (bprint, build, formatToString, (%))
 import qualified Prelude
 import           System.Wlog
-    (HasLoggerName (..), LoggerName)
+                       (HasLoggerName (..), LoggerName)
 import           Test.Hspec
-    (Spec)
+                       (Spec)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Property, Testable (..), forAll, ioProperty)
+                       (Arbitrary (..), Property, Testable (..), forAll,
+                       ioProperty)
 import           Test.QuickCheck.Gen
-    (Gen)
+                       (Gen)
 import           Test.QuickCheck.Monadic
-    (PropertyM (..), monadic)
+                       (PropertyM (..), monadic)
 
 import           Pos.AllSecrets
-    (HasAllSecrets (..))
+                       (HasAllSecrets (..))
 import           Pos.Block.BListener
-    (MonadBListener (..))
+                       (MonadBListener (..))
 import           Pos.Block.Slog
-    (HasSlogGState (..))
+                       (HasSlogGState (..))
 import           Pos.Block.Types
-    (LastKnownHeader, LastKnownHeaderTag, RecoveryHeader, RecoveryHeaderTag)
+                       (LastKnownHeader, LastKnownHeaderTag, RecoveryHeader,
+                       RecoveryHeaderTag)
 import           Pos.Client.KeyStorage
-    (MonadKeys (..), MonadKeysRead (..), getSecretDefault,
-    modifySecretPureDefault)
+                       (MonadKeys (..), MonadKeysRead (..), getSecretDefault,
+                       modifySecretPureDefault)
 import           Pos.Client.Txp.Addresses
-    (MonadAddresses (..))
+                       (MonadAddresses (..))
 import           Pos.Client.Txp.Balances
-    (MonadBalances (..))
+                       (MonadBalances (..))
 import           Pos.Client.Txp.History
-    (MonadTxHistory (..), getBlockHistoryDefault, getLocalHistoryDefault,
-    saveTxDefault)
+                       (MonadTxHistory (..), getBlockHistoryDefault,
+                       getLocalHistoryDefault, saveTxDefault)
 import           Pos.Context
-    (ConnectedPeers (..))
+                       (ConnectedPeers (..))
 import           Pos.Core
-    (HasConfiguration, Timestamp (..), largestHDAddressBoot)
+                       (HasConfiguration, Timestamp (..), largestHDAddressBoot)
 import           Pos.Core.Txp
-    (TxAux)
+                       (TxAux)
 import           Pos.Crypto
-    (PassPhrase)
+                       (PassPhrase)
 import           Pos.DB
-    (MonadDB (..), MonadDBRead (..), MonadGState (..))
+                       (MonadDB (..), MonadDBRead (..), MonadGState (..))
 import qualified Pos.DB as DB
 import qualified Pos.DB.Block as DB
 import           Pos.DB.DB
-    (gsAdoptedBVDataDefault)
+                       (gsAdoptedBVDataDefault)
 import           Pos.DB.Pure
-    (DBPureVar)
+                       (DBPureVar)
 import           Pos.Delegation
-    (DelegationVar, HasDlgConfiguration)
+                       (DelegationVar, HasDlgConfiguration)
 import           Pos.Generator.Block
-    (BlockGenMode)
+                       (BlockGenMode)
 import qualified Pos.GState as GS
 import           Pos.Infra.Network.Types
-    (HasNodeType (..), NodeType (..))
+                       (HasNodeType (..), NodeType (..))
 import           Pos.Infra.Reporting
-    (MonadReporting (..))
+                       (MonadReporting (..))
 import           Pos.Infra.Shutdown
-    (HasShutdownContext (..), ShutdownContext (..))
+                       (HasShutdownContext (..), ShutdownContext (..))
 import           Pos.Infra.Slotting
-    (HasSlottingVar (..), MonadSlots (..), MonadSlotsData,
-    SimpleSlottingStateVar, mkSimpleSlottingStateVar)
+                       (HasSlottingVar (..), MonadSlots (..), MonadSlotsData,
+                       SimpleSlottingStateVar, mkSimpleSlottingStateVar)
 import           Pos.Infra.StateLock
-    (StateLock, StateLockMetrics (..), newStateLock)
+                       (StateLock, StateLockMetrics (..), newStateLock)
 import           Pos.Infra.Util.JsonLog.Events
-    (HasJsonLogConfig (..), JsonLogConfig (..), MemPoolModifyReason,
-    jsonLogDefault)
+                       (HasJsonLogConfig (..), JsonLogConfig (..),
+                       MemPoolModifyReason, jsonLogDefault)
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Lrc
-    (LrcContext)
+                       (LrcContext)
 import           Pos.Ssc.Mem
-    (SscMemTag)
+                       (SscMemTag)
 import           Pos.Ssc.Types
-    (SscState)
+                       (SscState)
 import           Pos.Txp
-    (GenericTxpLocalData, MempoolExt, MonadTxpLocal (..), TxpGlobalSettings,
-    TxpHolderTag, recordTxpMetrics, txNormalize, txProcessTransactionNoLock,
-    txpMemPool, txpTip)
+                       (GenericTxpLocalData, MempoolExt, MonadTxpLocal (..),
+                       TxpGlobalSettings, TxpHolderTag, recordTxpMetrics,
+                       txNormalize, txProcessTransactionNoLock, txpMemPool,
+                       txpTip)
 import           Pos.Update.Context
-    (UpdateContext)
+                       (UpdateContext)
 import           Pos.Util
-    (postfixLFields)
+                       (postfixLFields)
 import           Pos.Util.LoggerName
-    (HasLoggerName' (..), askLoggerNameDefault, modifyLoggerNameDefault)
+                       (HasLoggerName' (..), askLoggerNameDefault,
+                       modifyLoggerNameDefault)
 import           Pos.Util.UserSecret
-    (HasUserSecret (..), UserSecret)
+                       (HasUserSecret (..), UserSecret)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 import           Pos.Wallet.Redirect
-    (applyLastUpdateWebWallet, blockchainSlotDurationWebWallet,
-    connectedPeersWebWallet, localChainDifficultyWebWallet,
-    networkChainDifficultyWebWallet, txpNormalizeWebWallet,
-    txpProcessTxWebWallet, waitForUpdateWebWallet)
+                       (applyLastUpdateWebWallet,
+                       blockchainSlotDurationWebWallet,
+                       connectedPeersWebWallet, localChainDifficultyWebWallet,
+                       networkChainDifficultyWebWallet, txpNormalizeWebWallet,
+                       txpProcessTxWebWallet, waitForUpdateWebWallet)
 import qualified System.Metrics as Metrics
 
 import           Pos.Wallet.WalletMode
-    (MonadBlockchainInfo (..), MonadUpdates (..), WalletMempoolExt)
+                       (MonadBlockchainInfo (..), MonadUpdates (..),
+                       WalletMempoolExt)
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId)
+                       (AccountId)
 import           Pos.Wallet.Web.Mode
-    (getBalanceDefault, getNewAddressWebWallet, getOwnUtxosDefault)
+                       (getBalanceDefault, getNewAddressWebWallet,
+                       getOwnUtxosDefault)
 import           Pos.Wallet.Web.State
-    (WalletDB, openMemState)
+                       (WalletDB, openMemState)
 import           Pos.Wallet.Web.Tracking.BListener
-    (onApplyBlocksWebWallet, onRollbackBlocksWebWallet)
+                       (onApplyBlocksWebWallet, onRollbackBlocksWebWallet)
 import           Pos.Wallet.Web.Tracking.Types
-    (SyncQueue)
+                       (SyncQueue)
 
 import           Test.Pos.Block.Logic.Emulation
-    (Emulation (..), runEmulation)
+                       (Emulation (..), runEmulation)
 import           Test.Pos.Block.Logic.Mode
-    (BlockTestContext (..), BlockTestContextTag, HasTestParams (..),
-    TestParams (..), btcSystemStartL, btcTxpMemL,
-    currentTimeSlottingTestDefault, getCurrentSlotBlockingTestDefault,
-    getCurrentSlotInaccurateTestDefault, getCurrentSlotTestDefault,
-    initBlockTestContext)
+                       (BlockTestContext (..), BlockTestContextTag,
+                       HasTestParams (..), TestParams (..), btcSystemStartL,
+                       btcTxpMemL, currentTimeSlottingTestDefault,
+                       getCurrentSlotBlockingTestDefault,
+                       getCurrentSlotInaccurateTestDefault,
+                       getCurrentSlotTestDefault, initBlockTestContext)
 
 ----------------------------------------------------------------------------
 -- Parameters

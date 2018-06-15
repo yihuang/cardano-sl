@@ -29,29 +29,30 @@ module Pos.Explorer.Txp.Toil.Monad
 import           Universum
 
 import           Control.Lens
-    (at, magnify, zoom, (%=), (.=))
+                       (at, magnify, zoom, (%=), (.=))
 import           Control.Monad.Free.Church
-    (F (..))
+                       (F (..))
 import           Control.Monad.Morph
-    (generalize, hoist)
+                       (generalize, hoist)
 import           Control.Monad.Reader
-    (mapReaderT)
+                       (mapReaderT)
 import           Control.Monad.State.Strict
-    (mapStateT)
+                       (mapStateT)
 import           System.Wlog
-    (NamedPureLogger)
+                       (NamedPureLogger)
 
 import           Pos.Core
-    (Address, Coin, TxId)
+                       (Address, Coin, TxId)
 import           Pos.Explorer.Core
-    (AddrHistory, TxExtra)
+                       (AddrHistory, TxExtra)
 import           Pos.Explorer.Txp.Toil.Types
-    (ExplorerExtraLookup (..), ExplorerExtraModifier, eemAddrBalances,
-    eemAddrHistories, eemLocalTxsExtra, eemNewUtxoSum)
+                       (ExplorerExtraLookup (..), ExplorerExtraModifier,
+                       eemAddrBalances, eemAddrHistories, eemLocalTxsExtra,
+                       eemNewUtxoSum)
 import           Pos.Txp.Toil
-    (ExtendedGlobalToilM, ExtendedLocalToilM, StakesLookupF)
+                       (ExtendedGlobalToilM, ExtendedLocalToilM, StakesLookupF)
 import           Pos.Util
-    (type (~>))
+                       (type (~>))
 import qualified Pos.Util.Modifier as MM
 
 ----------------------------------------------------------------------------

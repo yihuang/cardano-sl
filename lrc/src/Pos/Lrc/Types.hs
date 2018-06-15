@@ -9,7 +9,7 @@ module Pos.Lrc.Types
 import           Universum
 
 import           Pos.Core.Common
-    (Coin, StakeholderId)
+                       (Coin, StakeholderId)
 
 -- | Hashset of richmen (i. e. stakeholders whose stake is greater
 -- than some threshold).

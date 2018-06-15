@@ -30,15 +30,15 @@ module Cardano.Wallet.Kernel.DB.AcidState (
 import           Universum
 
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 import           Data.Acid
-    (Query, Update, makeAcidic)
+                       (Query, Update, makeAcidic)
 import           Data.SafeCopy
-    (base, deriveSafeCopy)
+                       (base, deriveSafeCopy)
 
 import qualified Pos.Core as Core
 import           Pos.Core.Chrono
-    (OldestFirst (..))
+                       (OldestFirst (..))
 
 import           Cardano.Wallet.Kernel.DB.BlockMeta
 import           Cardano.Wallet.Kernel.DB.HdWallet

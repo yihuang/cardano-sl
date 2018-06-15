@@ -11,28 +11,27 @@ module Pos.Crypto.Signing.Types.Redeem
        ) where
 
 import           Control.Exception.Safe
-    (Exception (..))
+                       (Exception (..))
 import qualified Crypto.Sign.Ed25519 as Ed25519
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON)
+                       (defaultOptions, deriveJSON)
 import qualified Data.ByteString as BS
 import           Data.Hashable
-    (Hashable)
+                       (Hashable)
 import qualified Data.Text as T
 import qualified Data.Text.Buildable as B
 import qualified Data.Text.Lazy.Builder as Builder
-    (fromText)
+                       (fromText)
 import           Formatting
-    (Format, bprint, fitLeft, later, (%), (%.))
+                       (Format, bprint, fitLeft, later, (%), (%.))
 import           Serokell.Util.Base64
-    (formatBase64)
+                       (formatBase64)
 import qualified Serokell.Util.Base64 as B64
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi)
-import           Pos.Crypto.Orphans
-    ()
+                       (Bi)
+import           Pos.Crypto.Orphans ()
 
 ----------------------------------------------------------------------------
 -- PK/SK and formatters

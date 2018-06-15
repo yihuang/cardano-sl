@@ -15,19 +15,19 @@ module Pos.Lrc.DB.Issuers
 import           Universum
 
 import           Pos.Binary.Class
-    (serialize')
+                       (serialize')
 import           Pos.Core.Common
-    (Coin, StakeholderId)
+                       (Coin, StakeholderId)
 import           Pos.Core.Slotting
-    (EpochIndex (..))
+                       (EpochIndex (..))
 import           Pos.DB.Class
-    (MonadDB, MonadDBRead)
+                       (MonadDB, MonadDBRead)
 import           Pos.DB.Error
-    (DBError (DBMalformed))
+                       (DBError (DBMalformed))
 import           Pos.Lrc.DB.Common
-    (getBi, putBi)
+                       (getBi, putBi)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 -- | The first value here is epoch for which this stake distribution is valid.
 -- The second one is total stake corresponding to that epoch.

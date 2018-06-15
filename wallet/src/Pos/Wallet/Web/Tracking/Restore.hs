@@ -3,38 +3,41 @@ module Pos.Wallet.Web.Tracking.Restore
 
 import           Universum
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import qualified Data.Map as M
 import           System.Wlog
-    (WithLogger, logInfo, modifyLoggerName)
+                       (WithLogger, logInfo, modifyLoggerName)
 
 import           Pos.Core
-    (Address, HasConfiguration, HasDifficulty (..), headerHash)
+                       (Address, HasConfiguration, HasDifficulty (..),
+                       headerHash)
 import           Pos.Core.Txp
-    (TxIn, TxOut (..), TxOutAux (..))
+                       (TxIn, TxOut (..), TxOutAux (..))
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class
-    (MonadDBRead (..))
+                       (MonadDBRead (..))
 import           Pos.Infra.Slotting
-    (MonadSlotsData)
+                       (MonadSlotsData)
 import           Pos.Txp
-    (genesisUtxo, unGenesisUtxo, utxoToModifier)
+                       (genesisUtxo, unGenesisUtxo, utxoToModifier)
 import           Pos.Txp.DB.Utxo
-    (filterUtxo)
+                       (filterUtxo)
 import           Pos.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 import           Pos.Wallet.Web.State
-    (WalletDB, WalletDbReader, askWalletDB, setWalletRestorationSyncTip,
-    updateWalletBalancesAndUtxo)
+                       (WalletDB, WalletDbReader, askWalletDB,
+                       setWalletRestorationSyncTip,
+                       updateWalletBalancesAndUtxo)
 import qualified Pos.Wallet.Web.State as WS
 import           Pos.Wallet.Web.Tracking.Decrypt
-    (WalletDecrCredentials, decryptAddress, selectOwnAddresses)
+                       (WalletDecrCredentials, decryptAddress,
+                       selectOwnAddresses)
 import           Pos.Wallet.Web.Tracking.Sync
-    (firstGenesisHeader, processSyncError)
+                       (firstGenesisHeader, processSyncError)
 import           Pos.Wallet.Web.Tracking.Types
-    (SyncQueue, newRestoreRequest, submitSyncRequest)
+                       (SyncQueue, newRestoreRequest, submitSyncRequest)
 
 
 -- | Restores a wallet from seed, by synchronously restoring its balance (and the initial address

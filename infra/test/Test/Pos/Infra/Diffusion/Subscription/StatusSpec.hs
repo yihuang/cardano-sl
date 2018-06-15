@@ -7,21 +7,22 @@ module Test.Pos.Infra.Diffusion.Subscription.StatusSpec
 import           Prelude
 
 import           Data.List
-    ((\\))
+                       ((\\))
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as Map
 import           Test.Hspec
-    (describe)
+                       (describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Gen, Property, elements, forAllShrink, ioProperty, listOf, shrinkList,
-    sized, (===))
+                       (Gen, Property, elements, forAllShrink, ioProperty,
+                       listOf, shrinkList, sized, (===))
 
 import           Pos.Infra.Diffusion.Subscription.Status
-    (Changes, SubscriptionStates, SubscriptionStatus (..), changes,
-    emptySubscriptionStates, subscribed, subscribing, terminated, withChanges)
+                       (Changes, SubscriptionStates, SubscriptionStatus (..),
+                       changes, emptySubscriptionStates, subscribed,
+                       subscribing, terminated, withChanges)
 
 data Key = A | B | C | D
   deriving (Eq, Ord, Show)

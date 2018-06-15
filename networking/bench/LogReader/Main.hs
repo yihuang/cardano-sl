@@ -2,52 +2,53 @@
 {-# LANGUAGE TypeApplications #-}
 
 import           Control.Applicative
-    (empty)
+                       (empty)
 import           Control.Exception.Safe
-    (throwString)
+                       (throwString)
 import           Control.Lens
-    (at, (^.))
+                       (at, (^.))
 import           Control.Monad.Trans
-    (liftIO)
+                       (liftIO)
 import           Control.Monad.Trans.Resource
-    (ResourceT, runResourceT)
+                       (ResourceT, runResourceT)
 import           Data.Conduit
-    (ConduitT, Void, runConduit, yield, (.|))
+                       (ConduitT, Void, runConduit, yield, (.|))
 import           Data.Conduit.Binary
-    (sinkFile, sourceFile)
+                       (sinkFile, sourceFile)
 import qualified Data.Conduit.Binary as CB
 import qualified Data.Conduit.List as CL
 import           Data.Conduit.Text
-    (decode, encode, utf8)
+                       (decode, encode, utf8)
 import           Data.Foldable
-    (foldrM)
+                       (foldrM)
 import           Data.List
-    (intersperse)
+                       (intersperse)
 import qualified Data.Map as M
 import           Data.Text
-    (Text)
+                       (Text)
 import           Formatting
-    (bprint, int, right, sformat, (%))
+                       (bprint, int, right, sformat, (%))
 import qualified Formatting as F
 import           System.IO
-    (FilePath)
+                       (FilePath)
 
 import           Data.Attoparsec.Text
-    (parseOnly)
+                       (parseOnly)
 import           Options.Applicative.Simple
-    (simpleOptions)
+                       (simpleOptions)
 
 import           Bench.Network.Commons
-    (LogMessage (..), MeasureEvent (..), MeasureInfo (..), MsgId, Payload (..),
-    Timestamp, logMessageParser, measureInfoParser)
+                       (LogMessage (..), MeasureEvent (..), MeasureInfo (..),
+                       MsgId, Payload (..), Timestamp, logMessageParser,
+                       measureInfoParser)
 import           LogReaderOptions
-    (Args (..), argsParser)
+                       (Args (..), argsParser)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith, wlogTrace)
+                       (Severity (..), Trace, traceWith, wlogTrace)
 import           System.Wlog
-    (productionB, setupLogging)
+                       (productionB, setupLogging)
 import           System.Wlog.Formatter
-    (centiUtcTimeF)
+                       (centiUtcTimeF)
 
 
 type Measures = M.Map MsgId (Payload, [(MeasureEvent, Timestamp)])

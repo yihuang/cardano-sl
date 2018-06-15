@@ -11,7 +11,7 @@ module Pos.Lrc.DB
        ) where
 
 import           Pos.Lrc.DB.Common
-    (getEpoch, putEpoch)
+                       (getEpoch, putEpoch)
 import           Pos.Lrc.DB.Issuers
 import           Pos.Lrc.DB.Leaders
 import           Pos.Lrc.DB.Lrc

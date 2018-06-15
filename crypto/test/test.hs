@@ -1,14 +1,14 @@
 import           Universum
 
 import           Test.Hspec
-    (hspec)
+                       (hspec)
 
 import           Spec
-    (spec)
+                       (spec)
 
 import qualified Test.Pos.Crypto.Bi
 import           Test.Pos.Crypto.TempHelpers
-    (runTests)
+                       (runTests)
 
 main :: IO ()
 main = do

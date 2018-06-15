@@ -11,12 +11,12 @@ module Test.Pos.Explorer.MockFactory
 import           Universum
 
 import           System.Wlog
-    (LoggerName)
+                       (LoggerName)
 
 import           Pos.Core
-    (Address, unsafeIntegerToCoin)
+                       (Address, unsafeIntegerToCoin)
 import           Pos.Core.Txp
-    (TxOut (..))
+                       (TxOut (..))
 
 -- | Factory to create `TxOut`
 -- | It is mostly taken from `makeTxOutAux` in `Test.Pos.Client.Txp.UtilSpec`

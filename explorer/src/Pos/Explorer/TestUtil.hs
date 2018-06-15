@@ -19,65 +19,65 @@ module Pos.Explorer.TestUtil
 
 import qualified Prelude
 import           Universum hiding
-    (keys)
+                       (keys)
 
 import           Control.Lens
-    (at)
+                       (at)
 import           Data.Default
-    (def)
+                       (def)
 import           Data.Function
-    (on)
+                       (on)
 import           Data.List
-    (groupBy)
+                       (groupBy)
 import qualified Data.List.NonEmpty as NE
 import           Data.Map
-    (fromList, fromListWith, keys, unions)
+                       (fromList, fromListWith, keys, unions)
 import           Serokell.Data.Memory.Units
-    (Byte, Gigabyte, convertUnit)
+                       (Byte, Gigabyte, convertUnit)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, Property, Testable, choose, counterexample, forAll,
-    generate, property, suchThat)
+                       (Arbitrary (..), Gen, Property, Testable, choose,
+                       counterexample, forAll, generate, property, suchThat)
 
-import           Pos.Arbitrary.Block
-    ()
+import           Pos.Arbitrary.Block ()
 import           Pos.Block.Base
-    (mkGenesisBlock)
+                       (mkGenesisBlock)
 import           Pos.Block.Logic
-    (RawPayload (..), createMainBlockPure)
+                       (RawPayload (..), createMainBlockPure)
 import           Pos.Block.Types
-    (Blund, SlogUndo (..), Undo (..))
-import qualified Pos.Communication
-    ()
+                       (Blund, SlogUndo (..), Undo (..))
+import qualified Pos.Communication ()
 import           Pos.Core
-    (Address, BlockCount (..), ChainDifficulty (..), EpochIndex (..),
-    GenesisHash (..), HasConfiguration, HeaderHash, LocalSlotIndex (..),
-    SlotId (..), SlotLeaders, StakeholderId, difficultyL, genesisHash,
-    headerHash, makePubKeyAddressBoot, protocolMagic)
+                       (Address, BlockCount (..), ChainDifficulty (..),
+                       EpochIndex (..), GenesisHash (..), HasConfiguration,
+                       HeaderHash, LocalSlotIndex (..), SlotId (..),
+                       SlotLeaders, StakeholderId, difficultyL, genesisHash,
+                       headerHash, makePubKeyAddressBoot, protocolMagic)
 import           Pos.Core.Block
-    (Block, BlockHeader, GenesisBlock, MainBlock, getBlockHeader)
+                       (Block, BlockHeader, GenesisBlock, MainBlock,
+                       getBlockHeader)
 import           Pos.Core.Ssc
-    (SscPayload)
+                       (SscPayload)
 import           Pos.Core.Txp
-    (TxAux)
+                       (TxAux)
 import           Pos.Core.Update
-    (UpdatePayload (..))
+                       (UpdatePayload (..))
 import           Pos.Crypto
-    (SecretKey, toPublic)
+                       (SecretKey, toPublic)
 import           Pos.Delegation
-    (DlgPayload, DlgUndo (..), ProxySKBlockInfo)
+                       (DlgPayload, DlgUndo (..), ProxySKBlockInfo)
 import           Pos.Ssc.Base
-    (defaultSscPayload)
+                       (defaultSscPayload)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 
 import           Pos.Explorer.BListener
-    (createPagedHeaderHashesPair)
+                       (createPagedHeaderHashesPair)
 import           Pos.Explorer.DB
-    (Epoch, EpochPagedBlocksKey, Page, convertToPagedMap)
+                       (Epoch, EpochPagedBlocksKey, Page, convertToPagedMap)
 import           Pos.Explorer.ExtraContext
-    (ExplorerMockableMode (..))
+                       (ExplorerMockableMode (..))
 
 
 ----------------------------------------------------------------

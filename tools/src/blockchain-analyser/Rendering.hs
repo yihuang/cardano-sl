@@ -9,27 +9,29 @@ module Rendering
 
 import qualified Data.Text as T
 import           Formatting hiding
-    (bytes)
+                       (bytes)
 import           Options
-    (CLIOptions (..), PrintMode (..), UOM (..))
+                       (CLIOptions (..), PrintMode (..), UOM (..))
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Block.Types
-    (Undo)
+                       (Undo)
 import           Pos.Core
-    (EpochIndex, EpochOrSlot (..), LocalSlotIndex (..), SlotId (..), Tx,
-    getEpochIndex, getEpochOrSlot)
+                       (EpochIndex, EpochOrSlot (..), LocalSlotIndex (..),
+                       SlotId (..), Tx, getEpochIndex, getEpochOrSlot)
 import           Pos.Core.Block
-    (Block, BlockHeader (..), blockHeaderHash, getBlockHeader, mbTxs, _gbBody,
-    _gbhConsensus, _mcdLeaderKey)
+                       (Block, BlockHeader (..), blockHeaderHash,
+                       getBlockHeader, mbTxs, _gbBody, _gbhConsensus,
+                       _mcdLeaderKey)
 import           Pos.Crypto
-    (PublicKey)
+                       (PublicKey)
 import           Serokell.Data.Memory.Units
-    (Byte, fromBytes, memory, toBytes)
+                       (Byte, fromBytes, memory, toBytes)
 import           Text.Tabl
-    (Alignment (..), Decoration (..), Environment (EnvAscii), tabl)
+                       (Alignment (..), Decoration (..),
+                       Environment (EnvAscii), tabl)
 import           Types
-    (DBFolderStat, prevBlock)
+                       (DBFolderStat, prevBlock)
 
 import           Universum
 

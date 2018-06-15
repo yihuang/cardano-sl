@@ -10,19 +10,19 @@ module Pos.Block.Network.Types
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import           Universum
 
 import           Pos.Core
-    (HeaderHash)
+                       (HeaderHash)
 import           Pos.Core.Block
-    (Block, BlockHeader (..))
+                       (Block, BlockHeader (..))
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..))
+                       (NE, NewestFirst (..))
 import           Pos.DB.Class
-    (SerializedBlock)
+                       (SerializedBlock)
 
 -- | 'GetHeaders' message. Behaviour of the response depends on
 -- particular combination of 'mghFrom' and 'mghTo'.

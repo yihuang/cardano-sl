@@ -7,52 +7,57 @@ module Pos.Update.Poll.Logic.Apply
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Monad.Except
-    (MonadError, runExceptT, throwError)
+                       (MonadError, runExceptT, throwError)
 import qualified Data.HashSet as HS
 import           Data.List
-    (partition)
+                       (partition)
 import qualified Data.List.NonEmpty as NE
 import           Formatting
-    (build, builder, int, sformat, (%))
+                       (build, builder, int, sformat, (%))
 import           System.Wlog
-    (logDebug, logInfo, logNotice)
+                       (logDebug, logInfo, logNotice)
 
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Core
-    (ChainDifficulty (..), Coin, EpochIndex, HasProtocolConstants,
-    HasProtocolMagic, HeaderHash, IsMainHeader (..), SlotId (siEpoch),
-    SoftwareVersion (..), addressHash, applyCoinPortionUp, blockVersionL,
-    coinToInteger, difficultyL, epochIndexL, flattenSlotId, headerHashG,
-    headerSlotL, sumCoins, unflattenSlotId, unsafeIntegerToCoin)
+                       (ChainDifficulty (..), Coin, EpochIndex,
+                       HasProtocolConstants, HasProtocolMagic, HeaderHash,
+                       IsMainHeader (..), SlotId (siEpoch),
+                       SoftwareVersion (..), addressHash, applyCoinPortionUp,
+                       blockVersionL, coinToInteger, difficultyL, epochIndexL,
+                       flattenSlotId, headerHashG, headerSlotL, sumCoins,
+                       unflattenSlotId, unsafeIntegerToCoin)
 import           Pos.Core.Configuration
-    (blkSecurityParam, protocolMagic)
+                       (blkSecurityParam, protocolMagic)
 import           Pos.Core.Update
-    (BlockVersion, BlockVersionData (..), UpId, UpdatePayload (..),
-    UpdateProposal (..), UpdateVote (..), bvdUpdateProposalThd,
-    checkUpdatePayload)
+                       (BlockVersion, BlockVersionData (..), UpId,
+                       UpdatePayload (..), UpdateProposal (..),
+                       UpdateVote (..), bvdUpdateProposalThd,
+                       checkUpdatePayload)
 import           Pos.Crypto
-    (hash, shortHashF)
+                       (hash, shortHashF)
 import           Pos.Data.Attributes
-    (areAttributesKnown)
+                       (areAttributesKnown)
 import           Pos.Update.Poll.Class
-    (MonadPoll (..), MonadPollRead (..))
+                       (MonadPoll (..), MonadPollRead (..))
 import           Pos.Update.Poll.Failure
-    (PollVerFailure (..))
+                       (PollVerFailure (..))
 import           Pos.Update.Poll.Logic.Base
-    (canBeAdoptedBV, canCreateBlockBV, confirmBlockVersion, isDecided,
-    mkTotNegative, mkTotPositive, mkTotSum, putNewProposal,
-    voteToUProposalState)
+                       (canBeAdoptedBV, canCreateBlockBV, confirmBlockVersion,
+                       isDecided, mkTotNegative, mkTotPositive, mkTotSum,
+                       putNewProposal, voteToUProposalState)
 import           Pos.Update.Poll.Logic.Version
-    (verifyAndApplyProposalBVS, verifyBlockVersion, verifySoftwareVersion)
+                       (verifyAndApplyProposalBVS, verifyBlockVersion,
+                       verifySoftwareVersion)
 import           Pos.Update.Poll.Types
-    (ConfirmedProposalState (..), DecidedProposalState (..), DpsExtra (..),
-    ProposalState (..), UndecidedProposalState (..), UpsExtra (..), psProposal)
+                       (ConfirmedProposalState (..), DecidedProposalState (..),
+                       DpsExtra (..), ProposalState (..),
+                       UndecidedProposalState (..), UpsExtra (..), psProposal)
 import           Pos.Util.Some
-    (Some (..))
+                       (Some (..))
 
 type ApplyMode m =
     ( MonadError PollVerFailure m

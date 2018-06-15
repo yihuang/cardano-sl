@@ -3,18 +3,19 @@ module Test.Pos.Infra.Diffusion.Subscription.SubscriptionSpec
     ) where
 
 import           Control.Concurrent.Async
-    (AsyncCancelled (..), async, cancel, waitCatch)
+                       (AsyncCancelled (..), async, cancel, waitCatch)
 import           Control.Concurrent.MVar
-    (newEmptyMVar, takeMVar)
+                       (newEmptyMVar, takeMVar)
 import           Control.Exception
-    (fromException, throwIO)
+                       (fromException, throwIO)
 import           System.IO.Error
-    (userError)
+                       (userError)
 import           Test.Hspec
-    (Expectation, Spec, describe, expectationFailure, it, shouldBe)
+                       (Expectation, Spec, describe, expectationFailure, it,
+                       shouldBe)
 
 import           Pos.Infra.Diffusion.Subscription.Common
-    (SubscriptionTerminationReason (..), networkSubscribeTo)
+                       (SubscriptionTerminationReason (..), networkSubscribeTo)
 
 spec :: Spec
 spec = describe "Exception handling" $ do

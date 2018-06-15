@@ -9,16 +9,16 @@ module Pos.Lrc.Mode
 import           Universum
 
 import           Mockable
-    (Async, Concurrently, Delay, Mockables)
+                       (Async, Concurrently, Delay, Mockables)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.DB.Class
-    (MonadDB, MonadGState)
+                       (MonadDB, MonadGState)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 
 -- | Set of constraints used by LRC.
 type LrcMode ctx m

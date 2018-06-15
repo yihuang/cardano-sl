@@ -17,71 +17,77 @@ module Pos.WorkMode
 import           Universum
 
 import           Control.Lens
-    (makeLensesWith)
+                       (makeLensesWith)
 import qualified Control.Monad.Reader as Mtl
 import           Mockable
-    (Production)
+                       (Production)
 import           System.Wlog
-    (HasLoggerName (..), LoggerName)
+                       (HasLoggerName (..), LoggerName)
 
 import           Pos.Block.BListener
-    (MonadBListener (..), onApplyBlocksStub, onRollbackBlocksStub)
+                       (MonadBListener (..), onApplyBlocksStub,
+                       onRollbackBlocksStub)
 import           Pos.Block.Slog
-    (HasSlogContext (..), HasSlogGState (..))
+                       (HasSlogContext (..), HasSlogGState (..))
 import           Pos.Context
-    (HasNodeContext (..), HasPrimaryKey (..), HasSscContext (..), NodeContext)
+                       (HasNodeContext (..), HasPrimaryKey (..),
+                       HasSscContext (..), NodeContext)
 import           Pos.Core
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.DB
-    (MonadGState (..), NodeDBs)
+                       (MonadGState (..), NodeDBs)
 import           Pos.DB.Block
-    (dbGetSerBlockRealDefault, dbGetSerUndoRealDefault,
-    dbPutSerBlundsRealDefault)
+                       (dbGetSerBlockRealDefault, dbGetSerUndoRealDefault,
+                       dbPutSerBlundsRealDefault)
 import           Pos.DB.Class
-    (MonadDB (..), MonadDBRead (..))
+                       (MonadDB (..), MonadDBRead (..))
 import           Pos.DB.DB
-    (gsAdoptedBVDataDefault)
+                       (gsAdoptedBVDataDefault)
 import           Pos.DB.Rocks
-    (dbDeleteDefault, dbGetDefault, dbIterSourceDefault, dbPutDefault,
-    dbWriteBatchDefault)
+                       (dbDeleteDefault, dbGetDefault, dbIterSourceDefault,
+                       dbPutDefault, dbWriteBatchDefault)
 import           Pos.Delegation.Class
-    (DelegationVar)
+                       (DelegationVar)
 import           Pos.Infra.DHT.Real.Param
-    (KademliaParams)
+                       (KademliaParams)
 import           Pos.Infra.Network.Types
-    (HasNodeType (..), getNodeTypeDefault)
+                       (HasNodeType (..), getNodeTypeDefault)
 import           Pos.Infra.Reporting
-    (HasMisbehaviorMetrics (..), MonadReporting (..), Reporter (..))
+                       (HasMisbehaviorMetrics (..), MonadReporting (..),
+                       Reporter (..))
 import           Pos.Infra.Shutdown
-    (HasShutdownContext (..))
+                       (HasShutdownContext (..))
 import           Pos.Infra.Slotting.Class
-    (MonadSlots (..))
+                       (MonadSlots (..))
 import           Pos.Infra.Slotting.Impl
-    (currentTimeSlottingSimple, getCurrentSlotBlockingSimple,
-    getCurrentSlotInaccurateSimple, getCurrentSlotSimple)
+                       (currentTimeSlottingSimple,
+                       getCurrentSlotBlockingSimple,
+                       getCurrentSlotInaccurateSimple, getCurrentSlotSimple)
 import           Pos.Infra.Slotting.MemState
-    (HasSlottingVar (..), MonadSlotsData)
+                       (HasSlottingVar (..), MonadSlotsData)
 import           Pos.Infra.Util.JsonLog.Events
-    (HasJsonLogConfig (..), JsonLogConfig, jsonLogDefault)
+                       (HasJsonLogConfig (..), JsonLogConfig, jsonLogDefault)
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Pos.Ssc.Mem
-    (SscMemTag)
+                       (SscMemTag)
 import           Pos.Ssc.Types
-    (SscState)
+                       (SscState)
 import           Pos.Txp
-    (GenericTxpLocalData, HasTxpConfiguration, MempoolExt, MonadTxpLocal (..),
-    TxpHolderTag, txNormalize, txProcessTransaction)
+                       (GenericTxpLocalData, HasTxpConfiguration, MempoolExt,
+                       MonadTxpLocal (..), TxpHolderTag, txNormalize,
+                       txProcessTransaction)
 import           Pos.Util.Lens
-    (postfixLFields)
+                       (postfixLFields)
 import           Pos.Util.LoggerName
-    (HasLoggerName' (..), askLoggerNameDefault, modifyLoggerNameDefault)
+                       (HasLoggerName' (..), askLoggerNameDefault,
+                       modifyLoggerNameDefault)
 import           Pos.Util.UserSecret
-    (HasUserSecret (..))
+                       (HasUserSecret (..))
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 import           Pos.WorkMode.Class
-    (MinWorkMode, WorkMode)
+                       (MinWorkMode, WorkMode)
 
 data RealModeContext ext = RealModeContext
     { rmcNodeDBs       :: !NodeDBs

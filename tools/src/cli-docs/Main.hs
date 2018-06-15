@@ -5,29 +5,30 @@ module Main ( module Main ) where
 import           Universum
 
 import           Control.Monad
-    (forM)
+                       (forM)
 import           Data.List
-    (intersperse)
+                       (intersperse)
 import           Data.Text
-    (Text)
+                       (Text)
 import           Data.Version
-    (showVersion)
+                       (showVersion)
 import           NeatInterpolation
-    (text)
+                       (text)
 import           Options.Applicative
-    (Parser, execParser, footer, fullDesc, header, help, helper, info,
-    infoOption, long, metavar, progDesc, strOption)
+                       (Parser, execParser, footer, fullDesc, header, help,
+                       helper, info, infoOption, long, metavar, progDesc,
+                       strOption)
 import           System.Directory
-    (doesDirectoryExist, listDirectory)
+                       (doesDirectoryExist, listDirectory)
 import           System.Environment
-    (getProgName)
+                       (getProgName)
 import           System.FilePath.Posix
-    ((<.>), (</>))
+                       ((<.>), (</>))
 import           System.Process
-    (readProcess)
+                       (readProcess)
 
 import           Paths_cardano_sl
-    (version)
+                       (version)
 
 type Help     = Text
 type Markdown = Text

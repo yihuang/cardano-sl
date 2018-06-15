@@ -7,7 +7,7 @@ import           Universum
 
 import qualified Pos.Binary.Class as Bi
 import           Pos.Crypto.Configuration
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 import           Pos.Crypto.Signing.Types.Tag
 
 -- | Get magic bytes corresponding to a 'SignTag'. Guaranteed to be different

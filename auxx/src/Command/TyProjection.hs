@@ -31,31 +31,37 @@ module Command.TyProjection
 import           Universum
 
 import           Data.Scientific
-    (Scientific, floatingOrInteger, toBoundedInteger, toRealFloat)
+                       (Scientific, floatingOrInteger, toBoundedInteger,
+                       toRealFloat)
 import           Data.Time.Units
-    (Microsecond, TimeUnit, convertUnit, fromMicroseconds)
+                       (Microsecond, TimeUnit, convertUnit, fromMicroseconds)
 import           Serokell.Data.Memory.Units
-    (Byte, fromBytes)
+                       (Byte, fromBytes)
 
 import           Pos.Core
-    (AddrStakeDistribution (..), Address, BlockVersion, Coin, CoinPortion,
-    EpochIndex, ScriptVersion, SoftwareVersion, StakeholderId, mkCoin,
-    unsafeCoinPortionFromDouble, unsafeGetCoin)
+                       (AddrStakeDistribution (..), Address, BlockVersion,
+                       Coin, CoinPortion, EpochIndex, ScriptVersion,
+                       SoftwareVersion, StakeholderId, mkCoin,
+                       unsafeCoinPortionFromDouble, unsafeGetCoin)
 import           Pos.Core.Txp
-    (TxOut (..))
+                       (TxOut (..))
 import           Pos.Crypto
-    (AHash (..), Hash, PublicKey)
+                       (AHash (..), Hash, PublicKey)
 import           Pos.Update
-    (ApplicationName (..), BlockVersionModifier (..), SystemTag (..))
+                       (ApplicationName (..), BlockVersionModifier (..),
+                       SystemTag (..))
 
 import           Lang.Argument
-    (TyProjection (..), TypeName (..))
+                       (TyProjection (..), TypeName (..))
 import           Lang.Value
-    (AddrDistrPart (..), ProposeUpdateSystem (..), Value (..),
-    _ValueAddrDistrPart, _ValueAddrStakeDistribution, _ValueAddress,
-    _ValueBlockVersion, _ValueBlockVersionModifier, _ValueBool, _ValueFilePath,
-    _ValueHash, _ValueNumber, _ValueProposeUpdateSystem, _ValuePublicKey,
-    _ValueSoftwareVersion, _ValueStakeholderId, _ValueString, _ValueTxOut)
+                       (AddrDistrPart (..), ProposeUpdateSystem (..),
+                       Value (..), _ValueAddrDistrPart,
+                       _ValueAddrStakeDistribution, _ValueAddress,
+                       _ValueBlockVersion, _ValueBlockVersionModifier,
+                       _ValueBool, _ValueFilePath, _ValueHash, _ValueNumber,
+                       _ValueProposeUpdateSystem, _ValuePublicKey,
+                       _ValueSoftwareVersion, _ValueStakeholderId,
+                       _ValueString, _ValueTxOut)
 
 tyValue :: TyProjection Value
 tyValue = TyProjection "Value" Just

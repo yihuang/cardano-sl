@@ -7,14 +7,14 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Fmt
-    (genericF)
+                       (genericF)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Crypto
-    (Hash, hash)
+                       (Hash, hash)
 import           Pos.Merkle
-    (MerkleRoot, mkMerkleTree, mtRoot)
+                       (MerkleRoot, mkMerkleTree, mtRoot)
 
 import           Pos.Core.Txp.Tx
 import           Pos.Core.Txp.TxPayload

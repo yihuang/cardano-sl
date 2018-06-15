@@ -6,15 +6,15 @@ module Pos.Lrc.Consumers
        ) where
 
 import           Pos.Lrc.Consumer
-    (LrcConsumer)
+                       (LrcConsumer)
 import           Pos.Lrc.Consumer.Delegation
-    (dlgLrcConsumer)
+                       (dlgLrcConsumer)
 import           Pos.Lrc.Consumer.Ssc
-    (sscLrcConsumer)
+                       (sscLrcConsumer)
 import           Pos.Lrc.Consumer.Update
-    (usLrcConsumer)
+                       (usLrcConsumer)
 import           Pos.Lrc.Mode
-    (LrcMode)
+                       (LrcMode)
 
 allLrcConsumers :: LrcMode ctx m => [LrcConsumer m]
 allLrcConsumers = [dlgLrcConsumer, usLrcConsumer, sscLrcConsumer]

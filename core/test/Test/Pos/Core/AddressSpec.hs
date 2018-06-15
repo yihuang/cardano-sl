@@ -8,30 +8,32 @@ import           Universum
 
 import qualified Data.ByteString as BS
 import           Formatting
-    (formatToString, int, (%))
+                       (formatToString, int, (%))
 import           Serokell.Data.Memory.Units
-    (Byte, memory)
+                       (Byte, memory)
 import           Test.Hspec
-    (Spec, describe, it, shouldBe)
+                       (Spec, describe, it, shouldBe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Gen, arbitrary, counterexample, forAll, frequency, vectorOf)
+                       (Gen, arbitrary, counterexample, forAll, frequency,
+                       vectorOf)
 
-import           Pos.Arbitrary.Core
-    ()
+import           Pos.Arbitrary.Core ()
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Core
-    (Address, IsBootstrapEraAddr (..), deriveLvl2KeyPair, largestHDAddressBoot,
-    largestPubKeyAddressBoot, largestPubKeyAddressSingleKey, makePubKeyAddress,
-    makePubKeyAddressBoot, makePubKeyHdwAddress)
+                       (Address, IsBootstrapEraAddr (..), deriveLvl2KeyPair,
+                       largestHDAddressBoot, largestPubKeyAddressBoot,
+                       largestPubKeyAddressSingleKey, makePubKeyAddress,
+                       makePubKeyAddressBoot, makePubKeyHdwAddress)
 import           Pos.Crypto
-    (EncryptedSecretKey, PassPhrase, PublicKey, SecretKey (..),
-    ShouldCheckPassphrase (..), deterministicKeyGen, emptyPassphrase,
-    mkEncSecretUnsafe, noPassEncrypt, toPublic)
+                       (EncryptedSecretKey, PassPhrase, PublicKey,
+                       SecretKey (..), ShouldCheckPassphrase (..),
+                       deterministicKeyGen, emptyPassphrase, mkEncSecretUnsafe,
+                       noPassEncrypt, toPublic)
 import           Pos.Crypto.HD
-    (HDAddressPayload (..))
+                       (HDAddressPayload (..))
 
 spec :: Spec
 spec = describe "Address" $ do

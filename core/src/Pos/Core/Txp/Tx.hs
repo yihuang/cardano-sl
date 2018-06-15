@@ -19,27 +19,27 @@ module Pos.Core.Txp.Tx
 import           Universum
 
 import           Control.Lens
-    (makeLenses, makePrisms)
+                       (makeLenses, makePrisms)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (Format, bprint, build, builder, int, sformat, (%))
+                       (Format, bprint, build, builder, int, sformat, (%))
 import           Serokell.Util.Base16
-    (base16F)
+                       (base16F)
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import           Serokell.Util.Verify
-    (VerificationRes (..), verResSingleF, verifyGeneric)
+                       (VerificationRes (..), verResSingleF, verifyGeneric)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core.Common
-    (Address (..), Coin (..), checkCoin, coinF)
+                       (Address (..), Coin (..), checkCoin, coinF)
 import           Pos.Crypto
-    (Hash, hash, shortHashF)
+                       (Hash, hash, shortHashF)
 import           Pos.Data.Attributes
-    (Attributes, areAttributesKnown)
+                       (Attributes, areAttributesKnown)
 
 ----------------------------------------------------------------------------
 -- Tx

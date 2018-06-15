@@ -5,17 +5,15 @@
 module Pos.Arbitrary.Explorer () where
 
 import           Test.QuickCheck
-    (Arbitrary (..))
+                       (Arbitrary (..))
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Core
-    ()
+import           Pos.Arbitrary.Core ()
 import           Pos.Explorer.Core.Types
-    (TxExtra (..))
+                       (TxExtra (..))
 
-import           Test.Pos.Txp.Arbitrary
-    ()
+import           Test.Pos.Txp.Arbitrary ()
 
 instance Arbitrary TxExtra where
     arbitrary = genericArbitrary

@@ -6,16 +6,17 @@ module Pos.Core.Genesis.NonAvvmBalances
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Serokell.Util
-    (mapJson)
+                       (mapJson)
 
 import           Pos.Core.Common
-    (Address, Coin, decodeTextAddress, unsafeAddCoin, unsafeIntegerToCoin)
+                       (Address, Coin, decodeTextAddress, unsafeAddCoin,
+                       unsafeIntegerToCoin)
 
 -- | Predefined balances of non avvm entries.
 newtype GenesisNonAvvmBalances = GenesisNonAvvmBalances

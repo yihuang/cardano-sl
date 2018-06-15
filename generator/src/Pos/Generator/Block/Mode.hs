@@ -23,73 +23,76 @@ module Pos.Generator.Block.Mode
 import           Universum
 
 import           Control.Lens
-    (lens)
+                       (lens)
 import           Control.Lens.TH
-    (makeLensesWith)
+                       (makeLensesWith)
 import qualified Control.Monad.Catch as UnsafeExc
 import           Control.Monad.Random.Strict
-    (RandT)
+                       (RandT)
 import qualified Crypto.Random as Rand
 import           Data.Default
-    (Default)
+                       (Default)
 import           Mockable
-    (MonadMockable, Promise)
+                       (MonadMockable, Promise)
 import           System.Wlog
-    (WithLogger, logWarning)
+                       (WithLogger, logWarning)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Block.BListener
-    (MonadBListener (..))
+                       (MonadBListener (..))
 import           Pos.Block.Slog
-    (HasSlogGState (..))
+                       (HasSlogGState (..))
 import           Pos.Client.Txp.Addresses
-    (MonadAddresses (..))
+                       (MonadAddresses (..))
 import           Pos.Configuration
-    (HasNodeConfiguration)
+                       (HasNodeConfiguration)
 import           Pos.Core
-    (Address, GenesisWStakeholders (..), HasConfiguration, HasPrimaryKey (..),
-    SlotId (..), Timestamp, epochOrSlotToSlot, getEpochOrSlot,
-    largestPubKeyAddressBoot)
+                       (Address, GenesisWStakeholders (..), HasConfiguration,
+                       HasPrimaryKey (..), SlotId (..), Timestamp,
+                       epochOrSlotToSlot, getEpochOrSlot,
+                       largestPubKeyAddressBoot)
 import           Pos.Crypto
-    (SecretKey)
+                       (SecretKey)
 import           Pos.DB
-    (DBSum, MonadDB, MonadDBRead)
+                       (DBSum, MonadDB, MonadDBRead)
 import qualified Pos.DB as DB
 import           Pos.DB.Block
-    (dbGetSerBlockSumDefault, dbGetSerUndoSumDefault, dbPutSerBlundsSumDefault)
+                       (dbGetSerBlockSumDefault, dbGetSerUndoSumDefault,
+                       dbPutSerBlundsSumDefault)
 import qualified Pos.DB.Block as DB
 import           Pos.DB.DB
-    (gsAdoptedBVDataDefault)
+                       (gsAdoptedBVDataDefault)
 import           Pos.Delegation
-    (DelegationVar, HasDlgConfiguration, mkDelegationVar)
+                       (DelegationVar, HasDlgConfiguration, mkDelegationVar)
 import           Pos.Exception
-    (reportFatalError)
+                       (reportFatalError)
 import           Pos.Generator.Block.Param
-    (BlockGenParams (..), HasBlockGenParams (..), HasTxGenParams (..))
+                       (BlockGenParams (..), HasBlockGenParams (..),
+                       HasTxGenParams (..))
 import qualified Pos.GState as GS
 import           Pos.Infra.Network.Types
-    (HasNodeType (..), NodeType (..))
+                       (HasNodeType (..), NodeType (..))
 import           Pos.Infra.Reporting
-    (HasMisbehaviorMetrics (..), MonadReporting (..))
+                       (HasMisbehaviorMetrics (..), MonadReporting (..))
 import           Pos.Infra.Slotting
-    (HasSlottingVar (..), MonadSlots (..), MonadSlotsData,
-    currentTimeSlottingSimple)
+                       (HasSlottingVar (..), MonadSlots (..), MonadSlotsData,
+                       currentTimeSlottingSimple)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 import           Pos.Lrc
-    (HasLrcContext, LrcContext (..))
+                       (HasLrcContext, LrcContext (..))
 import           Pos.Ssc
-    (HasSscConfiguration, SscMemTag, SscState, mkSscState)
+                       (HasSscConfiguration, SscMemTag, SscState, mkSscState)
 import           Pos.Txp
-    (GenericTxpLocalData, MempoolExt, TxpGlobalSettings, TxpHolderTag,
-    mkTxpLocalData)
+                       (GenericTxpLocalData, MempoolExt, TxpGlobalSettings,
+                       TxpHolderTag, mkTxpLocalData)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 import           Pos.Update.Context
-    (UpdateContext, mkUpdateContext)
+                       (UpdateContext, mkUpdateContext)
 import           Pos.Util
-    (HasLens (..), newInitFuture, postfixLFields)
+                       (HasLens (..), newInitFuture, postfixLFields)
 
 
 ----------------------------------------------------------------------------

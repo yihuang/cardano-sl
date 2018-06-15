@@ -12,16 +12,16 @@ import           Cardano.Wallet.API
 import qualified Cardano.Wallet.API.Development.Handlers as Dev
 import qualified Cardano.Wallet.API.V1.Handlers as V1
 import           Cardano.Wallet.API.V1.Swagger
-    (swaggerSchemaUIServer)
+                       (swaggerSchemaUIServer)
 import qualified Cardano.Wallet.API.V1.Swagger as Swagger
 import           Cardano.Wallet.Server.CLI
-    (RunMode (..))
+                       (RunMode (..))
 import           Cardano.Wallet.WalletLayer
-    (ActiveWalletLayer)
+                       (ActiveWalletLayer)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, curSoftwareVersion)
+                       (HasUpdateConfiguration, curSoftwareVersion)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, compileInfo)
+                       (HasCompileInfo, compileInfo)
 
 -- | Serve the REST interface to the wallet
 --

@@ -7,12 +7,12 @@ module Pos.Core.Common.TxSizeLinear
 import           Universum
 
 import           Data.Fixed
-    (Nano)
+                       (Nano)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Serokell.Data.Memory.Units
-    (Byte, toBytes)
+                       (Byte, toBytes)
 
 import           Pos.Core.Common.Coeff
 

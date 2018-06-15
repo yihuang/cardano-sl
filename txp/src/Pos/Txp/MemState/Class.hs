@@ -27,32 +27,32 @@ import           Universum
 
 import qualified Control.Concurrent.STM as STM
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import qualified Data.HashMap.Strict as HM
 import           Mockable
-    (CurrentTime, Mockable)
+                       (CurrentTime, Mockable)
 import           Pos.Core
-    (HeaderHash)
+                       (HeaderHash)
 import           Pos.Core.Txp
-    (TxAux, TxId)
+                       (TxAux, TxId)
 import           Pos.DB.Class
-    (MonadDBRead, MonadGState (..))
+                       (MonadDBRead, MonadGState (..))
 import           Pos.Infra.Reporting
-    (MonadReporting)
+                       (MonadReporting)
 import           Pos.Infra.Slotting
-    (MonadSlots (..))
+                       (MonadSlots (..))
 import           Pos.Txp.Configuration
-    (HasTxpConfiguration)
+                       (HasTxpConfiguration)
 import           Pos.Txp.MemState.Types
-    (GenericTxpLocalData (..))
+                       (GenericTxpLocalData (..))
 import           Pos.Txp.Toil.Failure
-    (ToilVerFailure)
+                       (ToilVerFailure)
 import           Pos.Txp.Toil.Types
-    (MemPool (..), UndoMap, UtxoModifier)
+                       (MemPool (..), UndoMap, UtxoModifier)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 import           System.Wlog
-    (NamedPureLogger, WithLogger, launchNamedPureLog)
+                       (NamedPureLogger, WithLogger, launchNamedPureLog)
 
 data TxpHolderTag
 

@@ -13,24 +13,24 @@ module Pos.Wallet.WalletMode
 import           Universum
 
 import           Control.Monad.Trans
-    (MonadTrans)
+                       (MonadTrans)
 import           Data.Time.Units
-    (Millisecond)
+                       (Millisecond)
 
 import           Pos.Client.KeyStorage
-    (MonadKeys)
+                       (MonadKeys)
 import           Pos.Client.Txp.History
-    (MonadTxHistory (..))
+                       (MonadTxHistory (..))
 import           Pos.Client.Txp.Network
-    (TxMode)
+                       (TxMode)
 import           Pos.Core
-    (ChainDifficulty)
+                       (ChainDifficulty)
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog)
+                       (CanJsonLog)
 import           Pos.Update
-    (ConfirmedProposalState (..))
+                       (ConfirmedProposalState (..))
 import           Pos.WorkMode
-    (EmptyMempoolExt)
+                       (EmptyMempoolExt)
 
 class Monad m => MonadBlockchainInfo m where
     networkChainDifficulty :: m (Maybe ChainDifficulty)

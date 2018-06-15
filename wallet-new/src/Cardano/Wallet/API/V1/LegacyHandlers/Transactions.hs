@@ -7,10 +7,10 @@ import qualified Data.List.NonEmpty as NE
 import           Servant
 
 import           Pos.Client.Txp.Util
-    (defaultInputSelectionPolicy)
+                       (defaultInputSelectionPolicy)
 import qualified Pos.Client.Txp.Util as V0
 import           Pos.Core
-    (TxAux)
+                       (TxAux)
 import qualified Pos.Core as Core
 import qualified Pos.Util.Servant as V0
 import qualified Pos.Wallet.WalletMode as V0
@@ -20,14 +20,14 @@ import qualified Pos.Wallet.Web.Methods.Payment as V0
 import qualified Pos.Wallet.Web.Methods.Txp as V0
 import qualified Pos.Wallet.Web.State as V0
 import           Pos.Wallet.Web.State.Storage
-    (WalletInfo (_wiSyncStatistics))
+                       (WalletInfo (_wiSyncStatistics))
 import qualified Pos.Wallet.Web.Util as V0
 
 import           Cardano.Wallet.API.Request
 import           Cardano.Wallet.API.Response
 import           Cardano.Wallet.API.V1.Errors
 import           Cardano.Wallet.API.V1.Migration
-    (HasConfigurations, MonadV1, migrate)
+                       (HasConfigurations, MonadV1, migrate)
 import qualified Cardano.Wallet.API.V1.Transactions as Transactions
 import           Cardano.Wallet.API.V1.Types
 

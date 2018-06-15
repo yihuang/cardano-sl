@@ -22,25 +22,25 @@ module Pos.Delegation.Class
 import           Universum
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import qualified Data.Cache.LRU as LRU
 import           Data.Time.Clock
-    (UTCTime)
+                       (UTCTime)
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Core
-    (HeaderHash, ProxySKHeavy, headerHash)
+                       (HeaderHash, ProxySKHeavy, headerHash)
 import           Pos.DB
-    (MonadBlockDBRead)
+                       (MonadBlockDBRead)
 import           Pos.DB.BlockIndex
-    (getTipHeader)
+                       (getTipHeader)
 import           Pos.Delegation.Configuration
-    (HasDlgConfiguration, dlgCacheParam)
+                       (HasDlgConfiguration, dlgCacheParam)
 import           Pos.Delegation.Types
-    (DlgMemPool)
+                       (DlgMemPool)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 ---------------------------------------------------------------------------
 -- Delegation in-memory data

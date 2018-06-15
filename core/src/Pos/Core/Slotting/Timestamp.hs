@@ -14,20 +14,22 @@ module Pos.Core.Slotting.Timestamp
 import           Universum
 
 import           Control.Lens
-    (Iso', from, iso, makePrisms)
+                       (Iso', from, iso, makePrisms)
 import qualified Data.Text.Buildable as Buildable
 import           Data.Time
-    (UTCTime, defaultTimeLocale, iso8601DateFormat, parseTimeM)
+                       (UTCTime, defaultTimeLocale, iso8601DateFormat,
+                       parseTimeM)
 import           Data.Time.Clock.POSIX
-    (POSIXTime, posixSecondsToUTCTime, utcTimeToPOSIXSeconds)
+                       (POSIXTime, posixSecondsToUTCTime,
+                       utcTimeToPOSIXSeconds)
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import           Formatting
-    (Format, build)
+                       (Format, build)
 import           Mockable
-    (CurrentTime, Mockable, currentTime)
+                       (CurrentTime, Mockable, currentTime)
 import           Numeric.Lens
-    (dividing)
+                       (dividing)
 import qualified Prelude
 
 -- | Timestamp is a number which represents some point in time. It is

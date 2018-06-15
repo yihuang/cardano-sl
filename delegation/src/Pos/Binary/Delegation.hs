@@ -9,15 +9,14 @@ module Pos.Binary.Delegation
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), deriveSimpleBi)
-import           Pos.Binary.Core
-    ()
+                       (Bi (..), Cons (..), Field (..), deriveSimpleBi)
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (ProxySKHeavy, StakeholderId)
+                       (ProxySKHeavy, StakeholderId)
 import           Pos.Delegation.Types
-    (DlgUndo (..))
+                       (DlgUndo (..))
 import           Pos.Infra.Communication.Types.Relay
-    (DataMsg (..))
+                       (DataMsg (..))
 
 deriveSimpleBi ''DlgUndo [
     Cons 'DlgUndo [

@@ -16,90 +16,96 @@ module Pos.Diffusion.Full
 import           Universum
 
 import           Control.Concurrent.Async
-    (Concurrently (..))
+                       (Concurrently (..))
 import qualified Control.Concurrent.STM as STM
 import           Data.Functor.Contravariant
-    (contramap)
+                       (contramap)
 import qualified Data.Map as M
 import           Data.Time.Units
-    (Microsecond, Millisecond, Second)
+                       (Microsecond, Millisecond, Second)
 import           Formatting
-    (Format)
+                       (Format)
 import qualified Network.Broadcast.OutboundQueue as OQ
 import           Network.Broadcast.OutboundQueue.Types
-    (MsgType (..), Origin (..))
+                       (MsgType (..), Origin (..))
 import           Network.Transport
-    (Transport)
+                       (Transport)
 import           Node
-    (Node, NodeAction (..), NodeEnvironment (..), defaultNodeEnvironment, node,
-    simpleNodeEndPoint)
+                       (Node, NodeAction (..), NodeEnvironment (..),
+                       defaultNodeEnvironment, node, simpleNodeEndPoint)
 import           Node.Conversation
-    (Conversation, Converse, converseWith)
+                       (Conversation, Converse, converseWith)
 import           System.Random
-    (newStdGen)
+                       (newStdGen)
 
 import           Pos.Block.Network
-    (MsgBlock, MsgGetBlocks, MsgGetHeaders, MsgHeaders)
+                       (MsgBlock, MsgGetBlocks, MsgGetHeaders, MsgHeaders)
 import           Pos.Communication
-    (EnqueueMsg, HandlerSpecs, InSpecs (..), InvOrDataTK, Listener,
-    MkListeners (..), Msg, MsgSubscribe, MsgSubscribe1, NodeId, OutSpecs (..),
-    PackingType, PeerData, SendActions, VerInfo (..), bipPacking, convH,
-    createOutSpecs, makeEnqueueMsg, makeSendActions, toOutSpecs)
+                       (EnqueueMsg, HandlerSpecs, InSpecs (..), InvOrDataTK,
+                       Listener, MkListeners (..), Msg, MsgSubscribe,
+                       MsgSubscribe1, NodeId, OutSpecs (..), PackingType,
+                       PeerData, SendActions, VerInfo (..), bipPacking, convH,
+                       createOutSpecs, makeEnqueueMsg, makeSendActions,
+                       toOutSpecs)
 import           Pos.Core
-    (BlockVersion, BlockVersionData (..), HeaderHash, ProtocolConstants (..),
-    ProxySKHeavy, StakeholderId)
+                       (BlockVersion, BlockVersionData (..), HeaderHash,
+                       ProtocolConstants (..), ProxySKHeavy, StakeholderId)
 import           Pos.Core.Block
-    (Block, BlockHeader, MainBlockHeader)
+                       (Block, BlockHeader, MainBlockHeader)
 import           Pos.Core.Chrono
-    (OldestFirst)
+                       (OldestFirst)
 import           Pos.Core.Ssc
-    (InnerSharesMap, Opening, SignedCommitment, VssCertificate)
+                       (InnerSharesMap, Opening, SignedCommitment,
+                       VssCertificate)
 import           Pos.Core.Txp
-    (TxAux)
+                       (TxAux)
 import           Pos.Core.Update
-    (UpId, UpdateProposal, UpdateVote)
+                       (UpId, UpdateProposal, UpdateVote)
 import           Pos.Crypto.Configuration
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 import qualified Pos.Diffusion.Full.Block as Diffusion.Block
 import qualified Pos.Diffusion.Full.Delegation as Diffusion.Delegation
 import qualified Pos.Diffusion.Full.Ssc as Diffusion.Ssc
 import qualified Pos.Diffusion.Full.Txp as Diffusion.Txp
 import qualified Pos.Diffusion.Full.Update as Diffusion.Update
 import           Pos.Infra.Communication.Relay.Logic
-    (invReqDataFlowTK)
+                       (invReqDataFlowTK)
 import           Pos.Infra.DHT.Real
-    (KademliaDHTInstance (..), KademliaParams (..), kademliaJoinNetworkNoThrow,
-    kademliaJoinNetworkRetry, startDHTInstance, stopDHTInstance)
+                       (KademliaDHTInstance (..), KademliaParams (..),
+                       kademliaJoinNetworkNoThrow, kademliaJoinNetworkRetry,
+                       startDHTInstance, stopDHTInstance)
 import           Pos.Infra.Diffusion.Subscription.Common
-    (subscriptionListeners)
+                       (subscriptionListeners)
 import           Pos.Infra.Diffusion.Subscription.Dht
-    (dhtSubscriptionWorker)
+                       (dhtSubscriptionWorker)
 import           Pos.Infra.Diffusion.Subscription.Dns
-    (dnsSubscriptionWorker)
+                       (dnsSubscriptionWorker)
 import           Pos.Infra.Diffusion.Subscription.Status
-    (SubscriptionStates, emptySubscriptionStates)
+                       (SubscriptionStates, emptySubscriptionStates)
 import           Pos.Infra.Diffusion.Transport.TCP
-    (bracketTransportTCP)
+                       (bracketTransportTCP)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..), DiffusionLayer (..))
+                       (Diffusion (..), DiffusionLayer (..))
 import           Pos.Infra.Network.Types
-    (Bucket (..), NetworkConfig (..), NodeType, SubscriptionWorker (..),
-    initQueue, topologyHealthStatus, topologyRunKademlia, topologySubscribers,
-    topologySubscriptionWorker)
+                       (Bucket (..), NetworkConfig (..), NodeType,
+                       SubscriptionWorker (..), initQueue,
+                       topologyHealthStatus, topologyRunKademlia,
+                       topologySubscribers, topologySubscriptionWorker)
 import           Pos.Infra.Reporting.Ekg
-    (EkgNodeMetrics (..), registerEkgNodeMetrics)
+                       (EkgNodeMetrics (..), registerEkgNodeMetrics)
 import           Pos.Infra.Reporting.Health.Types
-    (HealthStatus (..))
+                       (HealthStatus (..))
 import           Pos.Logic.Types
-    (Logic (..))
+                       (Logic (..))
 import           Pos.Ssc.Message
-    (MCCommitment (..), MCOpening (..), MCShares (..), MCVssCertificate (..))
+                       (MCCommitment (..), MCOpening (..), MCShares (..),
+                       MCVssCertificate (..))
 import           Pos.Util.OutboundQueue
-    (EnqueuedConversation (..))
+                       (EnqueuedConversation (..))
 import           Pos.Util.Timer
-    (Timer, newTimer)
+                       (Timer, newTimer)
 import           Pos.Util.Trace
-    (Severity (Error), Trace)
+                       (Severity (Error), Trace)
 
 {-# ANN module ("HLint: ignore Reduce duplication" :: Text) #-}
 {-# ANN module ("HLint: ignore Use whenJust" :: Text) #-}

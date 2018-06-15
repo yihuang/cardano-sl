@@ -13,12 +13,12 @@ import qualified Data.Map as Map
 import qualified Data.Yaml as Y
 import qualified Language.Haskell.TH.Syntax as TH
 import           System.Directory
-    (canonicalizePath, getDirectoryContents)
+                       (canonicalizePath, getDirectoryContents)
 import           System.FilePath
-    (takeDirectory, takeFileName, (</>))
+                       (takeDirectory, takeFileName, (</>))
 
 import           Pos.Util.Util
-    (maybeThrow, templateHaskellError)
+                       (maybeThrow, templateHaskellError)
 
 embedYamlObject :: Y.FromJSON r => FilePath -> FilePath -> (r -> TH.Q TH.Exp) -> TH.Q TH.Exp
 embedYamlObject name marker parser = do

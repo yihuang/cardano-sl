@@ -15,46 +15,48 @@ module Pos.Txp.Toil.Logic
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Monad.Except
-    (ExceptT, mapExceptT, throwError)
+                       (ExceptT, mapExceptT, throwError)
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Core
-    (AddrAttributes (..), AddrStakeDistribution (..), Address,
-    BlockVersionData (..), EpochIndex, HasGenesisData, HasProtocolMagic,
-    addrAttributesUnwrapped, isBootstrapEraBVD, isRedeemAddress)
+                       (AddrAttributes (..), AddrStakeDistribution (..),
+                       Address, BlockVersionData (..), EpochIndex,
+                       HasGenesisData, HasProtocolMagic,
+                       addrAttributesUnwrapped, isBootstrapEraBVD,
+                       isRedeemAddress)
 import           Pos.Core.Common
-    (integerToCoin)
+                       (integerToCoin)
 import qualified Pos.Core.Common as Fee
-    (TxFeePolicy (..), calculateTxSizeLinear)
+                       (TxFeePolicy (..), calculateTxSizeLinear)
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxId, TxOut (..), TxUndo, TxpUndo, checkTxAux,
-    toaOut, txOutAddress)
+                       (Tx (..), TxAux (..), TxId, TxOut (..), TxUndo, TxpUndo,
+                       checkTxAux, toaOut, txOutAddress)
 import           Pos.Crypto
-    (WithHash (..), hash)
+                       (WithHash (..), hash)
 import           Pos.Txp.Configuration
-    (HasTxpConfiguration, memPoolLimitTx)
+                       (HasTxpConfiguration, memPoolLimitTx)
 import           Pos.Txp.Toil.Failure
-    (ToilVerFailure (..))
+                       (ToilVerFailure (..))
 import           Pos.Txp.Toil.Monad
-    (GlobalToilM, LocalToilM, UtxoM, hasTx, memPoolSize, putTxWithUndo,
-    utxoMToGlobalToilM, utxoMToLocalToilM)
+                       (GlobalToilM, LocalToilM, UtxoM, hasTx, memPoolSize,
+                       putTxWithUndo, utxoMToGlobalToilM, utxoMToLocalToilM)
 import           Pos.Txp.Toil.Stakes
-    (applyTxsToStakes, rollbackTxsStakes)
+                       (applyTxsToStakes, rollbackTxsStakes)
 import           Pos.Txp.Toil.Types
-    (TxFee (..))
+                       (TxFee (..))
 import           Pos.Txp.Toil.Utxo
-    (VerifyTxUtxoRes (..))
+                       (VerifyTxUtxoRes (..))
 import qualified Pos.Txp.Toil.Utxo as Utxo
 import           Pos.Txp.Topsort
-    (topsortTxs)
+                       (topsortTxs)
 import           Pos.Util
-    (liftEither)
+                       (liftEither)
 
 ----------------------------------------------------------------------------
 -- Global

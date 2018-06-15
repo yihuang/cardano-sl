@@ -19,17 +19,16 @@ module Pos.Infra.Slotting.Types
        ) where
 
 import           Universum hiding
-    (keys)
+                       (keys)
 
 import           Data.Map.Strict as M
 import           Data.Time.Units
-    (Millisecond, toMicroseconds)
+                       (Millisecond, toMicroseconds)
 
 import           Pos.Core
-    (EpochIndex (..), LocalSlotIndex (..), TimeDiff (..), Timestamp (..),
-    addTimeDiffToTimestamp, getSlotIndex)
-import           Pos.Util.Util
-    ()
+                       (EpochIndex (..), LocalSlotIndex (..), TimeDiff (..),
+                       Timestamp (..), addTimeDiffToTimestamp, getSlotIndex)
+import           Pos.Util.Util ()
 
 
 ----------------------------------------------------------------------------

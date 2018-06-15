@@ -10,33 +10,35 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 import           Data.Reflection
-    (Reifies (..))
+                       (Reifies (..))
 import           Test.Hspec
-    (Expectation, Spec, describe, shouldBe)
+                       (Expectation, Spec, describe, shouldBe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Property, (.&&.), (===))
+                       (Property, (.&&.), (===))
 
 import           Pos.Core
-    (Coin, CoinPortion, StakeholderId, mkCoin, unsafeAddressHash,
-    unsafeCoinPortionFromDouble, unsafeGetCoin, unsafeSubCoin)
+                       (Coin, CoinPortion, StakeholderId, mkCoin,
+                       unsafeAddressHash, unsafeCoinPortionFromDouble,
+                       unsafeGetCoin, unsafeSubCoin)
 import           Pos.Core.Common
-    (applyCoinPortionDown, sumCoins)
+                       (applyCoinPortionDown, sumCoins)
 import           Pos.Core.Ssc
-    (SharesDistribution)
+                       (SharesDistribution)
 import           Pos.Lrc
-    (RichmenStakes, RichmenType (RTUsual), findRichmenPure)
+                       (RichmenStakes, RichmenType (RTUsual), findRichmenPure)
 import           Pos.Ssc
-    (SscVerifyError, computeSharesDistrPure, isDistrInaccuracyAcceptable,
-    sharesDistrMaxSumDistr)
+                       (SscVerifyError, computeSharesDistrPure,
+                       isDistrInaccuracyAcceptable, sharesDistrMaxSumDistr)
 
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 import           Test.Pos.Lrc.Arbitrary
-    (GenesisMpcThd, InvalidRichmenStakes (..), ValidRichmenStakes (..))
+                       (GenesisMpcThd, InvalidRichmenStakes (..),
+                       ValidRichmenStakes (..))
 import           Test.Pos.Util.QuickCheck.Property
-    (qcIsLeft)
+                       (qcIsLeft)
 
 spec :: Spec
 spec = withDefConfiguration $ describe "computeSharesDistr" $ do

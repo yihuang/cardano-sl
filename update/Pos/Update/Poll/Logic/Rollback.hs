@@ -9,14 +9,15 @@ import qualified Data.HashMap.Strict as HM
 import           Universum
 
 import           Pos.Core
-    (ApplicationName, BlockVersion, NumSoftwareVersion, SoftwareVersion (..))
+                       (ApplicationName, BlockVersion, NumSoftwareVersion,
+                       SoftwareVersion (..))
 import           Pos.Core.Update
-    (UpId)
+                       (UpId)
 import           Pos.Update.Poll.Class
-    (MonadPoll (..))
+                       (MonadPoll (..))
 import           Pos.Update.Poll.Types
-    (BlockVersionState, ConfirmedProposalState, PrevValue (..),
-    ProposalState (..), USUndo (..))
+                       (BlockVersionState, ConfirmedProposalState,
+                       PrevValue (..), ProposalState (..), USUndo (..))
 
 -- | Rollback application of UpdatePayload in MonadPoll using payload
 -- itself and undo data.

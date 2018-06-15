@@ -9,13 +9,13 @@ import           Universum
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, int, (%))
+                       (bprint, build, int, (%))
 
 import           Pos.Binary.Class
-    (Bi, decode, encode)
+                       (Bi, decode, encode)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Crypto.Signing
-    (PublicKey, RedeemPublicKey)
+                       (PublicKey, RedeemPublicKey)
 
 import           Pos.Core.Common.Script
 

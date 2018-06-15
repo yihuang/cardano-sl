@@ -7,54 +7,60 @@ module Test.Pos.Ssc.Toss.BaseSpec
 import           Universum
 
 import           Control.Lens
-    (ix, _Wrapped)
+                       (ix, _Wrapped)
 import qualified Crypto.Random as Rand
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Data.List.Extra
-    (nubOrdOn)
+                       (nubOrdOn)
 import           System.Random
-    (mkStdGen, randomR)
+                       (mkStdGen, randomR)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, NonEmptyList (..), Property, elements, listOf,
-    property, sublistOf, suchThat, vector, (.&&.), (===), (==>))
+                       (Arbitrary (..), Gen, NonEmptyList (..), Property,
+                       elements, listOf, property, sublistOf, suchThat, vector,
+                       (.&&.), (===), (==>))
 
 import           Pos.Arbitrary.Ssc
-    (BadCommAndOpening (..), BadSignedCommitment (..), CommitmentOpening (..))
+                       (BadCommAndOpening (..), BadSignedCommitment (..),
+                       CommitmentOpening (..))
 import           Pos.Binary
-    (AsBinary)
+                       (AsBinary)
 import           Pos.Core
-    (Coin, EpochIndex, EpochOrSlot (..), HasConfiguration, StakeholderId,
-    VssCertificate (..), VssCertificatesMap (..), addressHash, crucialSlot,
-    genesisBlockVersionData, insertVss, mkCoin, _vcVssKey)
+                       (Coin, EpochIndex, EpochOrSlot (..), HasConfiguration,
+                       StakeholderId, VssCertificate (..),
+                       VssCertificatesMap (..), addressHash, crucialSlot,
+                       genesisBlockVersionData, insertVss, mkCoin, _vcVssKey)
 import           Pos.Core.Ssc
-    (Commitment, CommitmentSignature, CommitmentsMap (..), InnerSharesMap,
-    Opening, OpeningsMap, SharesMap, SignedCommitment, mkCommitmentsMapUnsafe)
+                       (Commitment, CommitmentSignature, CommitmentsMap (..),
+                       InnerSharesMap, Opening, OpeningsMap, SharesMap,
+                       SignedCommitment, mkCommitmentsMapUnsafe)
 import           Pos.Crypto
-    (DecShare, PublicKey, SecretKey, SignTag (SignCommitment), protocolMagic,
-    sign, toPublic)
+                       (DecShare, PublicKey, SecretKey,
+                       SignTag (SignCommitment), protocolMagic, sign, toPublic)
 import           Pos.Lrc.Types
-    (RichmenStakes)
+                       (RichmenStakes)
 import           Pos.Ssc
-    (MultiRichmenStakes, PureTossWithEnv, SscGlobalState (..),
-    SscVerifyError (..), VssCertData (..), checkCertificatesPayload,
-    checkCommitmentsPayload, checkOpeningsPayload, checkSharesPayload,
-    runPureToss, sgsCommitments, sgsOpenings, sgsShares, sgsVssCertificates,
-    supplyPureTossEnv)
+                       (MultiRichmenStakes, PureTossWithEnv,
+                       SscGlobalState (..), SscVerifyError (..),
+                       VssCertData (..), checkCertificatesPayload,
+                       checkCommitmentsPayload, checkOpeningsPayload,
+                       checkSharesPayload, runPureToss, sgsCommitments,
+                       sgsOpenings, sgsShares, sgsVssCertificates,
+                       supplyPureTossEnv)
 import           Pos.Ssc.Base
-    (deleteSignedCommitment, verifyCommitment, verifyCommitmentSignature,
-    verifyOpening)
+                       (deleteSignedCommitment, verifyCommitment,
+                       verifyCommitmentSignature, verifyOpening)
 import           Test.Pos.Lrc.Arbitrary
-    (GenesisMpcThd, ValidRichmenStakes (..))
+                       (GenesisMpcThd, ValidRichmenStakes (..))
 import           Test.Pos.Util.QuickCheck.Property
-    (qcElem, qcFail, qcIsRight)
+                       (qcElem, qcFail, qcIsRight)
 
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 
 spec :: Spec
 spec = withDefConfiguration $ describe "Ssc.Base" $ do

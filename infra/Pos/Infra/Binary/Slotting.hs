@@ -9,19 +9,19 @@ module Pos.Infra.Binary.Slotting
 import           Universum
 
 import           Data.Time.Units
-    (Millisecond)
+                       (Millisecond)
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), deriveSimpleBi)
-import           Pos.Binary.Core
-    ()
+                       (Bi (..), Cons (..), Field (..), deriveSimpleBi)
+import           Pos.Binary.Core ()
 import           Pos.Core.Slotting
-    (TimeDiff)
+                       (TimeDiff)
 import           Pos.Infra.Slotting.Types
-    (EpochSlottingData (..), SlottingData, createSlottingDataUnsafe,
-    getSlottingDataMap, isValidSlottingDataMap)
+                       (EpochSlottingData (..), SlottingData,
+                       createSlottingDataUnsafe, getSlottingDataMap,
+                       isValidSlottingDataMap)
 import           Pos.Util.Util
-    (cborError)
+                       (cborError)
 
 deriveSimpleBi ''EpochSlottingData [
     Cons 'EpochSlottingData [

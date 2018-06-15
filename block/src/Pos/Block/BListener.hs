@@ -13,16 +13,16 @@ module Pos.Block.BListener
 import           Universum
 
 import           Control.Monad.Trans
-    (MonadTrans (..))
+                       (MonadTrans (..))
 import           Mockable
-    (SharedAtomicT)
+                       (SharedAtomicT)
 
 import           Pos.Block.Types
-    (Blund)
+                       (Blund)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..))
+                       (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.DB.BatchOp
-    (SomeBatchOp)
+                       (SomeBatchOp)
 
 class Monad m => MonadBListener m where
     -- Callback will be called after putting blocks into BlocksDB

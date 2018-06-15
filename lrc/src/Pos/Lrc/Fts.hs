@@ -9,25 +9,25 @@ module Pos.Lrc.Fts
 import           Universum
 
 import           Control.Lens
-    (makeLenses, makePrisms, uses)
+                       (makeLenses, makePrisms, uses)
 import           Data.Conduit
-    (ConduitT, await, runConduitPure, (.|))
+                       (ConduitT, await, runConduitPure, (.|))
 import qualified Data.Conduit.List as CL
 import           Data.List.NonEmpty
-    (fromList)
+                       (fromList)
 
 import           Formatting
-    (int, sformat, (%))
+                       (int, sformat, (%))
 
 import           Pos.Core.Common
-    (Coin, SharedSeed (..), SlotLeaders, StakeholderId, coinToInteger, mkCoin,
-    sumCoins, unsafeGetCoin)
+                       (Coin, SharedSeed (..), SlotLeaders, StakeholderId,
+                       coinToInteger, mkCoin, sumCoins, unsafeGetCoin)
 import           Pos.Core.Configuration
-    (HasProtocolConstants, epochSlots)
+                       (HasProtocolConstants, epochSlots)
 import           Pos.Core.Slotting
-    (LocalSlotIndex (..))
+                       (LocalSlotIndex (..))
 import           Pos.Crypto
-    (deterministic, randomNumber)
+                       (deterministic, randomNumber)
 
 -- Note: The "Satoshi" is the smallest indivisble unit of a Bitcoin.
 -- The currency of the Cardano network is called "Ada" and its smallest

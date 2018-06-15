@@ -7,14 +7,13 @@ module Pos.Aeson.Core.Configuration
     ) where
 
 import           Data.Aeson.TH
-    (deriveJSON)
+                       (deriveJSON)
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 
-import           Pos.Aeson.Genesis
-    ()
+import           Pos.Aeson.Genesis ()
 import           Pos.Core.Configuration.Core
-    (CoreConfiguration (..), GenesisConfiguration (..))
+                       (CoreConfiguration (..), GenesisConfiguration (..))
 
 deriveJSON defaultOptions ''GenesisConfiguration
 deriveJSON defaultOptions ''CoreConfiguration

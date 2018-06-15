@@ -15,7 +15,7 @@ module Cardano.Wallet.Kernel.DB.TxMeta (
 import           Universum
 
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 
 import qualified Pos.Core as Core
 

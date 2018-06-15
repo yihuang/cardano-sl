@@ -25,15 +25,15 @@ module Pos.Core.Common.Coin
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import           Data.Data
-    (Data)
+                       (Data)
 import qualified Data.Text.Buildable
 import           Formatting
-    (Format, bprint, build, int, (%))
+                       (Format, bprint, build, int, (%))
 
 import           Pos.Util.Util
-    (leftToPanic)
+                       (leftToPanic)
 
 -- | Coin is the least possible unit of currency.
 newtype Coin = Coin

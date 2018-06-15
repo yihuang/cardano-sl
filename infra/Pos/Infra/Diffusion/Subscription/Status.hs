@@ -16,14 +16,15 @@ module Pos.Infra.Diffusion.Subscription.Status
 import           Prelude
 
 import           Control.Concurrent.STM
-    (TVar, atomically, newTVarIO, readTVar, retry, writeTVar)
+                       (TVar, atomically, newTVarIO, readTVar, retry,
+                       writeTVar)
 import           Control.Monad
-    (when)
+                       (when)
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as Map
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 
 data SubscriptionStatus =
       Subscribed

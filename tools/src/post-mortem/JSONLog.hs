@@ -6,26 +6,26 @@ module JSONLog
     ) where
 
 import           Data.Attoparsec.Text
-    (Parser, parseOnly, takeTill)
+                       (Parser, parseOnly, takeTill)
 import           Pipes
 import           Pipes.ByteString
-    (fromHandle)
+                       (fromHandle)
 import           Pipes.Interleave
-    (interleave)
+                       (interleave)
 import qualified Pipes.Prelude as P
 import           System.Directory
-    (listDirectory)
+                       (listDirectory)
 import           System.FilePath
-    ((</>))
+                       ((</>))
 
 import           Pos.Infra.Util.JsonLog.Events
-    (JLEvent, JLTimedEvent (..))
+                       (JLEvent, JLTimedEvent (..))
 import           Types
 import           Universum
 import           Util.Aeson
-    (parseJSONP)
+                       (parseJSONP)
 import           Util.Safe
-    (runWithFiles)
+                       (runWithFiles)
 
 jsonLogs :: FilePath -> IO [(Text, FilePath)]
 jsonLogs logDir = do

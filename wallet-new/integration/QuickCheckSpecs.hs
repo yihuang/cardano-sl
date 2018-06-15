@@ -7,7 +7,7 @@ module QuickCheckSpecs (mkSpec) where
 import           Universum
 
 import           Network.HTTP.Client hiding
-    (Proxy)
+                       (Proxy)
 import           Network.HTTP.Types
 import           Servant
 import           Servant.QuickCheck
@@ -16,13 +16,13 @@ import           Test.Hspec
 import           Test.QuickCheck
 
 import           Cardano.Wallet.API.Request
-    (FilterBy, SortBy)
+                       (FilterBy, SortBy)
 import           Cardano.Wallet.API.Types
-    (AlternativeApiArg, Tags, WithDefaultApiArg)
+                       (AlternativeApiArg, Tags, WithDefaultApiArg)
 import qualified Cardano.Wallet.API.V1 as V0
 import qualified Cardano.Wallet.API.V1 as V1
 import           Cardano.Wallet.API.V1.Parameters
-    (WalletRequestParams, WithWalletRequestParams)
+                       (WalletRequestParams, WithWalletRequestParams)
 
 -- Our API apparently is returning JSON Arrays which is considered bad practice as very old
 -- browsers can be hacked: https://haacked.com/archive/2009/06/25/json-hijacking.aspx/

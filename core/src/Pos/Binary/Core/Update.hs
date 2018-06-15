@@ -9,33 +9,31 @@ module Pos.Binary.Core.Update
 import           Universum
 
 import           Data.Time.Units
-    (Millisecond)
+                       (Millisecond)
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), Raw, deriveSimpleBi, encodeListLen,
-    enforceSize)
-import           Pos.Binary.Core.Common
-    ()
-import           Pos.Binary.Core.Fee
-    ()
-import           Pos.Binary.Core.Script
-    ()
-import           Pos.Binary.Core.Slotting
-    ()
+                       (Bi (..), Cons (..), Field (..), Raw, deriveSimpleBi,
+                       encodeListLen, enforceSize)
+import           Pos.Binary.Core.Common ()
+import           Pos.Binary.Core.Fee ()
+import           Pos.Binary.Core.Script ()
+import           Pos.Binary.Core.Slotting ()
 import           Pos.Core.Common
-    (CoinPortion, ScriptVersion, TxFeePolicy)
+                       (CoinPortion, ScriptVersion, TxFeePolicy)
 import           Pos.Core.Slotting
-    (EpochIndex, FlatSlotId)
+                       (EpochIndex, FlatSlotId)
 import           Pos.Core.Update
-    (ApplicationName (..), BlockVersion (..), BlockVersionData (..),
-    BlockVersionModifier (..), NumSoftwareVersion, SoftforkRule (..),
-    SoftwareVersion (..), SystemTag (..), UpAttributes, UpdateData (..),
-    UpdatePayload (..), UpdateProposal (..), UpdateProposalToSign (..),
-    UpdateVote (..))
+                       (ApplicationName (..), BlockVersion (..),
+                       BlockVersionData (..), BlockVersionModifier (..),
+                       NumSoftwareVersion, SoftforkRule (..),
+                       SoftwareVersion (..), SystemTag (..), UpAttributes,
+                       UpdateData (..), UpdatePayload (..),
+                       UpdateProposal (..), UpdateProposalToSign (..),
+                       UpdateVote (..))
 import           Pos.Crypto
-    (Hash)
+                       (Hash)
 
 instance Bi ApplicationName where
     encode appName = encode (getApplicationName appName)

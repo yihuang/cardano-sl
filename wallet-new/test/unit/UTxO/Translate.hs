@@ -23,10 +23,10 @@ module UTxO.Translate (
   ) where
 
 import           Control.Exception
-    (throw)
+                       (throw)
 import           Control.Monad.Except
 import           Data.Constraint
-    (Dict (..))
+                       (Dict (..))
 import           Universum
 
 import           Pos.Block.Error
@@ -34,14 +34,14 @@ import           Pos.Block.Types
 import           Pos.Core
 import           Pos.Core.Chrono
 import           Pos.DB.Class
-    (MonadGState (..))
+                       (MonadGState (..))
 import           Pos.Txp.Toil
 import           Pos.Update
 
 import           Util.Validated
 import           UTxO.Context
 import           UTxO.Verify
-    (Verify)
+                       (Verify)
 import qualified UTxO.Verify as Verify
 
 {-------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ import qualified UTxO.Verify as Verify
 -------------------------------------------------------------------------------}
 
 import           Test.Pos.Configuration
-    (withDefConfiguration, withDefUpdateConfiguration)
+                       (withDefConfiguration, withDefUpdateConfiguration)
 
 {-------------------------------------------------------------------------------
   Translation monad

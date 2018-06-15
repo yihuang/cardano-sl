@@ -11,75 +11,76 @@ module Lib where
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), ToJSON, eitherDecodeStrict, withObject, (.:))
+                       (FromJSON (..), ToJSON, eitherDecodeStrict, withObject,
+                       (.:))
 import qualified Data.ByteString as B
 import           Data.Function
-    (id)
+                       (id)
 import qualified Data.List.NonEmpty as NE
 import           Data.Map
-    (fromList, union)
+                       (fromList, union)
 import           Data.String.Conv
-    (toS)
+                       (toS)
 import           Data.Time
-    (diffUTCTime, getCurrentTime)
+                       (diffUTCTime, getCurrentTime)
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 
 import           Crypto.Random.Entropy
-    (getEntropy)
+                       (getEntropy)
 import           Pos.Client.Txp
-    (TxHistoryEntry (..))
+                       (TxHistoryEntry (..))
 import           Pos.Core
-    (Address, Coin, mkCoin)
+                       (Address, Coin, mkCoin)
 import           Pos.Data.Attributes
-    (mkAttributes)
+                       (mkAttributes)
 import           Pos.DB.GState.Common
-    (getTip)
+                       (getTip)
 import           Pos.Infra.StateLock
-    (StateLock (..))
+                       (StateLock (..))
 import           Pos.Txp
-    (Tx (..), TxId, TxIn (..), TxOut (..), TxOutAux (..))
+                       (Tx (..), TxId, TxIn (..), TxOut (..), TxOutAux (..))
 import           Pos.Txp.Toil.Types
-    (utxoToModifier)
+                       (utxoToModifier)
 import           Pos.Util.BackupPhrase
-    (BackupPhrase (..))
+                       (BackupPhrase (..))
 import           Pos.Util.Mnemonics
-    (toMnemonic)
+                       (toMnemonic)
 import           Pos.Util.Servant
-    (decodeCType)
+                       (decodeCType)
 import           Pos.Util.Util
-    (lensOf)
+                       (lensOf)
 import           Pos.Wallet.Web.Account
-    (GenSeed (..))
+                       (GenSeed (..))
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId (..), CAccount (..), CAccountInit (..), CAccountMeta (..),
-    CAddress (..), CId (..), CWallet (..), CWalletAssurance (..),
-    CWalletInit (..), CWalletMeta (..), Wal)
-import           Pos.Wallet.Web.ClientTypes.Instances
-    ()
+                       (AccountId (..), CAccount (..), CAccountInit (..),
+                       CAccountMeta (..), CAddress (..), CId (..),
+                       CWallet (..), CWalletAssurance (..), CWalletInit (..),
+                       CWalletMeta (..), Wal)
+import           Pos.Wallet.Web.ClientTypes.Instances ()
 import           Pos.Wallet.Web.Methods.Logic
-    (getAccounts, newAccountIncludeUnready, newAddress)
+                       (getAccounts, newAccountIncludeUnready, newAddress)
 import           Pos.Wallet.Web.Methods.Restore
-    (newWallet)
+                       (newWallet)
 import           Pos.Wallet.Web.Mode
-    (WalletWebMode)
+                       (WalletWebMode)
 import           Pos.Wallet.Web.State.State
-    (askWalletDB, getWalletSnapshot, getWalletUtxo, insertIntoHistoryCache,
-    setWalletUtxo, updateWalletBalancesAndUtxo)
+                       (askWalletDB, getWalletSnapshot, getWalletUtxo,
+                       insertIntoHistoryCache, setWalletUtxo,
+                       updateWalletBalancesAndUtxo)
 import           Test.QuickCheck
-    (Gen, arbitrary, choose, frequency, generate, vectorOf)
+                       (Gen, arbitrary, choose, frequency, generate, vectorOf)
 import           Text.Printf
-    (printf)
+                       (printf)
 
 import           CLI
-    (CLI (..))
+                       (CLI (..))
 import           Rendering
-    (green, renderAccountId, say)
+                       (green, renderAccountId, say)
 import           Types
-    (UberMonad)
+                       (UberMonad)
 
-import           Test.Pos.Txp.Arbitrary
-    ()
+import           Test.Pos.Txp.Arbitrary ()
 
 --
 -- Types

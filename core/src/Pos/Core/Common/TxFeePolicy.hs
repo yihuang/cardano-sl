@@ -6,7 +6,7 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, shown, (%))
+                       (bprint, build, shown, (%))
 
 import           Pos.Core.Common.TxSizeLinear
 

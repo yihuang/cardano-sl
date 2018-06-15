@@ -20,56 +20,58 @@ module Pos.Wallet.Redirect
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (views)
+                       (views)
 import qualified Data.HashMap.Strict as HM
 import           Data.Time.Units
-    (Millisecond)
+                       (Millisecond)
 import           System.Wlog
-    (WithLogger, logWarning)
+                       (WithLogger, logWarning)
 
 import           Pos.Block.Types
-    (LastKnownHeaderTag, MonadLastKnownHeader)
+                       (LastKnownHeaderTag, MonadLastKnownHeader)
 import qualified Pos.Context as PC
 import           Pos.Core
-    (ChainDifficulty, HasConfiguration, Timestamp, Tx, TxAux (..), TxId,
-    TxUndo, difficultyL, getCurrentTimestamp)
+                       (ChainDifficulty, HasConfiguration, Timestamp, Tx,
+                       TxAux (..), TxId, TxUndo, difficultyL,
+                       getCurrentTimestamp)
 import           Pos.Core.Block
-    (BlockHeader)
+                       (BlockHeader)
 import           Pos.Crypto
-    (WithHash (..))
+                       (WithHash (..))
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import qualified Pos.DB.GState.Common as GS
 import           Pos.Infra.Shutdown
-    (HasShutdownContext, triggerShutdown)
+                       (HasShutdownContext, triggerShutdown)
 import           Pos.Infra.Slotting
-    (MonadSlots (..), getNextEpochSlotDuration)
+                       (MonadSlots (..), getNextEpochSlotDuration)
 import           Pos.Txp
-    (MempoolExt, MonadTxpLocal (..), ToilVerFailure, TxpLocalWorkMode,
-    TxpProcessTransactionMode, getLocalUndos, txNormalize,
-    txProcessTransaction, withTxpLocalData)
+                       (MempoolExt, MonadTxpLocal (..), ToilVerFailure,
+                       TxpLocalWorkMode, TxpProcessTransactionMode,
+                       getLocalUndos, txNormalize, txProcessTransaction,
+                       withTxpLocalData)
 import           Pos.Update.Context
-    (UpdateContext (ucDownloadedUpdate))
+                       (UpdateContext (ucDownloadedUpdate))
 import           Pos.Update.Poll.Types
-    (ConfirmedProposalState)
+                       (ConfirmedProposalState)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 import           Pos.Wallet.WalletMode
-    (MonadBlockchainInfo (..), MonadUpdates (..))
+                       (MonadBlockchainInfo (..), MonadUpdates (..))
 import           Pos.Wallet.Web.Account
-    (AccountMode, getSKById)
+                       (AccountMode, getSKById)
 import           Pos.Wallet.Web.ClientTypes
-    (CId, Wal)
+                       (CId, Wal)
 import           Pos.Wallet.Web.Methods.History
-    (addHistoryTxMeta)
+                       (addHistoryTxMeta)
 import qualified Pos.Wallet.Web.State as WS
 import           Pos.Wallet.Web.Tracking
-    (THEntryExtra, buildTHEntryExtra, eskToWalletDecrCredentials,
-    isTxEntryInteresting)
+                       (THEntryExtra, buildTHEntryExtra,
+                       eskToWalletDecrCredentials, isTxEntryInteresting)
 
 ----------------------------------------------------------------------------
 -- BlockchainInfo

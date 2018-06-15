@@ -3,12 +3,12 @@ module Main
        ) where
 
 import           Data.Proxy
-    (Proxy (..))
+                       (Proxy (..))
 import           Language.PureScript.Bridge
-    (BridgePart, buildBridge, defaultBridge, mkSumType, typeName, writePSTypes,
-    (<|>), (^==))
+                       (BridgePart, buildBridge, defaultBridge, mkSumType,
+                       typeName, writePSTypes, (<|>), (^==))
 import           Language.PureScript.Bridge.PSTypes
-    (psInt)
+                       (psInt)
 import           Universum
 
 import qualified Pos.Explorer.Socket as PS
@@ -16,9 +16,9 @@ import qualified Pos.Explorer.Web.ClientTypes as CT
 import qualified Pos.Explorer.Web.Error as CE
 
 import           PSOptions
-    (Args (..), getPSOptions)
+                       (Args (..), getPSOptions)
 import           PSTypes
-    (psPosixTime)
+                       (psPosixTime)
 
 main :: IO ()
 main = do

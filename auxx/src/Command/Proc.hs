@@ -8,75 +8,83 @@ module Command.Proc
 import           Universum
 
 import           Data.Constraint
-    (Dict (..))
+                       (Dict (..))
 import           Data.Default
-    (def)
+                       (def)
 import           Data.List
-    ((!!))
+                       ((!!))
 import qualified Data.Map as Map
 import           Formatting
-    (build, int, sformat, stext, (%))
+                       (build, int, sformat, stext, (%))
 import           System.Wlog
-    (CanLog, HasLoggerName, logError, logInfo, logWarning)
+                       (CanLog, HasLoggerName, logError, logInfo, logWarning)
 import qualified Text.JSON.Canonical as CanonicalJSON
 
 import           Pos.Client.KeyStorage
-    (addSecretKey, getSecretKeysPlain)
+                       (addSecretKey, getSecretKeysPlain)
 import           Pos.Client.Txp.Balances
-    (getBalance)
+                       (getBalance)
 import           Pos.Core
-    (AddrStakeDistribution (..), Address, HeavyDlgIndex (..),
-    SoftwareVersion (..), StakeholderId, addressHash, mkMultiKeyDistr,
-    protocolMagic, unsafeGetCoin)
+                       (AddrStakeDistribution (..), Address,
+                       HeavyDlgIndex (..), SoftwareVersion (..), StakeholderId,
+                       addressHash, mkMultiKeyDistr, protocolMagic,
+                       unsafeGetCoin)
 import           Pos.Core.Common
-    (AddrAttributes (..), AddrSpendingData (..), makeAddress)
+                       (AddrAttributes (..), AddrSpendingData (..),
+                       makeAddress)
 import           Pos.Core.Configuration
-    (genesisSecretKeys)
+                       (genesisSecretKeys)
 import           Pos.Core.Txp
-    (TxOut (..))
+                       (TxOut (..))
 import           Pos.Crypto
-    (PublicKey, emptyPassphrase, encToPublic, fullPublicKeyF, hashHexF,
-    noPassEncrypt, safeCreatePsk, unsafeCheatingHashCoerce, withSafeSigner)
+                       (PublicKey, emptyPassphrase, encToPublic,
+                       fullPublicKeyF, hashHexF, noPassEncrypt, safeCreatePsk,
+                       unsafeCheatingHashCoerce, withSafeSigner)
 import           Pos.DB.Class
-    (MonadGState (..))
+                       (MonadGState (..))
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..))
+                       (Diffusion (..))
 import           Pos.Update
-    (BlockVersionModifier (..))
+                       (BlockVersionModifier (..))
 import           Pos.Util.UserSecret
-    (WalletUserSecret (..), readUserSecret, usKeys, usPrimKey, usWallet,
-    userSecret)
+                       (WalletUserSecret (..), readUserSecret, usKeys,
+                       usPrimKey, usWallet, userSecret)
 import           Pos.Util.Util
-    (eitherToThrow)
+                       (eitherToThrow)
 
 import           Command.BlockGen
-    (generateBlocks)
+                       (generateBlocks)
 import           Command.Help
-    (mkHelpMessage)
+                       (mkHelpMessage)
 import qualified Command.Rollback as Rollback
 import qualified Command.Tx as Tx
 import           Command.TyProjection
-    (tyAddrDistrPart, tyAddrStakeDistr, tyAddress, tyApplicationName,
-    tyBlockVersion, tyBlockVersionModifier, tyBool, tyByte, tyCoin,
-    tyCoinPortion, tyEither, tyEpochIndex, tyFilePath, tyHash, tyInt,
-    tyProposeUpdateSystem, tyPublicKey, tyScriptVersion, tySecond,
-    tySoftwareVersion, tyStakeholderId, tySystemTag, tyTxOut, tyValue, tyWord,
-    tyWord32)
+                       (tyAddrDistrPart, tyAddrStakeDistr, tyAddress,
+                       tyApplicationName, tyBlockVersion,
+                       tyBlockVersionModifier, tyBool, tyByte, tyCoin,
+                       tyCoinPortion, tyEither, tyEpochIndex, tyFilePath,
+                       tyHash, tyInt, tyProposeUpdateSystem, tyPublicKey,
+                       tyScriptVersion, tySecond, tySoftwareVersion,
+                       tyStakeholderId, tySystemTag, tyTxOut, tyValue, tyWord,
+                       tyWord32)
 import qualified Command.Update as Update
 import           Lang.Argument
-    (getArg, getArgMany, getArgOpt, getArgSome, typeDirectedKwAnn)
+                       (getArg, getArgMany, getArgOpt, getArgSome,
+                       typeDirectedKwAnn)
 import           Lang.Command
-    (CommandProc (..), UnavailableCommand (..))
+                       (CommandProc (..), UnavailableCommand (..))
 import           Lang.Name
-    (Name)
+                       (Name)
 import           Lang.Value
-    (AddKeyParams (..), AddrDistrPart (..), GenBlocksParams (..),
-    ProposeUpdateParams (..), ProposeUpdateSystem (..), RollbackParams (..),
-    Value (..))
+                       (AddKeyParams (..), AddrDistrPart (..),
+                       GenBlocksParams (..), ProposeUpdateParams (..),
+                       ProposeUpdateSystem (..), RollbackParams (..),
+                       Value (..))
 import           Mode
-    (MonadAuxxMode, deriveHDAddressAuxx, makePubKeyAddressAuxx)
+                       (MonadAuxxMode, deriveHDAddressAuxx,
+                       makePubKeyAddressAuxx)
 import           Repl
-    (PrintAction)
+                       (PrintAction)
 
 createCommandProcs ::
        forall m. (MonadIO m, CanLog m, HasLoggerName m)

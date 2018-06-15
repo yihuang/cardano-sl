@@ -24,16 +24,16 @@ module Cardano.Wallet.Kernel.DB.Util.IxSet (
   ) where
 
 import           Universum hiding
-    (Foldable)
+                       (Foldable)
 
 import qualified Control.Lens as Lens
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import           Data.Foldable
-    (Foldable (..))
+                       (Foldable (..))
 import qualified Data.IxSet.Typed as IxSet
 import           Data.SafeCopy
-    (SafeCopy (..))
+                       (SafeCopy (..))
 import qualified Data.Set as Set
 import qualified Data.Traversable
 

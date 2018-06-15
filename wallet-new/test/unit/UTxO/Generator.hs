@@ -47,12 +47,12 @@ module UTxO.Generator (
 import           Universum
 
 import           Control.Lens
-    (zoom, (%=), (.=), (<<+=))
+                       (zoom, (%=), (.=), (<<+=))
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 import qualified Data.Set as Set
 import           Pos.Core
-    (maxCoinVal)
+                       (maxCoinVal)
 import           Pos.Core.Chrono
 import           Test.QuickCheck
 

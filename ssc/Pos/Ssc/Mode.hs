@@ -8,36 +8,36 @@ import           Universum
 
 import qualified Crypto.Random as Rand
 import           Mockable
-    (MonadMockable)
+                       (MonadMockable)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Core
-    (HasPrimaryKey)
+                       (HasPrimaryKey)
 import           Pos.DB.Class
-    (MonadDB, MonadGState)
+                       (MonadDB, MonadGState)
 import           Pos.Infra.Recovery.Info
-    (MonadRecoveryInfo)
+                       (MonadRecoveryInfo)
 import           Pos.Infra.Reporting
-    (MonadReporting)
+                       (MonadReporting)
 import           Pos.Infra.Shutdown
-    (HasShutdownContext)
+                       (HasShutdownContext)
 import           Pos.Infra.Slotting
-    (MonadSlots)
+                       (MonadSlots)
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog)
+                       (CanJsonLog)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Security.Params
-    (SecurityParams)
+                       (SecurityParams)
 import           Pos.Ssc.Configuration
-    (HasSscConfiguration)
+                       (HasSscConfiguration)
 import           Pos.Ssc.Mem
-    (MonadSscMem)
+                       (MonadSscMem)
 import           Pos.Ssc.Types
-    (HasSscContext)
+                       (HasSscContext)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 -- | Mode used for all SSC listeners, workers, and the like.
 type SscMode ctx m

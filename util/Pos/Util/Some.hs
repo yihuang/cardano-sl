@@ -16,7 +16,7 @@ import qualified Prelude
 import           Universum
 
 import           Control.Lens
-    (ALens', Getter, Getting, cloneLens, to)
+                       (ALens', Getter, Getting, cloneLens, to)
 
 -- | Turn any constraint into an existential type! Example:
 --

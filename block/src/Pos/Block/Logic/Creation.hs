@@ -17,97 +17,101 @@ module Pos.Block.Logic.Creation
 import           Universum
 
 import           Control.Lens
-    (uses, (-=), (.=), _Wrapped)
+                       (uses, (-=), (.=), _Wrapped)
 import           Control.Monad.Except
-    (MonadError (throwError), runExceptT)
+                       (MonadError (throwError), runExceptT)
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import           Formatting
-    (build, fixed, ords, sformat, stext, (%))
+                       (build, fixed, ords, sformat, stext, (%))
 import           JsonLog
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Serokell.Data.Memory.Units
-    (Byte, memory)
+                       (Byte, memory)
 import           System.Wlog
-    (WithLogger, logDebug)
+                       (WithLogger, logDebug)
 
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Block.Base
-    (mkGenesisBlock, mkMainBlock)
+                       (mkGenesisBlock, mkMainBlock)
 import           Pos.Block.Logic.Internal
-    (MonadBlockApply, applyBlocksUnsafe, normalizeMempool)
+                       (MonadBlockApply, applyBlocksUnsafe, normalizeMempool)
 import           Pos.Block.Logic.Util
-    (calcChainQualityM)
+                       (calcChainQualityM)
 import           Pos.Block.Logic.VAR
-    (verifyBlocksPrefix)
+                       (verifyBlocksPrefix)
 import           Pos.Block.Lrc
-    (LrcModeFull, lrcSingleShot)
+                       (LrcModeFull, lrcSingleShot)
 import           Pos.Block.Slog
-    (HasSlogGState (..), ShouldCallBListener (..))
+                       (HasSlogGState (..), ShouldCallBListener (..))
 import           Pos.Core
-    (Blockchain (..), EpochIndex, EpochOrSlot (..), HasProtocolConstants,
-    HasProtocolMagic, HeaderHash, SlotId (..), chainQualityThreshold,
-    epochIndexL, epochSlots, flattenSlotId, getEpochOrSlot, headerHash,
-    protocolMagic)
+                       (Blockchain (..), EpochIndex, EpochOrSlot (..),
+                       HasProtocolConstants, HasProtocolMagic, HeaderHash,
+                       SlotId (..), chainQualityThreshold, epochIndexL,
+                       epochSlots, flattenSlotId, getEpochOrSlot, headerHash,
+                       protocolMagic)
 import           Pos.Core.Block
-    (BlockHeader (..), GenesisBlock, MainBlock, MainBlockchain)
+                       (BlockHeader (..), GenesisBlock, MainBlock,
+                       MainBlockchain)
 import qualified Pos.Core.Block as BC
 import           Pos.Core.Context
-    (HasPrimaryKey, getOurSecretKey)
+                       (HasPrimaryKey, getOurSecretKey)
 import           Pos.Core.Ssc
-    (SscPayload)
+                       (SscPayload)
 import           Pos.Core.Txp
-    (TxAux (..), mkTxPayload)
+                       (TxAux (..), mkTxPayload)
 import           Pos.Core.Update
-    (UpdatePayload (..))
+                       (UpdatePayload (..))
 import           Pos.Crypto
-    (SecretKey)
+                       (SecretKey)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import           Pos.Delegation
-    (DelegationVar, DlgPayload (..), ProxySKBlockInfo, clearDlgMemPool,
-    getDlgMempool)
+                       (DelegationVar, DlgPayload (..), ProxySKBlockInfo,
+                       clearDlgMemPool, getDlgMempool)
 import           Pos.Exception
-    (assertionFailed, reportFatalError)
+                       (assertionFailed, reportFatalError)
 import           Pos.Infra.Reporting
-    (HasMisbehaviorMetrics, reportError)
+                       (HasMisbehaviorMetrics, reportError)
 import           Pos.Infra.StateLock
-    (Priority (..), StateLock, StateLockMetrics, modifyStateLock)
+                       (Priority (..), StateLock, StateLockMetrics,
+                       modifyStateLock)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason (..))
+                       (MemPoolModifyReason (..))
 import           Pos.Infra.Util.LogSafe
-    (logInfoS)
+                       (logInfoS)
 import           Pos.Lrc
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Lrc.Context
-    (lrcActionOnEpochReason)
+                       (lrcActionOnEpochReason)
 import qualified Pos.Lrc.DB as LrcDB
 import           Pos.Ssc.Base
-    (defaultSscPayload, stripSscPayload)
+                       (defaultSscPayload, stripSscPayload)
 import           Pos.Ssc.Logic
-    (sscGetLocalPayload)
+                       (sscGetLocalPayload)
 import           Pos.Ssc.Mem
-    (MonadSscMem)
+                       (MonadSscMem)
 import           Pos.Ssc.State
-    (sscResetLocal)
+                       (sscResetLocal)
 import           Pos.Txp
-    (MempoolExt, MonadTxpLocal (..), MonadTxpMem, clearTxpMemPool,
-    txGetPayload, withTxpLocalData)
+                       (MempoolExt, MonadTxpLocal (..), MonadTxpMem,
+                       clearTxpMemPool, txGetPayload, withTxpLocalData)
 import           Pos.Txp.Base
-    (emptyTxPayload)
+                       (emptyTxPayload)
 import           Pos.Update
-    (UpdateContext)
+                       (UpdateContext)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, curSoftwareVersion, lastKnownBlockVersion)
+                       (HasUpdateConfiguration, curSoftwareVersion,
+                       lastKnownBlockVersion)
 import qualified Pos.Update.DB as UDB
 import           Pos.Update.Logic
-    (clearUSMemPool, usCanCreateBlock, usPreparePayload)
+                       (clearUSMemPool, usCanCreateBlock, usPreparePayload)
 import           Pos.Util
-    (_neHead)
+                       (_neHead)
 import           Pos.Util.Util
-    (HasLens (..), HasLens')
+                       (HasLens (..), HasLens')
 
 -- | A set of constraints necessary to create a block from mempool.
 type MonadCreateBlock ctx m

@@ -3,29 +3,28 @@ module Bench.Pos.Criterion.TxSigningBench
        ) where
 
 import           Criterion.Main
-    (Benchmark, bench, defaultConfig, defaultMainWith, env, whnf)
+                       (Benchmark, bench, defaultConfig, defaultMainWith, env,
+                       whnf)
 import           Criterion.Types
-    (Config (..))
+                       (Config (..))
 import           Test.QuickCheck
-    (generate)
+                       (generate)
 import           Universum
 
 import           Pos.Core
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.Crypto
-    (SecretKey, SignTag (SignTx), protocolMagic, sign)
-import           Pos.Ssc
-    ()
+                       (SecretKey, SignTag (SignTx), protocolMagic, sign)
+import           Pos.Ssc ()
 import           Pos.Txp
-    (TxId, TxSig, TxSigData (..))
+                       (TxId, TxSig, TxSigData (..))
 
-import           Test.Pos.Txp.Arbitrary.Unsafe
-    ()
+import           Test.Pos.Txp.Arbitrary.Unsafe ()
 import           Test.Pos.Util.QuickCheck.Arbitrary
-    (arbitraryUnsafe)
+                       (arbitraryUnsafe)
 
 import           Bench.Configuration
-    (giveCoreConf)
+                       (giveCoreConf)
 
 signTx :: HasConfiguration => (SecretKey, TxId) -> TxSig
 signTx (sk, thash) = sign protocolMagic SignTx sk txSigData

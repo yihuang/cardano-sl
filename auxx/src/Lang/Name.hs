@@ -6,21 +6,21 @@ module Lang.Name
        ) where
 
 import           Prelude
-    (Show (..))
+                       (Show (..))
 import           Universum
 
 import           Data.Char
-    (isAlpha)
+                       (isAlpha)
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.List.Split
-    (splitWhen)
+                       (splitWhen)
 import qualified Data.Text.Buildable as Buildable
 import           Test.QuickCheck.Arbitrary.Generic
-    (Arbitrary (..))
+                       (Arbitrary (..))
 import           Test.QuickCheck.Gen
-    (Gen, listOf, suchThat)
+                       (Gen, listOf, suchThat)
 
 -- | Invariant: @isAlpha . getLetter = const True@
 newtype Letter = Letter { getLetter :: Char }

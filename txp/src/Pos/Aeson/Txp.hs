@@ -7,29 +7,30 @@ module Pos.Aeson.Txp where
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), FromJSONKey (..), FromJSONKeyFunction (..),
-    ToJSON (toJSON), ToJSONKey (..), object, withObject, (.:), (.=))
+                       (FromJSON (..), FromJSONKey (..),
+                       FromJSONKeyFunction (..), ToJSON (toJSON),
+                       ToJSONKey (..), object, withObject, (.:), (.=))
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON)
+                       (defaultOptions, deriveJSON)
 import           Data.Aeson.Types
-    (toJSONKeyText)
+                       (toJSONKeyText)
 import qualified Data.Text as T
 import           Formatting
-    (build, int, sformat, (%))
+                       (build, int, sformat, (%))
 import qualified Serokell.Util.Base16 as B16
 import           Serokell.Util.Base64
-    (JsonByteString (..))
+                       (JsonByteString (..))
 
-import           Pos.Aeson.Core
-    ()
+import           Pos.Aeson.Core ()
 import           Pos.Core
-    (coinToInteger, decodeTextAddress, integerToCoin)
+                       (coinToInteger, decodeTextAddress, integerToCoin)
 import           Pos.Core.Txp
-    (Tx, TxAux, TxIn (..), TxInWitness (..), TxOut (..), TxOutAux, TxSigData)
+                       (Tx, TxAux, TxIn (..), TxInWitness (..), TxOut (..),
+                       TxOutAux, TxSigData)
 import           Pos.Crypto
-    (decodeAbstractHash, hashHexF)
+                       (decodeAbstractHash, hashHexF)
 import           Pos.Util.Util
-    (aesonError, toAesonError)
+                       (aesonError, toAesonError)
 
 txInFromText :: Text -> Either Text TxIn
 txInFromText t = case T.splitOn "_" t of

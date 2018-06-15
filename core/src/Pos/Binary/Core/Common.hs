@@ -5,13 +5,12 @@ module Pos.Binary.Core.Common () where
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), deriveSimpleBi)
+                       (Bi (..), Cons (..), Field (..), deriveSimpleBi)
 import           Pos.Core.Common
-    (Coin (..), unsafeGetCoin)
+                       (Coin (..), unsafeGetCoin)
 import qualified Pos.Core.Common as T
 import qualified Pos.Data.Attributes as A
-import           Pos.Util.Orphans
-    ()
+import           Pos.Util.Orphans ()
 
 -- kind of boilerplate, but anyway that's what it was made for --
 -- verbosity and clarity

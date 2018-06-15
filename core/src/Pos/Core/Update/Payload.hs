@@ -6,19 +6,19 @@ module Pos.Core.Update.Payload
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError)
+                       (MonadError)
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Crypto
-    (ProtocolMagic)
+                       (ProtocolMagic)
 
 import           Pos.Core.Update.Proposal
 import           Pos.Core.Update.Vote

@@ -11,35 +11,35 @@ module Pos.Client.CLI.Params
 import           Universum
 
 import           Data.Default
-    (def)
+                       (def)
 import qualified Data.Yaml as Yaml
 import           System.Wlog
-    (LoggerName, WithLogger)
+                       (LoggerName, WithLogger)
 
 import           Pos.Behavior
-    (BehaviorConfig (..))
+                       (BehaviorConfig (..))
 import           Pos.Client.CLI.NodeOptions
-    (CommonNodeArgs (..), NodeArgs (..))
+                       (CommonNodeArgs (..), NodeArgs (..))
 import           Pos.Client.CLI.Options
-    (CommonArgs (..))
+                       (CommonArgs (..))
 import           Pos.Client.CLI.Secrets
-    (prepareUserSecret)
+                       (prepareUserSecret)
 import           Pos.Core.Configuration
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.Crypto
-    (VssKeyPair)
+                       (VssKeyPair)
 import           Pos.Infra.Network.CLI
-    (intNetworkConfigOpts)
+                       (intNetworkConfigOpts)
 import           Pos.Launcher.Param
-    (BaseParams (..), LoggingParams (..), NodeParams (..))
+                       (BaseParams (..), LoggingParams (..), NodeParams (..))
 import           Pos.Ssc
-    (SscParams (..))
+                       (SscParams (..))
 import           Pos.Update.Params
-    (UpdateParams (..))
+                       (UpdateParams (..))
 import           Pos.Util.UserSecret
-    (peekUserSecret)
+                       (peekUserSecret)
 import           Pos.Util.Util
-    (eitherToThrow)
+                       (eitherToThrow)
 
 loggingParams :: LoggerName -> CommonNodeArgs -> LoggingParams
 loggingParams defaultName CommonNodeArgs{..} =

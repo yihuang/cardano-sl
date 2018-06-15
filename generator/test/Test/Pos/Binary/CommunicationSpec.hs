@@ -6,31 +6,31 @@ import           Universum
 
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Default
-    (def)
+                       (def)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck.Monadic
-    (assert)
+                       (assert)
 
 import           Pos.Binary.Class
-    (decodeFull, serialize')
+                       (decodeFull, serialize')
 import           Pos.Binary.Communication
-    (serializeMsgSerializedBlock)
+                       (serializeMsgSerializedBlock)
 import           Pos.Block.Network.Types
-    (MsgBlock (..), MsgSerializedBlock (..))
+                       (MsgBlock (..), MsgSerializedBlock (..))
 import           Pos.DB.Class
-    (Serialized (..))
+                       (Serialized (..))
 import           Pos.Util.CompileInfo
-    (withCompileInfo)
+                       (withCompileInfo)
 
 import           Test.Pos.Block.Logic.Mode
-    (blockPropertyTestable)
+                       (blockPropertyTestable)
 import           Test.Pos.Block.Logic.Util
-    (EnableTxPayload (..), InplaceDB (..), bpGenBlock)
+                       (EnableTxPayload (..), InplaceDB (..), bpGenBlock)
 import           Test.Pos.Configuration
-    (HasStaticConfigurations, withStaticConfigurations)
+                       (HasStaticConfigurations, withStaticConfigurations)
 
 -- |
 -- The binary encoding of `MsgSerializedBlock` using `serializeMsgSerializedBlock`

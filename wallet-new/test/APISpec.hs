@@ -16,7 +16,8 @@ import qualified Data.List as List
 import qualified Data.Text.Encoding as Text
 import           Servant
 import           System.Directory
-    (getCurrentDirectory, listDirectory, makeAbsolute, setCurrentDirectory)
+                       (getCurrentDirectory, listDirectory, makeAbsolute,
+                       setCurrentDirectory)
 import           Test.Hspec
 
 import qualified Cardano.Wallet.API.V1 as V1

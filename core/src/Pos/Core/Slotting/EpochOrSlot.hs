@@ -16,20 +16,20 @@ module Pos.Core.Slotting.EpochOrSlot
 import           Universum
 
 import           Control.Lens
-    (Getter, lens, to)
+                       (Getter, lens, to)
 import qualified Data.Text.Buildable as Buildable
 import           Pos.Util.Some
-    (Some, applySome)
+                       (Some, applySome)
 
 import           Pos.Core.Configuration.Protocol
-    (HasProtocolConstants, epochSlots)
+                       (HasProtocolConstants, epochSlots)
 import           Pos.Util.Util
-    (leftToPanic)
+                       (leftToPanic)
 
 import           Pos.Core.Slotting.EpochIndex
 import           Pos.Core.Slotting.LocalSlotIndex
 import           Pos.Core.Slotting.SlotCount
-    (SlotCount)
+                       (SlotCount)
 import           Pos.Core.Slotting.SlotId
 
 -- | Represents SlotId or EpochIndex. Useful because genesis blocks

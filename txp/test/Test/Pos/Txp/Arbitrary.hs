@@ -22,38 +22,38 @@ module Test.Pos.Txp.Arbitrary
 import           Universum
 
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import           Data.List.NonEmpty
-    ((<|))
+                       ((<|))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Vector as V
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, choose, listOf, oneof, scale)
+                       (Arbitrary (..), Gen, choose, listOf, oneof, scale)
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Core
-    ()
+import           Pos.Arbitrary.Core ()
 import           Pos.Binary.Class
-    (Raw)
-import           Pos.Binary.Core
-    ()
+                       (Raw)
+import           Pos.Binary.Core ()
 import           Pos.Core.Common
-    (Coin, IsBootstrapEraAddr (..), makePubKeyAddress)
+                       (Coin, IsBootstrapEraAddr (..), makePubKeyAddress)
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxIn (..), TxInWitness (..), TxOut (..),
-    TxOutAux (..), TxPayload (..), TxProof (..), TxSigData (..), mkTxPayload)
+                       (Tx (..), TxAux (..), TxIn (..), TxInWitness (..),
+                       TxOut (..), TxOutAux (..), TxPayload (..), TxProof (..),
+                       TxSigData (..), mkTxPayload)
 import           Pos.Crypto
-    (Hash, ProtocolMagic, SecretKey, SignTag (SignTx), hash, sign, toPublic)
+                       (Hash, ProtocolMagic, SecretKey, SignTag (SignTx), hash,
+                       sign, toPublic)
 import           Pos.Crypto.Configuration
-    (HasProtocolMagic, protocolMagic)
+                       (HasProtocolMagic, protocolMagic)
 import           Pos.Data.Attributes
-    (mkAttributes)
+                       (mkAttributes)
 import           Pos.Merkle
-    (MerkleNode (..), MerkleRoot (..))
+                       (MerkleNode (..), MerkleRoot (..))
 
 import           Test.Pos.Crypto.Arbitrary
-    (genRedeemSignature, genSignature)
+                       (genRedeemSignature, genSignature)
 
 ----------------------------------------------------------------------------
 -- Arbitrary txp types

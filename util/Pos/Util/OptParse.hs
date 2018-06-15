@@ -5,9 +5,9 @@ module Pos.Util.OptParse
 import           Universum
 
 import           Options.Applicative
-    (ReadM, eitherReader)
+                       (ReadM, eitherReader)
 import           Text.Parsec
-    (Parsec, parse)
+                       (Parsec, parse)
 
 fromParsec :: Parsec Text () a -> ReadM a
 fromParsec parser =

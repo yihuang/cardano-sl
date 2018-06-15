@@ -8,14 +8,14 @@ module Test.Pos.Explorer.Socket.AppSpec
 import           Universum
 
 import           Network.Wai.Handler.Warp
-    (Settings, getPort)
+                       (Settings, getPort)
 import           Test.Hspec
-    (Spec, describe, it, shouldBe)
+                       (Spec, describe, it, shouldBe)
 
 import           Pos.Explorer.Socket.App
-    (NotifierSettings (..), toConfig)
+                       (NotifierSettings (..), toConfig)
 import           Test.Pos.Explorer.MockFactory
-    (testLoggerName)
+                       (testLoggerName)
 
 ----------------------------------------------------------------------------
 -- Spec

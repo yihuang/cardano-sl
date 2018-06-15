@@ -21,24 +21,24 @@ import           Universum
 
 import qualified Cardano.Crypto.Wallet as CC
 import           Crypto.Random
-    (MonadRandom, getRandomBytes)
+                       (MonadRandom, getRandomBytes)
 import qualified Data.ByteString as BS
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 
 import           Pos.Binary.Class
-    (Bi, Raw)
+                       (Bi, Raw)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Crypto.Configuration
-    (ProtocolMagic)
+                       (ProtocolMagic)
 import           Pos.Crypto.Hashing
-    (hash)
+                       (hash)
 import qualified Pos.Crypto.Scrypt as S
 import           Pos.Crypto.Signing.Signing
-    (ProxyCert (..), ProxySecretKey (..), PublicKey (..), SecretKey (..),
-    Signature (..), sign, toPublic)
+                       (ProxyCert (..), ProxySecretKey (..), PublicKey (..),
+                       SecretKey (..), Signature (..), sign, toPublic)
 import           Pos.Crypto.Signing.Tag
-    (SignTag (SignProxySK), signTag)
+                       (SignTag (SignProxySK), signTag)
 import           Pos.Crypto.Signing.Types.Safe
 
 -- | Regenerates secret key with new passphrase.

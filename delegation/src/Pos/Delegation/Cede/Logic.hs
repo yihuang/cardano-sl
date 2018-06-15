@@ -15,30 +15,31 @@ module Pos.Delegation.Cede.Logic
 import           Universum
 
 import           Control.Lens
-    (uses, (%=))
+                       (uses, (%=))
 import           Control.Monad.Except
-    (throwError)
+                       (throwError)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 
 import           Pos.Core
-    (EpochIndex, HeavyDlgIndex (..), ProxySKHeavy, StakeholderId, addressHash,
-    gbhConsensus)
+                       (EpochIndex, HeavyDlgIndex (..), ProxySKHeavy,
+                       StakeholderId, addressHash, gbhConsensus)
 import           Pos.Core.Block
-    (BlockSignature (..), MainBlockHeader, mainHeaderLeaderKey, mcdSignature)
+                       (BlockSignature (..), MainBlockHeader,
+                       mainHeaderLeaderKey, mcdSignature)
 import           Pos.Crypto
-    (HasProtocolMagic, ProxySecretKey (..), PublicKey, protocolMagic, psigPsk,
-    validateProxySecretKey)
+                       (HasProtocolMagic, ProxySecretKey (..), PublicKey,
+                       protocolMagic, psigPsk, validateProxySecretKey)
 import           Pos.DB
-    (DBError (DBMalformed))
+                       (DBError (DBMalformed))
 import           Pos.Delegation.Cede.Class
-    (MonadCedeRead (..), getPskPk)
+                       (MonadCedeRead (..), getPskPk)
 import           Pos.Delegation.Types
-    (DlgMemPool, isRevokePsk)
+                       (DlgMemPool, isRevokePsk)
 import           Pos.Lrc.Types
-    (RichmenSet)
+                       (RichmenSet)
 
 -- | Given an issuer, retrieves all certificate chains starting in
 -- issuer. This function performs a series of sequential db reads so

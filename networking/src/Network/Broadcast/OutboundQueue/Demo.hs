@@ -12,28 +12,28 @@ module Network.Broadcast.OutboundQueue.Demo where
 
 import           Control.Concurrent
 import           Control.Exception
-    (Exception, throwIO)
+                       (Exception, throwIO)
 import           Control.Monad
 import           Data.Function
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as Set
 import           Data.String
-    (fromString)
+                       (fromString)
 import           Data.Text
-    (Text)
+                       (Text)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           System.Wlog
 
 import           Pos.Util.Trace
-    (wlogTrace)
+                       (wlogTrace)
 
 import           Network.Broadcast.OutboundQueue
-    (OutboundQ)
+                       (OutboundQ)
 import qualified Network.Broadcast.OutboundQueue as OutQ
 import           Network.Broadcast.OutboundQueue.Types hiding
-    (simplePeers)
+                       (simplePeers)
 
 type Enqueue = IO
 

@@ -9,76 +9,79 @@ module Pos.Core.Genesis.Canonical
 import           Universum
 
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Control.Monad.Except
-    (MonadError (..))
+                       (MonadError (..))
 import           Data.Fixed
-    (Fixed (..))
+                       (Fixed (..))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.Buildable as Buildable
 import qualified Data.Text.Lazy.Builder as Builder
-    (fromText)
+                       (fromText)
 import           Data.Time.Units
-    (Millisecond, Second, convertUnit)
+                       (Millisecond, Second, convertUnit)
 import           Data.Typeable
-    (typeRep)
+                       (typeRep)
 import           Formatting
-    (formatToString)
+                       (formatToString)
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 import           Serokell.Util.Base16
-    (base16F)
+                       (base16F)
 import qualified Serokell.Util.Base16 as B16
 import           Serokell.Util.Base64
-    (base64F)
+                       (base64F)
 import qualified Serokell.Util.Base64 as B64
 import           Serokell.Util.Text
-    (readDecimal, readUnsignedDecimal)
+                       (readDecimal, readUnsignedDecimal)
 import           Text.JSON.Canonical
-    (FromJSON (..), FromObjectKey (..), Int54, JSValue (..),
-    ReportSchemaErrors (expected), ToJSON (..), ToObjectKey (..),
-    expectedButGotValue, fromJSField, fromJSObject, mkObject)
+                       (FromJSON (..), FromObjectKey (..), Int54, JSValue (..),
+                       ReportSchemaErrors (expected), ToJSON (..),
+                       ToObjectKey (..), expectedButGotValue, fromJSField,
+                       fromJSObject, mkObject)
 
 import           Pos.Binary.Class
-    (AsBinary (..))
-import           Pos.Binary.Core.Address
-    ()
+                       (AsBinary (..))
+import           Pos.Binary.Core.Address ()
 import           Pos.Core.Common
-    (Address, Coeff (..), Coin (..), CoinPortion (..), SharedSeed (..),
-    StakeholderId, TxFeePolicy (..), TxSizeLinear (..), addressF,
-    decodeTextAddress, getCoinPortion, unsafeGetCoin)
+                       (Address, Coeff (..), Coin (..), CoinPortion (..),
+                       SharedSeed (..), StakeholderId, TxFeePolicy (..),
+                       TxSizeLinear (..), addressF, decodeTextAddress,
+                       getCoinPortion, unsafeGetCoin)
 import           Pos.Core.Delegation
-    (HeavyDlgIndex (..), ProxySKHeavy)
+                       (HeavyDlgIndex (..), ProxySKHeavy)
 import           Pos.Core.ProtocolConstants
-    (VssMaxTTL (..), VssMinTTL (..))
+                       (VssMaxTTL (..), VssMinTTL (..))
 import           Pos.Core.Slotting
-    (EpochIndex (..), Timestamp (..))
+                       (EpochIndex (..), Timestamp (..))
 import           Pos.Core.Ssc
-    (VssCertificate (..), VssCertificatesMap (..), validateVssCertificatesMap)
+                       (VssCertificate (..), VssCertificatesMap (..),
+                       validateVssCertificatesMap)
 import           Pos.Core.Update
-    (BlockVersionData (..), SoftforkRule (..))
+                       (BlockVersionData (..), SoftforkRule (..))
 import           Pos.Crypto
-    (ProxyCert, ProxySecretKey (..), PublicKey, RedeemPublicKey, Signature,
-    decodeAbstractHash, fromAvvmPk, fullProxyCertHexF, fullPublicKeyF,
-    fullSignatureHexF, hashHexF, parseFullProxyCert, parseFullPublicKey,
-    parseFullSignature, redeemPkB64UrlF)
+                       (ProxyCert, ProxySecretKey (..), PublicKey,
+                       RedeemPublicKey, Signature, decodeAbstractHash,
+                       fromAvvmPk, fullProxyCertHexF, fullPublicKeyF,
+                       fullSignatureHexF, hashHexF, parseFullProxyCert,
+                       parseFullPublicKey, parseFullSignature, redeemPkB64UrlF)
 import           Pos.Crypto.Configuration
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 
 import           Pos.Core.Genesis.AvvmBalances
-    (GenesisAvvmBalances (..))
+                       (GenesisAvvmBalances (..))
 import           Pos.Core.Genesis.Data
-    (GenesisData (..))
+                       (GenesisData (..))
 import           Pos.Core.Genesis.Delegation
-    (GenesisDelegation (..), recreateGenesisDelegation)
+                       (GenesisDelegation (..), recreateGenesisDelegation)
 import           Pos.Core.Genesis.NonAvvmBalances
-    (GenesisNonAvvmBalances (..))
+                       (GenesisNonAvvmBalances (..))
 import           Pos.Core.Genesis.ProtocolConstants
-    (GenesisProtocolConstants (..))
+                       (GenesisProtocolConstants (..))
 import           Pos.Core.Genesis.VssCertificatesMap
-    (GenesisVssCertificatesMap (..))
+                       (GenesisVssCertificatesMap (..))
 import           Pos.Core.Genesis.WStakeholders
-    (GenesisWStakeholders (..))
+                       (GenesisWStakeholders (..))
 
 ----------------------------------------------------------------------------
 -- Primitive standard/3rdparty types

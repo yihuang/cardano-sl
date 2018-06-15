@@ -9,38 +9,41 @@ module Pos.Explorer.Txp.Local
        ) where
 
 import           JsonLog
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Universum
 
 import qualified Data.HashMap.Strict as HM
 
 import           Pos.Core
-    (BlockVersionData, EpochIndex, Timestamp)
+                       (BlockVersionData, EpochIndex, Timestamp)
 import           Pos.Core.Txp
-    (TxAux (..), TxId)
+                       (TxAux (..), TxId)
 import           Pos.Infra.Slotting
-    (MonadSlots (getCurrentSlot), getSlotStart)
+                       (MonadSlots (getCurrentSlot), getSlotStart)
 import           Pos.Infra.StateLock
-    (Priority (..), StateLock, StateLockMetrics, withStateLock)
+                       (Priority (..), StateLock, StateLockMetrics,
+                       withStateLock)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason (..))
+                       (MemPoolModifyReason (..))
 import           Pos.Txp.Logic.Local
-    (txNormalizeAbstract, txProcessTransactionAbstract)
+                       (txNormalizeAbstract, txProcessTransactionAbstract)
 import           Pos.Txp.MemState
-    (MempoolExt, TxpLocalWorkMode, getTxpExtra, withTxpLocalData)
+                       (MempoolExt, TxpLocalWorkMode, getTxpExtra,
+                       withTxpLocalData)
 import           Pos.Txp.Toil
-    (ToilVerFailure (..), Utxo)
+                       (ToilVerFailure (..), Utxo)
 import qualified Pos.Util.Modifier as MM
 import           Pos.Util.Util
-    (HasLens')
+                       (HasLens')
 
 import           Pos.Explorer.Core
-    (TxExtra (..))
+                       (TxExtra (..))
 import           Pos.Explorer.Txp.Common
-    (buildExplorerExtraLookup)
+                       (buildExplorerExtraLookup)
 import           Pos.Explorer.Txp.Toil
-    (ELocalToilM, ExplorerExtraLookup (..), ExplorerExtraModifier,
-    eNormalizeToil, eProcessTx, eemLocalTxsExtra)
+                       (ELocalToilM, ExplorerExtraLookup (..),
+                       ExplorerExtraModifier, eNormalizeToil, eProcessTx,
+                       eemLocalTxsExtra)
 
 
 type ETxpLocalWorkMode ctx m =

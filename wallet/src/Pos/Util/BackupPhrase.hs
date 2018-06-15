@@ -12,27 +12,27 @@ import qualified Prelude
 import           Universum
 
 import           Crypto.Hash
-    (Blake2b_256)
+                       (Blake2b_256)
 import qualified Data.ByteString as BS
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import           Data.Text.Buildable
-    (Buildable (..))
+                       (Buildable (..))
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, genericShrink, vectorOf)
-import           Test.QuickCheck.Instances
-    ()
+                       (Arbitrary (..), Gen, genericShrink, vectorOf)
+import           Test.QuickCheck.Instances ()
 
 import           Pos.Binary
-    (Bi (..), serialize')
+                       (Bi (..), serialize')
 import           Pos.Crypto
-    (AbstractHash, EncryptedSecretKey, PassPhrase, SecretKey, VssKeyPair,
-    deterministicKeyGen, deterministicVssKeyGen, safeDeterministicKeyGen,
-    unsafeAbstractHash)
+                       (AbstractHash, EncryptedSecretKey, PassPhrase,
+                       SecretKey, VssKeyPair, deterministicKeyGen,
+                       deterministicVssKeyGen, safeDeterministicKeyGen,
+                       unsafeAbstractHash)
 import           Pos.Infra.Util.LogSafe
-    (SecureLog)
+                       (SecureLog)
 import           Pos.Util.Mnemonics
-    (defMnemonic, fromMnemonic, toMnemonic)
+                       (defMnemonic, fromMnemonic, toMnemonic)
 
 -- | Datatype to contain a valid backup phrase
 newtype BackupPhrase = BackupPhrase

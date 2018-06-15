@@ -16,23 +16,24 @@ module Test.Pos.Block.Logic.Emulation
 import           Universum
 
 import           Control.Monad.Base
-    (MonadBase (..))
+                       (MonadBase (..))
 import qualified Control.Monad.Trans.Control as MC
 import qualified Crypto.Random as Rand
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import           Mockable
-    (Async, Channel, ChannelT, Concurrently, CurrentTime (..), Delay (..),
-    Fork, MFunctor' (hoist'), Mockable (..), MyThreadId (..), Production (..),
-    Promise, SharedAtomic (..), SharedAtomicT, SharedExclusive (..),
-    SharedExclusiveT, ThreadId)
+                       (Async, Channel, ChannelT, Concurrently,
+                       CurrentTime (..), Delay (..), Fork, MFunctor' (hoist'),
+                       Mockable (..), MyThreadId (..), Production (..),
+                       Promise, SharedAtomic (..), SharedAtomicT,
+                       SharedExclusive (..), SharedExclusiveT, ThreadId)
 import qualified Mockable.Metrics as Metrics
 import           System.Wlog
-    (CanLog (..))
+                       (CanLog (..))
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 newtype ClockVar = ClockVar (IORef Microsecond)
 

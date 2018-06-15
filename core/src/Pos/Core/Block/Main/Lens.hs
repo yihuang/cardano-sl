@@ -67,31 +67,32 @@ module Pos.Core.Block.Main.Lens
 import           Universum
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 
 import           Pos.Core.Block.Blockchain
-    (gbBody, gbExtra, gbHeader, gbPrevBlock, gbhBodyProof, gbhConsensus,
-    gbhExtra, gbhPrevBlock)
+                       (gbBody, gbExtra, gbHeader, gbPrevBlock, gbhBodyProof,
+                       gbhConsensus, gbhExtra, gbhPrevBlock)
 import           Pos.Core.Block.Main.Types
-    (BlockBodyAttributes, BlockHeaderAttributes, MainBody (..),
-    MainExtraBodyData, MainExtraHeaderData, MainProof (..))
+                       (BlockBodyAttributes, BlockHeaderAttributes,
+                       MainBody (..), MainExtraBodyData, MainExtraHeaderData,
+                       MainProof (..))
 import           Pos.Core.Block.Union.Types
-    (BlockSignature, HeaderHash, MainBlock, MainBlockHeader,
-    MainConsensusData (..), MainToSign (..))
+                       (BlockSignature, HeaderHash, MainBlock, MainBlockHeader,
+                       MainConsensusData (..), MainToSign (..))
 import           Pos.Core.Common
-    (ChainDifficulty)
+                       (ChainDifficulty)
 import           Pos.Core.Delegation
-    (DlgPayload)
+                       (DlgPayload)
 import           Pos.Core.Slotting
-    (SlotId)
+                       (SlotId)
 import           Pos.Core.Ssc
-    (SscPayload)
+                       (SscPayload)
 import           Pos.Core.Txp
-    (Tx, TxPayload, TxWitness, txpTxs, txpWitnesses)
+                       (Tx, TxPayload, TxWitness, txpTxs, txpWitnesses)
 import           Pos.Core.Update
-    (BlockVersion, SoftwareVersion, UpdatePayload)
+                       (BlockVersion, SoftwareVersion, UpdatePayload)
 import           Pos.Crypto
-    (Hash, PublicKey)
+                       (Hash, PublicKey)
 
 ----------------------------------------------------------------------------
 -- MainToSign

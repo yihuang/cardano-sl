@@ -7,10 +7,10 @@ import           Test.Hspec
 
 import qualified Data.Aeson as AE
 import           Launcher.Environment
-    (substituteEnvVarsValue)
+                       (substituteEnvVarsValue)
 import qualified System.Directory as Sys
 import           System.Environment
-    (setEnv)
+                       (setEnv)
 import           System.IO.Temp
 
 spec :: Spec

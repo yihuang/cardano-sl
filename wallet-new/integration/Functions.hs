@@ -12,38 +12,40 @@ module Functions
     ) where
 
 import           Universum hiding
-    (init, log, uncons)
+                       (init, log, uncons)
 
 import           Control.Lens
-    (at, each, filtered, uses, (%=), (+=), (.=), (<>=), (?=))
+                       (at, each, filtered, uses, (%=), (+=), (.=), (<>=),
+                       (?=))
 import           Data.Aeson
-    (toJSON)
+                       (toJSON)
 import           Data.Aeson.Diff
-    (diff)
+                       (diff)
 import           Data.Aeson.Encode.Pretty
-    (encodePretty)
+                       (encodePretty)
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import           Data.List
-    (isInfixOf, nub, uncons, (!!), (\\))
+                       (isInfixOf, nub, uncons, (!!), (\\))
 import           Servant.Client
-    (GenResponse (..))
+                       (GenResponse (..))
 import           Test.Hspec
 import           Test.QuickCheck
 import           Text.Show.Pretty
-    (ppShow)
+                       (ppShow)
 
 import           Cardano.Wallet.API.Response
-    (WalletResponse (..))
+                       (WalletResponse (..))
 import           Cardano.Wallet.API.V1.Migration.Types
-    (migrate)
+                       (migrate)
 import           Cardano.Wallet.API.V1.Types
 import           Cardano.Wallet.Client
-    (ClientError (..), ServantError (..), WalletClient (..), WalletError (..),
-    getAccounts, getAddressIndex, getTransactionIndex, getWallets, hoistClient)
+                       (ClientError (..), ServantError (..), WalletClient (..),
+                       WalletError (..), getAccounts, getAddressIndex,
+                       getTransactionIndex, getWallets, hoistClient)
 
 import           Pos.Core
-    (getCoin, mkCoin, unsafeAddCoin, unsafeSubCoin)
+                       (getCoin, mkCoin, unsafeAddCoin, unsafeSubCoin)
 import qualified Pos.Wallet.Web.ClientTypes.Types as V0
 
 import           Error

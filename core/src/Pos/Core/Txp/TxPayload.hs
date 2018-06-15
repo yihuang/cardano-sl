@@ -9,9 +9,9 @@ module Pos.Core.Txp.TxPayload
 import           Universum
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import           Control.Monad.Except
-    (MonadError)
+                       (MonadError)
 
 import           Pos.Core.Txp.Tx
 import           Pos.Core.Txp.TxAux

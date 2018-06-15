@@ -14,7 +14,7 @@ module Node.Message.Decoder
 
 import qualified Data.ByteString as BS
 import           Data.Int
-    (Int64)
+                       (Int64)
 import qualified Data.Text as T
 
 type ByteOffset = Int64

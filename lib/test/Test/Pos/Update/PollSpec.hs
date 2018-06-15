@@ -7,39 +7,39 @@ module Test.Pos.Update.PollSpec
 import           Universum
 
 import           Control.Lens
-    (at)
+                       (at)
 import qualified Data.HashSet as HS
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, Property, conjoin, forAll, listOf, suchThat, (===))
+                       (Arbitrary (..), Gen, Property, conjoin, forAll, listOf,
+                       suchThat, (===))
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Update
-    ()
+import           Pos.Arbitrary.Update ()
 import           Pos.Core
-    (ApplicationName, BlockVersion (..), BlockVersionData (..),
-    HasConfiguration, SoftwareVersion (..), StakeholderId, addressHash)
+                       (ApplicationName, BlockVersion (..),
+                       BlockVersionData (..), HasConfiguration,
+                       SoftwareVersion (..), StakeholderId, addressHash)
 import           Pos.Core.Update
-    (UpId, UpdateProposal (..))
+                       (UpId, UpdateProposal (..))
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 import           Pos.Update.BlockVersion
-    (applyBVM)
+                       (applyBVM)
 import qualified Pos.Update.Poll as Poll
 import qualified Pos.Util.Modifier as MM
 
-import           Test.Pos.Binary.Helpers
-    ()
+import           Test.Pos.Binary.Helpers ()
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 import           Test.Pos.Util.QuickCheck.Property
-    (formsMonoid)
+                       (formsMonoid)
 
 spec :: Spec
 spec = withDefConfiguration $ describe "Poll" $ do

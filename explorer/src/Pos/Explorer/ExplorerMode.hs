@@ -17,68 +17,70 @@ module Pos.Explorer.ExplorerMode
 import           Universum
 
 import           Control.Lens
-    (lens, makeLensesWith)
+                       (lens, makeLensesWith)
 import           System.Wlog
-    (CanLog, HasLoggerName (..), LoggerName (..))
+                       (CanLog, HasLoggerName (..), LoggerName (..))
 
 import           Test.QuickCheck
-    (Gen, Property, Testable (..), arbitrary, forAll, ioProperty)
+                       (Gen, Property, Testable (..), arbitrary, forAll,
+                       ioProperty)
 import           Test.QuickCheck.Monadic
-    (PropertyM, monadic)
+                       (PropertyM, monadic)
 
 import           Pos.Block.Slog
-    (mkSlogGState)
+                       (mkSlogGState)
 import           Pos.Core
-    (SlotId, Timestamp (..))
+                       (SlotId, Timestamp (..))
 import           Pos.DB
-    (MonadGState (..))
+                       (MonadGState (..))
 import qualified Pos.DB as DB
 import qualified Pos.DB.Block as DB
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import           Pos.DB.DB as DB
 import qualified Pos.GState as GS
 import           Pos.Infra.Slotting
-    (HasSlottingVar (..), MonadSlots (..), MonadSlotsData,
-    SimpleSlottingStateVar, mkSimpleSlottingStateVar)
+                       (HasSlottingVar (..), MonadSlots (..), MonadSlotsData,
+                       SimpleSlottingStateVar, mkSimpleSlottingStateVar)
 import qualified Pos.Infra.Slotting as Slot
 import           Pos.Lrc
-    (LrcContext (..), mkLrcSyncData)
+                       (LrcContext (..), mkLrcSyncData)
 import           Pos.Txp
-    (GenericTxpLocalData (..), MempoolExt, MonadTxpMem, TxpHolderTag,
-    mkTxpLocalData)
+                       (GenericTxpLocalData (..), MempoolExt, MonadTxpMem,
+                       TxpHolderTag, mkTxpLocalData)
 import           Pos.Util
-    (postfixLFields)
-import           Pos.Util.Mockable
-    ()
+                       (postfixLFields)
+import           Pos.Util.Mockable ()
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 import           Pos.Explorer.ExtraContext
-    (ExtraContext, ExtraContextT, HasExplorerCSLInterface,
-    HasGenesisRedeemAddressInfo, makeExtraCtx, runExtraContextT)
+                       (ExtraContext, ExtraContextT, HasExplorerCSLInterface,
+                       HasGenesisRedeemAddressInfo, makeExtraCtx,
+                       runExtraContextT)
 import           Pos.Explorer.Socket.Holder
-    (ConnectionsState)
+                       (ConnectionsState)
 import           Pos.Explorer.Txp
-    (ExplorerExtraModifier (..))
+                       (ExplorerExtraModifier (..))
 
 -- Need Emulation because it has instance Mockable CurrentTime
 import           Mockable
-    (Production, currentTime, runProduction)
+                       (Production, currentTime, runProduction)
 import           Pos.Infra.Util.JsonLog.Events
-    (HasJsonLogConfig (..), jsonLogDefault)
+                       (HasJsonLogConfig (..), jsonLogDefault)
 import           Pos.Infra.Util.TimeWarp
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Pos.Launcher.Configuration
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Util.LoggerName
-    (HasLoggerName' (..), askLoggerNameDefault, modifyLoggerNameDefault)
+                       (HasLoggerName' (..), askLoggerNameDefault,
+                       modifyLoggerNameDefault)
 import           Pos.WorkMode
-    (MinWorkMode)
+                       (MinWorkMode)
 import           Test.Pos.Block.Logic.Emulation
-    (Emulation (..), runEmulation)
+                       (Emulation (..), runEmulation)
 import           Test.Pos.Block.Logic.Mode
-    (TestParams (..))
+                       (TestParams (..))
 
 
 -------------------------------------------------------------------------------------

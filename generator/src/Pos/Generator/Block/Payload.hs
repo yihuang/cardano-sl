@@ -11,45 +11,48 @@ module Pos.Generator.Block.Payload
 import           Universum
 
 import           Control.Lens
-    (at, uses, (%=))
+                       (at, uses, (%=))
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 import           Control.Monad.Random.Class
-    (MonadRandom (..))
+                       (MonadRandom (..))
 import qualified Data.HashMap.Strict as HM
 import           Data.List
-    ((!!))
+                       ((!!))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import qualified Data.Vector as V
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           System.Random
-    (RandomGen (..))
+                       (RandomGen (..))
 
 import           Pos.AllSecrets
-    (asSecretKeys, asSpendingData, unInvAddrSpendingData, unInvSecretsMap)
+                       (asSecretKeys, asSpendingData, unInvAddrSpendingData,
+                       unInvSecretsMap)
 import           Pos.Client.Txp.Util
-    (InputSelectionPolicy (..), TxError (..), createGenericTx,
-    makeMPubKeyTxAddrs)
+                       (InputSelectionPolicy (..), TxError (..),
+                       createGenericTx, makeMPubKeyTxAddrs)
 import           Pos.Core
-    (AddrSpendingData (..), Address (..), Coin, SlotId (..), addressHash,
-    coinToInteger, makePubKeyAddressBoot, unsafeIntegerToCoin)
+                       (AddrSpendingData (..), Address (..), Coin, SlotId (..),
+                       addressHash, coinToInteger, makePubKeyAddressBoot,
+                       unsafeIntegerToCoin)
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxIn (..), TxOut (..), TxOutAux (..))
+                       (Tx (..), TxAux (..), TxIn (..), TxOut (..),
+                       TxOutAux (..))
 import           Pos.Crypto
-    (SecretKey, WithHash (..), fakeSigner, hash, toPublic)
+                       (SecretKey, WithHash (..), fakeSigner, hash, toPublic)
 import           Pos.Generator.Block.Error
-    (BlockGenError (..))
+                       (BlockGenError (..))
 import           Pos.Generator.Block.Mode
-    (BlockGenMode, BlockGenRandMode, MonadBlockGenBase)
+                       (BlockGenMode, BlockGenRandMode, MonadBlockGenBase)
 import           Pos.Generator.Block.Param
-    (HasBlockGenParams (..), HasTxGenParams (..))
+                       (HasBlockGenParams (..), HasTxGenParams (..))
 import qualified Pos.GState as DB
 import           Pos.Txp.MemState.Class
-    (MonadTxpLocal (..))
+                       (MonadTxpLocal (..))
 import           Pos.Txp.Toil
-    (Utxo, execUtxoM, utxoToLookup)
+                       (Utxo, execUtxoM, utxoToLookup)
 import qualified Pos.Txp.Toil.Utxo as Utxo
 import qualified Pos.Util.Modifier as Modifier
 

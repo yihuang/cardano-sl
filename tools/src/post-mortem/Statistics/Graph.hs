@@ -5,41 +5,41 @@ module Statistics.Graph
     ) where
 
 import           Universum hiding
-    (unlines)
+                       (unlines)
 
 import           Control.Foldl
-    (Fold (..))
+                       (Fold (..))
 import           Data.Graph.Inductive.Graph
-    (Graph (mkGraph))
+                       (Graph (mkGraph))
 import           Data.Graph.Inductive.PatriciaTree
-    (Gr)
+                       (Gr)
 import           Data.GraphViz
-    (DotGraph)
+                       (DotGraph)
 import qualified Data.GraphViz as G
 import qualified Data.GraphViz.Attributes.Complete as A
 import           Data.GraphViz.Commands.IO
-    (hPutDot)
+                       (hPutDot)
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as M
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as S
 import           Pos.Util
-    (withTempFile)
+                       (withTempFile)
 import           Prelude
-    (unlines)
+                       (unlines)
 import           System.Exit
-    (ExitCode (ExitSuccess))
+                       (ExitCode (ExitSuccess))
 import           System.IO
-    (hGetContents, hPutStrLn)
+                       (hGetContents, hPutStrLn)
 import           System.Process
-    (readProcessWithExitCode)
+                       (readProcessWithExitCode)
 
 import           JSONLog
-    (IndexedJLTimedEvent)
+                       (IndexedJLTimedEvent)
 import           Statistics.Block
-    (BlockHeader (..), blockChain, blockHeadersF)
+                       (BlockHeader (..), blockChain, blockHeadersF)
 import           Types
 
 graphF :: Fold IndexedJLTimedEvent (DotGraph Int)

@@ -9,33 +9,33 @@ module Pos.Explorer.Web.TestServer
 import           Universum
 
 import           Data.Time
-    (defaultTimeLocale, parseTimeOrError)
+                       (defaultTimeLocale, parseTimeOrError)
 import           Data.Time.Clock.POSIX
-    (POSIXTime, utcTimeToPOSIXSeconds)
+                       (POSIXTime, utcTimeToPOSIXSeconds)
 import           Network.Wai
-    (Application)
+                       (Application)
 import           Network.Wai.Handler.Warp
-    (run)
+                       (run)
 import           Servant.Generic
-    (AsServerT, toServant)
+                       (AsServerT, toServant)
 import           Servant.Server
-    (Handler, Server, serve)
+                       (Handler, Server, serve)
 
 import           Pos.Core
-    (EpochIndex (..), mkCoin)
-import           Pos.Explorer.Aeson.ClientTypes
-    ()
+                       (EpochIndex (..), mkCoin)
+import           Pos.Explorer.Aeson.ClientTypes ()
 import           Pos.Explorer.Web.Api
-    (ExplorerApi, ExplorerApiRecord (..), explorerApi)
+                       (ExplorerApi, ExplorerApiRecord (..), explorerApi)
 import           Pos.Explorer.Web.ClientTypes
-    (Byte, CAda (..), CAddress (..), CAddressSummary (..), CAddressType (..),
-    CAddressesFilter (..), CBlockEntry (..), CBlockSummary (..),
-    CGenesisAddressInfo (..), CGenesisSummary (..), CHash (..), CTxBrief (..),
-    CTxEntry (..), CTxId (..), CTxSummary (..), mkCCoin)
+                       (Byte, CAda (..), CAddress (..), CAddressSummary (..),
+                       CAddressType (..), CAddressesFilter (..),
+                       CBlockEntry (..), CBlockSummary (..),
+                       CGenesisAddressInfo (..), CGenesisSummary (..),
+                       CHash (..), CTxBrief (..), CTxEntry (..), CTxId (..),
+                       CTxSummary (..), mkCCoin)
 import           Pos.Explorer.Web.Error
-    (ExplorerError (..))
-import           Pos.Web
-    ()
+                       (ExplorerError (..))
+import           Pos.Web ()
 
 ----------------------------------------------------------------
 -- Top level functionality

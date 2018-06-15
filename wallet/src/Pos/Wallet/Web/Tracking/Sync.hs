@@ -41,88 +41,93 @@ module Pos.Wallet.Web.Tracking.Sync
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Concurrent.STM
-    (readTQueue)
+                       (readTQueue)
 import           Control.Exception.Safe
-    (handleAny)
+                       (handleAny)
 import           Control.Lens
-    (to)
+                       (to)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.DList as DL
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import qualified Data.List as List
-    (last)
+                       (last)
 import qualified Data.List.NonEmpty as NE
 import           Data.Time.Units
-    (Microsecond, TimeUnit (..))
+                       (Microsecond, TimeUnit (..))
 import           Formatting
-    (build, float, sformat, shown, (%))
+                       (build, float, sformat, shown, (%))
 import           Pos.Block.Types
-    (Blund, undoTx)
+                       (Blund, undoTx)
 import           Pos.Client.Txp.History
-    (TxHistoryEntry (..), txHistoryListToMap)
+                       (TxHistoryEntry (..), txHistoryListToMap)
 import           Pos.Core
-    (Address, BlockCount (..), ChainDifficulty (..), HasDifficulty (..),
-    HasProtocolConstants, HeaderHash, Timestamp (..), blkSecurityParam,
-    genesisHash, headerHash, headerSlotL, timestampToPosix)
+                       (Address, BlockCount (..), ChainDifficulty (..),
+                       HasDifficulty (..), HasProtocolConstants, HeaderHash,
+                       Timestamp (..), blkSecurityParam, genesisHash,
+                       headerHash, headerSlotL, timestampToPosix)
 import           Pos.Core.Block
-    (BlockHeader (..), getBlockHeader, mainBlockTxPayload)
+                       (BlockHeader (..), getBlockHeader, mainBlockTxPayload)
 import           Pos.Core.Chrono
-    (getNewestFirst)
+                       (getNewestFirst)
 import           Pos.Core.Txp
-    (TxAux (..), TxId, TxUndo)
+                       (TxAux (..), TxId, TxUndo)
 import           Pos.Crypto
-    (WithHash (..), shortHashF, withHash)
+                       (WithHash (..), shortHashF, withHash)
 import           Pos.DB.Block
-    (getBlund)
+                       (getBlund)
 import qualified Pos.DB.Block.Load as GS
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class
-    (MonadDBRead (..))
+                       (MonadDBRead (..))
 import qualified Pos.GState as GS
 import           Pos.GState.BlockExtra
-    (resolveForwardLink)
+                       (resolveForwardLink)
 import           Pos.Infra.Slotting
-    (MonadSlots (..), MonadSlotsData, getSlotStartPure, getSystemStartM)
+                       (MonadSlots (..), MonadSlotsData, getSlotStartPure,
+                       getSystemStartM)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 import           Pos.Infra.StateLock
-    (Priority (..), withStateLockNoMetrics)
+                       (Priority (..), withStateLockNoMetrics)
 import           Pos.Infra.Util.LogSafe
-    (buildSafe, logDebugSP, logErrorSP, logInfoSP, logWarningSP, secretOnlyF,
-    secure)
+                       (buildSafe, logDebugSP, logErrorSP, logInfoSP,
+                       logWarningSP, secretOnlyF, secure)
 import           Pos.Txp
-    (UndoMap, flattenTxPayload, topsortTxs, _txOutputs)
+                       (UndoMap, flattenTxPayload, topsortTxs, _txOutputs)
 import qualified Pos.Util.Modifier as MM
 import           Pos.Util.Servant
-    (encodeCType)
+                       (encodeCType)
 import           Pos.Util.Util
-    (HasLens (..), getKeys, timed)
+                       (HasLens (..), getKeys, timed)
 import           System.Wlog
-    (CanLog, HasLoggerName, WithLogger, logDebug, logError, logInfo,
-    logWarning, modifyLoggerName)
+                       (CanLog, HasLoggerName, WithLogger, logDebug, logError,
+                       logInfo, logWarning, modifyLoggerName)
 
 import           Pos.Wallet.Web.ClientTypes
-    (CId, CTxMeta (..), Wal)
+                       (CId, CTxMeta (..), Wal)
 import           Pos.Wallet.Web.Error.Types
-    (WalletError (..))
+                       (WalletError (..))
 import           Pos.Wallet.Web.Pending.Types
-    (PtxBlockInfo, PtxCondition (PtxApplying, PtxInNewestBlocks))
+                       (PtxBlockInfo,
+                       PtxCondition (PtxApplying, PtxInNewestBlocks))
 import           Pos.Wallet.Web.State
-    (CustomAddressType (..), SyncStatistics (..), WAddressMeta, WalletDB,
-    WalletDbReader, WalletSnapshot, WalletSyncState (..))
+                       (CustomAddressType (..), SyncStatistics (..),
+                       WAddressMeta, WalletDB, WalletDbReader, WalletSnapshot,
+                       WalletSyncState (..))
 import qualified Pos.Wallet.Web.State as WS
 import qualified Pos.Wallet.Web.State.State as WS
 import           Pos.Wallet.Web.Tracking.Decrypt
-    (THEntryExtra (..), WalletDecrCredentials, buildTHEntryExtra,
-    isTxEntryInteresting)
+                       (THEntryExtra (..), WalletDecrCredentials,
+                       buildTHEntryExtra, isTxEntryInteresting)
 import           Pos.Wallet.Web.Tracking.Modifier
-    (CAccModifier (..), VoidModifier, deleteAndInsertIMM, deleteAndInsertMM,
-    deleteAndInsertVM, indexedDeletions, sortedInsertions)
+                       (CAccModifier (..), VoidModifier, deleteAndInsertIMM,
+                       deleteAndInsertMM, deleteAndInsertVM, indexedDeletions,
+                       sortedInsertions)
 import           Pos.Wallet.Web.Tracking.Types
 
 

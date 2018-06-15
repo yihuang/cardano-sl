@@ -17,14 +17,14 @@ import           Universum
 
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import qualified Data.Hashable as H
 import qualified Data.Map as M
 import           Data.Text.Buildable
-    (Buildable)
+                       (Buildable)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, int, (%))
+                       (bprint, build, int, (%))
 import qualified Prelude
 
 import           Pos.Binary.Class

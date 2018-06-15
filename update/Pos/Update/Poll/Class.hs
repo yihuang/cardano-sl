@@ -10,20 +10,22 @@ module Pos.Update.Poll.Class
 import           Universum
 
 import           Control.Monad.Trans
-    (MonadTrans)
+                       (MonadTrans)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Core
-    (ApplicationName, BlockVersion, BlockVersionData, ChainDifficulty, Coin,
-    EpochIndex, NumSoftwareVersion, SlotId, SoftwareVersion, StakeholderId)
+                       (ApplicationName, BlockVersion, BlockVersionData,
+                       ChainDifficulty, Coin, EpochIndex, NumSoftwareVersion,
+                       SlotId, SoftwareVersion, StakeholderId)
 import           Pos.Core.Update
-    (UpId)
+                       (UpId)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 import           Pos.Update.Poll.Types
-    (BlockVersionState, ConfirmedProposalState, DecidedProposalState,
-    ProposalState, UndecidedProposalState)
+                       (BlockVersionState, ConfirmedProposalState,
+                       DecidedProposalState, ProposalState,
+                       UndecidedProposalState)
 
 ----------------------------------------------------------------------------
 -- Read-only

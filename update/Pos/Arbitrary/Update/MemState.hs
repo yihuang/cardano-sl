@@ -9,18 +9,16 @@ module Pos.Arbitrary.Update.MemState
 import           Universum
 
 import           Test.QuickCheck
-    (Arbitrary (..))
+                       (Arbitrary (..))
 
-import           Pos.Arbitrary.Update.Core
-    ()
+import           Pos.Arbitrary.Update.Core ()
 import           Pos.Binary.Class
-    (biSize)
+                       (biSize)
 import           Pos.Core.Configuration
-    (HasProtocolMagic)
+                       (HasProtocolMagic)
 import qualified Pos.Update.MemState as Upd
 
-import           Test.Pos.Crypto.Arbitrary
-    ()
+import           Test.Pos.Crypto.Arbitrary ()
 
 instance HasProtocolMagic => Arbitrary Upd.MemPool where
     arbitrary = do

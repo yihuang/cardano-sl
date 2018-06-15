@@ -23,30 +23,31 @@ module Pos.Wallet.Web.Tracking.Modifier
 import           Universum
 
 import           Data.DList
-    (DList)
+                       (DList)
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Serokell.Util
-    (listJson, listJsonIndent)
+                       (listJson, listJsonIndent)
 
 import           Pos.Client.Txp.History
-    (TxHistoryEntry (..))
+                       (TxHistoryEntry (..))
 import           Pos.Core
-    (Address, HeaderHash)
+                       (Address, HeaderHash)
 import           Pos.Core.Txp
-    (TxId)
+                       (TxId)
 import           Pos.Infra.Util.LogSafe
-    (BuildableSafeGen (..), deriveSafeBuildable, secretOnlyF, secureListF)
+                       (BuildableSafeGen (..), deriveSafeBuildable,
+                       secretOnlyF, secureListF)
 import           Pos.Txp.Toil
-    (UtxoModifier)
+                       (UtxoModifier)
 import           Pos.Util.Modifier
-    (MapModifier)
+                       (MapModifier)
 import qualified Pos.Util.Modifier as MM
 
 import           Pos.Wallet.Web.Pending.Types
-    (PtxBlockInfo)
+                       (PtxBlockInfo)
 import           Pos.Wallet.Web.State
-    (WAddressMeta)
+                       (WAddressMeta)
 
 -- VoidModifier describes a difference between two states.
 -- It's (set of added k, set of deleted k) essentially.

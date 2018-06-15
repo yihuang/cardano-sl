@@ -12,35 +12,35 @@ module Pos.Wallet.Web.Sockets.Notifier
 import           Universum
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Concurrent.Async
-    (mapConcurrently)
+                       (mapConcurrently)
 import           Control.Lens
-    ((.=))
+                       ((.=))
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import           Data.Time.Units
-    (Microsecond, Second)
+                       (Microsecond, Second)
 import           Pos.Core
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.DB
-    (MonadGState (..))
+                       (MonadGState (..))
 import           Pos.Wallet.WalletMode
-    (MonadBlockchainInfo (..), MonadUpdates (..))
+                       (MonadBlockchainInfo (..), MonadUpdates (..))
 import           Pos.Wallet.Web.ClientTypes
-    (spLocalCD, spNetworkCD, spPeers, toCUpdateInfo)
+                       (spLocalCD, spNetworkCD, spPeers, toCUpdateInfo)
 import           Pos.Wallet.Web.Mode
-    (MonadWalletWebSockets)
+                       (MonadWalletWebSockets)
 import           Pos.Wallet.Web.Sockets.Connection
-    (notifyAll)
+                       (notifyAll)
 import           Pos.Wallet.Web.Sockets.Types
-    (NotifyEvent (..))
+                       (NotifyEvent (..))
 import           Pos.Wallet.Web.State
-    (WalletDbReader, addUpdate, askWalletDB)
+                       (WalletDbReader, addUpdate, askWalletDB)
 import           Servant.Server
-    (Handler, runHandler)
+                       (Handler, runHandler)
 import           System.Wlog
-    (WithLogger, logDebug)
+                       (WithLogger, logDebug)
 
 type MonadNotifier ctx m =
     ( WithLogger m

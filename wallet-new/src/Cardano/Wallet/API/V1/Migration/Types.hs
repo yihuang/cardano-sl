@@ -9,41 +9,40 @@ module Cardano.Wallet.API.V1.Migration.Types (
     ) where
 
 import           Universum hiding
-    (elems)
+                       (elems)
 
 import qualified Control.Lens as Lens
 import qualified Control.Monad.Catch as Catch
 import           Data.Map
-    (elems)
+                       (elems)
 import           Data.Time.Clock.POSIX
-    (POSIXTime)
+                       (POSIXTime)
 import           Data.Time.Units
-    (fromMicroseconds, toMicroseconds)
+                       (fromMicroseconds, toMicroseconds)
 import           Data.Typeable
-    (typeRep)
+                       (typeRep)
 import           Formatting
-    (sformat)
+                       (sformat)
 
 import           Cardano.Wallet.API.V1.Errors as Errors
 import           Cardano.Wallet.API.V1.Types
-    (V1 (..))
+                       (V1 (..))
 import qualified Cardano.Wallet.API.V1.Types as V1
 import qualified Pos.Client.Txp.Util as V0
 import           Pos.Core
-    (addressF)
+                       (addressF)
 import qualified Pos.Core.Common as Core
 import qualified Pos.Core.Slotting as Core
 import qualified Pos.Core.Txp as Core
 import           Pos.Crypto
-    (decodeHash)
+                       (decodeHash)
 import qualified Pos.Txp.Toil.Types as V0
 import qualified Pos.Util.Servant as V0
-import qualified Pos.Wallet.Web.ClientTypes.Instances
-    ()
+import qualified Pos.Wallet.Web.ClientTypes.Instances ()
 import qualified Pos.Wallet.Web.ClientTypes.Types as V0
 import qualified Pos.Wallet.Web.State.Storage as OldStorage
 import           Pos.Wallet.Web.Tracking.Sync
-    (calculateEstimatedRemainingTime)
+                       (calculateEstimatedRemainingTime)
 
 -- | 'Migrate' encapsulates migration between types, when possible.
 -- NOTE: This has @nothing@ to do with database migrations (see `safecopy`),

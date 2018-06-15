@@ -9,58 +9,61 @@ module Main where
 import           Universum
 
 import           Control.Concurrent.STM
-    (newTQueueIO)
+                       (newTQueueIO)
 import           Data.Maybe
-    (fromJust)
+                       (fromJust)
 import           Mockable
-    (Production (..), runProduction)
+                       (Production (..), runProduction)
 import           Ntp.Client
-    (NtpStatus, withNtpClient)
+                       (NtpStatus, withNtpClient)
 import qualified Pos.Client.CLI as CLI
 import           Pos.DB.DB
-    (initNodeDBs)
+                       (initNodeDBs)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Infra.Ntp.Configuration
-    (NtpConfiguration, ntpClientSettings)
+                       (NtpConfiguration, ntpClientSettings)
 import           Pos.Launcher
-    (NodeParams (..), NodeResources (..), bpLoggingParams,
-    bracketNodeResources, loggerBracket, lpDefaultName, runNode,
-    withConfigurations)
+                       (NodeParams (..), NodeResources (..), bpLoggingParams,
+                       bracketNodeResources, loggerBracket, lpDefaultName,
+                       runNode, withConfigurations)
 import           Pos.Launcher.Configuration
-    (ConfigurationOptions, HasConfigurations)
+                       (ConfigurationOptions, HasConfigurations)
 import           Pos.Ssc.Types
-    (SscParams)
+                       (SscParams)
 import           Pos.Txp
-    (txpGlobalSettings)
+                       (txpGlobalSettings)
 import           Pos.Util
-    (logException)
+                       (logException)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
+                       (HasCompileInfo, retrieveCompileTimeInfo,
+                       withCompileInfo)
 import           Pos.Util.UserSecret
-    (usVss)
+                       (usVss)
 import           Pos.Wallet.Web
-    (bracketWalletWS, bracketWalletWebDB, getSKById, getWalletAddresses,
-    runWRealMode)
+                       (bracketWalletWS, bracketWalletWebDB, getSKById,
+                       getWalletAddresses, runWRealMode)
 import           Pos.Wallet.Web.Mode
-    (WalletWebMode)
+                       (WalletWebMode)
 import           Pos.Wallet.Web.State
-    (askWalletDB, askWalletSnapshot, flushWalletStorage)
+                       (askWalletDB, askWalletSnapshot, flushWalletStorage)
 import           Pos.Wallet.Web.Tracking.Decrypt
-    (eskToWalletDecrCredentials)
+                       (eskToWalletDecrCredentials)
 import           Pos.Wallet.Web.Tracking.Sync
-    (syncWallet)
+                       (syncWallet)
 import           System.Wlog
-    (LoggerName, Severity (..), logInfo, logMessage, usingLoggerName)
+                       (LoggerName, Severity (..), logInfo, logMessage,
+                       usingLoggerName)
 
 import qualified Cardano.Wallet.Kernel.Mode as Kernel.Mode
 import           Cardano.Wallet.Server.CLI
-    (ChooseWalletBackend (..), NewWalletBackendParams (..),
-    WalletBackendParams (..), WalletStartupOptions (..), getWalletNodeOptions,
-    walletDbPath, walletFlushDb, walletRebuildDb)
+                       (ChooseWalletBackend (..), NewWalletBackendParams (..),
+                       WalletBackendParams (..), WalletStartupOptions (..),
+                       getWalletNodeOptions, walletDbPath, walletFlushDb,
+                       walletRebuildDb)
 import qualified Cardano.Wallet.Server.Plugins as Plugins
 import           Cardano.Wallet.WalletLayer
-    (PassiveWalletLayer, bracketKernelPassiveWallet)
+                       (PassiveWalletLayer, bracketKernelPassiveWallet)
 
 
 -- | Default logger name when one is not provided on the command line

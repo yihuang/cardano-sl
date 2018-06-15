@@ -54,12 +54,12 @@ module Cardano.Wallet.Kernel.DB.HdWallet (
 import           Universum
 
 import           Control.Lens
-    (at)
+                       (at)
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 import qualified Data.IxSet.Typed as IxSet
 import           Data.SafeCopy
-    (base, deriveSafeCopy)
+                       (base, deriveSafeCopy)
 
 import qualified Pos.Core as Core
 import qualified Pos.Crypto as Core

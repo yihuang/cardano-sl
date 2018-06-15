@@ -14,40 +14,41 @@ import           Universum
 import qualified Codec.Archive.Tar as Tar
 import qualified Codec.Archive.Tar.Entry as Tar
 import           Control.Lens
-    (each, to)
+                       (each, to)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Conduit
-    (runConduitRes, yield, (.|))
+                       (runConduitRes, yield, (.|))
 import           Data.Conduit.List
-    (consume)
+                       (consume)
 import qualified Data.Conduit.Lzma as Lzma
 import qualified Data.HashMap.Strict as HM
 import           Data.List
-    (isSuffixOf)
+                       (isSuffixOf)
 import qualified Data.Text.IO as TIO
 import           Data.Time.Clock
-    (getCurrentTime)
+                       (getCurrentTime)
 import           Data.Time.Format
-    (defaultTimeLocale, formatTime)
+                       (defaultTimeLocale, formatTime)
 import           System.Directory
-    (canonicalizePath, doesFileExist, getTemporaryDirectory, removeFile)
+                       (canonicalizePath, doesFileExist, getTemporaryDirectory,
+                       removeFile)
 import           System.FilePath
-    (takeFileName)
+                       (takeFileName)
 import           System.IO
-    (IOMode (WriteMode), hClose, hFlush, withFile)
+                       (IOMode (WriteMode), hClose, hFlush, withFile)
 import           System.Wlog
-    (LoggerConfig (..), LoggerName, hwFilePath, lcTree, ltFiles, ltSubloggers,
-    retrieveLogContent)
+                       (LoggerConfig (..), LoggerName, hwFilePath, lcTree,
+                       ltFiles, ltSubloggers, retrieveLogContent)
 
 -- FIXME we get PackingError from here, but it should defined locally, since
 -- it's log-warper specific.
 import           Pos.Infra.Reporting.Exceptions
-    (ReportingError (..))
+                       (ReportingError (..))
 import           Pos.Util.Filesystem
-    (withSystemTempFile)
+                       (withSystemTempFile)
 import           Pos.Util.Util
-    ((<//>))
+                       ((<//>))
 
 
 -- | Use a 'LoggerConfig' to get logs, write them to a temporary file,

@@ -5,27 +5,27 @@ import           Universum
 
 import           Cardano.Wallet.API
 import           Cardano.Wallet.API.V1.Migration
-    (HasCompileInfo, HasConfigurations)
+                       (HasCompileInfo, HasConfigurations)
 
 import qualified Cardano.Wallet.API.Development.LegacyHandlers as Dev
 import qualified Cardano.Wallet.API.V0.Handlers as V0
 import qualified Cardano.Wallet.API.V1.LegacyHandlers as V1
 import           Cardano.Wallet.API.V1.Swagger
-    (swaggerSchemaUIServer)
+                       (swaggerSchemaUIServer)
 import qualified Cardano.Wallet.API.V1.Swagger as Swagger
 import           Cardano.Wallet.Server.CLI
-    (RunMode (..))
+                       (RunMode (..))
 
 import           Ntp.Client
-    (NtpStatus)
+                       (NtpStatus)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..))
+                       (Diffusion (..))
 import           Pos.Update.Configuration
-    (curSoftwareVersion)
+                       (curSoftwareVersion)
 import           Pos.Util.CompileInfo
-    (compileInfo)
+                       (compileInfo)
 import           Pos.Wallet.Web.Mode
-    (WalletWebMode)
+                       (WalletWebMode)
 import           Servant
 
 -- | This function has the tricky task of plumbing different versions of the API,

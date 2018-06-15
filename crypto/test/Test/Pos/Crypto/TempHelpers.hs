@@ -30,45 +30,47 @@ module Test.Pos.Crypto.TempHelpers
 import           Universum
 
 import           Control.Monad.IO.Class
-    (liftIO)
+                       (liftIO)
 import           Data.Aeson
-    (FromJSON, ToJSON)
+                       (FromJSON, ToJSON)
 import qualified Data.Aeson as JSON
-    (decode, encode)
+                       (decode, encode)
 import qualified Data.ByteString.Lazy.Char8 as BS
 import           Data.FileEmbed
-    (embedStringFile)
+                       (embedStringFile)
 import qualified Data.List as List
 import           Data.Text.Buildable
-    (Buildable (..))
+                       (Buildable (..))
 import           Data.Text.Internal.Builder
-    (fromText, toLazyText)
+                       (fromText, toLazyText)
 import           Language.Haskell.TH
-    (ExpQ, Q, loc_filename, runIO)
+                       (ExpQ, Q, loc_filename, runIO)
 import           Language.Haskell.TH.Syntax
-    (qLocation)
+                       (qLocation)
 import           System.Directory
-    (canonicalizePath)
+                       (canonicalizePath)
 import           System.FilePath
-    (takeDirectory, (</>))
+                       (takeDirectory, (</>))
 
 import           Hedgehog
-    (Gen, Group, MonadTest, Property, PropertyT, TestLimit, discoverPrefix,
-    eval, forAll, property, success, tripping, withTests, (===))
+                       (Gen, Group, MonadTest, Property, PropertyT, TestLimit,
+                       discoverPrefix, eval, forAll, property, success,
+                       tripping, withTests, (===))
 import           Hedgehog.Internal.Property
-    (Diff (..), failWith)
+                       (Diff (..), failWith)
 import           Hedgehog.Internal.Show
-    (LineDiff, lineDiff, mkValue, renderLineDiff, showPretty, valueDiff)
+                       (LineDiff, lineDiff, mkValue, renderLineDiff,
+                       showPretty, valueDiff)
 import           Hedgehog.Internal.TH
-    (TExpQ)
+                       (TExpQ)
 
 import           Pos.Binary.Class
-    (Bi (..), decodeFull, serialize)
+                       (Bi (..), decodeFull, serialize)
 
 import qualified Prelude
 
 import           Text.Show.Pretty
-    (Value (..), parseValue)
+                       (Value (..), parseValue)
 
 import qualified Test.Pos.Util.Base16 as B16
 

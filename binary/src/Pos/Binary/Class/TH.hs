@@ -8,25 +8,25 @@ module Pos.Binary.Class.TH
        ) where
 
 import           Universum hiding
-    (Type)
+                       (Type)
 
 import qualified Codec.CBOR.Decoding as Cbor
 import qualified Codec.CBOR.Encoding as Cbor
 import           Control.Lens
-    (imap)
+                       (imap)
 import           Data.Function
-    (on)
+                       (on)
 import           Data.List
-    (nubBy, (!!), (\\))
+                       (nubBy, (!!), (\\))
 import           Data.Maybe
-    (listToMaybe)
+                       (listToMaybe)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Language.Haskell.TH
 import           TH.ReifySimple
-    (DataCon (..), DataType (..), reifyDataType)
+                       (DataCon (..), DataType (..), reifyDataType)
 import           TH.Utilities
-    (plainInstanceD)
+                       (plainInstanceD)
 
 import qualified Pos.Binary.Class.Core as Bi
 

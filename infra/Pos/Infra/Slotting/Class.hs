@@ -9,12 +9,12 @@ module Pos.Infra.Slotting.Class
 import           Universum
 
 import           Control.Monad.Trans
-    (MonadTrans)
+                       (MonadTrans)
 
 import           Pos.Core.Slotting
-    (SlotId (..), Timestamp)
+                       (SlotId (..), Timestamp)
 import           Pos.Infra.Slotting.MemState
-    (MonadSlotsData)
+                       (MonadSlotsData)
 
 
 -- | Type class providing information about current slot.

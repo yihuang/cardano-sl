@@ -7,32 +7,32 @@ module Pos.Delegation.Worker
 import           Universum
 
 import           Control.Lens
-    ((%=))
+                       ((%=))
 import           Data.Time.Clock
-    (UTCTime, addUTCTime)
+                       (UTCTime, addUTCTime)
 import           Data.Time.Units
-    (Second)
+                       (Second)
 import           Mockable
-    (CurrentTime, Delay, Mockable, currentTime, delay)
+                       (CurrentTime, Delay, Mockable, currentTime, delay)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Delegation.Class
-    (MonadDelegation, dwMessageCache)
+                       (MonadDelegation, dwMessageCache)
 import           Pos.Delegation.Configuration
-    (HasDlgConfiguration, dlgMessageCacheTimeout)
+                       (HasDlgConfiguration, dlgMessageCacheTimeout)
 import           Pos.Delegation.Logic
-    (DelegationStateAction, runDelegationStateAction)
+                       (DelegationStateAction, runDelegationStateAction)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Infra.Reporting
-    (MonadReporting, reportOrLogE)
+                       (MonadReporting, reportOrLogE)
 import           Pos.Infra.Shutdown
-    (HasShutdownContext)
+                       (HasShutdownContext)
 import           Pos.Util
-    (microsecondsToUTC)
+                       (microsecondsToUTC)
 import           Pos.Util.LRU
-    (filterLRU)
+                       (filterLRU)
 
 -- | This is a subset of 'WorkMode'.
 type DlgWorkerConstraint ctx m

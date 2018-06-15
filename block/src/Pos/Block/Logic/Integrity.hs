@@ -19,36 +19,37 @@ module Pos.Block.Logic.Integrity
 import           Universum
 
 import           Control.Lens
-    (ix)
+                       (ix)
 import           Formatting
-    (build, int, sformat, (%))
+                       (build, int, sformat, (%))
 import           Serokell.Data.Memory.Units
-    (Byte, memory)
+                       (Byte, memory)
 import           Serokell.Util
-    (VerificationRes (..), verifyGeneric)
+                       (VerificationRes (..), verifyGeneric)
 
 import qualified Pos.Binary.Class as Bi
-import           Pos.Binary.Core
-    ()
-import           Pos.Binary.Update
-    ()
+import           Pos.Binary.Core ()
+import           Pos.Binary.Update ()
 import qualified Pos.Block.BHelpers as BHelpers
 import           Pos.Core
-    (BlockVersionData (..), ChainDifficulty, EpochOrSlot, HasDifficulty (..),
-    HasEpochIndex (..), HasEpochOrSlot (..), HasHeaderHash (..),
-    HasProtocolConstants, HasProtocolMagic, HeaderHash, SlotId (..),
-    SlotLeaders, addressHash, gbExtra, gbhExtra, getSlotIndex, headerSlotL,
-    prevBlockL, protocolMagic)
+                       (BlockVersionData (..), ChainDifficulty, EpochOrSlot,
+                       HasDifficulty (..), HasEpochIndex (..),
+                       HasEpochOrSlot (..), HasHeaderHash (..),
+                       HasProtocolConstants, HasProtocolMagic, HeaderHash,
+                       SlotId (..), SlotLeaders, addressHash, gbExtra,
+                       gbhExtra, getSlotIndex, headerSlotL, prevBlockL,
+                       protocolMagic)
 import           Pos.Core.Block
-    (Block, BlockHeader (..), blockHeaderProtocolMagic, gebAttributes,
-    gehAttributes, genBlockLeaders, getBlockHeader, mainHeaderLeaderKey,
-    mebAttributes, mehAttributes)
+                       (Block, BlockHeader (..), blockHeaderProtocolMagic,
+                       gebAttributes, gehAttributes, genBlockLeaders,
+                       getBlockHeader, mainHeaderLeaderKey, mebAttributes,
+                       mehAttributes)
 import           Pos.Core.Chrono
-    (NewestFirst (..), OldestFirst)
+                       (NewestFirst (..), OldestFirst)
 import           Pos.Crypto
-    (ProtocolMagic (getProtocolMagic))
+                       (ProtocolMagic (getProtocolMagic))
 import           Pos.Data.Attributes
-    (areAttributesKnown)
+                       (areAttributesKnown)
 
 ----------------------------------------------------------------------------
 -- Header

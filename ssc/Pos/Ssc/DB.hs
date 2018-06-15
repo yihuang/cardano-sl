@@ -9,29 +9,28 @@ module Pos.Ssc.DB
 import           Universum
 
 import           Data.Default
-    (def)
+                       (def)
 import qualified Data.Text.Buildable
 import qualified Database.RocksDB as Rocks
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 
-import           Pos.Binary.Ssc.Types
-    ()
+import           Pos.Binary.Ssc.Types ()
 import           Pos.Core
-    (HasCoreConfiguration, genesisVssCerts)
+                       (HasCoreConfiguration, genesisVssCerts)
 import           Pos.DB
-    (MonadDB, MonadDBRead, RocksBatchOp (..))
+                       (MonadDB, MonadDBRead, RocksBatchOp (..))
 import           Pos.DB.Error
-    (DBError (DBMalformed))
+                       (DBError (DBMalformed))
 import           Pos.DB.Functions
-    (dbSerializeValue)
+                       (dbSerializeValue)
 import           Pos.DB.GState.Common
-    (gsGetBi, gsPutBi)
+                       (gsGetBi, gsPutBi)
 import           Pos.Ssc.Types
-    (SscGlobalState (..))
+                       (SscGlobalState (..))
 import qualified Pos.Ssc.VssCertData as VCD
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 getSscGlobalState :: (MonadDBRead m) => m SscGlobalState
 getSscGlobalState =

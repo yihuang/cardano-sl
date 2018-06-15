@@ -17,75 +17,73 @@ module Pos.Launcher.Runner
 import           Universum
 
 import           Control.Concurrent.Async
-    (race)
+                       (race)
 import qualified Control.Monad.Reader as Mtl
 import           Data.Default
-    (Default)
+                       (Default)
 import           JsonLog
-    (jsonLog)
+                       (jsonLog)
 import           Mockable.Production
-    (Production (..))
+                       (Production (..))
 import           System.Exit
-    (ExitCode (..))
+                       (ExitCode (..))
 
 import           Pos.Behavior
-    (bcSecurityParams)
-import           Pos.Binary
-    ()
+                       (bcSecurityParams)
+import           Pos.Binary ()
 import           Pos.Block.Configuration
-    (HasBlockConfiguration, recoveryHeadersMessage)
+                       (HasBlockConfiguration, recoveryHeadersMessage)
 import           Pos.Configuration
-    (HasNodeConfiguration, networkConnectionTimeout)
+                       (HasNodeConfiguration, networkConnectionTimeout)
 import           Pos.Context.Context
-    (NodeContext (..))
+                       (NodeContext (..))
 import           Pos.Core
-    (StakeholderId, addressHash)
+                       (StakeholderId, addressHash)
 import           Pos.Core.Configuration
-    (HasProtocolConstants, protocolConstants)
+                       (HasProtocolConstants, protocolConstants)
 import           Pos.Crypto
-    (toPublic)
+                       (toPublic)
 import           Pos.Crypto.Configuration
-    (HasProtocolMagic, protocolMagic)
+                       (HasProtocolMagic, protocolMagic)
 import           Pos.Diffusion.Full
-    (FullDiffusionConfiguration (..), diffusionLayerFull)
+                       (FullDiffusionConfiguration (..), diffusionLayerFull)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..), DiffusionLayer (..), hoistDiffusion)
+                       (Diffusion (..), DiffusionLayer (..), hoistDiffusion)
 import           Pos.Infra.Network.Types
-    (NetworkConfig (..), topologyRoute53HealthCheckEnabled)
+                       (NetworkConfig (..), topologyRoute53HealthCheckEnabled)
 import           Pos.Infra.Reporting.Ekg
-    (EkgNodeMetrics (..), registerEkgMetrics, withEkgServer)
+                       (EkgNodeMetrics (..), registerEkgMetrics, withEkgServer)
 import           Pos.Infra.Reporting.Statsd
-    (withStatsd)
+                       (withStatsd)
 import           Pos.Infra.Shutdown
-    (ShutdownContext, waitForShutdown)
+                       (ShutdownContext, waitForShutdown)
 import           Pos.Infra.Util.JsonLog.Events
-    (JsonLogConfig (..), jsonLogConfigFromHandle)
+                       (JsonLogConfig (..), jsonLogConfigFromHandle)
 import           Pos.Launcher.Configuration
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Launcher.Param
-    (BaseParams (..), LoggingParams (..), NodeParams (..))
+                       (BaseParams (..), LoggingParams (..), NodeParams (..))
 import           Pos.Launcher.Resource
-    (NodeResources (..))
+                       (NodeResources (..))
 import           Pos.Logic.Full
-    (logicFull)
+                       (logicFull)
 import           Pos.Logic.Types
-    (Logic, hoistLogic)
-import           Pos.Recovery.Instance
-    ()
+                       (Logic, hoistLogic)
+import           Pos.Recovery.Instance ()
 import           Pos.Reporting.Production
-    (ProductionReporterParams (..), productionReporter)
+                       (ProductionReporterParams (..), productionReporter)
 import           Pos.Txp
-    (MonadTxpLocal)
+                       (MonadTxpLocal)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, lastKnownBlockVersion)
+                       (HasUpdateConfiguration, lastKnownBlockVersion)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, compileInfo)
+                       (HasCompileInfo, compileInfo)
 import           Pos.Util.Trace
-    (wlogTrace)
+                       (wlogTrace)
 import           Pos.Web.Server
-    (withRoute53HealthCheckApplication)
+                       (withRoute53HealthCheckApplication)
 import           Pos.WorkMode
-    (RealMode, RealModeContext (..))
+                       (RealMode, RealModeContext (..))
 
 ----------------------------------------------------------------------------
 -- High level runners

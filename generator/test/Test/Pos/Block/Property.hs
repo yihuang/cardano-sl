@@ -9,18 +9,18 @@ module Test.Pos.Block.Property
 import           Universum
 
 import           Test.Hspec
-    (Spec)
+                       (Spec)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 
 import           Pos.Core
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.Delegation
-    (HasDlgConfiguration)
+                       (HasDlgConfiguration)
 import           Test.Pos.Block.Logic.Mode
-    (BlockProperty, blockPropertyTestable)
+                       (BlockProperty, blockPropertyTestable)
 import           Test.QuickCheck.Property
-    (Testable)
+                       (Testable)
 
 -- | Specialized version of 'prop' function from 'hspec'.
 blockPropertySpec ::

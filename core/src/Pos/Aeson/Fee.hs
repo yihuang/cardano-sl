@@ -9,17 +9,17 @@ module Pos.Aeson.Fee
 import           Universum
 
 import           Data.Aeson
-    (object, (.=))
+                       (object, (.=))
 import qualified Data.Aeson as JSON
 import qualified Data.Aeson.Types as JSON
 import           Data.Fixed
-    (Fixed (..), resolution)
+                       (Fixed (..), resolution)
 import qualified Data.HashMap.Strict as HM.S
 
 import           Pos.Core.Common
-    (Coeff (..), TxFeePolicy (..), TxSizeLinear (..))
+                       (Coeff (..), TxFeePolicy (..), TxSizeLinear (..))
 import           Pos.Util.Util
-    (aesonError, toAesonError)
+                       (aesonError, toAesonError)
 
 instance JSON.ToJSON Coeff where
     toJSON (Coeff v) = JSON.toJSON (realToFrac @_ @Double v)

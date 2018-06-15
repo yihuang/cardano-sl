@@ -10,18 +10,18 @@ module Test.Pos.Helpers
 import           Universum
 
 import           Data.Functor.Identity
-    (Identity (..))
+                       (Identity (..))
 import           Test.Hspec
-    (Spec)
+                       (Spec)
 import           Test.QuickCheck
-    (Property, (.&&.), (===))
+                       (Property, (.&&.), (===))
 import qualified Text.JSON.Canonical as CanonicalJSON
 
 import           Pos.Core.Genesis
-    (SchemaError)
+                       (SchemaError)
 
 import           Test.Pos.Binary.Helpers
-    (IdTestingRequiredClassesAlmost, identityTest)
+                       (IdTestingRequiredClassesAlmost, identityTest)
 
 ----------------------------------------------------------------------------
 -- From/to tests

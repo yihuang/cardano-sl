@@ -6,18 +6,17 @@ module Pos.Ssc.SecretStorage
 
 import           Universum
 
-import           Pos.Binary.Ssc.Types
-    ()
+import           Pos.Binary.Ssc.Types ()
 import           Pos.Core
-    (EpochIndex)
+                       (EpochIndex)
 import           Pos.Core.Ssc
-    (Opening, SignedCommitment)
+                       (Opening, SignedCommitment)
 import           Pos.DB
-    (MonadDB, MonadDBRead)
+                       (MonadDB, MonadDBRead)
 import           Pos.DB.Misc.Common
-    (miscGetBi, miscPutBi)
+                       (miscGetBi, miscPutBi)
 import           Pos.Ssc.Types
-    (SscSecretStorage (..))
+                       (SscSecretStorage (..))
 
 -- | Get our commitment for given epoch if it's known.
 getOurCommitment

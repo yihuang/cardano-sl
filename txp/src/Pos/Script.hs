@@ -17,17 +17,18 @@ module Pos.Script
        ) where
 
 import           Universum hiding
-    (lift)
+                       (lift)
 
 import           Control.Exception
-    (ArithException (..), ArrayException (..), ErrorCall (..),
-    PatternMatchFail (..))
+                       (ArithException (..), ArrayException (..),
+                       ErrorCall (..), PatternMatchFail (..))
 import           Control.Exception.Safe
-    (Handler (..), SomeException (..), catches, displayException)
+                       (Handler (..), SomeException (..), catches,
+                       displayException)
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Control.Monad.Error.Class
-    (throwError)
+                       (throwError)
 import qualified Data.ByteArray as BA
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Set as S
@@ -36,22 +37,20 @@ import qualified Elaboration.Contexts as PL
 import qualified Interface.Integration as PL
 import qualified Interface.Prelude as PL
 import           Language.Haskell.TH.Syntax
-    (Lift (..), runIO)
+                       (Lift (..), runIO)
 import qualified PlutusCore.EvaluatorTypes as PLCore
 import qualified PlutusCore.Program as PL
 import           System.IO.Unsafe
-    (unsafePerformIO)
+                       (unsafePerformIO)
 import qualified Utils.Names as PL
 
 import qualified Pos.Binary.Class as Bi
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core.Common
-    (Script (..), ScriptVersion)
-import           Pos.Core.Script
-    ()
+                       (Script (..), ScriptVersion)
+import           Pos.Core.Script ()
 import           Pos.Core.Txp
-    (TxSigData (..))
+                       (TxSigData (..))
 
 {- NOTE
 

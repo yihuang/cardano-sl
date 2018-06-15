@@ -14,74 +14,77 @@ module Test.Pos.Wallet.Web.Methods.PaymentSpec
 import           Universum
 
 import           Control.Exception.Safe
-    (try)
+                       (try)
 import           Data.Default
-    (def)
+                       (def)
 import           Data.List
-    ((!!), (\\))
+                       ((!!), (\\))
 import           Data.List.NonEmpty
-    (fromList)
+                       (fromList)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Test.Hspec
-    (Spec, describe, shouldBe)
+                       (Spec, describe, shouldBe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess)
+                       (modifyMaxSuccess)
 import           Test.QuickCheck
-    (arbitrary, choose, generate)
+                       (arbitrary, choose, generate)
 import           Test.QuickCheck.Monadic
-    (pick)
+                       (pick)
 
 import           Pos.Client.Txp.Balances
-    (getBalance)
+                       (getBalance)
 import           Pos.Client.Txp.Util
-    (InputSelectionPolicy (..), txToLinearFee)
+                       (InputSelectionPolicy (..), txToLinearFee)
 import           Pos.Core
-    (Address, Coin, TxFeePolicy (..), bvdTxFeePolicy, mkCoin, sumCoins,
-    unsafeGetCoin, unsafeSubCoin)
+                       (Address, Coin, TxFeePolicy (..), bvdTxFeePolicy,
+                       mkCoin, sumCoins, unsafeGetCoin, unsafeSubCoin)
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), _TxOut)
+                       (Tx (..), TxAux (..), _TxOut)
 import           Pos.Crypto
-    (PassPhrase)
+                       (PassPhrase)
 import           Pos.DB.Class
-    (MonadGState (..))
+                       (MonadGState (..))
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Txp
-    (TxFee (..))
+                       (TxFee (..))
 import           Pos.Util.CompileInfo
-    (withCompileInfo)
+                       (withCompileInfo)
 import           Pos.Wallet.Web.Account
-    (myRootAddresses)
+                       (myRootAddresses)
 import           Pos.Wallet.Web.ClientTypes
-    (Addr, CAccount (..), CId, CTx (..), NewBatchPayment (..), Wal)
+                       (Addr, CAccount (..), CId, CTx (..),
+                       NewBatchPayment (..), Wal)
 import           Servant.Server
-    (ServantErr (..), err403)
+                       (ServantErr (..), err403)
 
 import           Pos.Wallet.Web.Methods.Logic
-    (getAccounts)
+                       (getAccounts)
 import           Pos.Wallet.Web.Methods.Payment
-    (newPaymentBatch)
+                       (newPaymentBatch)
 import qualified Pos.Wallet.Web.State.State as WS
 import           Pos.Wallet.Web.State.Storage
-    (AddressInfo (..), wamAddress)
+                       (AddressInfo (..), wamAddress)
 import           Pos.Wallet.Web.Util
-    (decodeCTypeOrFail, getAccountAddrsOrThrow)
+                       (decodeCTypeOrFail, getAccountAddrsOrThrow)
 
 import           Pos.Util.Servant
-    (encodeCType)
+                       (encodeCType)
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 
 
 import           Test.Pos.Util.QuickCheck.Property
-    (assertProperty, expectedOne, maybeStopProperty, splitWord, stopProperty)
+                       (assertProperty, expectedOne, maybeStopProperty,
+                       splitWord, stopProperty)
 import           Test.Pos.Wallet.Web.Mode
-    (WalletProperty, getSentTxs, submitTxTestMode, walletPropertySpec)
+                       (WalletProperty, getSentTxs, submitTxTestMode,
+                       walletPropertySpec)
 
 import           Test.Pos.Wallet.Web.Util
-    (deriveRandomAddress, expectedAddrBalance, importSomeWallets,
-    mostlyEmptyPassphrases)
+                       (deriveRandomAddress, expectedAddrBalance,
+                       importSomeWallets, mostlyEmptyPassphrases)
 
 
 deriving instance Eq CTx

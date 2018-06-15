@@ -13,72 +13,75 @@ module Pos.Explorer.Socket.App
        ) where
 
 import           Universum hiding
-    (on)
+                       (on)
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Lens
-    ((<<.=))
+                       ((<<.=))
 import           Control.Monad.State.Class
-    (MonadState (..))
+                       (MonadState (..))
 import qualified Data.Set as S
 import           Data.Time.Units
-    (Millisecond)
-import           Ether.TaggedTrans
-    ()
+                       (Millisecond)
+import           Ether.TaggedTrans ()
 import           Formatting
-    (int, sformat, (%))
+                       (int, sformat, (%))
 import qualified GHC.Exts as Exts
 import           Mockable
-    (withAsync)
+                       (withAsync)
 import           Network.EngineIO
-    (SocketId)
+                       (SocketId)
 import           Network.EngineIO.Wai
-    (WaiMonad, toWaiApplication, waiAPI)
+                       (WaiMonad, toWaiApplication, waiAPI)
 import           Network.HTTP.Types.Status
-    (status404)
+                       (status404)
 import           Network.SocketIO
-    (RoutingTable, Socket, appendDisconnectHandler, initialize, socketId)
+                       (RoutingTable, Socket, appendDisconnectHandler,
+                       initialize, socketId)
 import           Network.Wai
-    (Application, Middleware, Request, Response, pathInfo, responseLBS)
+                       (Application, Middleware, Request, Response, pathInfo,
+                       responseLBS)
 import           Network.Wai.Handler.Warp
-    (Settings, defaultSettings, runSettings, setPort)
+                       (Settings, defaultSettings, runSettings, setPort)
 import           Network.Wai.Middleware.Cors
-    (CorsResourcePolicy, Origin, cors, corsOrigins, simpleCorsResourcePolicy)
+                       (CorsResourcePolicy, Origin, cors, corsOrigins,
+                       simpleCorsResourcePolicy)
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import           System.Wlog
-    (CanLog, HasLoggerName, LoggerName, NamedPureLogger, WithLogger,
-    askLoggerName, logDebug, logInfo, logWarning, modifyLoggerName,
-    usingLoggerName)
+                       (CanLog, HasLoggerName, LoggerName, NamedPureLogger,
+                       WithLogger, askLoggerName, logDebug, logInfo,
+                       logWarning, modifyLoggerName, usingLoggerName)
 
 import           Pos.Block.Types
-    (Blund)
+                       (Blund)
 import           Pos.Core
-    (addressF, siEpoch)
+                       (addressF, siEpoch)
 import qualified Pos.GState as DB
 import           Pos.Infra.Slotting
-    (MonadSlots (getCurrentSlot))
+                       (MonadSlots (getCurrentSlot))
 
-import           Pos.Explorer.Aeson.ClientTypes
-    ()
+import           Pos.Explorer.Aeson.ClientTypes ()
 import           Pos.Explorer.ExplorerMode
-    (ExplorerMode)
+                       (ExplorerMode)
 import           Pos.Explorer.Socket.Holder
-    (ConnectionsState, ConnectionsVar, askingConnState, mkConnectionsState,
-    withConnState)
+                       (ConnectionsState, ConnectionsVar, askingConnState,
+                       mkConnectionsState, withConnState)
 import           Pos.Explorer.Socket.Methods
-    (ClientEvent (..), ServerEvent (..), Subscription (..), finishSession,
-    getBlockTxs, getBlundsFromTo, getTxInfo, notifyAddrSubscribers,
-    notifyBlocksLastPageSubscribers, notifyEpochsLastPageSubscribers,
-    notifyTxsSubscribers, startSession, subscribeAddr, subscribeBlocksLastPage,
-    subscribeEpochsLastPage, subscribeTxs, unsubscribeAddr,
-    unsubscribeBlocksLastPage, unsubscribeEpochsLastPage, unsubscribeTxs)
+                       (ClientEvent (..), ServerEvent (..), Subscription (..),
+                       finishSession, getBlockTxs, getBlundsFromTo, getTxInfo,
+                       notifyAddrSubscribers, notifyBlocksLastPageSubscribers,
+                       notifyEpochsLastPageSubscribers, notifyTxsSubscribers,
+                       startSession, subscribeAddr, subscribeBlocksLastPage,
+                       subscribeEpochsLastPage, subscribeTxs, unsubscribeAddr,
+                       unsubscribeBlocksLastPage, unsubscribeEpochsLastPage,
+                       unsubscribeTxs)
 import           Pos.Explorer.Socket.Util
-    (emitJSON, on, on_, regroupBySnd, runPeriodically)
+                       (emitJSON, on, on_, regroupBySnd, runPeriodically)
 import           Pos.Explorer.Web.ClientTypes
-    (cteId, tiToTxEntry)
+                       (cteId, tiToTxEntry)
 import           Pos.Explorer.Web.Server
-    (getMempoolTxs)
+                       (getMempoolTxs)
 
 
 data NotifierSettings = NotifierSettings

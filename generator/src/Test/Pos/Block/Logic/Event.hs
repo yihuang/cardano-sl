@@ -15,35 +15,37 @@ module Test.Pos.Block.Logic.Event
 import           Universum
 
 import           Control.Exception.Safe
-    (fromException)
+                       (fromException)
 import qualified Data.Map as Map
 import qualified Data.Text as T
 
 import           Pos.Block.Logic.VAR
-    (BlockLrcMode, rollbackBlocks, verifyAndApplyBlocks)
+                       (BlockLrcMode, rollbackBlocks, verifyAndApplyBlocks)
 import           Pos.Block.Types
-    (Blund)
+                       (Blund)
 import           Pos.Core
-    (HasConfiguration, HeaderHash)
+                       (HasConfiguration, HeaderHash)
 import           Pos.Core.Chrono
-    (NE, OldestFirst)
+                       (NE, OldestFirst)
 import           Pos.DB.Pure
-    (DBPureDiff, MonadPureDB, dbPureDiff, dbPureDump, dbPureReset)
+                       (DBPureDiff, MonadPureDB, dbPureDiff, dbPureDump,
+                       dbPureReset)
 import           Pos.Exception
-    (CardanoFatalError (..))
+                       (CardanoFatalError (..))
 import           Pos.Generator.BlockEvent
-    (BlockApplyResult (..), BlockEvent, BlockEvent' (..),
-    BlockRollbackFailure (..), BlockRollbackResult (..), BlockScenario,
-    BlockScenario' (..), SnapshotId, SnapshotOperation (..), beaInput,
-    beaOutValid, berInput, berOutValid)
+                       (BlockApplyResult (..), BlockEvent, BlockEvent' (..),
+                       BlockRollbackFailure (..), BlockRollbackResult (..),
+                       BlockScenario, BlockScenario' (..), SnapshotId,
+                       SnapshotOperation (..), beaInput, beaOutValid, berInput,
+                       berOutValid)
 import           Pos.Txp
-    (MonadTxpLocal)
+                       (MonadTxpLocal)
 import           Pos.Util.Util
-    (eitherToThrow, lensOf)
+                       (eitherToThrow, lensOf)
 import           Test.Pos.Block.Logic.Mode
-    (BlockTestContext, PureDBSnapshotsVar (..))
+                       (BlockTestContext, PureDBSnapshotsVar (..))
 import           Test.Pos.Block.Logic.Util
-    (satisfySlotCheck)
+                       (satisfySlotCheck)
 
 data SnapshotMissingEx = SnapshotMissingEx SnapshotId
     deriving (Show)

@@ -7,22 +7,22 @@ module Pos.Txp.MemState.Metrics
 import           Universum
 
 import           Data.Aeson.Types
-    (ToJSON (..))
+                       (ToJSON (..))
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import qualified System.Metrics as Metrics
 import qualified System.Metrics.Gauge as Metrics.Gauge
 import           System.Wlog
-    (logDebug)
+                       (logDebug)
 
 import           Pos.Infra.StateLock
-    (StateLockMetrics (..))
+                       (StateLockMetrics (..))
 import           Pos.Infra.Util.JsonLog.Events
-    (JLEvent (..), JLMemPool (..), MemPoolModifyReason (..))
+                       (JLEvent (..), JLMemPool (..), MemPoolModifyReason (..))
 import           Pos.System.Metrics.Constants
-    (withCardanoNamespace)
+                       (withCardanoNamespace)
 import           Pos.Txp.Toil.Types
-    (MemPool (_mpSize))
+                       (MemPool (_mpSize))
 
 -- | 'StateLockMetrics' to record txp MemPool metrics.
 recordTxpMetrics :: Metrics.Store -> TVar MemPool -> IO (StateLockMetrics MemPoolModifyReason)

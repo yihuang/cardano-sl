@@ -9,41 +9,41 @@ module Pos.Update.Worker
 import           Universum
 
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Serokell.Util.Text
-    (listJsonIndent)
+                       (listJsonIndent)
 import           System.Wlog
-    (logDebug, logInfo)
+                       (logDebug, logInfo)
 
 import           Pos.Core
-    (SoftwareVersion (..))
+                       (SoftwareVersion (..))
 import           Pos.Core.Update
-    (UpdateProposal (..))
+                       (UpdateProposal (..))
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Infra.Recovery.Info
-    (recoveryCommGuard)
+                       (recoveryCommGuard)
 import           Pos.Infra.Shutdown
-    (triggerShutdown)
+                       (triggerShutdown)
 import           Pos.Infra.Slotting.Util
-    (ActionTerminationPolicy (..), OnNewSlotParams (..),
-    defaultOnNewSlotParams, onNewSlot)
+                       (ActionTerminationPolicy (..), OnNewSlotParams (..),
+                       defaultOnNewSlotParams, onNewSlot)
 import           Pos.Update.Configuration
-    (curSoftwareVersion)
+                       (curSoftwareVersion)
 import           Pos.Update.Context
-    (UpdateContext (..))
+                       (UpdateContext (..))
 import           Pos.Update.DB
-    (getConfirmedProposals)
+                       (getConfirmedProposals)
 import           Pos.Update.Download
-    (downloadUpdate)
+                       (downloadUpdate)
 import           Pos.Update.Logic.Local
-    (processNewSlot)
+                       (processNewSlot)
 import           Pos.Update.Mode
-    (UpdateMode)
+                       (UpdateMode)
 import           Pos.Update.Poll.Types
-    (ConfirmedProposalState (..))
+                       (ConfirmedProposalState (..))
 import           Pos.Util.Util
-    (lensOf)
+                       (lensOf)
 
 -- | Update System related workers.
 usWorkers

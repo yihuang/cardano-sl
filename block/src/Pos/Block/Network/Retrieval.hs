@@ -9,52 +9,56 @@ module Pos.Block.Network.Retrieval
 import           Universum
 
 import           Control.Concurrent.STM
-    (putTMVar, swapTMVar, tryReadTBQueue, tryReadTMVar, tryTakeTMVar)
+                       (putTMVar, swapTMVar, tryReadTBQueue, tryReadTMVar,
+                       tryTakeTMVar)
 import           Control.Exception.Safe
-    (handleAny)
+                       (handleAny)
 import           Control.Lens
-    (to)
+                       (to)
 import           Control.Monad.STM
-    (retry)
+                       (retry)
 import qualified Data.List.NonEmpty as NE
 import           Data.Time.Units
-    (Second)
+                       (Second)
 import           Formatting
-    (build, int, sformat, (%))
+                       (build, int, sformat, (%))
 import           Mockable
-    (delay)
+                       (delay)
 import           System.Wlog
-    (logDebug, logError, logInfo, logWarning)
+                       (logDebug, logError, logInfo, logWarning)
 
 import           Pos.Block.BlockWorkMode
-    (BlockWorkMode)
+                       (BlockWorkMode)
 import           Pos.Block.Logic
-    (ClassifyHeaderRes (..), classifyNewHeader, getHeadersOlderExp)
+                       (ClassifyHeaderRes (..), classifyNewHeader,
+                       getHeadersOlderExp)
 import           Pos.Block.Network.Logic
-    (BlockNetLogicException (..), handleBlocks, triggerRecovery)
+                       (BlockNetLogicException (..), handleBlocks,
+                       triggerRecovery)
 import           Pos.Block.RetrievalQueue
-    (BlockRetrievalQueueTag, BlockRetrievalTask (..))
+                       (BlockRetrievalQueueTag, BlockRetrievalTask (..))
 import           Pos.Block.Types
-    (RecoveryHeaderTag)
+                       (RecoveryHeaderTag)
 import           Pos.Core
-    (Block, HasHeaderHash (..), HeaderHash, difficultyL, isMoreDifficult)
+                       (Block, HasHeaderHash (..), HeaderHash, difficultyL,
+                       isMoreDifficult)
 import           Pos.Core.Block
-    (BlockHeader)
+                       (BlockHeader)
 import           Pos.Core.Chrono
-    (NE, OldestFirst (..), _OldestFirst)
+                       (NE, OldestFirst (..), _OldestFirst)
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.Infra.Communication.Protocol
-    (NodeId)
+                       (NodeId)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import qualified Pos.Infra.Diffusion.Types as Diffusion
-    (Diffusion (getBlocks))
+                       (Diffusion (getBlocks))
 import           Pos.Infra.Reporting
-    (HasMisbehaviorMetrics, reportOrLogE, reportOrLogW)
+                       (HasMisbehaviorMetrics, reportOrLogE, reportOrLogW)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 -- I really don't like join
 {-# ANN retrievalWorker ("HLint: ignore Use join" :: Text) #-}

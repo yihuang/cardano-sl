@@ -7,13 +7,13 @@ module Pos.Core.Update.SoftforkRule
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError)
+                       (MonadError)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (Format, bprint, build, (%))
+                       (Format, bprint, build, (%))
 
 import           Pos.Core.Common
-    (CoinPortion, checkCoinPortion)
+                       (CoinPortion, checkCoinPortion)
 
 -- | Values defining softfork resolution rule.
 -- If a proposal is confirmed at the 's'-th epoch, softfork resolution threshold

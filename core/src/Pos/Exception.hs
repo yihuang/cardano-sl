@@ -13,16 +13,16 @@ module Pos.Exception
        ) where
 
 import           Control.Exception.Safe
-    (Exception (..))
+                       (Exception (..))
 import qualified Data.Text.Buildable
 import           Data.Typeable
-    (cast)
+                       (cast)
 import           Formatting
-    (bprint, stext, (%))
+                       (bprint, stext, (%))
 import           Serokell.Util
-    (Color (Red), colorize)
+                       (Color (Red), colorize)
 import           System.Wlog
-    (WithLogger, logError)
+                       (WithLogger, logError)
 import qualified Text.Show
 import           Universum
 

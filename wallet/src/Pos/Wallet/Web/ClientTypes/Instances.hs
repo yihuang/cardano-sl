@@ -11,35 +11,36 @@ import           Universum
 import qualified Data.ByteArray as ByteArray
 import qualified Data.ByteString as BS
 import           Data.List
-    (partition)
+                       (partition)
 import           Data.Text
-    (splitOn)
+                       (splitOn)
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, int, sformat, (%))
+                       (bprint, build, int, sformat, (%))
 import qualified Serokell.Util.Base16 as Base16
 import           Servant.API
-    (FromHttpApiData (..), ToHttpApiData (..))
+                       (FromHttpApiData (..), ToHttpApiData (..))
 import           Servant.Multipart
-    (FromMultipart (..), Mem, lookupFile, lookupInput)
+                       (FromMultipart (..), Mem, lookupFile, lookupInput)
 
 import           Pos.Core
-    (Address, Coin (..), checkCoin, coinToInteger, decodeTextAddress, mkCoin,
-    unsafeGetCoin)
+                       (Address, Coin (..), checkCoin, coinToInteger,
+                       decodeTextAddress, mkCoin, unsafeGetCoin)
 import           Pos.Core.Txp
-    (TxId)
+                       (TxId)
 import           Pos.Crypto
-    (PassPhrase, decodeHash, hashHexF, passphraseLength)
+                       (PassPhrase, decodeHash, hashHexF, passphraseLength)
 import           Pos.Util.Servant
-    (FromCType (..), HasTruncateLogPolicy (..), OriginType, ToCType (..),
-    WithTruncatedLog (..))
+                       (FromCType (..), HasTruncateLogPolicy (..), OriginType,
+                       ToCType (..), WithTruncatedLog (..))
 import           Pos.Wallet.Web.ClientTypes.Types
-    (AccountId (..), CAccount (..), CAccountId (..), CAddress (..), CCoin (..),
-    CElectronCrashReport (..), CHash (..), CId (..), CPassPhrase (..),
-    CPtxCondition (..), CTx (..), CTxId (..), CWallet (..), ScrollLimit (..),
-    ScrollOffset (..), mkCTxId)
+                       (AccountId (..), CAccount (..), CAccountId (..),
+                       CAddress (..), CCoin (..), CElectronCrashReport (..),
+                       CHash (..), CId (..), CPassPhrase (..),
+                       CPtxCondition (..), CTx (..), CTxId (..), CWallet (..),
+                       ScrollLimit (..), ScrollOffset (..), mkCTxId)
 import           Pos.Wallet.Web.Pending.Types
-    (PtxCondition (..))
+                       (PtxCondition (..))
 
 ----------------------------------------------------------------------------
 -- Convertions

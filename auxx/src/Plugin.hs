@@ -12,41 +12,41 @@ import           Universum
 
 #if !(defined(mingw32_HOST_OS))
 import           System.Exit
-    (ExitCode (ExitSuccess))
+                       (ExitCode (ExitSuccess))
 import           System.Posix.Process
-    (exitImmediately)
+                       (exitImmediately)
 #endif
 import           Control.Monad.Except
-    (ExceptT (..), withExceptT)
+                       (ExceptT (..), withExceptT)
 import           Data.Constraint
-    (Dict (..))
+                       (Dict (..))
 import           Data.Time.Units
-    (Second)
+                       (Second)
 import           Formatting
-    (float, int, sformat, (%))
+                       (float, int, sformat, (%))
 import           Mockable
-    (Delay, Mockable, delay)
+                       (Delay, Mockable, delay)
 import           System.IO
-    (hFlush, stdout)
+                       (hFlush, stdout)
 import           System.Wlog
-    (CanLog, HasLoggerName, logInfo)
+                       (CanLog, HasLoggerName, logInfo)
 
 import           Pos.Crypto
-    (AHash (..), fullPublicKeyF, hashHexF)
+                       (AHash (..), fullPublicKeyF, hashHexF)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Txp
-    (genesisUtxo, unGenesisUtxo)
+                       (genesisUtxo, unGenesisUtxo)
 
 import           AuxxOptions
-    (AuxxOptions (..))
+                       (AuxxOptions (..))
 import           Command
-    (createCommandProcs)
+                       (createCommandProcs)
 import qualified Lang
 import           Mode
-    (MonadAuxxMode)
+                       (MonadAuxxMode)
 import           Repl
-    (PrintAction, WithCommandAction (..))
+                       (PrintAction, WithCommandAction (..))
 
 ----------------------------------------------------------------------------
 -- Plugin implementation

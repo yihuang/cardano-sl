@@ -24,9 +24,9 @@ import           Wallet.Inductive
 import           Wallet.Inductive.Generator
 
 import           Pos.Core
-    (TxSizeLinear, calculateTxSizeLinear)
+                       (TxSizeLinear, calculateTxSizeLinear)
 import           Serokell.Data.Memory.Units
-    (Byte, fromBytes)
+                       (Byte, fromBytes)
 
 {-------------------------------------------------------------------------------
   Generator model

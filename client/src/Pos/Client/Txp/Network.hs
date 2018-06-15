@@ -15,43 +15,45 @@ module Pos.Client.Txp.Network
 import           Universum
 
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Mockable
-    (MonadMockable)
+                       (MonadMockable)
 import           System.Wlog
-    (logInfo)
+                       (logInfo)
 
 import           Pos.Client.Txp.Addresses
-    (MonadAddresses (..))
+                       (MonadAddresses (..))
 import           Pos.Client.Txp.Balances
-    (MonadBalances (..), getOwnUtxo, getOwnUtxoForPk)
+                       (MonadBalances (..), getOwnUtxo, getOwnUtxoForPk)
 import           Pos.Client.Txp.History
-    (MonadTxHistory (..))
+                       (MonadTxHistory (..))
 import           Pos.Client.Txp.Util
-    (InputSelectionPolicy, PendingAddresses (..), TxCreateMode, TxError (..),
-    createMTx, createRedemptionTx, createTx)
-import           Pos.Communication.Message
-    ()
+                       (InputSelectionPolicy, PendingAddresses (..),
+                       TxCreateMode, TxError (..), createMTx,
+                       createRedemptionTx, createTx)
+import           Pos.Communication.Message ()
 import           Pos.Communication.Types
-    (InvOrDataTK)
+                       (InvOrDataTK)
 import           Pos.Core
-    (Address, Coin, makeRedeemAddress, mkCoin, unsafeAddCoin)
+                       (Address, Coin, makeRedeemAddress, mkCoin,
+                       unsafeAddCoin)
 import           Pos.Core.Txp
-    (TxAux (..), TxId, TxOut (..), TxOutAux (..), txaF)
+                       (TxAux (..), TxId, TxOut (..), TxOutAux (..), txaF)
 import           Pos.Crypto
-    (RedeemSecretKey, SafeSigner, hash, redeemToPublic, safeToPublic)
+                       (RedeemSecretKey, SafeSigner, hash, redeemToPublic,
+                       safeToPublic)
 import           Pos.Infra.Communication.Protocol
-    (OutSpecs)
+                       (OutSpecs)
 import           Pos.Infra.Communication.Specs
-    (createOutSpecs)
+                       (createOutSpecs)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (sendTx))
+                       (Diffusion (sendTx))
 import           Pos.Txp.Network.Types
-    (TxMsgContents (..))
+                       (TxMsgContents (..))
 import           Pos.Util.Util
-    (eitherToThrow)
+                       (eitherToThrow)
 import           Pos.WorkMode.Class
-    (MinWorkMode)
+                       (MinWorkMode)
 
 type TxMode m
     = ( MinWorkMode m

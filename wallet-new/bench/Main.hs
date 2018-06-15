@@ -5,21 +5,23 @@ module Main
 import           Universum
 
 import           Control.Concurrent.Async
-    (async, wait)
+                       (async, wait)
 import qualified Data.ByteString as BS
 import           System.IO
-    (hSetEncoding, stdout, utf8)
+                       (hSetEncoding, stdout, utf8)
 
 import           Bench.Cardano.Wallet.Config
-    (extractEndpointConfigFor, getEndpointsConfig, getOptions,
-    getWalletsConfig)
+                       (extractEndpointConfigFor, getEndpointsConfig,
+                       getOptions, getWalletsConfig)
 import           Bench.Cardano.Wallet.Run
-    (runBench)
+                       (runBench)
 import           Bench.Cardano.Wallet.Types
-    (BenchEndpoint (..), CLOptions (..), CompleteConfig (..))
+                       (BenchEndpoint (..), CLOptions (..),
+                       CompleteConfig (..))
 import           Client.Cardano.Wallet.Web.Endpoint
-    (getAccountsIO, getHistoryIO, getSyncProgressIO, getWalletIO, getWalletsIO,
-    isValidAddressIO, newAddressIO, newPaymentIO, newWalletIO)
+                       (getAccountsIO, getHistoryIO, getSyncProgressIO,
+                       getWalletIO, getWalletsIO, isValidAddressIO,
+                       newAddressIO, newPaymentIO, newWalletIO)
 
 -- | Example of benchmark command:
 -- $ stack bench cardano-sl-wallet --benchmark-arguments  \

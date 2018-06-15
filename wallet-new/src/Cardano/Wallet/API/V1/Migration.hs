@@ -15,14 +15,14 @@ import           Cardano.Wallet.API.V1.Migration.Monads as Exports
 import           Cardano.Wallet.API.V1.Migration.Types as Exports
 
 import           Pos.Configuration
-    (HasNodeConfiguration)
+                       (HasNodeConfiguration)
 import           Pos.Core.Configuration
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.Launcher.Configuration
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Ssc
-    (HasSscConfiguration)
+                       (HasSscConfiguration)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo)
+                       (HasCompileInfo)

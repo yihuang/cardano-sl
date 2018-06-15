@@ -16,17 +16,17 @@ module Cardano.Wallet.WalletLayer
 import           Universum
 
 import           System.Wlog
-    (Severity)
+                       (Severity)
 
 import           Cardano.Wallet.Kernel.Diffusion
-    (WalletDiffusion (..))
+                       (WalletDiffusion (..))
 
 import qualified Cardano.Wallet.WalletLayer.Kernel as Kernel
 import qualified Cardano.Wallet.WalletLayer.Legacy as Legacy
 import qualified Cardano.Wallet.WalletLayer.QuickCheck as QuickCheck
 import           Cardano.Wallet.WalletLayer.Types
-    (ActiveWalletLayer (..), PassiveWalletLayer (..), applyBlocks,
-    rollbackBlocks)
+                       (ActiveWalletLayer (..), PassiveWalletLayer (..),
+                       applyBlocks, rollbackBlocks)
 
 ------------------------------------------------------------
 -- Kernel

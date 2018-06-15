@@ -16,37 +16,38 @@ module Pos.Wallet.Web.Pending.Submission
 import           Universum
 
 import           Control.Exception.Safe
-    (Handler (..), catches, onException)
+                       (Handler (..), catches, onException)
 import           Data.Time.Units
-    (fromMicroseconds)
+                       (fromMicroseconds)
 import           Formatting
-    (build, sformat, shown, stext, (%))
+                       (build, sformat, shown, stext, (%))
 import           System.Wlog
-    (WithLogger, logDebug, logInfo)
+                       (WithLogger, logDebug, logInfo)
 
 import           Pos.Client.Txp.History
-    (saveTx, thTimestamp)
+                       (saveTx, thTimestamp)
 import           Pos.Client.Txp.Network
-    (TxMode)
+                       (TxMode)
 import           Pos.Configuration
-    (walletTxCreationDisabled)
+                       (walletTxCreationDisabled)
 import           Pos.Core
-    (diffTimestamp, getCurrentTimestamp)
+                       (diffTimestamp, getCurrentTimestamp)
 import           Pos.Core.Txp
-    (TxAux)
+                       (TxAux)
 import           Pos.Infra.Util.LogSafe
-    (buildSafe, logInfoSP, logWarningSP, secretOnlyF)
+                       (buildSafe, logInfoSP, logWarningSP, secretOnlyF)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 import           Pos.Wallet.Web.Error
-    (WalletError (InternalError))
+                       (WalletError (InternalError))
 import           Pos.Wallet.Web.Pending.Functions
-    (isReclaimableFailure, ptxPoolInfo, usingPtxCoords)
+                       (isReclaimableFailure, ptxPoolInfo, usingPtxCoords)
 import           Pos.Wallet.Web.Pending.Types
-    (PendingTx (..), PtxCondition (..), PtxPoolInfo)
+                       (PendingTx (..), PtxCondition (..), PtxPoolInfo)
 import           Pos.Wallet.Web.State
-    (PtxMetaUpdate (PtxMarkAcknowledged), WalletDB, addOnlyNewPendingTx,
-    casPtxCondition, ptxUpdateMeta, removeOnlyCreatingPtx)
+                       (PtxMetaUpdate (PtxMarkAcknowledged), WalletDB,
+                       addOnlyNewPendingTx, casPtxCondition, ptxUpdateMeta,
+                       removeOnlyCreatingPtx)
 
 -- | Handers used for to procees various pending transaction submission
 -- errors.

@@ -68,38 +68,38 @@ module Pos.Wallet.Web.ClientTypes.Types
 import           Universum
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import           Data.Default
-    (Default, def)
+                       (Default, def)
 import           Data.Hashable
-    (Hashable (..))
+                       (Hashable (..))
 import qualified Data.Text.Buildable
 import           Data.Time.Clock.POSIX
-    (POSIXTime)
+                       (POSIXTime)
 import           Data.Typeable
-    (Typeable)
+                       (Typeable)
 import           Data.Version
-    (Version)
+                       (Version)
 import           Formatting
-    (bprint, build, builder, later, shown, (%))
+                       (bprint, build, builder, later, shown, (%))
 import qualified Prelude
 import           Serokell.Util
-    (listJsonIndent, mapBuilder)
+                       (listJsonIndent, mapBuilder)
 import           Servant.Multipart
-    (FileData, Mem)
+                       (FileData, Mem)
 
 import           Pos.Client.Txp.Util
-    (InputSelectionPolicy)
+                       (InputSelectionPolicy)
 import           Pos.Core
-    (BlockVersion, ChainDifficulty, Coin, ScriptVersion, SoftwareVersion,
-    unsafeGetCoin)
+                       (BlockVersion, ChainDifficulty, Coin, ScriptVersion,
+                       SoftwareVersion, unsafeGetCoin)
 import           Pos.Infra.Util.LogSafe
-    (BuildableSafeGen (..), SecureLog (..), buildUnsecure, deriveSafeBuildable,
-    secretOnlyF, secureListF)
+                       (BuildableSafeGen (..), SecureLog (..), buildUnsecure,
+                       deriveSafeBuildable, secretOnlyF, secureListF)
 import           Pos.Util.BackupPhrase
-    (BackupPhrase)
+                       (BackupPhrase)
 import           Pos.Util.Servant
-    (HasTruncateLogPolicy, WithTruncatedLog (..))
+                       (HasTruncateLogPolicy, WithTruncatedLog (..))
 
 data SyncProgress = SyncProgress
     { _spLocalCD   :: ChainDifficulty

@@ -86,46 +86,46 @@ import           Control.Concurrent
 import           Control.Concurrent.Async
 import           Control.Concurrent.STM
 import           Control.Exception
-    (Exception, SomeException, catch, displayException, finally, mask_,
-    throwIO)
+                       (Exception, SomeException, catch, displayException,
+                       finally, mask_, throwIO)
 import           Control.Lens
 import           Control.Monad
 import           Data.Either
-    (rights)
+                       (rights)
 import           Data.Foldable
-    (fold)
+                       (fold)
 import           Data.List
-    (intercalate, sortBy)
+                       (intercalate, sortBy)
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Maybe
-    (fromMaybe, mapMaybe, maybeToList)
+                       (fromMaybe, mapMaybe, maybeToList)
 import           Data.Monoid
-    ((<>))
+                       ((<>))
 import           Data.Ord
-    (comparing)
+                       (comparing)
 import           Data.Set
-    (Set)
+                       (Set)
 import qualified Data.Set as Set
 import           Data.Text
-    (Text)
+                       (Text)
 import qualified Data.Text as T
 import           Data.Time
 import           Data.Typeable
-    (typeOf)
+                       (typeOf)
 import           Formatting
-    (Format, sformat, shown, string, (%))
+                       (Format, sformat, shown, string, (%))
 import qualified System.Metrics as Monitoring
 import           System.Metrics.Counter
-    (Counter)
+                       (Counter)
 import qualified System.Metrics.Counter as Counter
 
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 
 import           Network.Broadcast.OutboundQueue.ConcurrentMultiQueue
-    (MultiQueue)
+                       (MultiQueue)
 import qualified Network.Broadcast.OutboundQueue.ConcurrentMultiQueue as MQ
 import           Network.Broadcast.OutboundQueue.Types
 

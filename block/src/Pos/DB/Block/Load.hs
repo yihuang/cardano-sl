@@ -17,37 +17,36 @@ module Pos.DB.Block.Load
 import           Universum
 
 import           Control.Lens
-    (_Wrapped)
+                       (_Wrapped)
 import           Formatting
-    (sformat, (%))
+                       (sformat, (%))
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Block.Types
-    (Blund)
+                       (Blund)
 import           Pos.Core
-    (BlockCount, HasDifficulty (difficultyL), HasGenesisHash,
-    HasPrevBlock (prevBlockL), HeaderHash)
+                       (BlockCount, HasDifficulty (difficultyL),
+                       HasGenesisHash, HasPrevBlock (prevBlockL), HeaderHash)
 import           Pos.Core.Block
-    (Block, BlockHeader)
+                       (Block, BlockHeader)
 import           Pos.Core.Chrono
-    (NewestFirst (..))
+                       (NewestFirst (..))
 import           Pos.Core.Configuration
-    (genesisHash)
+                       (genesisHash)
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 import           Pos.DB.Block
-    (getBlund)
+                       (getBlund)
 import           Pos.DB.BlockIndex
-    (getHeader)
+                       (getHeader)
 import           Pos.DB.Class
-    (MonadBlockDBRead, MonadDBRead, getBlock)
+                       (MonadBlockDBRead, MonadDBRead, getBlock)
 import           Pos.DB.Error
-    (DBError (..))
+                       (DBError (..))
 import           Pos.DB.GState.Common
-    (getTip)
+                       (getTip)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 type LoadHeadersMode m =
     ( MonadDBRead m

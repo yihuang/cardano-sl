@@ -10,53 +10,54 @@
 module Main where
 
 import           Control.Applicative
-    (empty, liftA2)
+                       (empty, liftA2)
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Concurrent.Async
-    (concurrently, forConcurrently)
+                       (concurrently, forConcurrently)
 import           Control.Exception
-    (throwIO)
+                       (throwIO)
 import           Control.Exception.Safe
-    (throwString)
+                       (throwString)
 import           Control.Monad
-    (forM, forM_)
+                       (forM, forM_)
 
 import           Data.Foldable
-    (foldlM)
+                       (foldlM)
 import           Data.Functor.Contravariant
-    (contramap)
+                       (contramap)
 import           Data.Time.Clock.POSIX
-    (getPOSIXTime)
+                       (getPOSIXTime)
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import           GHC.IO.Encoding
-    (setLocaleEncoding, utf8)
+                       (setLocaleEncoding, utf8)
 import qualified Network.Transport.TCP as TCP
 import qualified Network.Transport.TCP.Internal as TCP
-    (encodeEndPointAddress)
+                       (encodeEndPointAddress)
 import           Options.Applicative.Simple
-    (simpleOptions)
+                       (simpleOptions)
 import           System.Random
-    (mkStdGen, randomR)
+                       (mkStdGen, randomR)
 
 import qualified Network.Transport as NT
 import           Node
-    (Conversation (..), ConversationActions (..), Node (Node), NodeAction (..),
-    converseWith, defaultNodeEnvironment, noReceiveDelay, node,
-    simpleNodeEndPoint)
+                       (Conversation (..), ConversationActions (..),
+                       Node (Node), NodeAction (..), converseWith,
+                       defaultNodeEnvironment, noReceiveDelay, node,
+                       simpleNodeEndPoint)
 import           Node.Internal
-    (NodeId (..))
+                       (NodeId (..))
 import           Node.Message.Binary
-    (binaryPacking)
+                       (binaryPacking)
 import           Pos.Util.Trace
-    (Severity (..), wlogTrace)
+                       (Severity (..), wlogTrace)
 
 import           Bench.Network.Commons
-    (MeasureEvent (..), Payload (..), Ping (..), Pong (..), loadLogConfig,
-    logMeasure)
+                       (MeasureEvent (..), Payload (..), Ping (..), Pong (..),
+                       loadLogConfig, logMeasure)
 import           SenderOptions
-    (Args (..), argsParser)
+                       (Args (..), argsParser)
 
 data PingState = PingState
     { _lastResetMcs    :: !Microsecond

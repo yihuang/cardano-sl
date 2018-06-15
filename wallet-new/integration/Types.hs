@@ -24,13 +24,13 @@ module Types
 import           Universum
 
 import           Control.Lens
-    (Getter, makeLenses, to)
+                       (Getter, makeLenses, to)
 import           Data.Aeson
-    (ToJSON (..))
+                       (ToJSON (..))
 
 import           Cardano.Wallet.API.V1.Types
-    (Account, SpendingPassword, Transaction, Wallet (..), WalletAddress,
-    WalletId (..))
+                       (Account, SpendingPassword, Transaction, Wallet (..),
+                       WalletAddress, WalletId (..))
 
 -- | Ideally, we would put @MonadGen@ here and remove @MonadIO@,
 -- but it's better to see how the client fits in the end.

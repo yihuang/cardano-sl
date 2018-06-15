@@ -8,7 +8,7 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Data.Time.Units
-    (Microsecond)
+                       (Microsecond)
 import qualified Prelude
 
 import           Pos.Core.Slotting.Timestamp

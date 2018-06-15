@@ -38,34 +38,34 @@ import qualified Cardano.Crypto.Wallet as CC
 import qualified Codec.CBOR.Decoding as D
 import qualified Codec.CBOR.Encoding as E
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Data.Aeson
-    (FromJSON (..), ToJSON (..))
+                       (FromJSON (..), ToJSON (..))
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON)
+                       (defaultOptions, deriveJSON)
 import           Data.Hashable
-    (Hashable)
+                       (Hashable)
 import qualified Data.Text.Buildable as B
 import           Data.Text.Lazy.Builder
-    (Builder)
+                       (Builder)
 import           Formatting
-    (Format, bprint, build, fitLeft, later, sformat, (%), (%.))
+                       (Format, bprint, build, fitLeft, later, sformat, (%),
+                       (%.))
 import           Prelude
-    (show)
+                       (show)
 import qualified Serokell.Util.Base16 as B16
 import qualified Serokell.Util.Base64 as Base64
-    (decode, formatBase64)
+                       (decode, formatBase64)
 import           Universum hiding
-    (show)
+                       (show)
 
 import           Pos.Binary.Class
-    (Bi (..), encodeListLen, enforceSize)
+                       (Bi (..), encodeListLen, enforceSize)
 import           Pos.Crypto.Hashing
-    (hash)
-import           Pos.Crypto.Orphans
-    ()
+                       (hash)
+import           Pos.Crypto.Orphans ()
 import           Pos.Util.Util
-    (toAesonError, toCborError)
+                       (toAesonError, toCborError)
 
 ----------------------------------------------------------------------------
 -- Utilities for From/ToJSON instances

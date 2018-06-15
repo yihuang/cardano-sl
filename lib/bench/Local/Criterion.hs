@@ -5,7 +5,7 @@ module Main
 import           Universum
 
 import           System.IO
-    (hSetEncoding, stdout, utf8)
+                       (hSetEncoding, stdout, utf8)
 
 import qualified Bench.Pos.Criterion.FollowTheSatoshiBench as FTS
 import qualified Bench.Pos.Criterion.TxSigningBench as TS

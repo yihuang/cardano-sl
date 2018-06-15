@@ -30,25 +30,29 @@ module Pos.Generator.BlockEvent.DSL
 import           Universum
 
 import           Control.Lens
-    (at, makeLenses, (%=), (.=))
+                       (at, makeLenses, (%=), (.=))
 import           Control.Monad.Random.Strict
-    (RandT, mapRandT)
+                       (RandT, mapRandT)
 import qualified Data.Map as Map
 
 import           Pos.AllSecrets
-    (AllSecrets)
+                       (AllSecrets)
 import           Pos.Core
-    (GenesisWStakeholders)
+                       (GenesisWStakeholders)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..), toOldestFirst, _NewestFirst)
+                       (NE, NewestFirst (..), OldestFirst (..), toOldestFirst,
+                       _NewestFirst)
 import           Pos.Generator.Block
-    (BlockTxpGenMode, MonadBlockGen)
+                       (BlockTxpGenMode, MonadBlockGen)
 import           Pos.Generator.BlockEvent
-    (BlockApplyResult (..), BlockDesc (..), BlockEvent' (..),
-    BlockEventApply' (..), BlockEventRollback' (..), BlockRollbackFailure (..),
-    BlockRollbackResult (..), BlockScenario, BlockScenario' (..), Chance (..),
-    CheckCount (..), Path, PathSegment, SnapshotId, SnapshotOperation (..),
-    byChance, enrichWithSnapshotChecking, genBlocksInStructure, pathSequence)
+                       (BlockApplyResult (..), BlockDesc (..),
+                       BlockEvent' (..), BlockEventApply' (..),
+                       BlockEventRollback' (..), BlockRollbackFailure (..),
+                       BlockRollbackResult (..), BlockScenario,
+                       BlockScenario' (..), Chance (..), CheckCount (..), Path,
+                       PathSegment, SnapshotId, SnapshotOperation (..),
+                       byChance, enrichWithSnapshotChecking,
+                       genBlocksInStructure, pathSequence)
 
 data BlockEventGenState = BlockEventGenState
     { _begsEvents      :: !(NewestFirst [] (BlockEvent' Path))

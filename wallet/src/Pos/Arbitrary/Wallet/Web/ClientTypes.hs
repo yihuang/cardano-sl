@@ -10,12 +10,12 @@ import           Universum
 
 import qualified Data.ByteString.Char8 as B8
 import           Pos.Wallet.Web.ClientTypes.Types
-    (CHash (..), CId (..), CWAddressMeta (..))
+                       (CHash (..), CId (..), CWAddressMeta (..))
 import           Pos.Wallet.Web.State
-    (WAddressMeta (..))
+                       (WAddressMeta (..))
 import qualified Serokell.Util.Base64 as B64
 import           Test.QuickCheck
-    (Arbitrary (..), vectorOf)
+                       (Arbitrary (..), vectorOf)
 
 instance Arbitrary CHash where
     arbitrary = CHash . B64.encode . B8.pack <$> vectorOf 64 arbitrary

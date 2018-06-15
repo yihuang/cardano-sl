@@ -9,18 +9,18 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Serokell.Util.Base16
-    (base16F)
+                       (base16F)
 
 import           Pos.Core.Common
-    (Script, addressHash)
+                       (Script, addressHash)
 import           Pos.Crypto
-    (Hash, PublicKey, RedeemPublicKey, RedeemSignature, Signature, hash,
-    shortHashF)
+                       (Hash, PublicKey, RedeemPublicKey, RedeemSignature,
+                       Signature, hash, shortHashF)
 
 import           Pos.Core.Txp.Tx
-    (Tx)
+                       (Tx)
 
 -- | A witness is a proof that a transaction is allowed to spend the funds it
 -- spends (by providing signatures, redeeming scripts, etc). A separate proof

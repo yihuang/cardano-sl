@@ -15,70 +15,73 @@ import           Universum
 
 import qualified Control.Concurrent.STM as Conc
 import           Control.Exception
-    (Exception (..), throwIO)
+                       (Exception (..), throwIO)
 import           Control.Lens
-    (to)
+                       (to)
 import           Control.Monad.Except
-    (ExceptT, runExceptT, throwError)
+                       (ExceptT, runExceptT, throwError)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.List.NonEmpty
-    (NonEmpty ((:|)))
+                       (NonEmpty ((:|)))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Set as S
 import qualified Data.Text.Buildable as B
 import           Formatting
-    (bprint, build, int, sformat, shown, stext, (%))
+                       (bprint, build, int, sformat, shown, stext, (%))
 import qualified Network.Broadcast.OutboundQueue as OQ
 import           Node.Conversation
-    (sendRaw)
+                       (sendRaw)
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 
 import           Pos.Binary.Communication
-    (serializeMsgSerializedBlock)
+                       (serializeMsgSerializedBlock)
 import           Pos.Block.Network
-    (MsgBlock (..), MsgGetBlocks (..), MsgGetHeaders (..), MsgHeaders (..),
-    MsgSerializedBlock (..))
+                       (MsgBlock (..), MsgGetBlocks (..), MsgGetHeaders (..),
+                       MsgHeaders (..), MsgSerializedBlock (..))
 import           Pos.Communication.Limits
-    (mlMsgBlock, mlMsgGetBlocks, mlMsgGetHeaders, mlMsgHeaders)
-import           Pos.Communication.Message
-    ()
+                       (mlMsgBlock, mlMsgGetBlocks, mlMsgGetHeaders,
+                       mlMsgHeaders)
+import           Pos.Communication.Message ()
 import           Pos.Core
-    (BlockVersionData, HeaderHash, ProtocolConstants (..), bvdSlotDuration,
-    headerHash, prevBlockL)
+                       (BlockVersionData, HeaderHash, ProtocolConstants (..),
+                       bvdSlotDuration, headerHash, prevBlockL)
 import           Pos.Core.Block
-    (Block, BlockHeader (..), MainBlockHeader, blockHeader)
+                       (Block, BlockHeader (..), MainBlockHeader, blockHeader)
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 import           Pos.DB
-    (DBError (DBMalformed))
+                       (DBError (DBMalformed))
 import           Pos.Exception
-    (cardanoExceptionFromException, cardanoExceptionToException)
+                       (cardanoExceptionFromException,
+                       cardanoExceptionToException)
 import           Pos.Infra.Communication.Listener
-    (listenerConv)
+                       (listenerConv)
 import           Pos.Infra.Communication.Protocol
-    (Conversation (..), ConversationActions (..), EnqueueMsg, ListenerSpec,
-    MkListeners (..), MsgType (..), NodeId, Origin (..), OutSpecs,
-    constantListeners, recvLimited, waitForConversations, waitForDequeues)
+                       (Conversation (..), ConversationActions (..),
+                       EnqueueMsg, ListenerSpec, MkListeners (..),
+                       MsgType (..), NodeId, Origin (..), OutSpecs,
+                       constantListeners, recvLimited, waitForConversations,
+                       waitForDequeues)
 import           Pos.Infra.Network.Types
-    (Bucket)
+                       (Bucket)
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress, nodeIdToAddress)
+                       (NetworkAddress, nodeIdToAddress)
 import           Pos.Logic.Types
-    (Logic (..))
+                       (Logic (..))
 -- Dubious having this security stuff in here.
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..), toOldestFirst, _NewestFirst,
-    _OldestFirst)
+                       (NE, NewestFirst (..), OldestFirst (..), toOldestFirst,
+                       _NewestFirst, _OldestFirst)
 import           Pos.Security.Params
-    (AttackTarget (..), AttackType (..), NodeAttackedError (..),
-    SecurityParams (..))
+                       (AttackTarget (..), AttackType (..),
+                       NodeAttackedError (..), SecurityParams (..))
 import           Pos.Util
-    (_neHead, _neLast)
+                       (_neHead, _neLast)
 import           Pos.Util.Timer
-    (Timer, startTimer)
+                       (Timer, startTimer)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 
 {-# ANN module ("HLint: ignore Reduce duplication" :: Text) #-}
 

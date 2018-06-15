@@ -6,13 +6,12 @@ module Pos.Txp.Network.Types
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Universum
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core.Txp
-    (TxAux (..), txaF)
+                       (TxAux (..), txaF)
 
 -- | Data message. Can be used to send one transaction per message.
 -- Transaction is sent with auxilary data.

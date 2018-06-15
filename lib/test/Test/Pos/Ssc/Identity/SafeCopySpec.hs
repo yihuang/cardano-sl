@@ -5,19 +5,17 @@ module Test.Pos.Ssc.Identity.SafeCopySpec
        ) where
 
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Universum
 
-import           Pos.Arbitrary.Ssc
-    ()
+import           Pos.Arbitrary.Ssc ()
 import qualified Pos.Core.Ssc as Ssc
-import           Pos.SafeCopy
-    ()
+import           Pos.SafeCopy ()
 
 import           Test.Pos.Binary.Helpers
-    (safeCopyTest)
+                       (safeCopyTest)
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 
 spec :: Spec
 spec = withDefConfiguration $ describe "Ssc" $ do

@@ -3,14 +3,14 @@ module Statistics.MemPool
     ) where
 
 import           Control.Foldl
-    (Fold (..))
+                       (Fold (..))
 
 import           JSONLog
-    (IndexedJLTimedEvent (..))
+                       (IndexedJLTimedEvent (..))
 import           Pos.Infra.Util.JsonLog.Events
-    (JLEvent (..), JLMemPool (..))
+                       (JLEvent (..), JLMemPool (..))
 import           Prelude
-    (id)
+                       (id)
 import           Types
 
 memPoolF :: Fold IndexedJLTimedEvent [(NodeId, Timestamp, JLMemPool)]

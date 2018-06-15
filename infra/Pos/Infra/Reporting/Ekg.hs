@@ -11,19 +11,19 @@ module Pos.Infra.Reporting.Ekg
 import           Universum
 
 import           Node
-    (Node)
+                       (Node)
 import           Node.Util.Monitor
-    (registerMetrics)
+                       (registerMetrics)
 
 import qualified System.Metrics as Metrics
 import qualified System.Remote.Monitoring.Wai as Monitoring
 
 import           Pos.Infra.Statistics
-    (EkgParams (..))
+                       (EkgParams (..))
 import           Pos.Infra.Util.Monitor
-    (stopMonitor)
+                       (stopMonitor)
 import           Pos.System.Metrics.Constants
-    (cardanoNamespace)
+                       (cardanoNamespace)
 
 -- | All you need in order to register EKG metrics on a time-warp node.
 data EkgNodeMetrics = EkgNodeMetrics

@@ -13,22 +13,22 @@ module Pos.Update.MemState.Types
 import           Universum
 
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Core
-    (HeaderHash, SlotId (..), UpdateProposals)
+                       (HeaderHash, SlotId (..), UpdateProposals)
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import           Pos.DB.GState.Common
-    (getTip)
+                       (getTip)
 import           Pos.Infra.Slotting
-    (MonadSlots (getCurrentSlot))
+                       (MonadSlots (getCurrentSlot))
 import           Pos.Update.Poll.Modifier
-    (PollModifier)
+                       (PollModifier)
 import           Pos.Update.Poll.Types
-    (LocalVotes)
+                       (LocalVotes)
 
 -- | MemPool is data maintained by node to be included into block and
 -- relayed to other nodes.

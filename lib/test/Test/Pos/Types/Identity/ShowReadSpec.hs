@@ -6,15 +6,14 @@ module Test.Pos.Types.Identity.ShowReadSpec
 
 import           Universum
 
-import           Pos.Arbitrary.Core
-    ()
+import           Pos.Arbitrary.Core ()
 import           Pos.Core
-    (Timestamp (..))
+                       (Timestamp (..))
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 
 import           Test.Pos.Binary.Helpers
-    (showReadTest)
+                       (showReadTest)
 
 spec :: Spec
 spec = describe "Types" $ do

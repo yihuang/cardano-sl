@@ -13,61 +13,66 @@ import qualified Cardano.Crypto.Wallet.Encrypted as CC
 import qualified Crypto.Math.Edwards25519 as ED25519
 import qualified Crypto.Sign.Ed25519 as EDS25519
 import           Data.SafeCopy
-    (Contained, SafeCopy (..), base, contain, deriveSafeCopySimple, safeGet,
-    safePut)
+                       (Contained, SafeCopy (..), base, contain,
+                       deriveSafeCopySimple, safeGet, safePut)
 import qualified Data.Serialize as Cereal
 import qualified PlutusCore.Program as PLCore
 import qualified PlutusCore.Term as PLCore
-import           Serokell.AcidState.Instances
-    ()
+import           Serokell.AcidState.Instances ()
 import           Serokell.Data.Memory.Units
-    (Byte, fromBytes, toBytes)
+                       (Byte, fromBytes, toBytes)
 
 import           Pos.Binary.Class
-    (AsBinary (..), Bi)
+                       (AsBinary (..), Bi)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Core.Block
 import           Pos.Core.Common
-    (AddrAttributes (..), AddrSpendingData (..), AddrStakeDistribution (..),
-    AddrType (..), Address (..), Address' (..), BlockCount (..),
-    ChainDifficulty (..), Coeff (..), Coin, CoinPortion (..), Script (..),
-    SharedSeed (..), TxFeePolicy (..), TxSizeLinear (..))
+                       (AddrAttributes (..), AddrSpendingData (..),
+                       AddrStakeDistribution (..), AddrType (..), Address (..),
+                       Address' (..), BlockCount (..), ChainDifficulty (..),
+                       Coeff (..), Coin, CoinPortion (..), Script (..),
+                       SharedSeed (..), TxFeePolicy (..), TxSizeLinear (..))
 import           Pos.Core.Delegation
-    (DlgPayload (..), HeavyDlgIndex (..), LightDlgIndices (..))
+                       (DlgPayload (..), HeavyDlgIndex (..),
+                       LightDlgIndices (..))
 import           Pos.Core.Slotting
-    (EpochIndex (..), EpochOrSlot (..), LocalSlotIndex (..), SlotCount (..),
-    SlotId (..))
+                       (EpochIndex (..), EpochOrSlot (..), LocalSlotIndex (..),
+                       SlotCount (..), SlotId (..))
 import           Pos.Core.Ssc
-    (Commitment (..), CommitmentsMap, Opening (..), SscPayload (..),
-    SscProof (..), VssCertificate (..), VssCertificatesMap)
+                       (Commitment (..), CommitmentsMap, Opening (..),
+                       SscPayload (..), SscProof (..), VssCertificate (..),
+                       VssCertificatesMap)
 import           Pos.Core.Txp
-    (Tx (..), TxIn (..), TxInWitness (..), TxOut (..), TxOutAux (..),
-    TxPayload (..), TxProof (..))
+                       (Tx (..), TxIn (..), TxInWitness (..), TxOut (..),
+                       TxOutAux (..), TxPayload (..), TxProof (..))
 import           Pos.Core.Update
-    (ApplicationName (..), BlockVersion (..), BlockVersionData (..),
-    BlockVersionModifier (..), SoftforkRule (..), SoftwareVersion (..),
-    SystemTag (..), UpdateData (..), UpdatePayload (..), UpdateProposal (..),
-    UpdateVote (..))
+                       (ApplicationName (..), BlockVersion (..),
+                       BlockVersionData (..), BlockVersionModifier (..),
+                       SoftforkRule (..), SoftwareVersion (..), SystemTag (..),
+                       UpdateData (..), UpdatePayload (..),
+                       UpdateProposal (..), UpdateVote (..))
 import           Pos.Crypto
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 import           Pos.Crypto.Hashing
-    (AbstractHash (..), WithHash (..))
+                       (AbstractHash (..), WithHash (..))
 import           Pos.Crypto.HD
-    (HDAddressPayload (..))
+                       (HDAddressPayload (..))
 import           Pos.Crypto.SecretSharing
-    (SecretProof)
+                       (SecretProof)
 import           Pos.Crypto.Signing.Redeem
-    (RedeemPublicKey (..), RedeemSecretKey (..), RedeemSignature (..))
+                       (RedeemPublicKey (..), RedeemSecretKey (..),
+                       RedeemSignature (..))
 import           Pos.Crypto.Signing.Signing
-    (ProxyCert (..), ProxySecretKey (..), ProxySignature (..), PublicKey (..),
-    SecretKey (..), Signature (..), Signed (..))
+                       (ProxyCert (..), ProxySecretKey (..),
+                       ProxySignature (..), PublicKey (..), SecretKey (..),
+                       Signature (..), Signed (..))
 import           Pos.Data.Attributes
-    (Attributes (..), UnparsedFields)
+                       (Attributes (..), UnparsedFields)
 import           Pos.Merkle
-    (MerkleNode (..), MerkleRoot (..), MerkleTree (..))
+                       (MerkleNode (..), MerkleRoot (..), MerkleTree (..))
 import qualified Pos.Util.Modifier as MM
 import           Pos.Util.Util
-    (cerealError, toCerealError)
+                       (cerealError, toCerealError)
 
 ----------------------------------------------------------------------------
 -- Bi

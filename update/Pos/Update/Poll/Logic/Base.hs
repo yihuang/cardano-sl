@@ -30,46 +30,48 @@ module Pos.Update.Poll.Logic.Base
 import           Universum
 
 import           Control.Lens
-    (at)
+                       (at)
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Set as S
 import           Data.Tagged
-    (Tagged, untag)
+                       (Tagged, untag)
 import           Data.Time.Units
-    (convertUnit)
+                       (convertUnit)
 import           Formatting
-    (build, int, sformat, (%))
+                       (build, int, sformat, (%))
 import           System.Wlog
-    (WithLogger, logDebug, logNotice)
+                       (WithLogger, logDebug, logNotice)
 
-import           Pos.Binary.Update
-    ()
+import           Pos.Binary.Update ()
 import           Pos.Core
-    (BlockVersion (..), Coin, CoinPortion (..), EpochIndex,
-    HasProtocolConstants, HeaderHash, IsMainHeader (..), SlotId,
-    SoftforkRule (..), TimeDiff (..), addressHash, applyCoinPortionUp,
-    coinPortionDenominator, coinToInteger, difficultyL, epochSlots,
-    getCoinPortion, headerHashG, isBootstrapEra, sumCoins, unsafeAddCoin,
-    unsafeIntegerToCoin, unsafeSubCoin)
+                       (BlockVersion (..), Coin, CoinPortion (..), EpochIndex,
+                       HasProtocolConstants, HeaderHash, IsMainHeader (..),
+                       SlotId, SoftforkRule (..), TimeDiff (..), addressHash,
+                       applyCoinPortionUp, coinPortionDenominator,
+                       coinToInteger, difficultyL, epochSlots, getCoinPortion,
+                       headerHashG, isBootstrapEra, sumCoins, unsafeAddCoin,
+                       unsafeIntegerToCoin, unsafeSubCoin)
 import           Pos.Core.Update
-    (BlockVersionData (..), BlockVersionModifier (..), UpId,
-    UpdateProposal (..), UpdateVote (..))
+                       (BlockVersionData (..), BlockVersionModifier (..), UpId,
+                       UpdateProposal (..), UpdateVote (..))
 import           Pos.Crypto
-    (PublicKey, hash, shortHashF)
+                       (PublicKey, hash, shortHashF)
 import           Pos.Infra.Slotting.Types
-    (EpochSlottingData (..), SlottingData, addEpochSlottingData,
-    getCurrentEpochIndex, getNextEpochSlottingData)
+                       (EpochSlottingData (..), SlottingData,
+                       addEpochSlottingData, getCurrentEpochIndex,
+                       getNextEpochSlottingData)
 import           Pos.Update.Poll.Class
-    (MonadPoll (..), MonadPollRead (..))
+                       (MonadPoll (..), MonadPollRead (..))
 import           Pos.Update.Poll.Failure
-    (PollVerFailure (..))
+                       (PollVerFailure (..))
 import           Pos.Update.Poll.Types
-    (BlockVersionState (..), ConfirmedProposalState (..),
-    DecidedProposalState (..), DpsExtra (..), ProposalState (..),
-    UndecidedProposalState (..), UpsExtra (..), bvsIsConfirmed, combineVotes,
-    cpsBlockVersion, isPositiveVote, newVoteState)
+                       (BlockVersionState (..), ConfirmedProposalState (..),
+                       DecidedProposalState (..), DpsExtra (..),
+                       ProposalState (..), UndecidedProposalState (..),
+                       UpsExtra (..), bvsIsConfirmed, combineVotes,
+                       cpsBlockVersion, isPositiveVote, newVoteState)
 
 
 

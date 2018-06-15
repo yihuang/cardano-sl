@@ -8,22 +8,21 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 
-import           Pos.Arbitrary.Update
-    ()
+import           Pos.Arbitrary.Update ()
 import qualified Pos.Core.Update as Upd
 import           Pos.Crypto
-    (PublicKey, hash)
+                       (PublicKey, hash)
 import qualified Pos.Update.MemState as Upd
 
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Property, (.&&.), (==>))
+                       (Property, (.&&.), (==>))
 
 import           Test.Pos.Configuration
-    (withDefConfiguration)
+                       (withDefConfiguration)
 
 spec :: Spec
 spec = withDefConfiguration $ describe "MemState" $ do

@@ -20,18 +20,19 @@ module Pos.Infra.Slotting.Impl.Simple
 import           Universum
 
 import           Mockable
-    (CurrentTime, Mockable, currentTime)
+                       (CurrentTime, Mockable, currentTime)
 
 import           Pos.Core.Configuration
-    (HasProtocolConstants)
+                       (HasProtocolConstants)
 import           Pos.Core.Slotting
-    (SlotId (..), Timestamp (..), unflattenSlotId)
+                       (SlotId (..), Timestamp (..), unflattenSlotId)
 import           Pos.Infra.Slotting.Impl.Util
-    (approxSlotUsingOutdated, slotFromTimestamp)
+                       (approxSlotUsingOutdated, slotFromTimestamp)
 import           Pos.Infra.Slotting.MemState
-    (MonadSlotsData, getCurrentNextEpochIndexM, waitCurrentEpochEqualsM)
+                       (MonadSlotsData, getCurrentNextEpochIndexM,
+                       waitCurrentEpochEqualsM)
 import           Pos.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 ----------------------------------------------------------------------------
 -- Mode

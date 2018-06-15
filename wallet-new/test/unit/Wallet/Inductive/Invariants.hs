@@ -21,9 +21,9 @@ import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 
 import           Util
 import           Util.Validated

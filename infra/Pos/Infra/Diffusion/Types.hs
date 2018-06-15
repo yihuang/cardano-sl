@@ -11,28 +11,29 @@ module Pos.Infra.Diffusion.Types
 import           Universum
 
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import           Formatting
-    (Format, stext)
+                       (Format, stext)
 
 import           Pos.Core
-    (HeaderHash, ProxySKHeavy)
+                       (HeaderHash, ProxySKHeavy)
 import           Pos.Core.Block
-    (Block, BlockHeader, MainBlockHeader)
+                       (Block, BlockHeader, MainBlockHeader)
 import           Pos.Core.Chrono
-    (OldestFirst (..))
+                       (OldestFirst (..))
 import           Pos.Core.Ssc
-    (InnerSharesMap, Opening, SignedCommitment, VssCertificate)
+                       (InnerSharesMap, Opening, SignedCommitment,
+                       VssCertificate)
 import           Pos.Core.Txp
-    (TxAux)
+                       (TxAux)
 import           Pos.Core.Update
-    (UpId, UpdateProposal, UpdateVote)
+                       (UpId, UpdateProposal, UpdateVote)
 import           Pos.Infra.Communication.Types.Protocol
-    (NodeId)
+                       (NodeId)
 import           Pos.Infra.Diffusion.Subscription.Status
-    (SubscriptionStates, emptySubscriptionStates)
+                       (SubscriptionStates, emptySubscriptionStates)
 import           Pos.Infra.Reporting.Health.Types
-    (HealthStatus (..))
+                       (HealthStatus (..))
 
 
 

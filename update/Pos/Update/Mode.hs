@@ -8,38 +8,36 @@ module Pos.Update.Mode
 import           Universum
 
 import           Mockable
-    (MonadMockable)
+                       (MonadMockable)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
-import           Pos.Binary.Update
-    ()
-import           Pos.Core.Configuration
-    ()
+import           Pos.Binary.Update ()
+import           Pos.Core.Configuration ()
 import           Pos.DB.Class
-    (MonadDB, MonadGState)
+                       (MonadDB, MonadGState)
 import           Pos.Infra.Recovery.Info
-    (MonadRecoveryInfo)
+                       (MonadRecoveryInfo)
 import           Pos.Infra.Reporting
-    (MonadReporting)
+                       (MonadReporting)
 import           Pos.Infra.Shutdown.Class
-    (HasShutdownContext)
+                       (HasShutdownContext)
 import           Pos.Infra.Slotting.Class
-    (MonadSlots)
+                       (MonadSlots)
 import           Pos.Infra.StateLock
-    (StateLock)
+                       (StateLock)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 import           Pos.Update.Context
-    (UpdateContext)
+                       (UpdateContext)
 import           Pos.Update.Params
-    (UpdateParams)
+                       (UpdateParams)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 type UpdateMode ctx m
     = ( WithLogger m

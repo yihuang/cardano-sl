@@ -16,27 +16,29 @@ module Pos.Wallet.Web.Tracking.Decrypt
 import           Universum
 
 import           Data.List
-    ((!!))
+                       ((!!))
 import qualified Data.List.NonEmpty as NE
 import           Serokell.Util
-    (enumerate)
+                       (enumerate)
 
 import           Pos.Client.Txp.History
-    (TxHistoryEntry (..))
+                       (TxHistoryEntry (..))
 import           Pos.Core
-    (Address (..), ChainDifficulty, Timestamp, aaPkDerivationPath,
-    addrAttributesUnwrapped, makeRootPubKeyAddress)
+                       (Address (..), ChainDifficulty, Timestamp,
+                       aaPkDerivationPath, addrAttributesUnwrapped,
+                       makeRootPubKeyAddress)
 import           Pos.Core.Txp
-    (Tx (..), TxIn (..), TxOut, TxOutAux (..), TxUndo, toaOut, txOutAddress)
+                       (Tx (..), TxIn (..), TxOut, TxOutAux (..), TxUndo,
+                       toaOut, txOutAddress)
 import           Pos.Crypto
-    (EncryptedSecretKey, HDPassphrase, WithHash (..), deriveHDPassphrase,
-    encToPublic, unpackHDAddressAttr)
+                       (EncryptedSecretKey, HDPassphrase, WithHash (..),
+                       deriveHDPassphrase, encToPublic, unpackHDAddressAttr)
 import           Pos.Util.Servant
-    (encodeCType)
+                       (encodeCType)
 import           Pos.Wallet.Web.ClientTypes
-    (CId, Wal)
+                       (CId, Wal)
 import           Pos.Wallet.Web.State
-    (WAddressMeta (..))
+                       (WAddressMeta (..))
 
 type OwnTxInOuts = [((TxIn, TxOutAux), WAddressMeta)]
 

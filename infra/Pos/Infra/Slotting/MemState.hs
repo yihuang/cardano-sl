@@ -20,14 +20,15 @@ module Pos.Infra.Slotting.MemState
 import           Universum
 
 import           Control.Monad.STM
-    (retry)
+                       (retry)
 
 import           Pos.Core.Slotting
-    (EpochIndex, Timestamp)
+                       (EpochIndex, Timestamp)
 import           Pos.Infra.Slotting.Types
-    (EpochSlottingData, SlottingData, getAllEpochIndices, getCurrentEpochIndex,
-    getCurrentEpochSlottingData, getNextEpochIndex, getNextEpochSlottingData,
-    insertEpochSlottingDataUnsafe, lookupEpochSlottingData)
+                       (EpochSlottingData, SlottingData, getAllEpochIndices,
+                       getCurrentEpochIndex, getCurrentEpochSlottingData,
+                       getNextEpochIndex, getNextEpochSlottingData,
+                       insertEpochSlottingDataUnsafe, lookupEpochSlottingData)
 
 ----------------------------------------------------------------------------
 -- Context

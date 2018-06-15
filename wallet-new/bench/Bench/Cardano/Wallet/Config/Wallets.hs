@@ -10,15 +10,15 @@ module Bench.Cardano.Wallet.Config.Wallets
 import           Universum
 
 import           Data.Aeson.Types
-    (typeMismatch)
+                       (typeMismatch)
 import           Data.Yaml
-    ((.:))
+                       ((.:))
 import qualified Data.Yaml as Yaml
 
 import           Bench.Cardano.Wallet.Types
-    (Wallet (..), WalletAccount (..), WalletsConfig (..))
+                       (Wallet (..), WalletAccount (..), WalletsConfig (..))
 import           Pos.Wallet.Web.ClientTypes
-    (CAccountId (..), CHash (..), CId (..))
+                       (CAccountId (..), CHash (..), CId (..))
 
 instance Yaml.FromJSON CAccountId where
     parseJSON (Yaml.String t) = return $ CAccountId t

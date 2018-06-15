@@ -10,10 +10,10 @@ module Pos.Infra.Util.SigHandler
 import           Universum
 
 import           Control.Concurrent
-    (modifyMVar_, withMVar)
+                       (modifyMVar_, withMVar)
 import qualified Data.Map.Strict as Map
 import           System.IO.Unsafe
-    (unsafePerformIO)
+                       (unsafePerformIO)
 import qualified System.Posix.Signals as Posix
 
 {-------------------------------------------------------------------------------

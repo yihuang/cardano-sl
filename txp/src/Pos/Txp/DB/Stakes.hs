@@ -23,40 +23,42 @@ module Pos.Txp.DB.Stakes
 import           Universum
 
 import           Control.Lens
-    (at)
+                       (at)
 import           Control.Monad.Trans.Resource
-    (ResourceT)
+                       (ResourceT)
 import           Data.Conduit
-    (ConduitT, mapOutput, runConduitRes, (.|))
+                       (ConduitT, mapOutput, runConduitRes, (.|))
 import qualified Data.Conduit.List as CL
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text.Buildable
 import qualified Database.RocksDB as Rocks
 import           Formatting
-    (bprint, sformat, (%))
+                       (bprint, sformat, (%))
 import           Serokell.Util
-    (Color (Red), colorize)
+                       (Color (Red), colorize)
 import           System.Wlog
-    (WithLogger, logError)
+                       (WithLogger, logError)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Pos.Core
-    (Coin, HasCoreConfiguration, StakeholderId, StakesMap, coinF, mkCoin,
-    sumCoins, unsafeAddCoin, unsafeIntegerToCoin)
+                       (Coin, HasCoreConfiguration, StakeholderId, StakesMap,
+                       coinF, mkCoin, sumCoins, unsafeAddCoin,
+                       unsafeIntegerToCoin)
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 import           Pos.DB
-    (DBError (..), DBTag (GStateDB), IterType, MonadDB, MonadDBRead,
-    RocksBatchOp (..), dbIterSource, dbSerializeValue)
+                       (DBError (..), DBTag (GStateDB), IterType, MonadDB,
+                       MonadDBRead, RocksBatchOp (..), dbIterSource,
+                       dbSerializeValue)
 import           Pos.DB.GState.Common
-    (gsPutBi)
+                       (gsPutBi)
 import           Pos.DB.GState.Stakes
-    (StakeIter, ftsStakeKey, ftsSumKey, getRealTotalStake)
+                       (StakeIter, ftsStakeKey, ftsSumKey, getRealTotalStake)
 import           Pos.Txp.Toil.Types
-    (GenesisUtxo (..))
+                       (GenesisUtxo (..))
 import           Pos.Txp.Toil.Utxo
-    (utxoToStakes)
+                       (utxoToStakes)
 
 ----------------------------------------------------------------------------
 -- Operations

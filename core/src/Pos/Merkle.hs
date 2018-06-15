@@ -23,23 +23,23 @@ module Pos.Merkle
 import           Universum
 
 import           Data.Bits
-    (Bits (..))
+                       (Bits (..))
 import           Data.ByteArray
-    (ByteArrayAccess, convert)
+                       (ByteArrayAccess, convert)
 import           Data.ByteString.Builder
-    (Builder, byteString)
+                       (Builder, byteString)
 import qualified Data.ByteString.Builder.Extra as Builder
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import qualified Data.Foldable as Foldable
 import qualified Data.Text.Buildable as Buildable
 import qualified Prelude
 
 import           Pos.Binary.Class
-    (Bi, Raw, serializeBuilder)
+                       (Bi, Raw, serializeBuilder)
 import           Pos.Crypto
-    (AbstractHash (..), Hash, hashRaw)
+                       (AbstractHash (..), Hash, hashRaw)
 
 {-# ANN module ("HLint : ignore Unnecessary hiding" :: Text) #-}
 

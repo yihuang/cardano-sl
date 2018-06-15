@@ -16,46 +16,48 @@ module Pos.Txp.Logic.Global
 import           Universum
 
 import           Control.Lens
-    (magnify, zoom)
+                       (magnify, zoom)
 import           Control.Monad.Except
-    (throwError)
+                       (throwError)
 import           Data.Default
-    (Default, def)
+                       (Default, def)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List.NonEmpty as NE
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 
 import           Pos.Core
-    (HasCoreConfiguration, HasGenesisData, epochIndexL)
+                       (HasCoreConfiguration, HasGenesisData, epochIndexL)
 import           Pos.Core.Block.Union
-    (ComponentBlock (..))
+                       (ComponentBlock (..))
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..))
+                       (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.Core.Txp
-    (TxAux, TxUndo, TxpUndo)
+                       (TxAux, TxUndo, TxpUndo)
 import           Pos.DB
-    (SomeBatchOp (..))
+                       (SomeBatchOp (..))
 import           Pos.DB.Class
-    (gsAdoptedBVData)
+                       (gsAdoptedBVData)
 import qualified Pos.DB.GState.Stakes as DB
 import           Pos.Exception
-    (assertionFailed)
+                       (assertionFailed)
 import           Pos.Txp.Base
-    (flattenTxPayload)
+                       (flattenTxPayload)
 import qualified Pos.Txp.DB as DB
 import           Pos.Txp.Logic.Common
-    (buildUtxo, buildUtxoForRollback)
+                       (buildUtxo, buildUtxoForRollback)
 import           Pos.Txp.Settings.Global
-    (TxpBlock, TxpBlund, TxpCommonMode, TxpGlobalApplyMode,
-    TxpGlobalRollbackMode, TxpGlobalSettings (..), TxpGlobalVerifyMode)
+                       (TxpBlock, TxpBlund, TxpCommonMode, TxpGlobalApplyMode,
+                       TxpGlobalRollbackMode, TxpGlobalSettings (..),
+                       TxpGlobalVerifyMode)
 import           Pos.Txp.Toil
-    (ExtendedGlobalToilM, GlobalToilEnv (..), GlobalToilM,
-    GlobalToilState (..), StakesView (..), ToilVerFailure, Utxo, UtxoM,
-    UtxoModifier, applyToil, defGlobalToilState, gtsUtxoModifier, rollbackToil,
-    runGlobalToilMBase, runUtxoM, utxoToLookup, verifyToil)
+                       (ExtendedGlobalToilM, GlobalToilEnv (..), GlobalToilM,
+                       GlobalToilState (..), StakesView (..), ToilVerFailure,
+                       Utxo, UtxoM, UtxoModifier, applyToil,
+                       defGlobalToilState, gtsUtxoModifier, rollbackToil,
+                       runGlobalToilMBase, runUtxoM, utxoToLookup, verifyToil)
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 import qualified Pos.Util.Modifier as MM
 
 ----------------------------------------------------------------------------

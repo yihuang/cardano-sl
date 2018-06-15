@@ -19,40 +19,41 @@ module Pos.Block.BHelpers
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 
 import           Pos.Binary.Class
-    (Bi)
-import           Pos.Binary.Core
-    ()
+                       (Bi)
+import           Pos.Binary.Core ()
 import           Pos.Core.Block
-    (Block, GenesisBlockchain, MainBlockchain, MainConsensusData (..),
-    MainToSign (..))
+                       (Block, GenesisBlockchain, MainBlockchain,
+                       MainConsensusData (..), MainToSign (..))
 import           Pos.Core.Block.Blockchain
-    (Blockchain (..), GenericBlock (..), GenericBlockHeader (..), gbExtra)
+                       (Blockchain (..), GenericBlock (..),
+                       GenericBlockHeader (..), gbExtra)
 import           Pos.Core.Block.Main
-    (MainBody (..), MainExtraHeaderData (..), MainProof, mainBlockEBDataProof)
+                       (MainBody (..), MainExtraHeaderData (..), MainProof,
+                       mainBlockEBDataProof)
 import           Pos.Core.Block.Union
-    (BlockHeader (..), BlockSignature (..))
+                       (BlockHeader (..), BlockSignature (..))
 import           Pos.Core.Configuration
-    (HasProtocolConstants, HasProtocolMagic, protocolMagic)
+                       (HasProtocolConstants, HasProtocolMagic, protocolMagic)
 import           Pos.Core.Delegation
-    (LightDlgIndices (..), checkDlgPayload)
+                       (LightDlgIndices (..), checkDlgPayload)
 import           Pos.Core.Slotting
-    (SlotId (..))
+                       (SlotId (..))
 import           Pos.Core.Ssc
-    (checkSscPayload)
+                       (checkSscPayload)
 import           Pos.Core.Txp
-    (checkTxPayload)
+                       (checkTxPayload)
 import           Pos.Core.Update
-    (checkSoftwareVersion, checkUpdatePayload)
+                       (checkSoftwareVersion, checkUpdatePayload)
 import           Pos.Crypto
-    (ProxySignature (..), SignTag (..), checkSig, hash, isSelfSignedPsk,
-    proxyVerify)
+                       (ProxySignature (..), SignTag (..), checkSig, hash,
+                       isSelfSignedPsk, proxyVerify)
 import           Pos.Ssc.Functions
-    (verifySscPayload)
+                       (verifySscPayload)
 import           Pos.Util.Some
-    (Some (Some))
+                       (Some (Some))
 
 -- | Verify a BlockHeader in isolation. There is nothing to be done for
 -- genesis headers.

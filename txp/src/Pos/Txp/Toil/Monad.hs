@@ -50,32 +50,32 @@ module Pos.Txp.Toil.Monad
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at, magnify, makeLenses, zoom, (%=), (+=), (.=))
+                       (at, magnify, makeLenses, zoom, (%=), (+=), (.=))
 import           Control.Monad.Free.Church
-    (F (..), foldF)
+                       (F (..), foldF)
 import           Control.Monad.Reader
-    (mapReaderT)
+                       (mapReaderT)
 import           Control.Monad.State.Strict
-    (mapStateT)
+                       (mapStateT)
 import           Data.Default
-    (def)
+                       (def)
 import           Fmt
-    ((+|), (|+))
+                       ((+|), (|+))
 import           System.Wlog
-    (NamedPureLogger, WithLogger, launchNamedPureLog)
+                       (NamedPureLogger, WithLogger, launchNamedPureLog)
 
 import           Pos.Core.Common
-    (Coin, StakeholderId)
+                       (Coin, StakeholderId)
 import           Pos.Core.Txp
-    (TxAux, TxId, TxIn, TxOutAux, TxUndo)
+                       (TxAux, TxId, TxIn, TxOutAux, TxUndo)
 import           Pos.Txp.Toil.Types
-    (MemPool, StakesView, UndoMap, UtxoLookup, UtxoModifier, mpLocalTxs,
-    mpSize, svStakes, svTotal)
+                       (MemPool, StakesView, UndoMap, UtxoLookup, UtxoModifier,
+                       mpLocalTxs, mpSize, svStakes, svTotal)
 import           Pos.Util
-    (type (~>))
+                       (type (~>))
 import qualified Pos.Util.Modifier as MM
 
 ----------------------------------------------------------------------------

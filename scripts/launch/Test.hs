@@ -12,37 +12,37 @@
 
 import           Control.Lens
 import           Control.Monad
-    (forM_, void, when)
+                       (forM_, void, when)
 import           Control.Monad.Except
-    (ExceptT (..), runExceptT)
+                       (ExceptT (..), runExceptT)
 import           Control.Monad.Trans
-    (lift)
+                       (lift)
 import           "lens-aeson" Data.Aeson.Lens
 import qualified Data.List as L
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import           Data.Maybe
-    (catMaybes, fromJust, fromMaybe)
+                       (catMaybes, fromJust, fromMaybe)
 import           Data.Monoid
-    ((<>))
+                       ((<>))
 import           Data.Scientific
-    (Scientific)
+                       (Scientific)
 import qualified Data.Text as T
 import           Data.Text.IO as TIO
 import           Data.Text.Lazy
-    (fromStrict)
+                       (fromStrict)
 import           Data.Text.Lazy.Encoding
-    (encodeUtf8)
+                       (encodeUtf8)
 import qualified Data.Yaml as Y
 import           Filesystem.Path.CurrentOS
-    (encodeString)
+                       (encodeString)
 import qualified Filesystem.Path.CurrentOS as F
 import           GHC.Generics
 import           Prelude hiding
-    (FilePath)
+                       (FilePath)
 import           Text.Printf
 import           Turtle hiding
-    (printf)
+                       (printf)
 
 
 -- CLI Parser

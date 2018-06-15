@@ -17,22 +17,23 @@ import qualified Data.Text as T
 import qualified Data.Text.Buildable
 import           Data.Typeable
 import           Formatting
-    (bprint, build, formatToString, sformat)
+                       (bprint, build, formatToString, sformat)
 import qualified Generics.SOP as SOP
 import           GHC.TypeLits
-    (KnownSymbol, symbolVal)
+                       (KnownSymbol, symbolVal)
 import           Network.HTTP.Types
-    (parseQueryText)
+                       (parseQueryText)
 import           Network.Wai
-    (Request, rawQueryString)
+                       (Request, rawQueryString)
 import           Pos.Infra.Util.LogSafe
-    (BuildableSafeGen (..), SecureLog (..), buildSafe, secure, unsecure)
+                       (BuildableSafeGen (..), SecureLog (..), buildSafe,
+                       secure, unsecure)
 import           Pos.Util.Servant
-    (ApiCanLogArg (..), ApiHasArgClass (..))
+                       (ApiCanLogArg (..), ApiHasArgClass (..))
 import           Servant
 import           Servant.Client
 import           Servant.Client.Core
-    (appendToQueryString)
+                       (appendToQueryString)
 import           Servant.Server.Internal
 
 import           Cardano.Wallet.API.Indices

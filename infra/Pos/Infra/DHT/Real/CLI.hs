@@ -10,19 +10,19 @@ module Pos.Infra.DHT.Real.CLI
 import           Universum
 
 import           Control.Exception.Safe
-    (throwString)
+                       (throwString)
 import           Formatting
-    (build, formatToString, shown, (%))
+                       (build, formatToString, shown, (%))
 import qualified Options.Applicative as Opt
 import           Pos.Util.OptParse
-    (fromParsec)
+                       (fromParsec)
 import           Text.Parsec
-    (eof, parse)
+                       (eof, parse)
 
 import           Pos.Infra.DHT.Model.Types
-    (DHTKey, DHTNode, dhtKeyParser, dhtNodeParser)
+                       (DHTKey, DHTNode, dhtKeyParser, dhtNodeParser)
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress, addrParser)
+                       (NetworkAddress, addrParser)
 
 dhtExplicitInitialOption :: Opt.Parser Bool
 dhtExplicitInitialOption =

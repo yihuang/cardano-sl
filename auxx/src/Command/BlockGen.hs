@@ -7,37 +7,37 @@ module Command.BlockGen
 import           Universum
 
 import           Control.Monad.Random.Strict
-    (evalRandT)
+                       (evalRandT)
 import           Data.Default
-    (def)
+                       (def)
 import           System.Random
-    (mkStdGen, randomIO)
+                       (mkStdGen, randomIO)
 import           System.Wlog
-    (logInfo)
+                       (logInfo)
 
 import           Pos.AllSecrets
-    (mkAllSecretsSimple)
+                       (mkAllSecretsSimple)
 import           Pos.Client.KeyStorage
-    (getSecretKeysPlain)
+                       (getSecretKeysPlain)
 import           Pos.Core
-    (gdBootStakeholders, genesisData)
+                       (gdBootStakeholders, genesisData)
 import           Pos.Crypto
-    (encToSecret)
+                       (encToSecret)
 import           Pos.Generator.Block
-    (BlockGenParams (..), genBlocks, tgpTxCountRange)
+                       (BlockGenParams (..), genBlocks, tgpTxCountRange)
 import           Pos.Infra.StateLock
-    (Priority (..), withStateLock)
+                       (Priority (..), withStateLock)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason (..))
+                       (MemPoolModifyReason (..))
 import           Pos.Txp
-    (txpGlobalSettings)
+                       (txpGlobalSettings)
 import           Pos.Util.CompileInfo
-    (withCompileInfo)
+                       (withCompileInfo)
 
 import           Lang.Value
-    (GenBlocksParams (..))
+                       (GenBlocksParams (..))
 import           Mode
-    (MonadAuxxMode)
+                       (MonadAuxxMode)
 
 
 generateBlocks :: MonadAuxxMode m => GenBlocksParams -> m ()

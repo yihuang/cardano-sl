@@ -27,8 +27,7 @@ import           Pos.Core.Context
 import           Pos.Core.Delegation
 import           Pos.Core.Genesis
 import           Pos.Core.ProtocolConstants
-import           Pos.Core.Script
-    ()
+import           Pos.Core.Script ()
 import           Pos.Core.Slotting
 import           Pos.Core.Ssc
 import           Pos.Core.Txp

@@ -4,19 +4,19 @@ module Statistics.Tx
     ) where
 
 import           Control.Foldl
-    (Fold (..))
+                       (Fold (..))
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as M
 
 import           JSONLog
 import           Pos.Infra.Util.JsonLog.Events
-    (JLEvent (..), JLTxR (..))
+                       (JLEvent (..), JLTxR (..))
 import           Prelude
-    (head, id)
+                       (head, id)
 import           Types
 import           Universum hiding
-    (head)
+                       (head)
 
 txReceivedF :: Fold IndexedJLTimedEvent (Map TxHash [(Timestamp, NodeId)])
 txReceivedF = M.map reverse <$> Fold step M.empty id

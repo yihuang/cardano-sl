@@ -8,7 +8,7 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, int, (%))
+                       (bprint, int, (%))
 import qualified PlutusCore.Program as PLCore
 
 import qualified Pos.Binary.Class as Bi

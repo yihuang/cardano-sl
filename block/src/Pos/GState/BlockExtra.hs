@@ -18,37 +18,38 @@ module Pos.GState.BlockExtra
        ) where
 
 import           Universum hiding
-    (init)
+                       (init)
 
 import qualified Data.Text.Buildable
 import qualified Database.RocksDB as Rocks
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 
 import           Pos.Binary.Class
-    (serialize')
+                       (serialize')
 import           Pos.Block.Slog.Types
-    (LastBlkSlots, noLastBlkSlots)
+                       (LastBlkSlots, noLastBlkSlots)
 import           Pos.Core
-    (FlatSlotId, HasCoreConfiguration, HasHeaderHash, HasProtocolConstants,
-    HeaderHash, genesisHash, headerHash, slotIdF, unflattenSlotId)
+                       (FlatSlotId, HasCoreConfiguration, HasHeaderHash,
+                       HasProtocolConstants, HeaderHash, genesisHash,
+                       headerHash, slotIdF, unflattenSlotId)
 import           Pos.Core.Block
-    (Block, BlockHeader)
+                       (Block, BlockHeader)
 import           Pos.Core.Chrono
-    (OldestFirst (..))
+                       (OldestFirst (..))
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 import           Pos.DB
-    (DBError (..), MonadDB, MonadDBRead (..), RocksBatchOp (..),
-    dbSerializeValue, getHeader)
+                       (DBError (..), MonadDB, MonadDBRead (..),
+                       RocksBatchOp (..), dbSerializeValue, getHeader)
 import           Pos.DB.Class
-    (MonadBlockDBRead, getBlock)
+                       (MonadBlockDBRead, getBlock)
 import           Pos.DB.GState.Common
-    (gsGetBi, gsPutBi)
+                       (gsGetBi, gsPutBi)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 ----------------------------------------------------------------------------
 -- Getters

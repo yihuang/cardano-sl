@@ -34,15 +34,15 @@ module Pos.DB.Rocks.Types
 import           Universum
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import qualified Database.RocksDB as Rocks
 
 import           Pos.DB.Class
-    (DBTag (..))
+                       (DBTag (..))
 import           Pos.Util.Concurrent.RWLock
-    (RWLock)
+                       (RWLock)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 
 -- | This is the set of constraints necessary to operate on «real» DBs

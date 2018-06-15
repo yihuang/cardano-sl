@@ -5,9 +5,9 @@ module Pos.Core.Genesis.AvvmBalances
 import           Universum
 
 import           Pos.Core.Common
-    (Coin)
+                       (Coin)
 import           Pos.Crypto.Signing
-    (RedeemPublicKey)
+                       (RedeemPublicKey)
 
 -- | Predefined balances of avvm entries.
 newtype GenesisAvvmBalances = GenesisAvvmBalances

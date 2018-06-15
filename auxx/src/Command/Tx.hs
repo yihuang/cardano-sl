@@ -13,65 +13,67 @@ module Command.Tx
 import           Universum
 
 import           Control.Concurrent.STM.TQueue
-    (newTQueue, tryReadTQueue, writeTQueue)
+                       (newTQueue, tryReadTQueue, writeTQueue)
 import           Control.Exception.Safe
-    (Exception (..), try)
+                       (Exception (..), try)
 import           Control.Monad.Except
-    (runExceptT)
+                       (runExceptT)
 import           Data.Aeson
-    (eitherDecodeStrict)
+                       (eitherDecodeStrict)
 import qualified Data.ByteString as BS
 import           Data.Default
-    (def)
+                       (def)
 import qualified Data.HashMap.Strict as HM
 import           Data.List
-    ((!!))
+                       ((!!))
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import           Data.Time.Units
-    (Microsecond, fromMicroseconds, toMicroseconds)
+                       (Microsecond, fromMicroseconds, toMicroseconds)
 import           Formatting
-    (build, int, sformat, shown, stext, (%))
+                       (build, int, sformat, shown, stext, (%))
 import           Mockable
-    (Mockable, SharedAtomic, SharedAtomicT, concurrently, currentTime, delay,
-    forConcurrently, modifySharedAtomic, newSharedAtomic)
+                       (Mockable, SharedAtomic, SharedAtomicT, concurrently,
+                       currentTime, delay, forConcurrently, modifySharedAtomic,
+                       newSharedAtomic)
 import           System.Environment
-    (lookupEnv)
+                       (lookupEnv)
 import           System.IO
-    (BufferMode (LineBuffering), hClose, hSetBuffering)
+                       (BufferMode (LineBuffering), hClose, hSetBuffering)
 import           System.Wlog
-    (logError, logInfo)
+                       (logError, logInfo)
 
 import           Pos.Client.KeyStorage
-    (getSecretKeysPlain)
+                       (getSecretKeysPlain)
 import           Pos.Client.Txp.Balances
-    (getOwnUtxoForPk)
+                       (getOwnUtxoForPk)
 import           Pos.Client.Txp.Network
-    (prepareMTx, submitTxRaw)
+                       (prepareMTx, submitTxRaw)
 import           Pos.Client.Txp.Util
-    (createTx)
+                       (createTx)
 import           Pos.Core
-    (BlockVersionData (bvdSlotDuration), IsBootstrapEraAddr (..),
-    Timestamp (..), deriveFirstHDAddress, makePubKeyAddress, mkCoin)
+                       (BlockVersionData (bvdSlotDuration),
+                       IsBootstrapEraAddr (..), Timestamp (..),
+                       deriveFirstHDAddress, makePubKeyAddress, mkCoin)
 import           Pos.Core.Configuration
-    (genesisBlockVersionData, genesisSecretKeys)
+                       (genesisBlockVersionData, genesisSecretKeys)
 import           Pos.Core.Txp
-    (TxAux, TxOut (..), TxOutAux (..), txaF)
+                       (TxAux, TxOut (..), TxOutAux (..), txaF)
 import           Pos.Crypto
-    (EncryptedSecretKey, emptyPassphrase, encToPublic, fakeSigner,
-    safeToPublic, toPublic, withSafeSigners)
+                       (EncryptedSecretKey, emptyPassphrase, encToPublic,
+                       fakeSigner, safeToPublic, toPublic, withSafeSigners)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..))
+                       (Diffusion (..))
 import           Pos.Txp
-    (topsortTxAuxes)
+                       (topsortTxAuxes)
 import           Pos.Util.UserSecret
-    (usWallet, userSecret, wusRootKey)
+                       (usWallet, userSecret, wusRootKey)
 import           Pos.Util.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 import           Mode
-    (MonadAuxxMode, makePubKeyAddressAuxx)
+                       (MonadAuxxMode, makePubKeyAddressAuxx)
 
 ----------------------------------------------------------------------------
 -- Send to all genesis

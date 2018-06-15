@@ -4,30 +4,29 @@ module Bench.Pos.Criterion.FollowTheSatoshiBench
     ) where
 
 import           Criterion.Main
-    (Benchmark, bench, defaultConfig, defaultMainWith, env, whnf)
+                       (Benchmark, bench, defaultConfig, defaultMainWith, env,
+                       whnf)
 import           Criterion.Types
-    (Config (..))
+                       (Config (..))
 import           Formatting
-    (int, sformat, (%))
+                       (int, sformat, (%))
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, generate, infiniteListOf)
+                       (Arbitrary (..), Gen, generate, infiniteListOf)
 import           Universum
 
-import           Pos.Arbitrary.Core.Unsafe
-    ()
+import           Pos.Arbitrary.Core.Unsafe ()
 import           Pos.Core
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.Core.Common
-    (Coin, StakeholderId)
+                       (Coin, StakeholderId)
 import           Pos.Lrc
-    (followTheSatoshi)
+                       (followTheSatoshi)
 
 import           Bench.Configuration
-    (giveCoreConf)
-import           Test.Pos.Crypto.Arbitrary
-    ()
+                       (giveCoreConf)
+import           Test.Pos.Crypto.Arbitrary ()
 import           Test.Pos.Util.QuickCheck.Arbitrary
-    (arbitraryUnsafe)
+                       (arbitraryUnsafe)
 
 type UtxoSize = Int
 

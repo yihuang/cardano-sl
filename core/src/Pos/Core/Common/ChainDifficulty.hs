@@ -7,7 +7,7 @@ module Pos.Core.Common.ChainDifficulty
 import           Universum
 
 import           Pos.Util.Some
-    (Some, liftLensSome)
+                       (Some, liftLensSome)
 
 import           Pos.Core.Common.BlockCount
 

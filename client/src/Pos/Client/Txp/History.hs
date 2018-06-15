@@ -28,60 +28,62 @@ module Pos.Client.Txp.History
 import           Universum
 
 import           Control.Exception.Safe
-    (Exception (..))
+                       (Exception (..))
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import           Control.Monad.Trans
-    (MonadTrans)
+                       (MonadTrans)
 import qualified Data.Map.Strict as M
-    (fromList, insert)
+                       (fromList, insert)
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           JsonLog
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           Mockable
-    (CurrentTime, Mockable)
+                       (CurrentTime, Mockable)
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Block.Base
-    (genesisBlock0)
+                       (genesisBlock0)
 import           Pos.Core
-    (Address, ChainDifficulty, GenesisHash (..), HasConfiguration,
-    Timestamp (..), difficultyL, genesisHash, headerHash, protocolMagic)
+                       (Address, ChainDifficulty, GenesisHash (..),
+                       HasConfiguration, Timestamp (..), difficultyL,
+                       genesisHash, headerHash, protocolMagic)
 import           Pos.Core.Block
-    (Block, MainBlock, mainBlockSlot, mainBlockTxPayload)
+                       (Block, MainBlock, mainBlockSlot, mainBlockTxPayload)
 import           Pos.Crypto
-    (WithHash (..), withHash)
+                       (WithHash (..), withHash)
 import           Pos.DB
-    (MonadDBRead, MonadGState)
+                       (MonadDBRead, MonadGState)
 import           Pos.DB.Block
-    (getBlock)
+                       (getBlock)
 import qualified Pos.GState as GS
 import           Pos.Infra.Network.Types
-    (HasNodeType)
+                       (HasNodeType)
 import           Pos.Infra.Slotting
-    (MonadSlots, getSlotStartPure, getSystemStartM)
+                       (MonadSlots, getSlotStartPure, getSystemStartM)
 import           Pos.Infra.StateLock
-    (StateLock, StateLockMetrics)
+                       (StateLock, StateLockMetrics)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason)
+                       (MemPoolModifyReason)
 import           Pos.Lrc.Genesis
-    (genesisLeaders)
+                       (genesisLeaders)
 import           Pos.Txp
-    (MempoolExt, MonadTxpLocal, MonadTxpMem, ToilVerFailure, Tx (..),
-    TxAux (..), TxId, TxOut, TxOutAux (..), TxWitness, TxpError (..),
-    UtxoLookup, UtxoM, UtxoModifier, applyTxToUtxo, buildUtxo, evalUtxoM,
-    flattenTxPayload, genesisUtxo, getLocalTxs, runUtxoM, topsortTxs,
-    txOutAddress, txpProcessTx, unGenesisUtxo, utxoGet, utxoToLookup,
-    withTxpLocalData)
+                       (MempoolExt, MonadTxpLocal, MonadTxpMem, ToilVerFailure,
+                       Tx (..), TxAux (..), TxId, TxOut, TxOutAux (..),
+                       TxWitness, TxpError (..), UtxoLookup, UtxoM,
+                       UtxoModifier, applyTxToUtxo, buildUtxo, evalUtxoM,
+                       flattenTxPayload, genesisUtxo, getLocalTxs, runUtxoM,
+                       topsortTxs, txOutAddress, txpProcessTx, unGenesisUtxo,
+                       utxoGet, utxoToLookup, withTxpLocalData)
 import           Pos.Util
-    (eitherToThrow, maybeThrow)
+                       (eitherToThrow, maybeThrow)
 import           Pos.Util.Util
-    (HasLens')
+                       (HasLens')
 
 ----------------------------------------------------------------------
 -- Deduction of history

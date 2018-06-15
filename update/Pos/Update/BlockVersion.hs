@@ -8,9 +8,9 @@ module Pos.Update.BlockVersion
 import           Universum
 
 import           Pos.Core
-    (BlockVersionData (..))
+                       (BlockVersionData (..))
 import           Pos.Core.Update
-    (BlockVersionModifier (..))
+                       (BlockVersionModifier (..))
 
 -- | Apply 'BlockVersionModifier' to 'BlockVersionData'.
 applyBVM :: BlockVersionModifier -> BlockVersionData -> BlockVersionData

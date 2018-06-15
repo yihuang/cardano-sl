@@ -18,40 +18,42 @@ module Ntp.Client
 import           Universum
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Concurrent.Async
-    (async, concurrently, forConcurrently, race, withAsync)
+                       (async, concurrently, forConcurrently, race, withAsync)
 import           Control.Concurrent.STM
-    (TVar, check, modifyTVar')
+                       (TVar, check, modifyTVar')
 import           Control.Exception.Safe
-    (Exception, catchAny, handleAny)
+                       (Exception, catchAny, handleAny)
 import           Control.Monad
-    (forever)
+                       (forever)
 import           Data.Binary
-    (decodeOrFail, encode)
+                       (decodeOrFail, encode)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.List.NonEmpty as NE
 import           Data.Maybe
-    (catMaybes, isNothing)
+                       (catMaybes, isNothing)
 import           Data.Time.Units
-    (Microsecond, TimeUnit, toMicroseconds)
+                       (Microsecond, TimeUnit, toMicroseconds)
 import           Data.Typeable
-    (Typeable)
+                       (Typeable)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Network.Socket
-    (AddrInfo, SockAddr (..), Socket, addrAddress, addrFamily, close)
+                       (AddrInfo, SockAddr (..), Socket, addrAddress,
+                       addrFamily, close)
 import           Network.Socket.ByteString
-    (recvFrom, sendTo)
+                       (recvFrom, sendTo)
 import           System.Wlog
-    (LoggerNameBox)
+                       (LoggerNameBox)
 import qualified System.Wlog as Wlog
 
 import           Ntp.Packet
-    (NtpOffset, NtpPacket (..), evalClockOffset, mkCliNtpPacket, ntpPacketSize)
+                       (NtpOffset, NtpPacket (..), evalClockOffset,
+                       mkCliNtpPacket, ntpPacketSize)
 import           Ntp.Util
-    (createAndBindSock, resolveNtpHost, selectIPv4, selectIPv6,
-    udpLocalAddresses, withSocketsDoLifted)
+                       (createAndBindSock, resolveNtpHost, selectIPv4,
+                       selectIPv6, udpLocalAddresses, withSocketsDoLifted)
 
 data NtpStatus =
       -- | The difference between ntp time and local system time

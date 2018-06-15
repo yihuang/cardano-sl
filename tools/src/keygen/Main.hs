@@ -5,44 +5,48 @@ module Main
 import           Universum
 
 import           Data.ByteString.Base58
-    (bitcoinAlphabet, encodeBase58)
+                       (bitcoinAlphabet, encodeBase58)
 import qualified Data.List as L
 import qualified Data.Text as T
 import           Formatting
-    (build, sformat, stext, string, (%))
+                       (build, sformat, stext, string, (%))
 import           System.Directory
-    (createDirectoryIfMissing)
+                       (createDirectoryIfMissing)
 import           System.FilePath
-    ((</>))
+                       ((</>))
 import           System.FilePath.Glob
-    (glob)
+                       (glob)
 import           System.Wlog
-    (WithLogger, debugPlus, logInfo, productionB, setupLogging,
-    termSeveritiesOutB, usingLoggerName)
+                       (WithLogger, debugPlus, logInfo, productionB,
+                       setupLogging, termSeveritiesOutB, usingLoggerName)
 import qualified Text.JSON.Canonical as CanonicalJSON
 
 import           Pos.Binary
-    (asBinary, serialize')
+                       (asBinary, serialize')
 import qualified Pos.Client.CLI as CLI
 import           Pos.Core
-    (CoreConfiguration (..), GenesisConfiguration (..), RichSecrets (..),
-    addressHash, ccGenesis, coreConfiguration, generateFakeAvvm,
-    generateRichSecrets, mkVssCertificate, protocolMagic, vcSigningKey,
-    vssMaxTTL)
+                       (CoreConfiguration (..), GenesisConfiguration (..),
+                       RichSecrets (..), addressHash, ccGenesis,
+                       coreConfiguration, generateFakeAvvm,
+                       generateRichSecrets, mkVssCertificate, protocolMagic,
+                       vcSigningKey, vssMaxTTL)
 import           Pos.Crypto
-    (EncryptedSecretKey (..), SecretKey (..), VssKeyPair, fullPublicKeyF,
-    hashHexF, noPassEncrypt, redeemPkB64F, toPublic, toVssPublicKey)
+                       (EncryptedSecretKey (..), SecretKey (..), VssKeyPair,
+                       fullPublicKeyF, hashHexF, noPassEncrypt, redeemPkB64F,
+                       toPublic, toVssPublicKey)
 import           Pos.Launcher
-    (HasConfigurations, withConfigurations)
+                       (HasConfigurations, withConfigurations)
 import           Pos.Util.UserSecret
-    (readUserSecret, takeUserSecret, usKeys, usPrimKey, usVss, usWallet,
-    writeUserSecretRelease, wusRootKey)
+                       (readUserSecret, takeUserSecret, usKeys, usPrimKey,
+                       usVss, usWallet, writeUserSecretRelease, wusRootKey)
 
 import           Dump
-    (dumpFakeAvvmSeed, dumpGeneratedGenesisData, dumpRichSecrets)
+                       (dumpFakeAvvmSeed, dumpGeneratedGenesisData,
+                       dumpRichSecrets)
 import           KeygenOptions
-    (DumpAvvmSeedsOptions (..), GenKeysOptions (..), KeygenCommand (..),
-    KeygenOptions (..), getKeygenOptions)
+                       (DumpAvvmSeedsOptions (..), GenKeysOptions (..),
+                       KeygenCommand (..), KeygenOptions (..),
+                       getKeygenOptions)
 
 ----------------------------------------------------------------------------
 -- Helpers

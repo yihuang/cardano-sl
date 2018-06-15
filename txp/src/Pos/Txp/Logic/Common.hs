@@ -8,17 +8,17 @@ module Pos.Txp.Logic.Common
 import           Universum
 
 import qualified Data.Map as M
-    (fromList)
+                       (fromList)
 
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxIn (..), TxOutAux)
+                       (Tx (..), TxAux (..), TxIn (..), TxOutAux)
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import qualified Pos.Txp.DB as DB
 import           Pos.Txp.Toil
-    (Utxo, UtxoModifier)
+                       (Utxo, UtxoModifier)
 import qualified Pos.Util.Modifier as MM
 
 -- | Build base 'Utxo' for given transactions considering given

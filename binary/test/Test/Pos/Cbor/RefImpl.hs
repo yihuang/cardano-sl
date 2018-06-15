@@ -34,25 +34,25 @@ import           Data.Bits
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
 import           Data.List
-    (span)
+                       (span)
 import qualified Data.Text.Encoding as T
 import           Foreign
-    (Storable (..), alloca, castPtr)
+                       (Storable (..), alloca, castPtr)
 import           GHC.Float
-    (RealFloat (..))
+                       (RealFloat (..))
 import           Numeric.Half
-    (Half (..))
+                       (Half (..))
 import qualified Numeric.Half as Half
 import           System.IO.Unsafe
-    (unsafeDupablePerformIO)
+                       (unsafeDupablePerformIO)
 
 import           Test.QuickCheck.Arbitrary
-    (Arbitrary (..), arbitraryBoundedIntegral)
+                       (Arbitrary (..), arbitraryBoundedIntegral)
 import           Test.QuickCheck.Gen
-    (Gen, choose, elements, frequency, oneof, resize, sized, suchThat,
-    vectorOf)
+                       (Gen, choose, elements, frequency, oneof, resize, sized,
+                       suchThat, vectorOf)
 import           Test.QuickCheck.Property
-    (Property, conjoin, property, (.&&.), (===))
+                       (Property, conjoin, property, (.&&.), (===))
 
 serialise :: Term -> LBS.ByteString
 serialise = LBS.pack . encodeTerm

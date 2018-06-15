@@ -8,11 +8,11 @@ module Pos.Explorer.Core.Types
 import           Universum
 
 import           Pos.Core
-    (HeaderHash, Timestamp)
+                       (HeaderHash, Timestamp)
 import           Pos.Core.Chrono
-    (NewestFirst)
+                       (NewestFirst)
 import           Pos.Core.Txp
-    (TxId, TxUndo)
+                       (TxId, TxUndo)
 
 type AddrHistory = NewestFirst [] TxId
 

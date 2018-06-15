@@ -10,42 +10,43 @@ module Pos.Diffusion.Full.Ssc
 import           Universum
 
 import           Data.Tagged
-    (Tagged (..))
+                       (Tagged (..))
 import qualified Network.Broadcast.OutboundQueue as OQ
 import           Node.Message.Class
-    (Message)
+                       (Message)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Binary.Limit
-    (Limit)
-import           Pos.Binary.Ssc
-    ()
+                       (Limit)
+import           Pos.Binary.Ssc ()
 -- Message instances for various types.
 -- TODO should move these into the Diffusion module subtree.
 import           Pos.Communication.Limits
-    (mlMCCommitment, mlMCOpening, mlMCShares, mlMCVssCertificate)
-import           Pos.Communication.Message
-    ()
+                       (mlMCCommitment, mlMCOpening, mlMCShares,
+                       mlMCVssCertificate)
+import           Pos.Communication.Message ()
 import           Pos.Core
-    (StakeholderId)
-import           Pos.Infra.Binary
-    ()
+                       (StakeholderId)
+import           Pos.Infra.Binary ()
 import           Pos.Infra.Communication.Relay
-    (DataMsg, InvOrData, InvReqDataParams (..), MempoolParams (NoMempool),
-    Relay (..), ReqMsg, ReqOrRes, relayListeners, relayPropagateOut)
+                       (DataMsg, InvOrData, InvReqDataParams (..),
+                       MempoolParams (NoMempool), Relay (..), ReqMsg, ReqOrRes,
+                       relayListeners, relayPropagateOut)
 import           Pos.Infra.Communication.Types.Protocol
-    (EnqueueMsg, MkListeners, MsgType (..), NodeId, OutSpecs)
+                       (EnqueueMsg, MkListeners, MsgType (..), NodeId,
+                       OutSpecs)
 import           Pos.Infra.Network.Types
-    (Bucket)
+                       (Bucket)
 import           Pos.Logic.Types
-    (Logic (..))
+                       (Logic (..))
 import qualified Pos.Logic.Types as KV
-    (KeyVal (..))
+                       (KeyVal (..))
 import           Pos.Ssc.Message
-    (MCCommitment (..), MCOpening (..), MCShares (..), MCVssCertificate (..))
+                       (MCCommitment (..), MCOpening (..), MCShares (..),
+                       MCVssCertificate (..))
 import           Pos.Util.Trace
-    (Severity, Trace)
+                       (Severity, Trace)
 
 sscListeners
     :: Trace IO (Severity, Text)

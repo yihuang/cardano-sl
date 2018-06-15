@@ -16,9 +16,9 @@ module Bench.Cardano.Wallet.Types
 import           Universum
 
 import           Pos.Wallet.Web.ClientTypes
-    (Addr, CAccountId (..), CId (..), Wal)
+                       (Addr, CAccountId (..), CId (..), Wal)
 import           Pos.Wallet.Web.Error.Types
-    (WalletError (..))
+                       (WalletError (..))
 
 -- | Complete configuration for benchmarking.
 data CompleteConfig = CompleteConfig

@@ -29,20 +29,20 @@ module Cardano.Wallet.Kernel.DB.HdWallet.Read (
   ) where
 
 import           Universum hiding
-    (toList)
+                       (toList)
 
 import           Control.Lens
-    (at)
+                       (at)
 import           Data.Foldable
-    (toList)
+                       (toList)
 
 import           Pos.Core
-    (Coin, sumCoins)
+                       (Coin, sumCoins)
 
 import           Cardano.Wallet.Kernel.DB.HdWallet
 import           Cardano.Wallet.Kernel.DB.Spec
 import           Cardano.Wallet.Kernel.DB.Util.IxSet
-    (IxSet)
+                       (IxSet)
 import qualified Cardano.Wallet.Kernel.DB.Util.IxSet as IxSet
 
 {-# ANN module ("HLint: ignore Unnecessary hiding" :: Text) #-}

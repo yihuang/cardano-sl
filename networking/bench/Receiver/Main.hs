@@ -8,39 +8,41 @@
 module Main where
 
 import           Control.Applicative
-    (empty)
+                       (empty)
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Exception
-    (throwIO)
+                       (throwIO)
 import           Control.Exception.Safe
-    (throwString)
+                       (throwString)
 import           Control.Monad
-    (unless)
+                       (unless)
 
 import           Data.Functor.Contravariant
-    (contramap)
+                       (contramap)
 import           Data.Text
-    (Text)
+                       (Text)
 import           GHC.IO.Encoding
-    (setLocaleEncoding, utf8)
+                       (setLocaleEncoding, utf8)
 import           Options.Applicative.Simple
-    (simpleOptions)
+                       (simpleOptions)
 import           System.Random
-    (mkStdGen)
+                       (mkStdGen)
 
 import           Bench.Network.Commons
-    (MeasureEvent (..), Ping (..), Pong (..), loadLogConfig, logMeasure)
+                       (MeasureEvent (..), Ping (..), Pong (..), loadLogConfig,
+                       logMeasure)
 import qualified Network.Transport.TCP as TCP
 import           Node
-    (ConversationActions (..), Listener (..), NodeAction (..),
-    defaultNodeEnvironment, noReceiveDelay, node, simpleNodeEndPoint)
+                       (ConversationActions (..), Listener (..),
+                       NodeAction (..), defaultNodeEnvironment, noReceiveDelay,
+                       node, simpleNodeEndPoint)
 import           Node.Message.Binary
-    (binaryPacking)
+                       (binaryPacking)
 import           Pos.Util.Trace
-    (Severity (..), Trace, wlogTrace)
+                       (Severity (..), Trace, wlogTrace)
 import           ReceiverOptions
-    (Args (..), argsParser)
+                       (Args (..), argsParser)
 
 main :: IO ()
 main = do

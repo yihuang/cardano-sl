@@ -17,43 +17,46 @@ import           Universum
 
 import qualified Data.List.NonEmpty as NE
 import           Formatting
-    (build, sformat, stext, (%))
+                       (build, sformat, stext, (%))
 
 import           Pos.Client.KeyStorage
-    (MonadKeys)
+                       (MonadKeys)
 import           Pos.Client.Txp.Addresses
-    (MonadAddresses (..))
+                       (MonadAddresses (..))
 import           Pos.Client.Txp.Util
-    (InputSelectionPolicy (..), PendingAddresses (..), isCheckedTxError)
+                       (InputSelectionPolicy (..), PendingAddresses (..),
+                       isCheckedTxError)
 import           Pos.Core.Chrono
-    (getNewestFirst, toNewestFirst)
+                       (getNewestFirst, toNewestFirst)
 import           Pos.Core.Common
-    (Coin)
+                       (Coin)
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxOut (..), TxOutAux (..))
+                       (Tx (..), TxAux (..), TxOut (..), TxOutAux (..))
 import           Pos.Crypto
-    (PassPhrase, hash)
+                       (PassPhrase, hash)
 import           Pos.Util.Servant
-    (encodeCType)
+                       (encodeCType)
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId, Addr, CId)
+                       (AccountId, Addr, CId)
 import           Pos.Wallet.Web.Error
-    (WalletError (..), rewrapToWalletError)
+                       (WalletError (..), rewrapToWalletError)
 import           Pos.Wallet.Web.Methods.History
-    (MonadWalletHistory)
+                       (MonadWalletHistory)
 import           Pos.Wallet.Web.Methods.Misc
-    (PendingTxsSummary (..))
+                       (PendingTxsSummary (..))
 import           Pos.Wallet.Web.Mode
-    (MonadWalletWebMode)
+                       (MonadWalletWebMode)
 import           Pos.Wallet.Web.Pending
-    (PendingTx (..), TxSubmissionMode, allPendingAddresses, isPtxInBlocks,
-    ptxFirstSubmissionHandler, sortPtxsChrono)
+                       (PendingTx (..), TxSubmissionMode, allPendingAddresses,
+                       isPtxInBlocks, ptxFirstSubmissionHandler,
+                       sortPtxsChrono)
 import           Pos.Wallet.Web.Pending.Submission
-    (submitAndSavePtx)
+                       (submitAndSavePtx)
 import           Pos.Wallet.Web.State
-    (WalletDB, WalletSnapshot, askWalletSnapshot, getPendingTxs)
+                       (WalletDB, WalletSnapshot, askWalletSnapshot,
+                       getPendingTxs)
 import           Pos.Wallet.Web.Util
-    (decodeCTypeOrFail)
+                       (decodeCTypeOrFail)
 
 
 type MonadWalletTxFull ctx m =

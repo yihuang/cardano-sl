@@ -13,15 +13,15 @@ module Cardano.Wallet.Kernel.DB.Resolved (
 import           Universum
 
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 import qualified Data.Map as Map
 import           Data.SafeCopy
-    (base, deriveSafeCopy)
+                       (base, deriveSafeCopy)
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Serokell.Util
-    (listJson, mapJson)
+                       (listJson, mapJson)
 
 import qualified Pos.Core as Core
 import qualified Pos.Txp as Core

@@ -11,24 +11,25 @@ module Ntp.Packet
 
 
 import           Control.Lens
-    (each, (^..))
+                       (each, (^..))
 import           Control.Monad
-    (replicateM_)
+                       (replicateM_)
 import           Control.Monad.Trans
-    (MonadIO (..))
+                       (MonadIO (..))
 import           Data.Binary
-    (Binary (..))
+                       (Binary (..))
 import           Data.Binary.Get
-    (getInt8, getWord32be, getWord8)
+                       (getInt8, getWord32be, getWord8)
 import           Data.Binary.Put
-    (putWord32be, putWord8)
+                       (putWord32be, putWord8)
 import           Data.Time.Units
-    (Microsecond, TimeUnit, fromMicroseconds, toMicroseconds)
+                       (Microsecond, TimeUnit, fromMicroseconds,
+                       toMicroseconds)
 import           Data.Word
-    (Word32, Word8)
+                       (Word32, Word8)
 
 import           Ntp.Util
-    (getCurrentTime)
+                       (getCurrentTime)
 
 data NtpPacket = NtpPacket
     { ntpParams       :: Word8        -- some magic parameters

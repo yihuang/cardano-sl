@@ -20,51 +20,54 @@ import           Universum
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Monad.Except
-    (mapExceptT, runExceptT, throwError)
+                       (mapExceptT, runExceptT, throwError)
 import           Control.Monad.Morph
-    (generalize, hoist)
+                       (generalize, hoist)
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import qualified Data.HashMap.Strict as HM
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           JsonLog
-    (CanJsonLog (..))
+                       (CanJsonLog (..))
 import           System.Wlog
-    (NamedPureLogger, WithLogger, launchNamedPureLog, logDebug, logError,
-    logWarning)
+                       (NamedPureLogger, WithLogger, launchNamedPureLog,
+                       logDebug, logError, logWarning)
 
 import           Pos.Core
-    (BlockVersionData, EpochIndex, HeaderHash, siEpoch)
+                       (BlockVersionData, EpochIndex, HeaderHash, siEpoch)
 import           Pos.Core.Txp
-    (TxAux (..), TxId, TxUndo)
+                       (TxAux (..), TxId, TxUndo)
 import           Pos.Crypto
-    (WithHash (..))
+                       (WithHash (..))
 import           Pos.DB.Class
-    (MonadGState (..))
+                       (MonadGState (..))
 import qualified Pos.DB.GState.Common as GS
 import           Pos.Infra.Reporting
-    (reportError)
+                       (reportError)
 import           Pos.Infra.Slotting
-    (MonadSlots (..))
+                       (MonadSlots (..))
 import           Pos.Infra.StateLock
-    (Priority (..), StateLock, StateLockMetrics, withStateLock)
+                       (Priority (..), StateLock, StateLockMetrics,
+                       withStateLock)
 import           Pos.Infra.Util.JsonLog.Events
-    (MemPoolModifyReason (..))
+                       (MemPoolModifyReason (..))
 import           Pos.Txp.Logic.Common
-    (buildUtxo)
+                       (buildUtxo)
 import           Pos.Txp.MemState
-    (GenericTxpLocalData (..), MempoolExt, MonadTxpMem, TxpLocalWorkMode,
-    getLocalTxsMap, getLocalUndos, getMemPool, getTxpExtra, getUtxoModifier,
-    setTxpLocalData, withTxpLocalData, withTxpLocalDataLog)
+                       (GenericTxpLocalData (..), MempoolExt, MonadTxpMem,
+                       TxpLocalWorkMode, getLocalTxsMap, getLocalUndos,
+                       getMemPool, getTxpExtra, getUtxoModifier,
+                       setTxpLocalData, withTxpLocalData, withTxpLocalDataLog)
 import           Pos.Txp.Toil
-    (ExtendedLocalToilM, LocalToilState (..), MemPool, ToilVerFailure (..),
-    UndoMap, Utxo, UtxoLookup, UtxoModifier, extendLocalToilM, mpLocalTxs,
-    normalizeToil, processTx, utxoToLookup)
+                       (ExtendedLocalToilM, LocalToilState (..), MemPool,
+                       ToilVerFailure (..), UndoMap, Utxo, UtxoLookup,
+                       UtxoModifier, extendLocalToilM, mpLocalTxs,
+                       normalizeToil, processTx, utxoToLookup)
 import           Pos.Txp.Topsort
-    (topsortTxs)
+                       (topsortTxs)
 import           Pos.Util.Util
-    (HasLens')
+                       (HasLens')
 
 type TxpProcessTransactionMode ctx m =
     ( TxpLocalWorkMode ctx m

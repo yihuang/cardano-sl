@@ -6,10 +6,10 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 
 import           Pos.Core.Txp.Tx
-    (TxOut)
+                       (TxOut)
 
 -- | Transaction output and auxilary data corresponding to it.
 -- [CSL-366] Add more data.

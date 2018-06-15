@@ -12,24 +12,25 @@ module Pos.Ssc.Toss.Trans
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at, (%=), (.=))
+                       (at, (%=), (.=))
 import qualified Ether
 import           Mockable
-    (ChannelT, Promise, SharedAtomicT, ThreadId)
+                       (ChannelT, Promise, SharedAtomicT, ThreadId)
 
 import           Pos.Core.Ssc
-    (insertVss)
+                       (insertVss)
 import           Pos.Ssc.Base
-    (deleteSignedCommitment, insertSignedCommitment)
+                       (deleteSignedCommitment, insertSignedCommitment)
 import           Pos.Ssc.Toss.Class
-    (MonadToss (..), MonadTossEnv (..), MonadTossRead (..))
+                       (MonadToss (..), MonadTossEnv (..), MonadTossRead (..))
 import           Pos.Ssc.Toss.Types
-    (TossModifier (..), tmCertificates, tmCommitments, tmOpenings, tmShares)
+                       (TossModifier (..), tmCertificates, tmCommitments,
+                       tmOpenings, tmShares)
 import           Pos.Util.Util
-    (ether)
+                       (ether)
 
 ----------------------------------------------------------------------------
 -- Tranformer

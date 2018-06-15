@@ -17,28 +17,28 @@ module DevelopmentSpec (spec) where
 import           Universum
 
 import           Pos.Client.KeyStorage
-    (addSecretKey, getSecretKeysPlain)
+                       (addSecretKey, getSecretKeysPlain)
 
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Util.BackupPhrase
-    (BackupPhrase (..), safeKeysFromPhrase)
+                       (BackupPhrase (..), safeKeysFromPhrase)
 import           Test.Pos.Util.QuickCheck.Property
-    (assertProperty)
+                       (assertProperty)
 
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess)
+                       (modifyMaxSuccess)
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 import           Test.Pos.Wallet.Web.Mode
-    (walletPropertySpec)
+                       (walletPropertySpec)
 
 import           Cardano.Wallet.API.Development.LegacyHandlers
-    (deleteSecretKeys)
+                       (deleteSecretKeys)
 import           Cardano.Wallet.Server.CLI
-    (RunMode (..))
+                       (RunMode (..))
 import           Servant
 
 {-# ANN module ("HLint: ignore Reduce duplication" :: Text) #-}

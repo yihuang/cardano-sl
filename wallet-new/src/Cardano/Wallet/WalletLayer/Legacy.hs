@@ -10,59 +10,58 @@ module Cardano.Wallet.WalletLayer.Legacy
 import           Universum
 
 import           Control.Monad.Catch
-    (catchAll)
+                       (catchAll)
 import           Control.Monad.IO.Unlift
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 
 import           Cardano.Wallet.WalletLayer.Error
-    (WalletLayerError (..))
+                       (WalletLayerError (..))
 import           Cardano.Wallet.WalletLayer.Types
-    (ActiveWalletLayer (..), PassiveWalletLayer (..))
+                       (ActiveWalletLayer (..), PassiveWalletLayer (..))
 
 import           Cardano.Wallet.API.V1.Migration
-    (migrate)
-import           Cardano.Wallet.API.V1.Migration.Types
-    ()
+                       (migrate)
+import           Cardano.Wallet.API.V1.Migration.Types ()
 import           Cardano.Wallet.API.V1.Types
-    (Account, AccountIndex, AccountUpdate, Address, NewAccount (..),
-    NewWallet (..), V1 (..), Wallet, WalletId, WalletOperation (..),
-    WalletUpdate)
+                       (Account, AccountIndex, AccountUpdate, Address,
+                       NewAccount (..), NewWallet (..), V1 (..), Wallet,
+                       WalletId, WalletOperation (..), WalletUpdate)
 import           Cardano.Wallet.Kernel.Diffusion
-    (WalletDiffusion (..))
+                       (WalletDiffusion (..))
 
 import           Pos.Client.KeyStorage
-    (MonadKeys)
+                       (MonadKeys)
 import           Pos.Core
-    (ChainDifficulty)
+                       (ChainDifficulty)
 import           Pos.Crypto
-    (PassPhrase)
+                       (PassPhrase)
 
 import           Pos.Util
-    (HasLens', maybeThrow)
+                       (HasLens', maybeThrow)
 import           Pos.Wallet.Web.Account
-    (GenSeed (..))
+                       (GenSeed (..))
 import           Pos.Wallet.Web.ClientTypes.Types
-    (CWallet (..), CWalletInit (..), CWalletMeta (..))
+                       (CWallet (..), CWalletInit (..), CWalletMeta (..))
 import qualified Pos.Wallet.Web.Error.Types as V0
 import           Pos.Wallet.Web.Methods.Logic
-    (MonadWalletLogicRead)
+                       (MonadWalletLogicRead)
 import qualified Pos.Wallet.Web.Methods.Logic as V0
 import           Pos.Wallet.Web.Methods.Restore
-    (newWallet, restoreWalletFromSeed)
+                       (newWallet, restoreWalletFromSeed)
 import           Pos.Wallet.Web.State.State
-    (WalletDbReader, askWalletDB, askWalletSnapshot, getWalletAddresses,
-    setWalletMeta)
+                       (WalletDbReader, askWalletDB, askWalletSnapshot,
+                       getWalletAddresses, setWalletMeta)
 import           Pos.Wallet.Web.State.Storage
-    (getWalletInfo)
+                       (getWalletInfo)
 import           Pos.Wallet.Web.Tracking.Types
-    (SyncQueue)
+                       (SyncQueue)
 
 import           Pos.Block.Types
-    (Blund)
+                       (Blund)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..))
+                       (NE, NewestFirst (..), OldestFirst (..))
 
 
 -- | Let's unify all the requirements for the legacy wallet.

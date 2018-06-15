@@ -7,10 +7,10 @@ module Pos.Binary.Block.Network
 import           Universum
 
 import qualified Codec.CBOR.Write as CBOR
-    (toStrictByteString)
+                       (toStrictByteString)
 
 import           Pos.Binary.Class
-    (Bi (..), encodeListLen)
+                       (Bi (..), encodeListLen)
 
 -- | Get an encoded MsgBlock from an encoded block.
 msgBlockPrefix :: ByteString

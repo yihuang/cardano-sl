@@ -5,7 +5,7 @@ module Pos.Core.Slotting.SlotCount
 import           Universum
 
 import           System.Random
-    (Random (..))
+                       (Random (..))
 
 newtype SlotCount = SlotCount {getSlotCount :: Word64}
     deriving (Eq, Ord, Num, Real, Integral, Enum, Read, Show,

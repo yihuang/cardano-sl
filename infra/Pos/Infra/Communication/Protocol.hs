@@ -25,32 +25,32 @@ import           Universum
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Exception
-    (throwIO)
+                       (throwIO)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Text.Buildable as B
 import           Formatting
-    (bprint, build, sformat, (%))
+                       (bprint, build, sformat, (%))
 import           Mockable
-    (Async, Delay, Mockable, Mockables, SharedAtomic)
+                       (Async, Delay, Mockable, Mockables, SharedAtomic)
 import qualified Network.Broadcast.OutboundQueue as OQ
 import qualified Node as N
 import           Node.Message.Class
-    (Message (..), MessageCode, messageCode)
+                       (Message (..), MessageCode, messageCode)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 
 import           Pos.Infra.Communication.Types.Protocol
 import           Pos.Infra.Recovery.Info
-    (MonadRecoveryInfo)
+                       (MonadRecoveryInfo)
 import           Pos.Infra.Reporting
-    (MonadReporting)
+                       (MonadReporting)
 import           Pos.Infra.Shutdown
-    (HasShutdownContext)
+                       (HasShutdownContext)
 import           Pos.Infra.Slotting
-    (MonadSlots)
+                       (MonadSlots)
 
 mapListener
     :: (forall t. IO t -> IO t) -> Listener -> Listener

@@ -5,7 +5,7 @@ module Node.Util.Monitor (
     ) where
 
 import           Data.Monoid
-    ((<>))
+                       ((<>))
 import qualified Data.Text as T
 import           Node
 import qualified System.Metrics as Monitoring

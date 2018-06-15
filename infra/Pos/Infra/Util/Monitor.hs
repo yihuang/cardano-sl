@@ -9,13 +9,13 @@ module Pos.Infra.Util.Monitor
 import           Universum
 
 import           Control.Concurrent
-    (killThread)
+                       (killThread)
 import           Node
-    (Node)
+                       (Node)
 import           Node.Util.Monitor
-    (registerMetrics)
+                       (registerMetrics)
 import           Pos.System.Metrics.Constants
-    (cardanoNamespace)
+                       (cardanoNamespace)
 import qualified System.Metrics as Monitoring
 import qualified System.Remote.Monitoring.Wai as Monitoring
 

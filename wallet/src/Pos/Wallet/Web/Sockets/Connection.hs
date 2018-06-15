@@ -19,28 +19,28 @@ module Pos.Wallet.Web.Sockets.Connection
 import           Universum
 
 import           Control.Concurrent.STM.TVar
-    (swapTVar)
+                       (swapTVar)
 import           Data.Aeson
-    (encode)
+                       (encode)
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Network.Wai
-    (Application)
+                       (Application)
 import           Network.Wai.Handler.WebSockets
-    (websocketsOr)
+                       (websocketsOr)
 import qualified Network.WebSockets as WS
 import           System.Wlog
-    (logError, logNotice, usingLoggerName)
+                       (logError, logNotice, usingLoggerName)
 
 import           Pos.Util.Util
-    (HasLens (..), HasLens')
-import           Pos.Wallet.Aeson
-    ()
+                       (HasLens (..), HasLens')
+import           Pos.Wallet.Aeson ()
 import qualified Pos.Wallet.Web.Sockets.ConnSet as CS
 import           Pos.Wallet.Web.Sockets.Types
-    (NotifyEvent (ConnectionClosed, ConnectionOpened), WSConnection)
+                       (NotifyEvent (ConnectionClosed, ConnectionOpened),
+                       WSConnection)
 
 
 initWSConnections :: MonadIO m => m CS.ConnectionsVar

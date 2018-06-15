@@ -13,30 +13,30 @@ import           Universum
 -- instance so that 'bracketNodeResources' can log.
 -- Get rid of production and use a 'Trace IO' instead.
 import           Mockable.Production
-    (Production (..))
+                       (Production (..))
 
 import           Pos.DB.DB
-    (initNodeDBs)
+                       (initNodeDBs)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion)
+                       (Diffusion)
 import           Pos.Launcher.Configuration
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Launcher.Param
-    (NodeParams (..))
+                       (NodeParams (..))
 import           Pos.Launcher.Resource
-    (NodeResources (..), bracketNodeResources)
+                       (NodeResources (..), bracketNodeResources)
 import           Pos.Launcher.Runner
-    (runRealMode)
+                       (runRealMode)
 import           Pos.Launcher.Scenario
-    (runNode)
+                       (runNode)
 import           Pos.Ssc.Types
-    (SscParams)
+                       (SscParams)
 import           Pos.Txp
-    (txpGlobalSettings)
+                       (txpGlobalSettings)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo)
+                       (HasCompileInfo)
 import           Pos.WorkMode
-    (EmptyMempoolExt, RealMode)
+                       (EmptyMempoolExt, RealMode)
 
 -----------------------------------------------------------------------------
 -- Main launchers

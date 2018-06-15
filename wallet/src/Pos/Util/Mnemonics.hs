@@ -16,16 +16,16 @@ module Pos.Util.Mnemonics
        ) where
 
 import           Crypto.Hash
-    (Digest, SHA256, hash)
+                       (Digest, SHA256, hash)
 import           Data.Bits
-    (shiftL, shiftR, (.&.), (.|.))
+                       (shiftL, shiftR, (.&.), (.|.))
 import           Data.ByteArray
-    (convert)
+                       (convert)
 import           Data.ByteString
-    (ByteString)
+                       (ByteString)
 import qualified Data.ByteString as BS
 import           Data.Char
-    (isAscii)
+                       (isAscii)
 import qualified Data.List as L
 import           Universum
 

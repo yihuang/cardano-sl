@@ -3,13 +3,13 @@ module Cardano.Wallet.API.V0.Handlers where
 
 import qualified Cardano.Wallet.API.V0 as V0
 import           Ntp.Client
-    (NtpStatus)
+                       (NtpStatus)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (sendTx))
+                       (Diffusion (sendTx))
 import           Pos.Util.CompileInfo
-    (HasCompileInfo)
+                       (HasCompileInfo)
 import           Pos.Wallet.Web.Mode
-    (MonadFullWalletWebMode)
+                       (MonadFullWalletWebMode)
 import qualified Pos.Wallet.Web.Server.Handlers as V0
 import           Servant
 import           Universum

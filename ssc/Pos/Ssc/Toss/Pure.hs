@@ -13,27 +13,28 @@ module Pos.Ssc.Toss.Pure
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (at, uses, (%=), (.=))
+                       (at, uses, (%=), (.=))
 import qualified Crypto.Random as Rand
 import           System.Wlog
-    (CanLog, HasLoggerName (..), LogEvent, NamedPureLogger (..), WithLogger,
-    dispatchEvents, runNamedPureLog)
+                       (CanLog, HasLoggerName (..), LogEvent,
+                       NamedPureLogger (..), WithLogger, dispatchEvents,
+                       runNamedPureLog)
 
 import           Pos.Core
-    (BlockVersionData, EpochIndex, HasGenesisData, HasProtocolConstants,
-    crucialSlot, genesisVssCerts)
+                       (BlockVersionData, EpochIndex, HasGenesisData,
+                       HasProtocolConstants, crucialSlot, genesisVssCerts)
 import           Pos.Lrc.Types
-    (RichmenSet, RichmenStakes)
+                       (RichmenSet, RichmenStakes)
 import           Pos.Ssc.Base
-    (deleteSignedCommitment, insertSignedCommitment)
+                       (deleteSignedCommitment, insertSignedCommitment)
 import           Pos.Ssc.Toss.Class
-    (MonadToss (..), MonadTossEnv (..), MonadTossRead (..))
+                       (MonadToss (..), MonadTossEnv (..), MonadTossRead (..))
 import           Pos.Ssc.Types
-    (SscGlobalState, sgsCommitments, sgsOpenings, sgsShares,
-    sgsVssCertificates)
+                       (SscGlobalState, sgsCommitments, sgsOpenings, sgsShares,
+                       sgsVssCertificates)
 import qualified Pos.Ssc.VssCertData as VCD
 
 type MultiRichmenStakes = HashMap EpochIndex RichmenStakes

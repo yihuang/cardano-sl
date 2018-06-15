@@ -8,12 +8,12 @@ import           Universum
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build)
+                       (bprint, build)
 
 import           Pos.Core.Slotting
-    (EpochIndex)
+                       (EpochIndex)
 import           Pos.Crypto
-    (ProxySecretKey (..), ProxySignature)
+                       (ProxySecretKey (..), ProxySignature)
 
 -- | Witness for heavy delegation signature -- epoch in which
 -- certificate starts being active. It is needed for replay attack

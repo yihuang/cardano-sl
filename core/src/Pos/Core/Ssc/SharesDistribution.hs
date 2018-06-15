@@ -5,14 +5,14 @@ module Pos.Core.Ssc.SharesDistribution
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 
 import           Pos.Core.Common
-    (StakeholderId)
+                       (StakeholderId)
 
 -- | This maps shareholders to amount of shares she should issue. Depends on
 -- the stake distribution.

@@ -28,14 +28,14 @@ import           Universum
 
 import qualified Data.Set as Set
 import           Numeric.Natural
-    (Natural)
+                       (Natural)
 
 import           Lang.Name
-    (Name (..))
+                       (Name (..))
 import           Lang.Syntax
-    (Arg (..))
+                       (Arg (..))
 import           Lang.Value
-    (Value)
+                       (Value)
 
 data ArgumentError = ArgumentError
     { aeMissingKeys    :: !(Set Name)
@@ -258,4 +258,4 @@ getParameters = \case
 typeDirectedKwAnn :: Name -> TyProjection a -> Arg Value -> Arg Value
 typeDirectedKwAnn name tp arg = case arg of
     ArgPos v | isJust (tpMatcher tp v) -> ArgKw name v
-    _        -> arg
+    _                                  -> arg

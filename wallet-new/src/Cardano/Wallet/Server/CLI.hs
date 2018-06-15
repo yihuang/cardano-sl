@@ -6,23 +6,24 @@ module Cardano.Wallet.Server.CLI where
 import           Universum
 
 import           Data.Time.Units
-    (Minute)
+                       (Minute)
 import           Data.Version
-    (showVersion)
+                       (showVersion)
 import           Options.Applicative
-    (Parser, auto, execParser, footerDoc, fullDesc, header, help, helper, info,
-    infoOption, long, metavar, option, progDesc, strOption, switch, value)
+                       (Parser, auto, execParser, footerDoc, fullDesc, header,
+                       help, helper, info, infoOption, long, metavar, option,
+                       progDesc, strOption, switch, value)
 import           Paths_cardano_sl
-    (version)
+                       (version)
 import           Pos.Client.CLI
-    (CommonNodeArgs (..))
+                       (CommonNodeArgs (..))
 import qualified Pos.Client.CLI as CLI
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress, localhost)
+                       (NetworkAddress, localhost)
 import           Pos.Util.CompileInfo
-    (CompileTimeInfo (..), HasCompileInfo, compileInfo)
+                       (CompileTimeInfo (..), HasCompileInfo, compileInfo)
 import           Pos.Web
-    (TlsParams (..))
+                       (TlsParams (..))
 
 
 -- | The options parsed from the CLI when starting up this wallet node.

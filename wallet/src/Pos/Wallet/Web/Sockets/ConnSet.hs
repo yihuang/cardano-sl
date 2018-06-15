@@ -13,15 +13,15 @@ module Pos.Wallet.Web.Sockets.ConnSet
 import           Universum
 
 import           Control.Monad.State.Strict
-    (MonadState (get, put))
+                       (MonadState (get, put))
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import qualified Data.IntMap.Strict as IM
 import           Serokell.Util.Concurrent
-    (modifyTVarS)
+                       (modifyTVarS)
 
 import           Pos.Wallet.Web.Sockets.Types
-    (WSConnection)
+                       (WSConnection)
 
 data TaggedSet v = TaggedSet
     { tsUnusedTag :: IM.Key

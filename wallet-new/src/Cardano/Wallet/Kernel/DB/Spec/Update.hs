@@ -11,11 +11,11 @@ module Cardano.Wallet.Kernel.DB.Spec.Update (
 import           Universum
 
 import           Data.SafeCopy
-    (base, deriveSafeCopy)
+                       (base, deriveSafeCopy)
 
 import qualified Pos.Core as Core
 import           Pos.Core.Chrono
-    (OldestFirst (..))
+                       (OldestFirst (..))
 
 import           Cardano.Wallet.Kernel.DB.BlockMeta
 import           Cardano.Wallet.Kernel.DB.InDb

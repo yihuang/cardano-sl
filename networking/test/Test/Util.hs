@@ -37,65 +37,66 @@ module Test.Util
        ) where
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Concurrent.Async
-    (forConcurrently, wait, withAsync)
+                       (forConcurrently, wait, withAsync)
 import           Control.Concurrent.MVar
-    (newEmptyMVar, putMVar, readMVar, takeMVar)
+                       (newEmptyMVar, putMVar, readMVar, takeMVar)
 import           Control.Concurrent.STM
-    (STM, atomically, check, registerDelay)
+                       (STM, atomically, check, registerDelay)
 import           Control.Concurrent.STM.TVar
-    (TVar, readTVar)
+                       (TVar, readTVar)
 import           Control.Exception
-    (Exception, SomeException (..), catch, finally, throwIO)
+                       (Exception, SomeException (..), catch, finally, throwIO)
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import           Control.Monad
-    (forM_, void)
+                       (forM_, void)
 import           Control.Monad.IO.Class
-    (MonadIO (..))
+                       (MonadIO (..))
 import           Control.Monad.State.Strict
-    (StateT)
+                       (StateT)
 import           Data.Binary
-    (Binary (..))
+                       (Binary (..))
 import qualified Data.ByteString as LBS
 import qualified Data.List as L
 import qualified Data.Set as S
 import           Data.Time.Units
-    (Microsecond, Second, TimeUnit, toMicroseconds)
+                       (Microsecond, Second, TimeUnit, toMicroseconds)
 import           Data.Word
-    (Word32)
+                       (Word32)
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import qualified Network.Transport as NT
-    (Transport)
+                       (Transport)
 import qualified Network.Transport.InMemory as InMemory
 import qualified Network.Transport.TCP as TCP
 import           Serokell.Util.Concurrent
-    (modifyTVarS)
+                       (modifyTVarS)
 import           System.Random
-    (mkStdGen)
+                       (mkStdGen)
 import           Test.QuickCheck
-    (Property)
+                       (Property)
 import           Test.QuickCheck.Arbitrary
-    (Arbitrary (..))
+                       (Arbitrary (..))
 import           Test.QuickCheck.Gen
-    (choose)
+                       (choose)
 import           Test.QuickCheck.Modifiers
-    (getLarge)
+                       (getLarge)
 import           Test.QuickCheck.Property
-    (Testable (..), failed, reason, succeeded)
+                       (Testable (..), failed, reason, succeeded)
 
 import           Node
-    (Conversation (..), ConversationActions (..), Listener (..), Message (..),
-    NodeAction (..), NodeEnvironment, NodeId, converseWith, noReceiveDelay,
-    node, nodeId, simpleNodeEndPoint)
+                       (Conversation (..), ConversationActions (..),
+                       Listener (..), Message (..), NodeAction (..),
+                       NodeEnvironment, NodeId, converseWith, noReceiveDelay,
+                       node, nodeId, simpleNodeEndPoint)
 import           Node.Conversation
-    (Converse)
+                       (Converse)
 import           Node.Message.Binary
-    (BinaryP, binaryPacking)
+                       (BinaryP, binaryPacking)
 import           Pos.Util.Trace
-    (wlogTrace)
+                       (wlogTrace)
 
 -- | Run a computation, but kill it if it takes more than a given number of
 --   Microseconds to complete. If that happens, log using a given string

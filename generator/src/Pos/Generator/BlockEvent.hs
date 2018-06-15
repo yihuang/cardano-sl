@@ -47,9 +47,9 @@ module Pos.Generator.BlockEvent
 import           Universum
 
 import           Control.Lens
-    (folded, makeLenses, makePrisms, to, toListOf)
+                       (folded, makeLenses, makePrisms, to, toListOf)
 import           Control.Monad.Random.Strict
-    (RandT, Random (..), RandomGen, mapRandT, weighted)
+                       (RandT, Random (..), RandomGen, mapRandT, weighted)
 import qualified Data.ByteString.Short as SBS
 import qualified Data.List as List
 import qualified Data.List.NonEmpty as NE
@@ -57,31 +57,32 @@ import qualified Data.Map as Map
 import qualified Data.Sequence as Seq
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, sformat, shown, (%))
+                       (bprint, build, sformat, shown, (%))
 import qualified Prelude
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 
 import           Pos.AllSecrets
-    (AllSecrets)
+                       (AllSecrets)
 import           Pos.Block.Types
-    (Blund)
+                       (Blund)
 import           Pos.Core
-    (GenesisWStakeholders, HeaderHash, headerHash, prevBlockL)
+                       (GenesisWStakeholders, HeaderHash, headerHash,
+                       prevBlockL)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..), toNewestFirst, toOldestFirst,
-    _OldestFirst)
+                       (NE, NewestFirst (..), OldestFirst (..), toNewestFirst,
+                       toOldestFirst, _OldestFirst)
 import           Pos.Crypto.Hashing
-    (hashHexF)
+                       (hashHexF)
 import           Pos.Generator.Block
-    (BlockGenParams (..), BlockTxpGenMode, MonadBlockGen, TxGenParams (..),
-    genBlocks)
+                       (BlockGenParams (..), BlockTxpGenMode, MonadBlockGen,
+                       TxGenParams (..), genBlocks)
 import           Pos.GState
-    (withClonedGState)
+                       (withClonedGState)
 import           Pos.Txp
-    (TxpGlobalSettings)
+                       (TxpGlobalSettings)
 import           Pos.Util.Util
-    (lensOf')
+                       (lensOf')
 
 ----------------------------------------------------------------------------
 -- Blockchain tree

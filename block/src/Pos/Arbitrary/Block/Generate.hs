@@ -8,16 +8,16 @@ module Pos.Arbitrary.Block.Generate
 import           Universum
 
 import           Test.QuickCheck
-    (arbitrary)
+                       (arbitrary)
 import qualified Test.QuickCheck.Gen as QC
 import qualified Test.QuickCheck.Random as QC
 
 import           Pos.Core
-    (HasGenesisHash, HasProtocolConstants, HasProtocolMagic, MainBlock,
-    ProtocolConstants, ProtocolMagic)
+                       (HasGenesisHash, HasProtocolConstants, HasProtocolMagic,
+                       MainBlock, ProtocolConstants, ProtocolMagic)
 -- Also brings in the 'Arbitrary' instance for 'MainBlock'.
 import           Pos.Arbitrary.Block
-    (genMainBlock)
+                       (genMainBlock)
 
 -- | Use 'Arbitrary' instances to generate a 'MainBlock'.
 -- These require magical configurations.

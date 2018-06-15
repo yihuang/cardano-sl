@@ -8,17 +8,18 @@ import           Universum
 
 
 import           Test.Hspec
-    (Expectation, Spec, anyErrorCall, describe, it, shouldBe, shouldSatisfy)
+                       (Expectation, Spec, anyErrorCall, describe, it,
+                       shouldBe, shouldSatisfy)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (Property, (.||.), (===))
+                       (Property, (.||.), (===))
 
 import qualified Pos.Arbitrary.Core as C
 import qualified Pos.Core.Common as C
 
 import           Test.Pos.Util.QuickCheck.Property
-    (shouldThrowException, (.=.))
+                       (shouldThrowException, (.=.))
 
 spec :: Spec
 spec = describe "Coin properties" $ do

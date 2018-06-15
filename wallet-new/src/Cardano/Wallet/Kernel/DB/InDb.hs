@@ -6,9 +6,9 @@ module Cardano.Wallet.Kernel.DB.InDb (
 import           Universum
 
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 import           Data.SafeCopy
-    (SafeCopy (..))
+                       (SafeCopy (..))
 
 import qualified Pos.Core as Core
 import qualified Pos.Crypto as Core

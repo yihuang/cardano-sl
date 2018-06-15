@@ -11,59 +11,62 @@ module Pos.Ssc.Logic.VAR
        ) where
 
 import           Control.Lens
-    ((.=), _Wrapped)
+                       ((.=), _Wrapped)
 import           Control.Monad.Except
-    (MonadError (throwError), runExceptT)
+                       (MonadError (throwError), runExceptT)
 import           Control.Monad.Morph
-    (hoist)
+                       (hoist)
 import qualified Crypto.Random as Rand
 import qualified Data.HashMap.Strict as HM
 import           Formatting
-    (build, int, sformat, (%))
+                       (build, int, sformat, (%))
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 import           System.Wlog
-    (WithLogger, logDebug)
+                       (WithLogger, logDebug)
 import           Universum
 
-import           Pos.Binary.Ssc
-    ()
+import           Pos.Binary.Ssc ()
 import           Pos.Core
-    (BlockVersionData, ComponentBlock (..), HasCoreConfiguration,
-    HasGenesisData, HasProtocolConstants, HasProtocolMagic, HeaderHash,
-    epochIndexL, epochOrSlotG, headerHash)
+                       (BlockVersionData, ComponentBlock (..),
+                       HasCoreConfiguration, HasGenesisData,
+                       HasProtocolConstants, HasProtocolMagic, HeaderHash,
+                       epochIndexL, epochOrSlotG, headerHash)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..))
+                       (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.Core.Ssc
-    (SscPayload (..))
+                       (SscPayload (..))
 import           Pos.DB
-    (MonadDBRead, MonadGState, SomeBatchOp (..), gsAdoptedBVData)
+                       (MonadDBRead, MonadGState, SomeBatchOp (..),
+                       gsAdoptedBVData)
 import           Pos.Exception
-    (assertionFailed)
+                       (assertionFailed)
 import           Pos.Infra.Reporting.Methods
-    (MonadReporting, reportError)
+                       (MonadReporting, reportError)
 import           Pos.Lrc.Consumer.Ssc
-    (getSscRichmen)
+                       (getSscRichmen)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Lrc.Types
-    (RichmenStakes)
+                       (RichmenStakes)
 import           Pos.Ssc.Configuration
-    (HasSscConfiguration)
+                       (HasSscConfiguration)
 import qualified Pos.Ssc.DB as DB
 import           Pos.Ssc.Error
-    (SscVerifyError (..), sscIsCriticalVerifyError)
+                       (SscVerifyError (..), sscIsCriticalVerifyError)
 import           Pos.Ssc.Mem
-    (MonadSscMem, SscGlobalUpdate, askSscMem, sscRunGlobalUpdate)
+                       (MonadSscMem, SscGlobalUpdate, askSscMem,
+                       sscRunGlobalUpdate)
 import           Pos.Ssc.Toss
-    (MultiRichmenStakes, PureToss, applyGenesisBlock, rollbackSsc,
-    runPureTossWithLogger, supplyPureTossEnv, verifyAndApplySscPayload)
+                       (MultiRichmenStakes, PureToss, applyGenesisBlock,
+                       rollbackSsc, runPureTossWithLogger, supplyPureTossEnv,
+                       verifyAndApplySscPayload)
 import           Pos.Ssc.Types
-    (SscBlock, SscGlobalState (..), sscGlobal)
+                       (SscBlock, SscGlobalState (..), sscGlobal)
 import           Pos.Util.AssertMode
-    (inAssertMode)
+                       (inAssertMode)
 import           Pos.Util.Lens
-    (_neHead, _neLast)
+                       (_neHead, _neLast)
 
 ----------------------------------------------------------------------------
 -- Modes

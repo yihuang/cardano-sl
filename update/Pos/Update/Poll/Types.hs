@@ -48,26 +48,28 @@ module Pos.Update.Poll.Types
 import           Universum
 
 import           Control.Lens
-    (makeLensesFor)
+                       (makeLensesFor)
 import           Data.Default
-    (Default (def))
+                       (Default (def))
 import qualified Data.Text.Buildable
 import           Data.Time.Units
-    (Millisecond)
+                       (Millisecond)
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Core
-    (ChainDifficulty, Coin, HeaderHash, ScriptVersion, StakeholderId, mkCoin)
+                       (ChainDifficulty, Coin, HeaderHash, ScriptVersion,
+                       StakeholderId, mkCoin)
 import           Pos.Core.Slotting
-    (EpochIndex, SlotId)
+                       (EpochIndex, SlotId)
 import           Pos.Core.Update
-    (ApplicationName, BlockVersion, BlockVersionModifier (..),
-    NumSoftwareVersion, SoftwareVersion, UpId, UpdateProposal (..), UpdateVote)
+                       (ApplicationName, BlockVersion,
+                       BlockVersionModifier (..), NumSoftwareVersion,
+                       SoftwareVersion, UpId, UpdateProposal (..), UpdateVote)
 import           Pos.Crypto
-    (PublicKey)
+                       (PublicKey)
 import           Pos.Infra.Slotting.Types
-    (SlottingData)
+                       (SlottingData)
 
 ----------------------------------------------------------------------------
 -- VoteState

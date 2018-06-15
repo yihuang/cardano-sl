@@ -7,44 +7,47 @@
 module Cardano.NodeIPC (startNodeJsIPC) where
 
 import           Control.Arrow
-    ((>>>))
+                       ((>>>))
 import           Control.Concurrent
-    (forkIO)
+                       (forkIO)
 import           Control.Monad.Reader
-    (MonadReader)
+                       (MonadReader)
 import           Data.Aeson
-    (FromJSON (parseJSON), ToJSON (toEncoding), defaultOptions, eitherDecode,
-    encode, genericParseJSON, genericToEncoding)
+                       (FromJSON (parseJSON), ToJSON (toEncoding),
+                       defaultOptions, eitherDecode, encode, genericParseJSON,
+                       genericToEncoding)
 import           Data.Aeson.Types
-    (Options, SumEncoding (ObjectWithSingleField), sumEncoding)
+                       (Options, SumEncoding (ObjectWithSingleField),
+                       sumEncoding)
 import           Data.Binary.Get
-    (getWord32le, getWord64le, runGet)
+                       (getWord32le, getWord64le, runGet)
 import           Data.Binary.Put
-    (putLazyByteString, putWord32le, putWord64le, runPut)
+                       (putLazyByteString, putWord32le, putWord64le, runPut)
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.ByteString.Lazy.Char8 as BSLC
 import           Distribution.System
-    (OS (Windows), buildOS)
+                       (OS (Windows), buildOS)
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import           GHC.IO.Handle.FD
-    (fdToHandle)
+                       (fdToHandle)
 import           Pos.Infra.Shutdown.Class
-    (HasShutdownContext (..))
+                       (HasShutdownContext (..))
 import           Pos.Infra.Shutdown.Logic
-    (triggerShutdown)
+                       (triggerShutdown)
 import           Pos.Infra.Shutdown.Types
-    (ShutdownContext)
+                       (ShutdownContext)
 import           System.Environment
-    (lookupEnv)
+                       (lookupEnv)
 import           System.IO
-    (hFlush, hGetLine, hSetNewlineMode, noNewlineTranslation)
+                       (hFlush, hGetLine, hSetNewlineMode,
+                       noNewlineTranslation)
 import           System.IO.Error
-    (IOError, isEOFError)
+                       (IOError, isEOFError)
 import           System.Wlog
-    (WithLogger, logError, logInfo)
+                       (WithLogger, logError, logInfo)
 import           System.Wlog.LoggerNameBox
-    (usingLoggerName)
+                       (usingLoggerName)
 import           Universum
 
 data Packet = Started | QueryPort | ReplyPort Word16 | Ping | Pong | ParseError Text deriving (Show, Eq, Generic)

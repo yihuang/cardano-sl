@@ -12,45 +12,48 @@ module Main
 import           Universum
 
 import           Data.Maybe
-    (fromJust)
+                       (fromJust)
 import           Mockable
-    (Production (..), runProduction)
+                       (Production (..), runProduction)
 import           System.Wlog
-    (LoggerName, logInfo)
+                       (LoggerName, logInfo)
 
 import           ExplorerNodeOptions
-    (ExplorerArgs (..), ExplorerNodeArgs (..), getExplorerNodeOptions)
-import           Pos.Binary
-    ()
+                       (ExplorerArgs (..), ExplorerNodeArgs (..),
+                       getExplorerNodeOptions)
+import           Pos.Binary ()
 import           Pos.Client.CLI
-    (CommonNodeArgs (..), NodeArgs (..), getNodeParams)
+                       (CommonNodeArgs (..), NodeArgs (..), getNodeParams)
 import qualified Pos.Client.CLI as CLI
 import           Pos.Context
-    (NodeContext (..))
+                       (NodeContext (..))
 import           Pos.Explorer.DB
-    (explorerInitDB)
+                       (explorerInitDB)
 import           Pos.Explorer.ExtraContext
-    (makeExtraCtx)
+                       (makeExtraCtx)
 import           Pos.Explorer.Socket
-    (NotifierSettings (..))
+                       (NotifierSettings (..))
 import           Pos.Explorer.Txp
-    (ExplorerExtraModifier, explorerTxpGlobalSettings)
+                       (ExplorerExtraModifier, explorerTxpGlobalSettings)
 import           Pos.Explorer.Web
-    (ExplorerProd, explorerPlugin, notifierPlugin, runExplorerProd)
+                       (ExplorerProd, explorerPlugin, notifierPlugin,
+                       runExplorerProd)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion, hoistDiffusion)
+                       (Diffusion, hoistDiffusion)
 import           Pos.Launcher
-    (ConfigurationOptions (..), HasConfigurations, NodeParams (..),
-    NodeResources (..), bracketNodeResources, loggerBracket, runNode,
-    runRealMode, withConfigurations)
+                       (ConfigurationOptions (..), HasConfigurations,
+                       NodeParams (..), NodeResources (..),
+                       bracketNodeResources, loggerBracket, runNode,
+                       runRealMode, withConfigurations)
 import           Pos.Update.Worker
-    (updateTriggerWorker)
+                       (updateTriggerWorker)
 import           Pos.Util
-    (logException)
+                       (logException)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
+                       (HasCompileInfo, retrieveCompileTimeInfo,
+                       withCompileInfo)
 import           Pos.Util.UserSecret
-    (usVss)
+                       (usVss)
 
 loggerName :: LoggerName
 loggerName = "node"

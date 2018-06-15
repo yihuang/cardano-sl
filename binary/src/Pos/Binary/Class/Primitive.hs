@@ -41,26 +41,26 @@ import qualified Codec.CBOR.Encoding as E
 import qualified Codec.CBOR.Read as CBOR.Read
 import qualified Codec.CBOR.Write as CBOR.Write
 import           Control.Exception.Safe
-    (impureThrow)
+                       (impureThrow)
 import           Control.Monad.ST
-    (ST, runST)
+                       (ST, runST)
 import qualified Data.ByteString as BS
 import           Data.ByteString.Builder
-    (Builder)
+                       (Builder)
 import qualified Data.ByteString.Builder.Extra as Builder
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.ByteString.Lazy.Internal as BSL
 import           Data.Digest.CRC32
-    (CRC32 (..))
+                       (CRC32 (..))
 import           Data.Typeable
-    (typeOf)
+                       (typeOf)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Binary.Class.Core
-    (Bi (..), cborError, enforceSize, toCborError)
+                       (Bi (..), cborError, enforceSize, toCborError)
 
 -- | Serialize a Haskell value to an external binary representation.
 --

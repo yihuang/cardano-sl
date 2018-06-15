@@ -12,7 +12,7 @@ module Pos.Core.Constants
 import           Universum
 
 import           Pos.Crypto.HD
-    (firstHardened)
+                       (firstHardened)
 
 -- | First index in derivation path for HD account, which is put to genesis utxo
 accountGenesisIndex :: Word32

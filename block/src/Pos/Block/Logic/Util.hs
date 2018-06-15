@@ -17,43 +17,44 @@ module Pos.Block.Logic.Util
 import           Universum
 
 import           Control.Lens
-    (_Wrapped)
+                       (_Wrapped)
 import           Data.List
-    (findIndex)
+                       (findIndex)
 import           Data.List.NonEmpty
-    ((<|))
+                       ((<|))
 import qualified Data.List.NonEmpty as NE
 import           Formatting
-    (int, sformat, (%))
+                       (int, sformat, (%))
 import           System.Wlog
-    (WithLogger)
+                       (WithLogger)
 
 import           Pos.Block.Configuration
-    (HasBlockConfiguration, fixedTimeCQ)
+                       (HasBlockConfiguration, fixedTimeCQ)
 import           Pos.Block.Slog.Context
-    (slogGetLastSlots)
+                       (slogGetLastSlots)
 import           Pos.Block.Slog.Types
-    (HasSlogGState)
+                       (HasSlogGState)
 import           Pos.Core
-    (BlockCount, FlatSlotId, HasProtocolConstants, HeaderHash, Timestamp (..),
-    difficultyL, flattenSlotId, headerHash, prevBlockL)
+                       (BlockCount, FlatSlotId, HasProtocolConstants,
+                       HeaderHash, Timestamp (..), difficultyL, flattenSlotId,
+                       headerHash, prevBlockL)
 import           Pos.Core.Block
-    (BlockHeader)
+                       (BlockHeader)
 import           Pos.Core.Chrono
-    (NE, OldestFirst (..))
+                       (NE, OldestFirst (..))
 import           Pos.Core.Configuration
-    (blkSecurityParam)
+                       (blkSecurityParam)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class
-    (MonadBlockDBRead)
+                       (MonadBlockDBRead)
 import           Pos.Exception
-    (reportFatalError)
+                       (reportFatalError)
 import           Pos.GState.BlockExtra
-    (isBlockInMainChain)
+                       (isBlockInMainChain)
 import           Pos.Infra.Slotting
-    (MonadSlots (..), getCurrentSlotFlat, slotFromTimestamp)
+                       (MonadSlots (..), getCurrentSlotFlat, slotFromTimestamp)
 import           Pos.Util
-    (_neHead)
+                       (_neHead)
 
 -- | Find LCA of headers list and main chain, including oldest
 -- header's parent hash. Acts as it would iterate from newest to

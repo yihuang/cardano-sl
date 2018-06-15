@@ -3,15 +3,15 @@ module Statistics.Report
     ) where
 
 import           Data.Map.Strict
-    (Map)
+                       (Map)
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import qualified Data.Text as T
 import           System.IO
-    (hPutStrLn)
+                       (hPutStrLn)
 
 import           Statistics.Block
-    (TxFate (..))
+                       (TxFate (..))
 import           Types
 import           Universum
 

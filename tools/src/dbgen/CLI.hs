@@ -3,22 +3,22 @@ module CLI where
 import           Universum
 
 import           Data.String.Conv
-    (toS)
+                       (toS)
 import           Options.Applicative
-    (auto, eitherReader, help, long, metavar, option, strOption, switch)
+                       (auto, eitherReader, help, long, metavar, option,
+                       strOption, switch)
 import           Options.Generic
-    (ParseRecord (..))
+                       (ParseRecord (..))
 import           Pos.Util.Servant
-    (decodeCType)
-import           Pos.Wallet.Web.ClientTypes.Instances
-    ()
+                       (decodeCType)
+import           Pos.Wallet.Web.ClientTypes.Instances ()
 import           Pos.Wallet.Web.ClientTypes.Types
-    (AccountId, CAccountId (..))
+                       (AccountId, CAccountId (..))
 import           Text.Read
-    (readMaybe)
+                       (readMaybe)
 
 import           Types
-    (Method (..))
+                       (Method (..))
 
 data CLI = CLI
     { config            :: FilePath

@@ -23,18 +23,17 @@ module Pos.Infra.Reporting.Methods
 import           Universum
 
 import           Control.Exception
-    (ErrorCall (..), Exception (..))
+                       (ErrorCall (..), Exception (..))
 import           Pos.ReportServer.Report
-    (ReportType (..))
+                       (ReportType (..))
 import           System.Wlog
-    (Severity (..), WithLogger, logMessage)
+                       (Severity (..), WithLogger, logMessage)
 
 import           Pos.DB.Error
-    (DBError (..))
+                       (DBError (..))
 import           Pos.Exception
-    (CardanoFatalError)
-import           Pos.Infra.Reporting.MemState
-    ()
+                       (CardanoFatalError)
+import           Pos.Infra.Reporting.MemState ()
 
 -- | Encapsulates the sending of a report, with potential for side-effects.
 newtype Reporter m = Reporter

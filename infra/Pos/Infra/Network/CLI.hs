@@ -27,47 +27,48 @@ module Pos.Infra.Network.CLI
 import           Universum
 
 import           Control.Concurrent
-    (Chan, newChan, readChan, writeChan)
+                       (Chan, newChan, readChan, writeChan)
 import           Control.Exception.Safe
-    (try)
+                       (try)
 import qualified Data.ByteString.Char8 as BS.C8
 import           Data.IP
-    (IPv4)
+                       (IPv4)
 import qualified Data.Map.Strict as M
 import           Data.Maybe
-    (fromJust, mapMaybe)
+                       (fromJust, mapMaybe)
 import qualified Data.Yaml as Yaml
 import           Formatting
-    (build, sformat, shown, (%))
-import           Mockable.Concurrent
-    ()
+                       (build, sformat, shown, (%))
+import           Mockable.Concurrent ()
 import           Network.Broadcast.OutboundQueue
-    (Alts, Peers, peersFromList)
+                       (Alts, Peers, peersFromList)
 import qualified Network.DNS as DNS
 import qualified Network.Transport.TCP as TCP
 import qualified Options.Applicative as Opt
 import           Serokell.Util.OptParse
-    (fromParsec)
+                       (fromParsec)
 import           System.Wlog
-    (LoggerNameBox, WithLogger, askLoggerName, logError, logNotice,
-    usingLoggerName)
+                       (LoggerNameBox, WithLogger, askLoggerName, logError,
+                       logNotice, usingLoggerName)
 
 import qualified Pos.Infra.DHT.Real.Param as DHT
-    (KademliaParams (..), MalformedDHTKey (..), fromYamlConfig)
+                       (KademliaParams (..), MalformedDHTKey (..),
+                       fromYamlConfig)
 import           Pos.Infra.Network.DnsDomains
-    (DnsDomains (..), NodeAddr (..))
+                       (DnsDomains (..), NodeAddr (..))
 import           Pos.Infra.Network.Types
-    (NodeId, NodeName (..))
+                       (NodeId, NodeName (..))
 import qualified Pos.Infra.Network.Types as T
 import           Pos.Infra.Network.Yaml
-    (NodeMetadata (..))
+                       (NodeMetadata (..))
 import qualified Pos.Infra.Network.Yaml as Y
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress, addrParser, addrParserNoWildcard, addressToNodeId)
+                       (NetworkAddress, addrParser, addrParserNoWildcard,
+                       addressToNodeId)
 
 #ifdef POSIX
 import           Pos.Infra.Util.SigHandler
-    (Signal (..), installHandler)
+                       (Signal (..), installHandler)
 #endif
 
 ----------------------------------------------------------------------------

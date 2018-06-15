@@ -10,26 +10,27 @@ module Pos.Ssc.Logic.Global
 
 import           Universum
 
-import           Pos.Binary.Ssc
-    ()
+import           Pos.Binary.Ssc ()
 import           Pos.Core
-    (EpochIndex (..), SharedSeed, VssCertificatesMap (..), vcVssKey)
+                       (EpochIndex (..), SharedSeed, VssCertificatesMap (..),
+                       vcVssKey)
 import           Pos.DB
-    (MonadDBRead)
+                       (MonadDBRead)
 import           Pos.Lrc.Consumer.Ssc
-    (getSscRichmen)
+                       (getSscRichmen)
 import           Pos.Lrc.Context
-    (HasLrcContext)
+                       (HasLrcContext)
 import           Pos.Lrc.Types
-    (RichmenStakes)
+                       (RichmenStakes)
 import           Pos.Ssc.Error
-    (SscSeedError)
+                       (SscSeedError)
 import           Pos.Ssc.Mem
-    (MonadSscMem, SscGlobalQuery, sscRunGlobalQuery)
+                       (MonadSscMem, SscGlobalQuery, sscRunGlobalQuery)
 import           Pos.Ssc.Seed
-    (calculateSeed)
+                       (calculateSeed)
 import           Pos.Ssc.Types
-    (sgsCommitments, sgsOpenings, sgsShares, sgsVssCertificates)
+                       (sgsCommitments, sgsOpenings, sgsShares,
+                       sgsVssCertificates)
 import qualified Pos.Ssc.VssCertData as VCD
 
 ----------------------------------------------------------------------------

@@ -13,30 +13,31 @@ module Pos.Logic.Types
 import           Universum
 
 import           Data.Default
-    (def)
+                       (def)
 import           Data.Tagged
-    (Tagged)
+                       (Tagged)
 
 import           Pos.Block.Logic
-    (GetHashesRangeError, GetHeadersFromManyToError)
+                       (GetHashesRangeError, GetHeadersFromManyToError)
 import           Pos.Communication
-    (NodeId, TxMsgContents)
+                       (NodeId, TxMsgContents)
 import           Pos.Core
-    (HeaderHash, ProxySKHeavy, StakeholderId)
+                       (HeaderHash, ProxySKHeavy, StakeholderId)
 import           Pos.Core.Block
-    (Block, BlockHeader)
+                       (Block, BlockHeader)
 import           Pos.Core.Chrono
-    (NE, NewestFirst, OldestFirst (..))
+                       (NE, NewestFirst, OldestFirst (..))
 import           Pos.Core.Txp
-    (TxId)
+                       (TxId)
 import           Pos.Core.Update
-    (BlockVersionData, UpId, UpdateProposal, UpdateVote, VoteId)
+                       (BlockVersionData, UpId, UpdateProposal, UpdateVote,
+                       VoteId)
 import           Pos.DB.Class
-    (SerializedBlock)
+                       (SerializedBlock)
 import           Pos.Security.Params
-    (SecurityParams (..))
+                       (SecurityParams (..))
 import           Pos.Ssc.Message
-    (MCCommitment, MCOpening, MCShares, MCVssCertificate)
+                       (MCCommitment, MCOpening, MCShares, MCVssCertificate)
 
 -- | The interface to a logic layer, i.e. some component which encapsulates
 -- blockchain / crypto logic.

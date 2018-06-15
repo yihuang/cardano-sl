@@ -7,14 +7,14 @@ module Test.Pos.Binary.BiSerialize
 import           Universum
 
 import           Hedgehog
-    (Gen, Property, discover, (===))
+                       (Gen, Property, discover, (===))
 import qualified Hedgehog as H
 import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 
 import           Pos.Binary.Class
-    (Cons (..), Field (..), cborError, deriveIndexedBi, deriveSimpleBi,
-    serialize')
+                       (Cons (..), Field (..), cborError, deriveIndexedBi,
+                       deriveSimpleBi, serialize')
 
 import qualified Serokell.Util.Base16 as B16
 

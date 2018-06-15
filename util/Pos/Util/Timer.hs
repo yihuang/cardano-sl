@@ -7,9 +7,9 @@ module Pos.Util.Timer
   ) where
 
 import           Control.Concurrent.STM
-    (readTVar, registerDelay, retry)
+                       (readTVar, registerDelay, retry)
 import           Data.Time.Units
-    (TimeUnit, toMicroseconds)
+                       (TimeUnit, toMicroseconds)
 import           Universum
 
 newtype Timer = Timer { timerSemaphore :: TVar (TVar Bool) }

@@ -13,42 +13,43 @@ import qualified Control.Concurrent as Conc
 import qualified Control.Concurrent.Async as Conc
 import qualified Control.Concurrent.STM as Conc
 import           Control.Exception.Safe
-    (MonadCatch, MonadMask (..), MonadThrow)
+                       (MonadCatch, MonadMask (..), MonadThrow)
 import qualified Control.Exception.Safe as Exception
 import           Control.Monad.Fix
-    (MonadFix)
+                       (MonadFix)
 import           Control.Monad.IO.Class
-    (MonadIO)
+                       (MonadIO)
 import           Control.Monad.IO.Unlift
-    (MonadUnliftIO (..))
+                       (MonadUnliftIO (..))
 import qualified Crypto.Random as Rand
 import           Data.Time.Units
-    (toMicroseconds)
+                       (toMicroseconds)
 import qualified GHC.IO as GHC
 import qualified System.Metrics.Counter as EKG.Counter
 import qualified System.Metrics.Distribution as EKG.Distribution
 import qualified System.Metrics.Gauge as EKG.Gauge
 import           System.Wlog
-    (CanLog (..), HasLoggerName (..))
+                       (CanLog (..), HasLoggerName (..))
 
 import           Control.Monad.Base
-    (MonadBase (..))
+                       (MonadBase (..))
 import           Control.Monad.Trans.Control
-    (MonadBaseControl (..))
+                       (MonadBaseControl (..))
 import           Mockable.Channel
-    (Channel (..), ChannelT)
+                       (Channel (..), ChannelT)
 import           Mockable.Class
-    (Mockable (..))
+                       (Mockable (..))
 import           Mockable.Concurrent
-    (Async (..), Concurrently (..), Delay (..), Fork (..), LowLevelAsync (..),
-    MyThreadId (..), Promise, RunInUnboundThread (..), ThreadId)
+                       (Async (..), Concurrently (..), Delay (..), Fork (..),
+                       LowLevelAsync (..), MyThreadId (..), Promise,
+                       RunInUnboundThread (..), ThreadId)
 import           Mockable.CurrentTime
-    (CurrentTime (..), realTime)
+                       (CurrentTime (..), realTime)
 import qualified Mockable.Metrics as Metrics
 import           Mockable.SharedAtomic
-    (SharedAtomic (..), SharedAtomicT)
+                       (SharedAtomic (..), SharedAtomicT)
 import           Mockable.SharedExclusive
-    (SharedExclusive (..), SharedExclusiveT)
+                       (SharedExclusive (..), SharedExclusiveT)
 
 newtype Production t = Production
     { runProduction :: IO t

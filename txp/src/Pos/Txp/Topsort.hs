@@ -6,21 +6,20 @@ module Pos.Txp.Topsort
        ) where
 
 import           Universum hiding
-    (tail, uncons)
+                       (tail, uncons)
 
 import           Control.Lens
-    (makeLenses, to, uses, (%=), (.=))
+                       (makeLenses, to, uses, (%=), (.=))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Data.List
-    (nub, tail, uncons)
+                       (nub, tail, uncons)
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxIn (..), txInputs)
+                       (Tx (..), TxAux (..), TxIn (..), txInputs)
 import           Pos.Crypto
-    (Hash, WithHash (..), withHash)
+                       (Hash, WithHash (..), withHash)
 
 ----------------------------------------------------------------------------
 -- Topsorting

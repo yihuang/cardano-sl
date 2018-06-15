@@ -10,22 +10,23 @@ module Pos.Core.Update.Vote
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Data.Text.Buildable as Buildable
 import           Data.Text.Lazy.Builder
-    (Builder)
+                       (Builder)
 import           Formatting
-    (Format, bprint, build, builder, later, (%))
+                       (Format, bprint, build, builder, later, (%))
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 
 import           Pos.Binary.Class
-    (Bi)
+                       (Bi)
 import           Pos.Core.Common
-    (addressHash)
+                       (addressHash)
 import           Pos.Crypto
-    (ProtocolMagic, PublicKey, SafeSigner, SecretKey, SignTag (SignUSVote),
-    Signature, checkSig, safeSign, safeToPublic, shortHashF, sign, toPublic)
+                       (ProtocolMagic, PublicKey, SafeSigner, SecretKey,
+                       SignTag (SignUSVote), Signature, checkSig, safeSign,
+                       safeToPublic, shortHashF, sign, toPublic)
 
 import           Pos.Core.Update.Proposal
 

@@ -9,13 +9,14 @@ module Pos.Infra.Reporting.Exceptions
 import           Universum
 
 import           Control.Exception.Safe
-    (Exception (..))
+                       (Exception (..))
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, shown, stext, string, (%))
+                       (bprint, shown, stext, string, (%))
 
 import           Pos.Exception
-    (cardanoExceptionFromException, cardanoExceptionToException)
+                       (cardanoExceptionFromException,
+                       cardanoExceptionToException)
 
 data ReportingError
     = CantRetrieveLogs FilePath

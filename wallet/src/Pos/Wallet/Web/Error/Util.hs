@@ -11,16 +11,16 @@ module Pos.Wallet.Web.Error.Util
 import           Universum
 
 import           Control.Exception.Safe
-    (Handler (..), catches, tryJust)
+                       (Handler (..), catches, tryJust)
 import           Formatting
-    (sformat, shown, (%))
+                       (sformat, shown, (%))
 import           Servant.Server
-    (ServantErr (..), err500)
+                       (ServantErr (..), err500)
 import           System.Wlog
-    (CanLog, logError, usingLoggerName)
+                       (CanLog, logError, usingLoggerName)
 
 import           Pos.Wallet.Web.Error.Types
-    (WalletError (..), _RequestError)
+                       (WalletError (..), _RequestError)
 
 rewrapToWalletError
     :: forall e m a.

@@ -12,18 +12,18 @@ module Network.Discovery.Transport.Kademlia
 import qualified Control.Concurrent.STM as STM
 import qualified Control.Concurrent.STM.TVar as TVar
 import           Control.Monad
-    (forM)
+                       (forM)
 import           Data.Binary
-    (Binary, decodeOrFail, encode)
+                       (Binary, decodeOrFail, encode)
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import           Data.Typeable
-    (Typeable)
+                       (Typeable)
 import           Data.Word
-    (Word16)
+                       (Word16)
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import qualified Network.Kademlia as K
 
 import           Network.Discovery.Abstract

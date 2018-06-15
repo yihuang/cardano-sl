@@ -12,36 +12,36 @@ module Pos.Launcher.Param
 import           Universum
 
 import           Control.Lens
-    (makeLensesWith)
+                       (makeLensesWith)
 import           System.Wlog
-    (LoggerName)
+                       (LoggerName)
 
 import           Pos.Behavior
-    (BehaviorConfig (..))
+                       (BehaviorConfig (..))
 import           Pos.Core
-    (HasPrimaryKey (..))
+                       (HasPrimaryKey (..))
 import           Pos.Crypto
-    (SecretKey)
+                       (SecretKey)
 import           Pos.Infra.DHT.Real.Param
-    (KademliaParams)
+                       (KademliaParams)
 import           Pos.Infra.Network.Types
-    (NetworkConfig)
+                       (NetworkConfig)
 import           Pos.Infra.Statistics
-    (EkgParams, StatsdParams)
+                       (EkgParams, StatsdParams)
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress)
+                       (NetworkAddress)
 import           Pos.Security.Params
-    (SecurityParams)
+                       (SecurityParams)
 import           Pos.Ssc.Behavior
-    (SscBehavior)
+                       (SscBehavior)
 import           Pos.Update.Params
-    (UpdateParams)
+                       (UpdateParams)
 import           Pos.Util.Lens
-    (postfixLFields)
+                       (postfixLFields)
 import           Pos.Util.UserSecret
-    (UserSecret)
+                       (UserSecret)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 -- | Contains all parameters required for hierarchical logger initialization.
 data LoggingParams = LoggingParams

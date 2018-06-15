@@ -6,12 +6,12 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 
 import           Pos.Binary.Class
-    (Raw)
+                       (Raw)
 import           Pos.Crypto
-    (Hash)
+                       (Hash)
 
 -- | Data which describes update. It is specific for each system.
 data UpdateData = UpdateData

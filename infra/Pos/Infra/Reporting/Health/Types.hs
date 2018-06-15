@@ -5,6 +5,6 @@ module Pos.Infra.Reporting.Health.Types
     ) where
 
 import           Data.Text
-    (Text)
+                       (Text)
 
 data HealthStatus = HSHealthy Text | HSUnhealthy Text

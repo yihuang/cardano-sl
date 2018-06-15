@@ -14,26 +14,27 @@ module Pos.Wallet.Web.State.Transactions
     where
 
 import           Universum hiding
-    (for_)
+                       (for_)
 
 import           Data.Foldable
-    (for_)
+                       (for_)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Map as M
 import           Pos.Client.Txp.History
-    (TxHistoryEntry)
+                       (TxHistoryEntry)
 import           Pos.Core
-    (Address, ChainDifficulty, HeaderHash, ProtocolConstants)
+                       (Address, ChainDifficulty, HeaderHash,
+                       ProtocolConstants)
 import           Pos.Txp
-    (TxId, UtxoModifier)
+                       (TxId, UtxoModifier)
 import           Pos.Util.Servant
-    (encodeCType)
+                       (encodeCType)
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId (..), CAccountMeta, CId, CTxId, CTxMeta, Wal)
+                       (AccountId (..), CAccountMeta, CId, CTxId, CTxMeta, Wal)
 import           Pos.Wallet.Web.Pending.Types
-    (PtxCondition)
+                       (PtxCondition)
 import           Pos.Wallet.Web.State.Storage
-    (Update)
+                       (Update)
 import qualified Pos.Wallet.Web.State.Storage as WS
 
 -- | Create an account with an address.

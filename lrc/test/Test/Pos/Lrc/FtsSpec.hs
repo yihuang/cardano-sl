@@ -8,28 +8,29 @@ module Test.Pos.Lrc.FtsSpec
 import           Universum
 
 import           Data.List
-    (scanl1)
+                       (scanl1)
 import qualified Data.Set as S
-    (deleteFindMin, fromList)
+                       (deleteFindMin, fromList)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Arbitrary (..), Property, choose, infiniteListOf, suchThat, (===))
+                       (Arbitrary (..), Property, choose, infiniteListOf,
+                       suchThat, (===))
 
-import           Pos.Arbitrary.Core
-    ()
+import           Pos.Arbitrary.Core ()
 import           Pos.Core
-    (Coin, HasConfiguration, SharedSeed, StakeholderId, StakesList,
-    addressHash, blkSecurityParam, defaultCoreConfiguration, epochSlots,
-    mkCoin, sumCoins, unsafeAddCoin, unsafeIntegerToCoin, withGenesisSpec)
+                       (Coin, HasConfiguration, SharedSeed, StakeholderId,
+                       StakesList, addressHash, blkSecurityParam,
+                       defaultCoreConfiguration, epochSlots, mkCoin, sumCoins,
+                       unsafeAddCoin, unsafeIntegerToCoin, withGenesisSpec)
 import           Pos.Crypto
-    (PublicKey)
+                       (PublicKey)
 import           Pos.Lrc.Fts
-    (followTheSatoshi)
+                       (followTheSatoshi)
 import           Test.Pos.Util.QuickCheck.Property
-    (qcNotElem)
+                       (qcNotElem)
 
 spec :: Spec
 spec = withGenesisSpec 0 defaultCoreConfiguration $ do

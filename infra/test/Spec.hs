@@ -4,9 +4,9 @@ module Spec
 
 import           Test.Hspec
 import qualified Test.Pos.Infra.Diffusion.Subscription.StatusSpec
-    (spec)
+                       (spec)
 import qualified Test.Pos.Infra.Diffusion.Subscription.SubscriptionSpec
-    (spec)
+                       (spec)
 
 spec :: Spec
 spec = describe "Subscription" $ do

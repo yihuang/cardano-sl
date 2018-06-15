@@ -12,74 +12,78 @@ module Main
 import           Universum
 
 import           Control.Concurrent.STM
-    (newTBQueueIO)
+                       (newTBQueueIO)
 import           Data.Maybe
-    (fromJust)
+                       (fromJust)
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           Mockable
-    (Production, runProduction)
+                       (Production, runProduction)
 import           System.Wlog
-    (LoggerName, logInfo, modifyLoggerName)
+                       (LoggerName, logInfo, modifyLoggerName)
 
 import           Ntp.Client
-    (NtpStatus, withNtpClient)
+                       (NtpStatus, withNtpClient)
 
-import           Pos.Binary
-    ()
+import           Pos.Binary ()
 import           Pos.Client.CLI
-    (CommonNodeArgs (..), NodeArgs (..), getNodeParams)
+                       (CommonNodeArgs (..), NodeArgs (..), getNodeParams)
 import qualified Pos.Client.CLI as CLI
 import           Pos.Communication
-    (OutSpecs)
+                       (OutSpecs)
 import           Pos.Communication.Util
-    (ActionSpec (..))
+                       (ActionSpec (..))
 import           Pos.Configuration
-    (walletProductionApi, walletTxCreationDisabled)
+                       (walletProductionApi, walletTxCreationDisabled)
 import           Pos.Context
-    (HasNodeContext)
+                       (HasNodeContext)
 import           Pos.DB.DB
-    (initNodeDBs)
+                       (initNodeDBs)
 import           Pos.Infra.Diffusion.Types
-    (Diffusion (..))
+                       (Diffusion (..))
 import           Pos.Infra.Ntp.Configuration
-    (NtpConfiguration, ntpClientSettings)
+                       (NtpConfiguration, ntpClientSettings)
 import           Pos.Launcher
-    (ConfigurationOptions (..), HasConfigurations, NodeParams (..),
-    NodeResources (..), bracketNodeResources, loggerBracket, runNode,
-    withConfigurations)
+                       (ConfigurationOptions (..), HasConfigurations,
+                       NodeParams (..), NodeResources (..),
+                       bracketNodeResources, loggerBracket, runNode,
+                       withConfigurations)
 import           Pos.Ssc.Types
-    (SscParams)
+                       (SscParams)
 import           Pos.Txp
-    (txpGlobalSettings)
+                       (txpGlobalSettings)
 import           Pos.Util
-    (lensOf, logException)
+                       (lensOf, logException)
 import           Pos.Util.CompileInfo
-    (HasCompileInfo, retrieveCompileTimeInfo, withCompileInfo)
+                       (HasCompileInfo, retrieveCompileTimeInfo,
+                       withCompileInfo)
 import           Pos.Util.UserSecret
-    (usVss)
+                       (usVss)
 import           Pos.Wallet.Web
-    (WalletWebMode, bracketWalletWS, bracketWalletWebDB, getSKById,
-    notifierPlugin, runWRealMode, startPendingTxsResubmitter,
-    walletServeWebFull, walletServerOuts)
+                       (WalletWebMode, bracketWalletWS, bracketWalletWebDB,
+                       getSKById, notifierPlugin, runWRealMode,
+                       startPendingTxsResubmitter, walletServeWebFull,
+                       walletServerOuts)
 import           Pos.Wallet.Web.State
-    (askWalletDB, askWalletSnapshot, cleanupAcidStatePeriodically,
-    flushWalletStorage, getWalletAddresses)
+                       (askWalletDB, askWalletSnapshot,
+                       cleanupAcidStatePeriodically, flushWalletStorage,
+                       getWalletAddresses)
 import           Pos.Wallet.Web.Tracking.Decrypt
-    (eskToWalletDecrCredentials)
+                       (eskToWalletDecrCredentials)
 import           Pos.Wallet.Web.Tracking.Sync
-    (processSyncRequest, syncWallet)
+                       (processSyncRequest, syncWallet)
 import           Pos.Wallet.Web.Tracking.Types
-    (SyncQueue)
+                       (SyncQueue)
 import           Pos.Web
-    (serveWeb)
+                       (serveWeb)
 import           Pos.Worker.Types
-    (WorkerSpec, worker)
+                       (WorkerSpec, worker)
 import           Pos.WorkMode
-    (WorkMode)
+                       (WorkMode)
 
 import           NodeOptions
-    (WalletArgs (..), WalletNodeArgs (..), getWalletNodeOptions)
+                       (WalletArgs (..), WalletNodeArgs (..),
+                       getWalletNodeOptions)
 
 loggerName :: LoggerName
 loggerName = "node"

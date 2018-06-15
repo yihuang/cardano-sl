@@ -7,14 +7,14 @@ module Test.Pos.ConstantsSpec
 import           Universum
 
 import           Pos.Core
-    (SystemTag (..))
+                       (SystemTag (..))
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration, ourSystemTag)
+                       (HasUpdateConfiguration, ourSystemTag)
 
 import           Test.Hspec
-    (Expectation, Spec, describe, it, shouldSatisfy)
+                       (Expectation, Spec, describe, it, shouldSatisfy)
 import           Test.Pos.Configuration
-    (withDefUpdateConfiguration)
+                       (withDefUpdateConfiguration)
 
 -- | @currentSystemTag@ is a value obtained at compile time with TemplateHaskell
 -- that represents that current system's platform (i.e. where it was compiled).

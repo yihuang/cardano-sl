@@ -31,33 +31,33 @@ module Pos.Ssc.Types
        ) where
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import           Data.Default
-    (Default, def)
+                       (Default, def)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.Text as T
 import qualified Data.Text.Buildable
 import           Data.Text.Lazy.Builder
-    (Builder, fromText)
+                       (Builder, fromText)
 import           Formatting
-    (sformat, (%))
+                       (sformat, (%))
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 import           Universum
 
 import           Pos.Core
-    (ComponentBlock (..), EpochIndex)
+                       (ComponentBlock (..), EpochIndex)
 import           Pos.Core.Ssc
-    (CommitmentsMap (getCommitmentsMap), Opening, OpeningsMap, SharesMap,
-    SignedCommitment, SscPayload)
+                       (CommitmentsMap (getCommitmentsMap), Opening,
+                       OpeningsMap, SharesMap, SignedCommitment, SscPayload)
 import           Pos.Crypto
-    (VssKeyPair)
+                       (VssKeyPair)
 import           Pos.Ssc.Behavior
-    (SscBehavior)
+                       (SscBehavior)
 import           Pos.Ssc.Toss.Types
-    (TossModifier)
+                       (TossModifier)
 import qualified Pos.Ssc.VssCertData as VCD
 
 ----------------------------------------------------------------------------

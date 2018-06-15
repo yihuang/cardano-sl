@@ -18,21 +18,21 @@ import qualified Cardano.Wallet.Kernel as Kernel
 import           Cardano.Wallet.Kernel.Types
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Pos.Core
-    (Coin, unsafeIntegerToCoin)
+                       (Coin, unsafeIntegerToCoin)
 import           Pos.Core.Chrono
 import           Pos.Crypto
-    (EncryptedSecretKey)
+                       (EncryptedSecretKey)
 import           Pos.Txp
-    (Utxo, formatUtxo)
+                       (Utxo, formatUtxo)
 
 import           Util
 import           Util.Validated
 import           UTxO.Context
-    (Addr)
+                       (Addr)
 import           UTxO.DSL
-    (Hash)
+                       (Hash)
 import qualified UTxO.DSL as DSL
 import           UTxO.Interpreter
 import           UTxO.Translate

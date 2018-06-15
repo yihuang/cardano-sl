@@ -14,14 +14,14 @@ module Pos.Infra.Communication.Types.Relay
        ) where
 
 import           Control.Lens
-    (Wrapped (..), iso)
+                       (Wrapped (..), iso)
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON)
+                       (defaultOptions, deriveJSON)
 import           Data.Tagged
-    (Tagged)
+                       (Tagged)
 import qualified Data.Text.Buildable as B
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 import           Universum
 
 -- | Inventory message. Can be used to announce the fact that you have

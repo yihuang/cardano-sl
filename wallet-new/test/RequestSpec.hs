@@ -3,9 +3,9 @@ module RequestSpec (spec) where
 import           Universum
 
 import           Data.Either
-    (isLeft)
+                       (isLeft)
 import           Formatting
-    (build, sformat)
+                       (build, sformat)
 import           Test.Hspec
 
 import           Cardano.Wallet.API.Request.Filter

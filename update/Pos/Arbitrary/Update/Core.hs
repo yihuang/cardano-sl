@@ -12,31 +12,28 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 import           Test.QuickCheck
-    (Arbitrary (..), Gen, frequency, listOf, listOf1, oneof)
+                       (Arbitrary (..), Gen, frequency, listOf, listOf1, oneof)
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Core
-    ()
-import           Pos.Arbitrary.Slotting
-    ()
-import           Pos.Binary.Update
-    ()
+import           Pos.Arbitrary.Core ()
+import           Pos.Arbitrary.Slotting ()
+import           Pos.Binary.Update ()
 import           Pos.Core.Configuration
-    (HasProtocolMagic, protocolMagic)
+                       (HasProtocolMagic, protocolMagic)
 import           Pos.Core.Update
-    (BlockVersionModifier, SystemTag (..), UpdateData (..), UpdatePayload (..),
-    UpdateProposal (..), UpdateProposalToSign (..), UpdateVote (..),
-    mkUpdateProposalWSign, mkUpdateVote)
+                       (BlockVersionModifier, SystemTag (..), UpdateData (..),
+                       UpdatePayload (..), UpdateProposal (..),
+                       UpdateProposalToSign (..), UpdateVote (..),
+                       mkUpdateProposalWSign, mkUpdateVote)
 import           Pos.Crypto
-    (ProtocolMagic, fakeSigner)
+                       (ProtocolMagic, fakeSigner)
 import           Pos.Data.Attributes
-    (mkAttributes)
+                       (mkAttributes)
 import           Pos.Update.Poll.Types
-    (VoteState (..))
+                       (VoteState (..))
 
-import           Test.Pos.Crypto.Arbitrary
-    ()
+import           Test.Pos.Crypto.Arbitrary ()
 
 instance Arbitrary BlockVersionModifier where
     arbitrary = genericArbitrary

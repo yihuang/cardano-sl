@@ -15,26 +15,27 @@ import           Universum
 
 import qualified Data.ByteString as BS
 import           Test.QuickCheck
-    (Testable (..), ioProperty)
+                       (Testable (..), ioProperty)
 import           Test.QuickCheck.Monadic
-    (PropertyM, monadic)
+                       (PropertyM, monadic)
 
 import           Pos.Client.Txp.Addresses
-    (MonadAddresses (..))
+                       (MonadAddresses (..))
 import           Pos.Configuration
-    (HasNodeConfiguration)
+                       (HasNodeConfiguration)
 import           Pos.Core
-    (Address, BlockVersionData, HasConfiguration, makePubKeyAddressBoot)
+                       (Address, BlockVersionData, HasConfiguration,
+                       makePubKeyAddressBoot)
 import           Pos.Core.Configuration
-    (HasGenesisBlockVersionData, genesisBlockVersionData)
+                       (HasGenesisBlockVersionData, genesisBlockVersionData)
 import           Pos.Crypto
-    (deterministicKeyGen)
+                       (deterministicKeyGen)
 import           Pos.DB
-    (MonadGState (..))
+                       (MonadGState (..))
 import           Pos.Ssc.Configuration
-    (HasSscConfiguration)
+                       (HasSscConfiguration)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 
 ----------------------------------------------------------------------------
 -- Configuration propagation

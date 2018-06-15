@@ -17,20 +17,21 @@ import           Universum
 
 import qualified Cardano.Crypto.Wallet as CC
 import           Control.Monad.Except
-    (MonadError, throwError)
+                       (MonadError, throwError)
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 
 import           Pos.Binary.Class
-    (Bi, Raw)
+                       (Bi, Raw)
 import qualified Pos.Binary.Class as Bi
 import           Pos.Crypto.Configuration
-    (ProtocolMagic)
+                       (ProtocolMagic)
 import           Pos.Crypto.Signing.Tag
-    (signTag)
+                       (signTag)
 import           Pos.Crypto.Signing.Types
-    (ProxyCert (..), ProxySecretKey (..), ProxySignature (..), PublicKey (..),
-    SignTag (..), Signature (..))
+                       (ProxyCert (..), ProxySecretKey (..),
+                       ProxySignature (..), PublicKey (..), SignTag (..),
+                       Signature (..))
 
 -- CHECK: @checkSig
 -- | Verify a signature.

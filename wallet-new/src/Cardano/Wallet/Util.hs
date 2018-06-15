@@ -16,11 +16,11 @@ module Cardano.Wallet.Util
 import           Universum
 
 import           Data.Char
-    (isUpper, toLower)
+                       (isUpper, toLower)
 import qualified Data.Text.Buildable
 import qualified Data.Time as Time
 import           Formatting
-    (bprint, build, formatToString, (%))
+                       (bprint, build, formatToString, (%))
 import qualified Prelude
 
 -- * String manipulation utils

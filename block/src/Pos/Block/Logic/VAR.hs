@@ -16,52 +16,58 @@ module Pos.Block.Logic.VAR
 import           Universum
 
 import           Control.Exception.Safe
-    (bracketOnError)
+                       (bracketOnError)
 import           Control.Lens
-    (_Wrapped)
+                       (_Wrapped)
 import           Control.Monad.Except
-    (ExceptT (ExceptT), MonadError (throwError), runExceptT, withExceptT)
+                       (ExceptT (ExceptT), MonadError (throwError), runExceptT,
+                       withExceptT)
 import qualified Data.List.NonEmpty as NE
 import           System.Wlog
-    (logDebug)
+                       (logDebug)
 
 import           Pos.Block.Error
-    (ApplyBlocksException (..), RollbackException (..),
-    VerifyBlocksException (..))
+                       (ApplyBlocksException (..), RollbackException (..),
+                       VerifyBlocksException (..))
 import           Pos.Block.Logic.Internal
-    (BypassSecurityCheck (..), MonadBlockApply, MonadBlockVerify,
-    MonadMempoolNormalization, applyBlocksUnsafe, normalizeMempool,
-    rollbackBlocksUnsafe, toSscBlock, toTxpBlock, toUpdateBlock)
+                       (BypassSecurityCheck (..), MonadBlockApply,
+                       MonadBlockVerify, MonadMempoolNormalization,
+                       applyBlocksUnsafe, normalizeMempool,
+                       rollbackBlocksUnsafe, toSscBlock, toTxpBlock,
+                       toUpdateBlock)
 import           Pos.Block.Lrc
-    (LrcModeFull, lrcSingleShot)
+                       (LrcModeFull, lrcSingleShot)
 import           Pos.Block.Slog
-    (ShouldCallBListener (..), mustDataBeKnown, slogVerifyBlocks)
+                       (ShouldCallBListener (..), mustDataBeKnown,
+                       slogVerifyBlocks)
 import           Pos.Block.Types
-    (Blund, Undo (..))
+                       (Blund, Undo (..))
 import           Pos.Core
-    (Block, HeaderHash, epochIndexL, headerHashG, prevBlockL)
+                       (Block, HeaderHash, epochIndexL, headerHashG,
+                       prevBlockL)
 import           Pos.Core.Chrono
-    (NE, NewestFirst (..), OldestFirst (..), toNewestFirst, toOldestFirst)
+                       (NE, NewestFirst (..), OldestFirst (..), toNewestFirst,
+                       toOldestFirst)
 import qualified Pos.DB.GState.Common as GS
-    (getTip)
+                       (getTip)
 import           Pos.Delegation.Logic
-    (dlgVerifyBlocks)
+                       (dlgVerifyBlocks)
 import           Pos.Infra.Reporting
-    (HasMisbehaviorMetrics)
+                       (HasMisbehaviorMetrics)
 import           Pos.Ssc.Logic
-    (sscVerifyBlocks)
+                       (sscVerifyBlocks)
 import           Pos.Txp.Settings
-    (TxpGlobalSettings (TxpGlobalSettings, tgsVerifyBlocks))
+                       (TxpGlobalSettings (TxpGlobalSettings, tgsVerifyBlocks))
 import qualified Pos.Update.DB as GS
-    (getAdoptedBV)
+                       (getAdoptedBV)
 import           Pos.Update.Logic
-    (usVerifyBlocks)
+                       (usVerifyBlocks)
 import           Pos.Update.Poll
-    (PollModifier)
+                       (PollModifier)
 import           Pos.Util
-    (neZipWith4, spanSafe, _neHead)
+                       (neZipWith4, spanSafe, _neHead)
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 -- -- CHECK: @verifyBlocksLogic
 -- -- #txVerifyBlocks

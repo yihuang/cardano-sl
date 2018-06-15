@@ -16,20 +16,21 @@ module Pos.Block.Slog.Types
 import           Universum
 
 import           Control.Lens
-    (makeClassy)
+                       (makeClassy)
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint)
+                       (bprint)
 import           System.Metrics.Label
-    (Label)
+                       (Label)
 
 import           Pos.Core
-    (ChainDifficulty, EpochIndex, FlatSlotId, HasProtocolConstants,
-    LocalSlotIndex, slotIdF, unflattenSlotId)
+                       (ChainDifficulty, EpochIndex, FlatSlotId,
+                       HasProtocolConstants, LocalSlotIndex, slotIdF,
+                       unflattenSlotId)
 import           Pos.Core.Chrono
-    (OldestFirst (..))
+                       (OldestFirst (..))
 import           Pos.Infra.Reporting.Metrics
-    (MetricMonitorState)
+                       (MetricMonitorState)
 
 -- | This type contains 'FlatSlotId's of the blocks whose depth is
 -- less than 'blkSecurityParam'. 'FlatSlotId' is chosen in favor of

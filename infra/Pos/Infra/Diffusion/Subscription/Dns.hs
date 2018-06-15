@@ -7,43 +7,44 @@ module Pos.Infra.Diffusion.Subscription.Dns
     ) where
 
 import           Universum hiding
-    (atomically)
+                       (atomically)
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Concurrent.Async
-    (forConcurrently_)
+                       (forConcurrently_)
 import           Control.Concurrent.STM
-    (atomically)
+                       (atomically)
 import           Control.Exception
-    (IOException, SomeException, toException)
+                       (IOException, SomeException, toException)
 import           Data.Either
-    (partitionEithers)
+                       (partitionEithers)
 import qualified Data.Map.Strict as Map
 import           Data.Time.Units
-    (Microsecond, Millisecond, convertUnit, fromMicroseconds, toMicroseconds)
+                       (Microsecond, Millisecond, convertUnit,
+                       fromMicroseconds, toMicroseconds)
 import           Formatting
-    (int, sformat, shown, (%))
+                       (int, sformat, shown, (%))
 import qualified Network.Broadcast.OutboundQueue as OQ
 import qualified Network.DNS as DNS
 
 import           Pos.Infra.Communication.Protocol
-    (SendActions)
+                       (SendActions)
 import           Pos.Infra.Diffusion.Subscription.Common
-    (SubscriptionMessageConstraints, networkSubscribeTo')
+                       (SubscriptionMessageConstraints, networkSubscribeTo')
 import           Pos.Infra.Diffusion.Subscription.Status
-    (SubscriptionStates)
+                       (SubscriptionStates)
 import           Pos.Infra.Diffusion.Subscription.Subscriber
-    (SubscribeTo, SubscriptionTarget (..), subscriber)
+                       (SubscribeTo, SubscriptionTarget (..), subscriber)
 import           Pos.Infra.Network.DnsDomains
-    (NodeAddr)
+                       (NodeAddr)
 import           Pos.Infra.Network.Types
-    (Bucket (..), DnsDomains (..), NodeId (..), NodeType (..),
-    resolveDnsDomains)
+                       (Bucket (..), DnsDomains (..), NodeId (..),
+                       NodeType (..), resolveDnsDomains)
 import           Pos.Util.Timer
-    (Timer, startTimer, waitTimer)
+                       (Timer, startTimer, waitTimer)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 
 -- | Resolve a fixed list of names to a NodeId (using a given port) repeatedly.
 -- If the resolution may give more than one address, the addresses are given

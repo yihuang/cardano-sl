@@ -10,38 +10,39 @@ module Lang.DisplayError
     ) where
 
 import           Universum hiding
-    (empty, (<$>))
+                       (empty, (<$>))
 
 import qualified Data.List.NonEmpty as NE
 import qualified Text.PrettyPrint.ANSI.Leijen
 
 import           Control.Lens
-    (matching)
+                       (matching)
 import           Data.Loc
-    (Span, loc, locColumn, locLine, spanEnd, spanFromTo, spanStart, toNat)
+                       (Span, loc, locColumn, locLine, spanEnd, spanFromTo,
+                       spanStart, toNat)
 import           Data.Loc.Span
-    (joinAsc)
+                       (joinAsc)
 import           Data.Text.Buildable
-    (build)
+                       (build)
 import           Data.Text.Lazy.Builder
-    (toLazyText)
+                       (toLazyText)
 import           Text.Earley
-    (Report (..))
+                       (Report (..))
 import           Text.PrettyPrint.ANSI.Leijen
-    (Doc, bold, char, comma, empty, hcat, indent, punctuate, red, squotes,
-    vcat, yellow, (<$>), (<+>))
+                       (Doc, bold, char, comma, empty, hcat, indent, punctuate,
+                       red, squotes, vcat, yellow, (<$>), (<+>))
 
 import           Lang.Argument
-    (ArgumentError (..), ProcError (..), TypeError (..), TypeName (..),
-    isEmptyArgumentError)
+                       (ArgumentError (..), ProcError (..), TypeError (..),
+                       TypeName (..), isEmptyArgumentError)
 import           Lang.Interpreter
-    (EvalError (..))
+                       (EvalError (..))
 import           Lang.Lexer
-    (_TokenUnknown)
+                       (_TokenUnknown)
 import           Lang.Name
-    (Name)
+                       (Name)
 import           Lang.Parser
-    (ParseError (..))
+                       (ParseError (..))
 
 {-# ANN module ("HLint: ignore Functor law" :: Text) #-}
 

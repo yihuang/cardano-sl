@@ -15,47 +15,46 @@ module Pos.Infra.DHT.Real.Real
 -- Universum uses those from Control.Exception.Safe, but in here we never
 -- squelch async exceptions so it's ok.
 import           Universum hiding
-    (catch, try)
+                       (catch, try)
 
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import           Control.Exception
-    (catch, throwIO, try)
+                       (catch, throwIO, try)
 import qualified Data.ByteString.Char8 as B8
-    (unpack)
+                       (unpack)
 import qualified Data.ByteString.Lazy as BS
 import           Data.List
-    (intersect, (\\))
+                       (intersect, (\\))
 import           Data.Time.Units
-    (Second, toMicroseconds)
+                       (Second, toMicroseconds)
 import           Formatting
-    (build, sformat, shown, (%))
+                       (build, sformat, shown, (%))
 import qualified Network.Kademlia as K
 import qualified Network.Kademlia.Instance as K
-    (KademliaInstance (state), KademliaState (sTree))
+                       (KademliaInstance (state), KademliaState (sTree))
 import qualified Network.Kademlia.Tree as K
-    (toView)
+                       (toView)
 import           Serokell.Util
-    (listJson)
+                       (listJson)
 import           System.Directory
-    (doesFileExist)
+                       (doesFileExist)
 
 import           Pos.Binary.Class
-    (decodeFull)
-import           Pos.Infra.Binary.DHTModel
-    ()
+                       (decodeFull)
+import           Pos.Infra.Binary.DHTModel ()
 import           Pos.Infra.DHT.Constants
-    (enhancedMessageBroadcast, enhancedMessageTimeout)
+                       (enhancedMessageBroadcast, enhancedMessageTimeout)
 import           Pos.Infra.DHT.Model.Types
-    (DHTException (..), DHTKey, DHTNode (..), randomDHTKey)
+                       (DHTException (..), DHTKey, DHTNode (..), randomDHTKey)
 import           Pos.Infra.DHT.Real.Param
-    (KademliaParams (..))
+                       (KademliaParams (..))
 import           Pos.Infra.DHT.Real.Types
-    (KademliaDHTInstance (..))
+                       (KademliaDHTInstance (..))
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress)
+                       (NetworkAddress)
 import           Pos.Util.Trace
-    (Severity (..), Trace, traceWith)
+                       (Severity (..), Trace, traceWith)
 
 kademliaConfig :: K.KademliaConfig
 kademliaConfig = K.defaultConfig { K.k = 16 }

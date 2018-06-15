@@ -21,28 +21,28 @@ import           Universum
 
 import qualified Data.ByteString as BS
 import           Data.Hashable
-    (Hashable (..))
+                       (Hashable (..))
 import           Data.Text.Buildable
-    (Buildable (..))
+                       (Buildable (..))
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import qualified Formatting as F
 import           Network.Kademlia
-    (fromBS)
+                       (fromBS)
 import           Network.Kademlia.HashNodeId
-    (HashId (..), genNonce, hashAddress)
+                       (HashId (..), genNonce, hashAddress)
 import qualified Prelude
 import qualified Serokell.Util.Base64 as B64
 import qualified Serokell.Util.Parse as P
 import           Serokell.Util.Text
-    (listBuilderJSON)
+                       (listBuilderJSON)
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Text as P
 
 import           Pos.Crypto.Random
-    (runSecureRandom)
+                       (runSecureRandom)
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress, addrParser)
+                       (NetworkAddress, addrParser)
 
 -- | Data type for DHT exceptions.
 data DHTException = NodeDown | AllPeersUnavailable

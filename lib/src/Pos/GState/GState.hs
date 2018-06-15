@@ -7,23 +7,23 @@ module Pos.GState.GState
 import           Universum
 
 import           Pos.Core
-    (GenesisData (..), HeaderHash, genesisData)
+                       (GenesisData (..), HeaderHash, genesisData)
 import           Pos.DB.Class
-    (MonadDB)
+                       (MonadDB)
 import           Pos.DB.GState.Common
-    (initGStateCommon, isInitialized, setInitialized)
+                       (initGStateCommon, isInitialized, setInitialized)
 import           Pos.Delegation.DB
-    (initGStateDlg)
+                       (initGStateDlg)
 import           Pos.GState.BlockExtra
-    (initGStateBlockExtra)
+                       (initGStateBlockExtra)
 import           Pos.Ssc.DB
-    (initSscDB)
+                       (initSscDB)
 import           Pos.Txp.DB
-    (initGStateStakes, initGStateUtxo)
+                       (initGStateStakes, initGStateUtxo)
 import           Pos.Txp.GenesisUtxo
-    (genesisUtxo)
+                       (genesisUtxo)
 import           Pos.Update.DB
-    (initGStateUS)
+                       (initGStateUS)
 
 -- | Put missing initial data into GState DB.
 prepareGStateDB ::

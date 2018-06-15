@@ -6,7 +6,7 @@ module Pos.DB.Error
 
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, int, stext, (%))
+                       (bprint, int, stext, (%))
 import           Universum
 
 data DBError =

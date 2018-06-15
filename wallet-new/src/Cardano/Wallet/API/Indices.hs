@@ -13,14 +13,14 @@ import           Universum
 
 import           Cardano.Wallet.API.V1.Types
 import           Data.String.Conv
-    (toS)
+                       (toS)
 import           GHC.TypeLits
 import qualified Pos.Core as Core
 import           Pos.Crypto
-    (decodeHash)
+                       (decodeHash)
 
 import           Data.IxSet.Typed
-    (Indexable (..), IsIndexOf, IxSet, ixFun, ixList)
+                       (Indexable (..), IsIndexOf, IxSet, ixFun, ixList)
 
 -- | 'ToIndex' represents the witness that we can build an index 'ix' for a resource 'a'
 -- from an input 'Text'.
@@ -36,9 +36,9 @@ instance ToIndex Wallet WalletId where
 
 instance ToIndex Wallet Core.Coin where
     toIndex _ x = case readMaybe (toS x) of
-        Nothing -> Nothing
+        Nothing                       -> Nothing
         Just c  | c > Core.maxCoinVal -> Nothing
-        Just c  -> Just (Core.mkCoin c)
+        Just c                        -> Just (Core.mkCoin c)
     accessIx Wallet{..} = let (V1 balance) = walBalance in balance
 
 instance ToIndex Wallet (V1 Core.Timestamp) where

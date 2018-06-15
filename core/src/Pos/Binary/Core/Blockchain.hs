@@ -7,24 +7,23 @@ module Pos.Binary.Core.Blockchain
        ) where
 
 import           Codec.CBOR.Decoding
-    (decodeWordCanonical)
+                       (decodeWordCanonical)
 import           Codec.CBOR.Encoding
-    (encodeWord)
+                       (encodeWord)
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..), decodeListLenCanonicalOf, encodeListLen, enforceSize)
-import           Pos.Binary.Core.Block
-    ()
-import           Pos.Binary.Core.Common
-    ()
+                       (Bi (..), decodeListLenCanonicalOf, encodeListLen,
+                       enforceSize)
+import           Pos.Binary.Core.Block ()
+import           Pos.Binary.Core.Common ()
 import qualified Pos.Core.Block.Blockchain as T
 import           Pos.Core.Block.Union.Types
-    (BlockHeader (..))
+                       (BlockHeader (..))
 import           Pos.Crypto.Configuration
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 import           Pos.Util.Util
-    (cborError)
+                       (cborError)
 
 instance ( Typeable b
          , Bi (T.BHeaderHash b)

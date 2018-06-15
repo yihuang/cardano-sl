@@ -14,9 +14,9 @@ module Pos.Util.Concurrent
 import           Universum
 
 import           Control.Exception.Safe
-    (onException)
+                       (onException)
 import           Control.Monad.STM
-    (retry)
+                       (retry)
 
 clearMVar :: MonadIO m => MVar a -> m ()
 clearMVar = void . tryTakeMVar

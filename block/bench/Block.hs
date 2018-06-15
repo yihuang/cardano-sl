@@ -4,40 +4,42 @@
 import           Universum
 
 import           Control.DeepSeq
-    (NFData (..), deepseq)
+                       (NFData (..), deepseq)
 import           Criterion
 import           Criterion.Main
 import           Data.ByteString
-    (ByteString)
+                       (ByteString)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
 import           Formatting
-    (build, sformat, shown)
+                       (build, sformat, shown)
 import           System.Environment
-    (lookupEnv)
+                       (lookupEnv)
 
 import           Pos.Arbitrary.Block.Generate
-    (generateMainBlock)
+                       (generateMainBlock)
 import           Pos.Binary.Class
-    (Bi, serialize, unsafeDeserialize)
+                       (Bi, serialize, unsafeDeserialize)
 import qualified Pos.Block.BHelpers as Verify
 import           Pos.Core
-    (Block, BlockHeader, BlockVersionData (..), Body, BodyProof,
-    CoinPortion (..), ConsensusData, DlgPayload, EpochIndex (..),
-    ExtraBodyData, ExtraHeaderData, MainBlock, MainBlockHeader, MainBlockchain,
-    SoftforkRule (..), SscPayload, Timestamp (..), TxFeePolicy (..),
-    TxPayload (..), UpdatePayload, unsafeCoinPortionFromDouble, _gbBody,
-    _gbExtra, _gbHeader, _gbhBodyProof, _gbhConsensus, _gbhExtra,
-    _mbDlgPayload, _mbSscPayload, _mbTxPayload, _mbUpdatePayload)
-import           Pos.Core.Block.Main
-    ()
+                       (Block, BlockHeader, BlockVersionData (..), Body,
+                       BodyProof, CoinPortion (..), ConsensusData, DlgPayload,
+                       EpochIndex (..), ExtraBodyData, ExtraHeaderData,
+                       MainBlock, MainBlockHeader, MainBlockchain,
+                       SoftforkRule (..), SscPayload, Timestamp (..),
+                       TxFeePolicy (..), TxPayload (..), UpdatePayload,
+                       unsafeCoinPortionFromDouble, _gbBody, _gbExtra,
+                       _gbHeader, _gbhBodyProof, _gbhConsensus, _gbhExtra,
+                       _mbDlgPayload, _mbSscPayload, _mbTxPayload,
+                       _mbUpdatePayload)
+import           Pos.Core.Block.Main ()
 import           Pos.Core.Common
-    (CoinPortion, SharedSeed (..))
+                       (CoinPortion, SharedSeed (..))
 import           Pos.Core.Genesis
 import           Pos.Core.ProtocolConstants
-    (ProtocolConstants (..))
+                       (ProtocolConstants (..))
 import           Pos.Crypto
-    (ProtocolMagic (..))
+                       (ProtocolMagic (..))
 
 -- We need 'ProtocolMagic' and 'ProtocolConstants' in order to generate a
 -- 'MainBlock'.

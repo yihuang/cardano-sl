@@ -9,6 +9,5 @@ module Pos.Binary.Ssc
 
 import           Pos.Binary.Ssc.Relay
 import           Pos.Binary.Ssc.Toss
-import           Pos.Binary.Ssc.Types
-    ()
+import           Pos.Binary.Ssc.Types ()
 

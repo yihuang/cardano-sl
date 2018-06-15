@@ -12,22 +12,22 @@ module Pos.DB.DB
 import           Universum
 
 import           Pos.Block.Base
-    (genesisBlock0)
+                       (genesisBlock0)
 import           Pos.Core
-    (BlockVersionData, GenesisHash (..), genesisHash, headerHash,
-    protocolMagic)
+                       (BlockVersionData, GenesisHash (..), genesisHash,
+                       headerHash, protocolMagic)
 import           Pos.DB.Block
-    (prepareBlockDB)
+                       (prepareBlockDB)
 import           Pos.DB.Class
-    (MonadDB, MonadDBRead (..))
+                       (MonadDB, MonadDBRead (..))
 import           Pos.GState.GState
-    (prepareGStateDB)
+                       (prepareGStateDB)
 import           Pos.Lrc.DB
-    (prepareLrcDB)
+                       (prepareLrcDB)
 import           Pos.Lrc.Genesis
-    (genesisLeaders)
+                       (genesisLeaders)
 import           Pos.Update.DB
-    (getAdoptedBVData)
+                       (getAdoptedBVData)
 
 -- | Initialize DBs if necessary.
 initNodeDBs

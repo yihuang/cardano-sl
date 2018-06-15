@@ -8,38 +8,37 @@ module Test.Pos.Txp.CoreSpec
 import           Universum
 
 import           Control.Lens
-    (each)
+                       (each)
 import qualified Data.HashMap.Strict as HM
 import           Data.List
-    (elemIndex, (\\))
+                       (elemIndex, (\\))
 import qualified Data.List.NonEmpty as NE
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (prop)
+                       (prop)
 import           Test.QuickCheck
-    (NonNegative (..), Positive (..), Property, arbitrary, forAll, resize,
-    shuffle, vectorOf, (.&.), (===))
+                       (NonNegative (..), Positive (..), Property, arbitrary,
+                       forAll, resize, shuffle, vectorOf, (.&.), (===))
 import           Test.QuickCheck.Gen
-    (Gen)
+                       (Gen)
 
 import           Pos.Core
-    (mkCoin)
+                       (mkCoin)
 import           Pos.Core.Txp
-    (Tx (..), TxIn (..), TxOut (..), checkTx)
+                       (Tx (..), TxIn (..), TxOut (..), checkTx)
 import           Pos.Crypto
-    (hash, whData, withHash)
+                       (hash, whData, withHash)
 import           Pos.Data.Attributes
-    (mkAttributes)
+                       (mkAttributes)
 import           Pos.Txp.Topsort
-    (topsortTxs)
+                       (topsortTxs)
 import           Pos.Util
-    (_neHead)
+                       (_neHead)
 
-import           Test.Pos.Txp.Arbitrary
-    ()
+import           Test.Pos.Txp.Arbitrary ()
 import           Test.Pos.Util.QuickCheck.Arbitrary
-    (sublistN)
+                       (sublistN)
 
 spec :: Spec
 spec = describe "Txp.Core" $ do

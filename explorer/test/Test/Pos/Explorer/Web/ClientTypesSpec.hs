@@ -10,26 +10,27 @@ module Test.Pos.Explorer.Web.ClientTypesSpec
 import           Universum
 
 import           Crypto.Hash
-    (Blake2b_224, Blake2b_256)
+                       (Blake2b_224, Blake2b_256)
 import           Prelude
-    (id)
+                       (id)
 
 import           Pos.Binary
-    (Bi)
+                       (Bi)
 import           Pos.Core
-    (Address)
+                       (Address)
 import           Pos.Crypto
 import           Pos.Explorer.Web.ClientTypes
-    (CAddress (..), decodeHashHex, encodeHashHex, fromCAddress, fromCHash,
-    fromCTxId, toCAddress, toCHash, toCTxId)
+                       (CAddress (..), decodeHashHex, encodeHashHex,
+                       fromCAddress, fromCHash, fromCTxId, toCAddress, toCHash,
+                       toCTxId)
 import           Pos.Txp
-    (Tx, TxId)
+                       (Tx, TxId)
 import           Test.Hspec
-    (Spec, describe, it, shouldBe, shouldSatisfy)
+                       (Spec, describe, it, shouldBe, shouldSatisfy)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Gen, Property, arbitrary, forAll, (===))
+                       (Gen, Property, arbitrary, forAll, (===))
 
 
 ----------------------------------------------------------------------------

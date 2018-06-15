@@ -11,19 +11,20 @@ module Bench.Cardano.Wallet.Config.Endpoints
 import           Universum
 
 import           Data.Csv
-    (FromRecord (..), HasHeader (..), decode, (.!))
+                       (FromRecord (..), HasHeader (..), decode, (.!))
 
 import           Control.Exception
-    (SomeException)
+                       (SomeException)
 import qualified Data.ByteString.Lazy as Lazy
 import           Data.List.NonEmpty
-    (fromList)
+                       (fromList)
 import           Data.Vector
-    (Vector)
+                       (Vector)
 import qualified Data.Vector as V
 
 import           Bench.Cardano.Wallet.Types
-    (BenchEndpoint (..), CompleteConfig (..), EndpointConfig (..))
+                       (BenchEndpoint (..), CompleteConfig (..),
+                       EndpointConfig (..))
 
 -- | Read Endpoints configuration from the local .csv-file. The format is:
 --

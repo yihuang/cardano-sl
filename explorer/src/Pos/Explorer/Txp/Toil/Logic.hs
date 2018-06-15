@@ -10,45 +10,50 @@ module Pos.Explorer.Txp.Toil.Logic
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Monad.Except
-    (mapExceptT)
+                       (mapExceptT)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Data.List
-    (delete)
+                       (delete)
 import qualified Data.List.NonEmpty as NE
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           System.Wlog
-    (logError)
+                       (logError)
 
 import           Pos.Core
-    (Address, BlockVersionData, Coin, EpochIndex, HasConfiguration, HeaderHash,
-    Timestamp, mkCoin, sumCoins, unsafeAddCoin, unsafeSubCoin)
+                       (Address, BlockVersionData, Coin, EpochIndex,
+                       HasConfiguration, HeaderHash, Timestamp, mkCoin,
+                       sumCoins, unsafeAddCoin, unsafeSubCoin)
 import           Pos.Core.Chrono
-    (NewestFirst (..))
+                       (NewestFirst (..))
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), TxId, TxOut (..), TxOutAux (..), TxUndo, _TxOut)
+                       (Tx (..), TxAux (..), TxId, TxOut (..), TxOutAux (..),
+                       TxUndo, _TxOut)
 import           Pos.Crypto
-    (WithHash (..), hash)
+                       (WithHash (..), hash)
 import           Pos.Explorer.Core
-    (AddrHistory, TxExtra (..))
+                       (AddrHistory, TxExtra (..))
 import           Pos.Explorer.Txp.Toil.Monad
-    (EGlobalToilM, ELocalToilM, ExplorerExtraM, delAddrBalance, delTxExtra,
-    explorerExtraMToEGlobalToilM, explorerExtraMToELocalToilM, getAddrBalance,
-    getAddrHistory, getTxExtra, getUtxoSum, putAddrBalance, putTxExtra,
-    putUtxoSum, updateAddrHistory)
+                       (EGlobalToilM, ELocalToilM, ExplorerExtraM,
+                       delAddrBalance, delTxExtra,
+                       explorerExtraMToEGlobalToilM,
+                       explorerExtraMToELocalToilM, getAddrBalance,
+                       getAddrHistory, getTxExtra, getUtxoSum, putAddrBalance,
+                       putTxExtra, putUtxoSum, updateAddrHistory)
 import           Pos.Txp.Configuration
-    (HasTxpConfiguration)
+                       (HasTxpConfiguration)
 import           Pos.Txp.Toil
-    (ToilVerFailure (..), extendGlobalToilM, extendLocalToilM)
+                       (ToilVerFailure (..), extendGlobalToilM,
+                       extendLocalToilM)
 import qualified Pos.Txp.Toil as Txp
 import           Pos.Txp.Topsort
-    (topsortTxs)
+                       (topsortTxs)
 import           Pos.Util.Util
-    (Sign (..))
+                       (Sign (..))
 
 ----------------------------------------------------------------------------
 -- Global

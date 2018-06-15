@@ -8,16 +8,16 @@ module Pos.Update.DB.Misc
 import           Universum
 
 import           Formatting
-    (sformat)
+                       (sformat)
 
 import           Pos.Binary.Class
-    (Raw)
+                       (Raw)
 import           Pos.Crypto
-    (Hash, hashHexF)
+                       (Hash, hashHexF)
 import           Pos.DB.Class
-    (MonadDB)
+                       (MonadDB)
 import           Pos.DB.Misc.Common
-    (miscGetBi, miscPutBi)
+                       (miscGetBi, miscPutBi)
 
 isUpdateInstalled :: MonadDB m => Hash Raw -> m Bool
 isUpdateInstalled h = isJust <$> miscGetBi @() (updateTrackKey h)

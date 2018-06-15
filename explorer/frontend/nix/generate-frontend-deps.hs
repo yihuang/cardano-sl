@@ -6,13 +6,13 @@
 
 import qualified Control.Foldl as Fold
 import           Data.Foldable
-    (find)
+                       (find)
 import qualified Data.Text as T
 import           System.IO
-    (IOMode (WriteMode), withFile)
+                       (IOMode (WriteMode), withFile)
 import           Turtle
 import           Universum hiding
-    (FilePath, die, fold, (<>))
+                       (FilePath, die, fold, (<>))
 
 main :: IO ()
 main = do

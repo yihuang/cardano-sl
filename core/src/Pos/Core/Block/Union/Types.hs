@@ -45,43 +45,41 @@ module Pos.Core.Block.Union.Types
        ) where
 
 import           Control.Lens
-    (Getter, LensLike', choosing, makePrisms, to)
+                       (Getter, LensLike', choosing, makePrisms, to)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (Format, bprint, build, (%))
+                       (Format, bprint, build, (%))
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi)
-import           Pos.Binary.Core.Delegation
-    ()
-import           Pos.Binary.Core.Ssc
-    ()
-import           Pos.Binary.Core.Txp
-    ()
-import           Pos.Binary.Core.Update
-    ()
+                       (Bi)
+import           Pos.Binary.Core.Delegation ()
+import           Pos.Binary.Core.Ssc ()
+import           Pos.Binary.Core.Txp ()
+import           Pos.Binary.Core.Update ()
 import           Pos.Core.Block.Blockchain
-    (Blockchain (..), GenericBlock (..), GenericBlockHeader (..), gbHeader,
-    gbhPrevBlock)
+                       (Blockchain (..), GenericBlock (..),
+                       GenericBlockHeader (..), gbHeader, gbhPrevBlock)
 import           Pos.Core.Block.Genesis.Types
 import           Pos.Core.Block.Main.Types
 import           Pos.Core.Common
-    (ChainDifficulty, HasDifficulty (..))
+                       (ChainDifficulty, HasDifficulty (..))
 import           Pos.Core.Delegation
-    (ProxySigHeavy, ProxySigLight)
+                       (ProxySigHeavy, ProxySigLight)
 import           Pos.Core.Slotting
-    (HasEpochIndex (..), HasEpochOrSlot (..), SlotId (..))
+                       (HasEpochIndex (..), HasEpochOrSlot (..), SlotId (..))
 import           Pos.Core.Ssc
-    (mkSscProof)
+                       (mkSscProof)
 import           Pos.Core.Txp
-    (mkTxProof)
+                       (mkTxProof)
 import           Pos.Core.Update
-    (HasBlockVersion (..), HasSoftwareVersion (..), mkUpdateProof)
+                       (HasBlockVersion (..), HasSoftwareVersion (..),
+                       mkUpdateProof)
 import           Pos.Crypto
-    (Hash, ProtocolMagic, PublicKey, Signature, hash, unsafeHash)
+                       (Hash, ProtocolMagic, PublicKey, Signature, hash,
+                       unsafeHash)
 import           Pos.Util.Some
-    (Some, applySome, liftLensSome)
+                       (Some, applySome, liftLensSome)
 
 ----------------------------------------------------------------------------
 -- GenesisBlockchain

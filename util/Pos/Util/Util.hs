@@ -79,48 +79,48 @@ import           Universum
 
 import qualified Codec.CBOR.Decoding as CBOR
 import           Control.Concurrent
-    (threadDelay)
+                       (threadDelay)
 import qualified Control.Exception.Safe as E
 import           Control.Lens
-    (Getting, Iso', coerced, foldMapOf, ( # ))
+                       (Getting, Iso', coerced, foldMapOf, ( # ))
 import           Control.Monad.Except
-    (MonadError, throwError)
+                       (MonadError, throwError)
 import           Control.Monad.Trans.Class
-    (MonadTrans)
+                       (MonadTrans)
 import           Data.Aeson
-    (FromJSON (..))
+                       (FromJSON (..))
 import qualified Data.Aeson as A
 import qualified Data.Aeson.Types as A
 import           Data.HashSet
-    (fromMap)
+                       (fromMap)
 import           Data.List
-    (span, zipWith3, zipWith4)
+                       (span, zipWith3, zipWith4)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map as M
 import           Data.Ratio
-    ((%))
+                       ((%))
 import qualified Data.Semigroup as Smg
 import qualified Data.Serialize as Cereal
 import           Data.Time.Clock
-    (NominalDiffTime, UTCTime, diffUTCTime, getCurrentTime)
+                       (NominalDiffTime, UTCTime, diffUTCTime, getCurrentTime)
 import           Data.Time.Clock.POSIX
-    (posixSecondsToUTCTime)
+                       (posixSecondsToUTCTime)
 import           Data.Time.Units
-    (Microsecond, fromMicroseconds, toMicroseconds)
+                       (Microsecond, fromMicroseconds, toMicroseconds)
 import qualified Ether
 import           Ether.Internal
-    (HasLens (..))
+                       (HasLens (..))
 import qualified Formatting as F
 import           GHC.TypeLits
-    (ErrorMessage (..))
+                       (ErrorMessage (..))
 import qualified Language.Haskell.TH as TH
 import qualified Prelude
 import           Serokell.Util
-    (listJson)
-import           Serokell.Util.Exceptions
-    ()
+                       (listJson)
+import           Serokell.Util.Exceptions ()
 import           System.Wlog
-    (LoggerName, WithLogger, logDebug, logError, logInfo, usingLoggerName)
+                       (LoggerName, WithLogger, logDebug, logError, logInfo,
+                       usingLoggerName)
 import qualified Text.Megaparsec as P
 
 ----------------------------------------------------------------------------

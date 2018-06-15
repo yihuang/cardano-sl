@@ -7,25 +7,22 @@ module Pos.Arbitrary.Update.Network
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Test.QuickCheck
-    (Arbitrary (..), listOf)
+                       (Arbitrary (..), listOf)
 
-import           Pos.Arbitrary.Core
-    ()
-import           Pos.Arbitrary.Update.Core
-    ()
-import           Pos.Binary.Update
-    ()
+import           Pos.Arbitrary.Core ()
+import           Pos.Arbitrary.Update.Core ()
+import           Pos.Binary.Update ()
 import           Pos.Core.Configuration
-    (HasProtocolMagic, protocolMagic)
+                       (HasProtocolMagic, protocolMagic)
 import           Pos.Core.Update
-    (UpdateProposal (..), UpdateVote (..), mkUpdateVote)
+                       (UpdateProposal (..), UpdateVote (..), mkUpdateVote)
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import           Pos.Infra.Communication.Relay
-    (DataMsg (..))
+                       (DataMsg (..))
 
 instance HasProtocolMagic => Arbitrary (DataMsg UpdateVote) where
     arbitrary = DataMsg <$> arbitrary

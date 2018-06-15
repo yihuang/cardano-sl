@@ -25,21 +25,21 @@ module Cardano.Wallet.Kernel.DB.Spec (
   ) where
 
 import           Universum hiding
-    (elems)
+                       (elems)
 
 import           Control.Lens
-    (to)
+                       (to)
 import           Control.Lens.TH
-    (makeLenses)
+                       (makeLenses)
 import qualified Data.Map.Strict as M
 import           Data.SafeCopy
-    (base, deriveSafeCopy)
+                       (base, deriveSafeCopy)
 import           Data.Text.Buildable
-    (build)
+                       (build)
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Serokell.Util.Text
-    (listJsonIndent)
+                       (listJsonIndent)
 
 import qualified Pos.Core as Core
 import qualified Pos.Txp as Core

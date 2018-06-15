@@ -8,7 +8,7 @@ module Pos.Infra.Shutdown.Types
 import           Universum
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 
 data ShutdownContext = ShutdownContext
     { _shdnIsTriggered :: !(TVar Bool)

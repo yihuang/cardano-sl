@@ -14,26 +14,27 @@ module Pos.Explorer.Web.Api
 import           Universum
 
 import           Control.Exception.Safe
-    (try)
+                       (try)
 import           Data.Proxy
-    (Proxy (Proxy))
+                       (Proxy (Proxy))
 import           Servant.API
-    ((:>), Capture, Get, JSON, QueryParam, Summary)
+                       ((:>), Capture, Get, JSON, QueryParam, Summary)
 import           Servant.Generic
-    ((:-), AsApi, ToServant)
+                       ((:-), AsApi, ToServant)
 import           Servant.Server
-    (ServantErr (..))
+                       (ServantErr (..))
 
 import           Pos.Core
-    (EpochIndex)
+                       (EpochIndex)
 import           Pos.Explorer.Web.ClientTypes
-    (Byte, CAda, CAddress, CAddressSummary, CAddressesFilter, CBlockEntry,
-    CBlockSummary, CGenesisAddressInfo, CGenesisSummary, CHash, CTxBrief,
-    CTxEntry, CTxId, CTxSummary)
+                       (Byte, CAda, CAddress, CAddressSummary,
+                       CAddressesFilter, CBlockEntry, CBlockSummary,
+                       CGenesisAddressInfo, CGenesisSummary, CHash, CTxBrief,
+                       CTxEntry, CTxId, CTxSummary)
 import           Pos.Explorer.Web.Error
-    (ExplorerError)
+                       (ExplorerError)
 import           Pos.Util.Servant
-    (DQueryParam, ModifiesApiRes (..), VerbMod)
+                       (DQueryParam, ModifiesApiRes (..), VerbMod)
 
 type PageNumber = Integer
 

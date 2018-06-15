@@ -7,31 +7,32 @@ module Pos.Ssc.Seed
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 
 import           Pos.Binary.Class
-    (AsBinary, fromBinary)
+                       (AsBinary, fromBinary)
 import           Pos.Core
-    (SharedSeed, StakeholderId, addressHash, mkCoin, sumCoins,
-    unsafeIntegerToCoin)
+                       (SharedSeed, StakeholderId, addressHash, mkCoin,
+                       sumCoins, unsafeIntegerToCoin)
 import           Pos.Core.Ssc
-    (Commitment (..), CommitmentsMap (..), Opening (..), OpeningsMap,
-    SharesMap, SignedCommitment, getCommShares)
+                       (Commitment (..), CommitmentsMap (..), Opening (..),
+                       OpeningsMap, SharesMap, SignedCommitment, getCommShares)
 import           Pos.Crypto
-    (DecShare, Secret, VssPublicKey, recoverSecret, verifySecret)
+                       (DecShare, Secret, VssPublicKey, recoverSecret,
+                       verifySecret)
 import           Pos.Lrc.Types
-    (RichmenStakes)
+                       (RichmenStakes)
 import           Pos.Ssc.Base
-    (secretToSharedSeed, verifyOpening, vssThreshold)
+                       (secretToSharedSeed, verifyOpening, vssThreshold)
 import           Pos.Ssc.Error.Seed
-    (SscSeedError (..))
+                       (SscSeedError (..))
 import           Pos.Util.Util
-    (getKeys)
+                       (getKeys)
 
 -- | Calculate SharedSeed. SharedSeed is a random bytestring that all
 -- nodes generate together and agree on.

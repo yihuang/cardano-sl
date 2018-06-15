@@ -12,14 +12,14 @@ module Lang.Syntax
 import           Universum
 
 import           Data.Scientific
-    (Scientific)
+                       (Scientific)
 
 import           Lang.Name
-    (Name)
+                       (Name)
 import           Pos.Core
-    (Address, BlockVersion, SoftwareVersion, StakeholderId)
+                       (Address, BlockVersion, SoftwareVersion, StakeholderId)
 import           Pos.Crypto
-    (AHash, PublicKey)
+                       (AHash, PublicKey)
 
 data Expr cmd
     = ExprUnit

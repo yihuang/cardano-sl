@@ -31,24 +31,24 @@ module Pos.Script.Examples
 
 import qualified Data.ByteString as BS
 import           Formatting
-    (build, sformat, (%))
+                       (build, sformat, (%))
 import           NeatInterpolation
-    (text)
+                       (text)
 import           Serokell.Util.Base16
-    (base16F)
+                       (base16F)
 import           Universum
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (StakeholderId, TxSigData)
+                       (StakeholderId, TxSigData)
 import           Pos.Crypto
-    (SafeSigner, SignTag (SignTx), deterministicKeyGen, fullPublicKeyHexF,
-    fullSignatureHexF, hashHexF, safeSign, safeToPublic, signRaw, signTag)
+                       (SafeSigner, SignTag (SignTx), deterministicKeyGen,
+                       fullPublicKeyHexF, fullSignatureHexF, hashHexF,
+                       safeSign, safeToPublic, signRaw, signTag)
 import           Pos.Crypto.Configuration
-    (HasProtocolMagic, protocolMagic)
+                       (HasProtocolMagic, protocolMagic)
 import           Pos.Script
-    (Script, parseRedeemer, parseValidator)
+                       (Script, parseRedeemer, parseValidator)
 
 fromE :: Either String Script -> Script
 fromE = either (error . toText) identity

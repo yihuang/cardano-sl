@@ -16,13 +16,13 @@ module Cardano.Wallet.API
        ) where
 
 import           Cardano.Wallet.API.Types
-    (WalletLoggingConfig)
+                       (WalletLoggingConfig)
 import           Pos.Util.Servant
-    (LoggingApi)
+                       (LoggingApi)
 import           Servant
-    ((:<|>), (:>), Proxy (..))
+                       ((:<|>), (:>), Proxy (..))
 import           Servant.Swagger.UI
-    (SwaggerSchemaUI)
+                       (SwaggerSchemaUI)
 
 import qualified Cardano.Wallet.API.Development as Dev
 import qualified Cardano.Wallet.API.V0 as V0

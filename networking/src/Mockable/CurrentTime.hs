@@ -18,12 +18,12 @@ module Mockable.CurrentTime
 import           Universum
 
 import           Data.Time.Clock.POSIX
-    (getPOSIXTime)
+                       (getPOSIXTime)
 import           Data.Time.Units
-    (Microsecond, TimeUnit, convertUnit)
+                       (Microsecond, TimeUnit, convertUnit)
 
 import           Mockable.Class
-    (MFunctor' (..), Mockable (..))
+                       (MFunctor' (..), Mockable (..))
 
 data CurrentTime (m :: * -> *) (t :: *) where
     CurrentTime :: CurrentTime m Microsecond

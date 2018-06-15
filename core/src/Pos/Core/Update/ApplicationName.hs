@@ -7,9 +7,9 @@ module Pos.Core.Update.ApplicationName
 import           Universum
 
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import           Data.Char
-    (isAscii)
+                       (isAscii)
 import qualified Data.Text as T
 
 newtype ApplicationName = ApplicationName

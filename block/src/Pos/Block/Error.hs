@@ -9,18 +9,18 @@ module Pos.Block.Error
 import           Universum
 
 import           Control.Exception.Safe
-    (Exception (..))
+                       (Exception (..))
 import           Data.Text.Buildable
-    (Buildable (..))
+                       (Buildable (..))
 import           Data.Text.Lazy.Builder
-    (Builder, fromText)
+                       (Builder, fromText)
 import           Formatting
-    (bprint, stext, (%))
+                       (bprint, stext, (%))
 
 import           Pos.Core
-    (HeaderHash)
+                       (HeaderHash)
 import           Pos.Crypto
-    (shortHashF)
+                       (shortHashF)
 
 
 -- | This function can be used to create a message when tip mismatch

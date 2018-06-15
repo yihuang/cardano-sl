@@ -37,61 +37,61 @@ module Pos.Util.UserSecret
        ) where
 
 import           Universum hiding
-    (keys)
+                       (keys)
 
 import           Control.Exception.Safe
-    (onException, throwString)
+                       (onException, throwString)
 import           Control.Lens
-    (makeLenses, to)
+                       (makeLenses, to)
 import qualified Data.ByteString as BS
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import qualified Data.Text.Buildable
 import           Formatting
-    (Format, bprint, build, formatToString, later, (%))
+                       (Format, bprint, build, formatToString, later, (%))
 import qualified Prelude
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 import           System.Directory
-    (doesFileExist)
+                       (doesFileExist)
 import           System.Directory
-    (renameFile)
+                       (renameFile)
 import           System.FileLock
-    (FileLock, SharedExclusive (..), lockFile, unlockFile, withFileLock)
+                       (FileLock, SharedExclusive (..), lockFile, unlockFile,
+                       withFileLock)
 import           System.FilePath
-    (takeDirectory, takeFileName)
+                       (takeDirectory, takeFileName)
 import           System.IO
-    (hClose, openBinaryTempFile)
+                       (hClose, openBinaryTempFile)
 #ifdef POSIX
 import           System.Wlog
-    (WithLogger, logInfo, logWarning)
+                       (WithLogger, logInfo, logWarning)
 #else
 import           System.Wlog
-    (WithLogger, logInfo)
+                       (WithLogger, logInfo)
 #endif
 import           Test.QuickCheck
-    (Arbitrary (..))
+                       (Arbitrary (..))
 import           Test.QuickCheck.Arbitrary.Generic
-    (genericArbitrary, genericShrink)
+                       (genericArbitrary, genericShrink)
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), decodeFull', deriveSimpleBi,
-    encodeListLen, enforceSize, serialize')
+                       (Bi (..), Cons (..), Field (..), decodeFull',
+                       deriveSimpleBi, encodeListLen, enforceSize, serialize')
 import           Pos.Core
-    (Address, accountGenesisIndex, addressF, makeRootPubKeyAddress,
-    wAddressGenesisIndex)
+                       (Address, accountGenesisIndex, addressF,
+                       makeRootPubKeyAddress, wAddressGenesisIndex)
 import           Pos.Crypto
-    (EncryptedSecretKey, SecretKey, VssKeyPair, encToPublic)
+                       (EncryptedSecretKey, SecretKey, VssKeyPair, encToPublic)
 
-import           Test.Pos.Crypto.Arbitrary
-    ()
+import           Test.Pos.Crypto.Arbitrary ()
 
 #ifdef POSIX
 import           Formatting
-    (oct, sformat)
+                       (oct, sformat)
 import qualified System.Posix.Files as PSX
 import qualified System.Posix.Types as PSX
-    (FileMode)
+                       (FileMode)
 #endif
 
 -- Because of the Formatting import

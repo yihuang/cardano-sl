@@ -7,19 +7,19 @@ module Client.Cardano.Wallet.Web.Endpoint.GetWallet
 import           Universum
 
 import           Bench.Cardano.Wallet.Random
-    (pickRandomElementFrom)
+                       (pickRandomElementFrom)
 import           Bench.Cardano.Wallet.Types
-    (BenchEndpoint (..), CompleteConfig (..), Response, ResponseReport (..),
-    Wallet (..), WalletsConfig (..))
+                       (BenchEndpoint (..), CompleteConfig (..), Response,
+                       ResponseReport (..), Wallet (..), WalletsConfig (..))
 import           Client.Cardano.Wallet.Web.Analyze
-    (analyzeResponseIfNeeded, checkResponse)
+                       (analyzeResponseIfNeeded, checkResponse)
 import           Client.Cardano.Wallet.Web.Api
-    (getWallet)
+                       (getWallet)
 import           Client.Cardano.Wallet.Web.Run
-    (runEndpointClient)
+                       (runEndpointClient)
 
 import           Pos.Wallet.Web.ClientTypes
-    (CHash (..), CId (..), CWallet (..), Wal)
+                       (CHash (..), CId (..), CWallet (..), Wal)
 
 -- | Run 'GetWallet' client. As a result we will get a particular wallet.
 getWalletIO :: CompleteConfig -> IO ()

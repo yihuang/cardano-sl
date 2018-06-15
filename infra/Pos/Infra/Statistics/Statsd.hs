@@ -7,9 +7,9 @@ module Pos.Infra.Statistics.Statsd
 
 import qualified Options.Applicative as Opt
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress, addrParserNoWildcard)
+                       (NetworkAddress, addrParserNoWildcard)
 import           Pos.Util.OptParse
-    (fromParsec)
+                       (fromParsec)
 import           Universum
 
 data StatsdParams = StatsdParams

@@ -1,7 +1,7 @@
 import           Spec
-    (spec)
+                       (spec)
 import           Test.Hspec
-    (hspec)
+                       (hspec)
 import           Universum
 
 main :: IO ()

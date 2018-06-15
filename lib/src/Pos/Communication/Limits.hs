@@ -60,44 +60,49 @@ import           Universum
 
 import qualified Cardano.Crypto.Wallet as CC
 import           Crypto.Hash.IO
-    (HashAlgorithm, hashDigestSize)
+                       (HashAlgorithm, hashDigestSize)
 import qualified Crypto.SCRAPE as Scrape
 import           Data.Coerce
-    (coerce)
+                       (coerce)
 import           Serokell.Data.Memory.Units
-    (Byte)
+                       (Byte)
 
 import           Pos.Binary.Class
-    (AsBinary (..))
+                       (AsBinary (..))
 import           Pos.Binary.Limit
-    (Limit (..), mlBool, mlEither, mlMaybe, mlTriple, mlTuple, vectorOf,
-    vectorOfNE, (<+>))
+                       (Limit (..), mlBool, mlEither, mlMaybe, mlTriple,
+                       mlTuple, vectorOf, vectorOfNE, (<+>))
 import           Pos.Block.Network
-    (MsgBlock (..), MsgGetBlocks (..), MsgGetHeaders (..), MsgHeaders (..))
+                       (MsgBlock (..), MsgGetBlocks (..), MsgGetHeaders (..),
+                       MsgHeaders (..))
 import           Pos.Core
-    (BlockCount, BlockVersionData (..), EpochIndex, StakeholderId, UpId,
-    VssCertificate, coinPortionToDouble)
+                       (BlockCount, BlockVersionData (..), EpochIndex,
+                       StakeholderId, UpId, VssCertificate,
+                       coinPortionToDouble)
 import           Pos.Core.Block
-    (Block, BlockHeader (..), GenesisBlock, GenesisBlockHeader, MainBlock,
-    MainBlockHeader)
+                       (Block, BlockHeader (..), GenesisBlock,
+                       GenesisBlockHeader, MainBlock, MainBlockHeader)
 import           Pos.Core.Delegation
-    (HeavyDlgIndex (..), LightDlgIndices (..))
+                       (HeavyDlgIndex (..), LightDlgIndices (..))
 import           Pos.Core.Ssc
-    (Commitment (..), InnerSharesMap, Opening (..), SignedCommitment)
+                       (Commitment (..), InnerSharesMap, Opening (..),
+                       SignedCommitment)
 import           Pos.Core.Txp
-    (TxAux)
+                       (TxAux)
 import           Pos.Core.Update
-    (UpdateProposal (..), UpdateVote (..))
+                       (UpdateProposal (..), UpdateVote (..))
 import           Pos.Crypto
-    (AbstractHash, DecShare, EncShare, ProxyCert (..), ProxySecretKey (..),
-    PublicKey, Secret, SecretProof (..), Signature (..), VssPublicKey)
+                       (AbstractHash, DecShare, EncShare, ProxyCert (..),
+                       ProxySecretKey (..), PublicKey, Secret,
+                       SecretProof (..), Signature (..), VssPublicKey)
 import           Pos.Ssc.Message
-    (MCCommitment (..), MCOpening (..), MCShares (..), MCVssCertificate (..))
+                       (MCCommitment (..), MCOpening (..), MCShares (..),
+                       MCVssCertificate (..))
 import           Pos.Txp.Network.Types
-    (TxMsgContents (..))
+                       (TxMsgContents (..))
 
 import           Pos.Core.Chrono
-    (NewestFirst (..))
+                       (NewestFirst (..))
 
 ----------------------------------------------------------------------------
 -- Instances (MessageLimited[Pure])

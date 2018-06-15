@@ -35,13 +35,13 @@ module Repl
 import           Universum
 
 import           Control.Concurrent.Async
-    (race_)
+                       (race_)
 import           Control.Exception.Safe
-    (displayException, handleAsync)
+                       (displayException, handleAsync)
 import           Data.Text
-    (strip)
+                       (strip)
 import           System.Console.Haskeline
-    (InputT)
+                       (InputT)
 import qualified System.Console.Haskeline as Haskeline
 
 -- | An action used to print messages to the terminal. We can't hardcode

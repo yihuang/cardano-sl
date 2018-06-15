@@ -11,18 +11,18 @@ module Pos.Infra.DHT.Real.Types
 import           Universum
 
 import           Control.Concurrent.STM
-    (TVar)
+                       (TVar)
 
 import qualified Network.Kademlia as K
 
 import           Data.Bifunctor
-    (bimap)
+                       (bimap)
 import           Pos.Binary.Class
-    (Bi (..), deserializeOrFail', serialize')
+                       (Bi (..), deserializeOrFail', serialize')
 import           Pos.Infra.DHT.Model.Types
-    (DHTData, DHTKey)
+                       (DHTData, DHTKey)
 import           Pos.Infra.Util.TimeWarp
-    (NetworkAddress)
+                       (NetworkAddress)
 
 
 instance Bi DHTData => K.Serialize DHTData where

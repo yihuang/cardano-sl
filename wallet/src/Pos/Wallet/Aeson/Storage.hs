@@ -10,30 +10,29 @@ module Pos.Wallet.Aeson.Storage
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), FromJSONKey (..), FromJSONKeyFunction (..), ToJSON (..),
-    ToJSONKey (..))
+                       (FromJSON (..), FromJSONKey (..),
+                       FromJSONKeyFunction (..), ToJSON (..), ToJSONKey (..))
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON)
+                       (defaultOptions, deriveJSON)
 import           Data.Aeson.Types
-    (toJSONKeyText)
+                       (toJSONKeyText)
 import qualified Data.Text as T
 
-import           Pos.Aeson.Txp
-    ()
+import           Pos.Aeson.Txp ()
 import           Pos.Client.Txp.History
-    (TxHistoryEntry)
+                       (TxHistoryEntry)
 import           Pos.Util.Util
-    (toAesonError)
+                       (toAesonError)
 
-import           Pos.Wallet.Aeson.ClientTypes
-    ()
+import           Pos.Wallet.Aeson.ClientTypes ()
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId (..), CHash (..), CId (..), CTxId (..))
+                       (AccountId (..), CHash (..), CId (..), CTxId (..))
 import           Pos.Wallet.Web.Pending.Types
-    (PendingTx, PtxCondition, PtxSubmitTiming)
+                       (PendingTx, PtxCondition, PtxSubmitTiming)
 import           Pos.Wallet.Web.State.Storage
-    (AccountInfo, AddressInfo, RestorationBlockDepth, SyncStatistics,
-    SyncThroughput, WAddressMeta, WalletInfo, WalletStorage, WalletSyncState)
+                       (AccountInfo, AddressInfo, RestorationBlockDepth,
+                       SyncStatistics, SyncThroughput, WAddressMeta,
+                       WalletInfo, WalletStorage, WalletSyncState)
 
 instance FromJSON (CId a) => FromJSONKey (CId a) where
     fromJSONKey = FromJSONKeyTextParser parser

@@ -9,46 +9,47 @@ module Pos.Aeson.Core
 import           Universum
 
 import           Data.Aeson
-    (FromJSON (..), FromJSONKey (..), FromJSONKeyFunction (..),
-    ToJSON (toJSON), ToJSONKey (..), object, withObject, (.:), (.=))
+                       (FromJSON (..), FromJSONKey (..),
+                       FromJSONKeyFunction (..), ToJSON (toJSON),
+                       ToJSONKey (..), object, withObject, (.:), (.=))
 import           Data.Aeson.TH
-    (defaultOptions, deriveJSON, deriveToJSON)
+                       (defaultOptions, deriveJSON, deriveToJSON)
 import           Data.Aeson.Types
-    (toJSONKeyText)
+                       (toJSONKeyText)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
 import           Data.Time.Units
-    (Microsecond, Millisecond, Second)
+                       (Microsecond, Millisecond, Second)
 import           Formatting
-    (sformat)
+                       (sformat)
 import qualified Serokell.Aeson.Options as S
-    (defaultOptions)
+                       (defaultOptions)
 import           Serokell.Util.Base64
-    (JsonByteString (..))
+                       (JsonByteString (..))
 
-import           Pos.Aeson.Fee
-    ()
+import           Pos.Aeson.Fee ()
 import           Pos.Binary.Class
-    (AsBinary (..))
-import           Pos.Binary.Core
-    ()
+                       (AsBinary (..))
+import           Pos.Binary.Core ()
 import           Pos.Core.Common
-    (Address, BlockCount (..), ChainDifficulty, Coin, CoinPortion, Script (..),
-    SharedSeed (..), addressF, coinPortionToDouble, decodeTextAddress, mkCoin,
-    unsafeCoinPortionFromDouble, unsafeGetCoin)
+                       (Address, BlockCount (..), ChainDifficulty, Coin,
+                       CoinPortion, Script (..), SharedSeed (..), addressF,
+                       coinPortionToDouble, decodeTextAddress, mkCoin,
+                       unsafeCoinPortionFromDouble, unsafeGetCoin)
 import           Pos.Core.Delegation
-    (HeavyDlgIndex (..))
+                       (HeavyDlgIndex (..))
 import           Pos.Core.Slotting
-    (EpochIndex (..), LocalSlotIndex, SlotCount (..), SlotId, Timestamp (..))
+                       (EpochIndex (..), LocalSlotIndex, SlotCount (..),
+                       SlotId, Timestamp (..))
 import           Pos.Core.Ssc
-    (VssCertificate)
+                       (VssCertificate)
 import           Pos.Core.Update
-    (ApplicationName (..), BlockVersion, BlockVersionData, SoftforkRule,
-    SoftwareVersion (..))
+                       (ApplicationName (..), BlockVersion, BlockVersionData,
+                       SoftforkRule, SoftwareVersion (..))
 import           Pos.Data.Attributes
-    (Attributes, UnparsedFields (..))
+                       (Attributes, UnparsedFields (..))
 import           Pos.Util.Util
-    (toAesonError)
+                       (toAesonError)
 
 instance ToJSON SharedSeed where
     toJSON = toJSON . JsonByteString . getSharedSeed

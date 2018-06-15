@@ -12,38 +12,38 @@ module Pos.Update.Poll.Trans
        ) where
 
 import           Universum hiding
-    (id)
+                       (id)
 
 import           Control.Lens
-    (uses, (%=), (.=))
+                       (uses, (%=), (.=))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import qualified Ether
 import           System.Wlog
-    (logWarning)
+                       (logWarning)
 
-import           Pos.Binary.Update
-    ()
+import           Pos.Binary.Update ()
 import           Pos.Core
-    (SoftwareVersion (..), addressHash)
+                       (SoftwareVersion (..), addressHash)
 import           Pos.Core.Update
-    (UpdateProposal (..))
+                       (UpdateProposal (..))
 import           Pos.Crypto
-    (hash)
+                       (hash)
 import           Pos.Update.BlockVersion
-    (applyBVM)
+                       (applyBVM)
 import           Pos.Update.Poll.Class
-    (MonadPoll (..), MonadPollRead (..))
+                       (MonadPoll (..), MonadPollRead (..))
 import           Pos.Update.Poll.Modifier
-    (PollModifier (..), pmActivePropsL, pmAdoptedBVFullL, pmBVsL, pmConfirmedL,
-    pmConfirmedPropsL, pmEpochProposersL, pmSlottingDataL)
+                       (PollModifier (..), pmActivePropsL, pmAdoptedBVFullL,
+                       pmBVsL, pmConfirmedL, pmConfirmedPropsL,
+                       pmEpochProposersL, pmSlottingDataL)
 import           Pos.Update.Poll.Types
-    (BlockVersionState (..), DecidedProposalState (..), ProposalState (..),
-    UndecidedProposalState (..), bvsIsConfirmed, cpsSoftwareVersion,
-    psProposal)
+                       (BlockVersionState (..), DecidedProposalState (..),
+                       ProposalState (..), UndecidedProposalState (..),
+                       bvsIsConfirmed, cpsSoftwareVersion, psProposal)
 import qualified Pos.Util.Modifier as MM
 import           Pos.Util.Util
-    (ether)
+                       (ether)
 
 ----------------------------------------------------------------------------
 -- Tranformer

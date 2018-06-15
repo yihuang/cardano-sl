@@ -16,16 +16,16 @@ import           Universum
 
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, (%))
+                       (bprint, (%))
 import           Serokell.Util.Text
-    (listJson)
+                       (listJson)
 
 import           Pos.Core
-    (ComponentBlock (..), ProxySKHeavy, StakeholderId)
+                       (ComponentBlock (..), ProxySKHeavy, StakeholderId)
 import           Pos.Core.Delegation
-    (DlgPayload (..), checkDlgPayload)
+                       (DlgPayload (..), checkDlgPayload)
 import           Pos.Crypto
-    (ProxySecretKey, PublicKey, isSelfSignedPsk)
+                       (ProxySecretKey, PublicKey, isSelfSignedPsk)
 
 -- | Undo for the delegation component.
 data DlgUndo = DlgUndo

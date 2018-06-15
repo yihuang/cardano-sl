@@ -17,13 +17,13 @@ module Wallet.Basic (
   ) where
 
 import           Universum hiding
-    (State)
+                       (State)
 
 import           Control.Lens.TH
 import qualified Data.Map as Map
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, (%))
+                       (bprint, build, (%))
 
 import           UTxO.DSL
 import           Wallet.Abstract

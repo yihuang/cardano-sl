@@ -9,7 +9,7 @@ module Pos.Binary.Core.Slotting
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..), Cons (..), Field (..), deriveSimpleBi)
+                       (Bi (..), Cons (..), Field (..), deriveSimpleBi)
 import qualified Pos.Core.Slotting as T
 
 instance Bi T.Timestamp where

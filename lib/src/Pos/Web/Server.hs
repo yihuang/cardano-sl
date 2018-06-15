@@ -19,74 +19,77 @@ import           Universum
 import qualified Control.Concurrent.Async as Async
 import qualified Control.Exception.Safe as E
 import           Control.Monad.Except
-    (MonadError (throwError))
+                       (MonadError (throwError))
 import qualified Control.Monad.Reader as Mtl
 import           Data.Aeson.TH
-    (defaultOptions, deriveToJSON)
+                       (defaultOptions, deriveToJSON)
 import qualified Data.ByteString.Char8 as BSC
 import           Data.Default
-    (Default, def)
+                       (Default, def)
 import           Data.Streaming.Network
-    (bindPortTCP, bindRandomPortTCP)
+                       (bindPortTCP, bindRandomPortTCP)
 import           Data.X509
-    (ExtKeyUsagePurpose (..), HashALG (..))
+                       (ExtKeyUsagePurpose (..), HashALG (..))
 import           Data.X509.CertificateStore
-    (readCertificateStore)
+                       (readCertificateStore)
 import           Data.X509.Validation
-    (ValidationChecks (..), ValidationHooks (..))
+                       (ValidationChecks (..), ValidationHooks (..))
 import qualified Data.X509.Validation as X509
 import           Mockable
-    (Production (runProduction))
+                       (Production (runProduction))
 import           Network.TLS
-    (CertificateRejectReason (..), CertificateUsage (..), ServerHooks (..))
+                       (CertificateRejectReason (..), CertificateUsage (..),
+                       ServerHooks (..))
 import           Network.Wai
-    (Application)
+                       (Application)
 import           Network.Wai.Handler.Warp
-    (Settings, defaultSettings, getHost, runSettingsSocket, setHost, setPort)
+                       (Settings, defaultSettings, getHost, runSettingsSocket,
+                       setHost, setPort)
 import           Network.Wai.Handler.WarpTLS
-    (TLSSettings (..), runTLSSocket, tlsSettingsChain)
+                       (TLSSettings (..), runTLSSocket, tlsSettingsChain)
 import           Servant.API
-    ((:<|>) ((:<|>)), FromHttpApiData)
+                       ((:<|>) ((:<|>)), FromHttpApiData)
 import           Servant.Server
-    (Handler, HasServer, ServantErr (errBody), Server, ServerT, err404, err503,
-    hoistServer, serve)
+                       (Handler, HasServer, ServantErr (errBody), Server,
+                       ServerT, err404, err503, hoistServer, serve)
 import           UnliftIO
-    (MonadUnliftIO)
+                       (MonadUnliftIO)
 
 import           Network.Socket
-    (Socket, close)
-import           Pos.Aeson.Txp
-    ()
+                       (Socket, close)
+import           Pos.Aeson.Txp ()
 import           Pos.Context
-    (HasNodeContext (..), HasSscContext (..), NodeContext, getOurPublicKey)
+                       (HasNodeContext (..), HasSscContext (..), NodeContext,
+                       getOurPublicKey)
 import           Pos.Core
-    (EpochIndex (..), SlotLeaders)
+                       (EpochIndex (..), SlotLeaders)
 import           Pos.Core.Configuration
-    (HasConfiguration)
+                       (HasConfiguration)
 import           Pos.DB
-    (MonadDBRead)
+                       (MonadDBRead)
 import qualified Pos.DB as DB
 import qualified Pos.GState as GS
 import           Pos.Infra.Reporting.Health.Types
-    (HealthStatus (..))
+                       (HealthStatus (..))
 import qualified Pos.Lrc.DB as LrcDB
 import           Pos.Ssc
-    (scParticipateSsc)
+                       (scParticipateSsc)
 import           Pos.Txp
-    (TxOut (..), toaOut)
+                       (TxOut (..), toaOut)
 import           Pos.Txp.MemState
-    (GenericTxpLocalData, MempoolExt, getLocalTxs, withTxpLocalData)
+                       (GenericTxpLocalData, MempoolExt, getLocalTxs,
+                       withTxpLocalData)
 import           Pos.Update.Configuration
-    (HasUpdateConfiguration)
+                       (HasUpdateConfiguration)
 import           Pos.Web.Mode
-    (WebMode, WebModeContext (..))
+                       (WebMode, WebModeContext (..))
 import           Pos.WorkMode.Class
-    (WorkMode)
+                       (WorkMode)
 
 import           Pos.Web.Api
-    (HealthCheckApi, NodeApi, healthCheckApi, nodeApi)
+                       (HealthCheckApi, NodeApi, healthCheckApi, nodeApi)
 import           Pos.Web.Types
-    (CConfirmedProposalState (..), TlsParams (..))
+                       (CConfirmedProposalState (..), TlsParams (..))
 
 ----------------------------------------------------------------------------
 -- Top level functionality

@@ -2,7 +2,7 @@ module Cardano.Wallet.API.V1.Addresses where
 
 import           Servant
 import           Universum
-    (Text)
+                       (Text)
 
 import           Cardano.Wallet.API.Response
 import           Cardano.Wallet.API.Types

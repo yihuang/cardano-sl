@@ -7,22 +7,22 @@ module Pos.Lrc.DB.Lrc
 import           Universum
 
 import           Pos.DB.Class
-    (MonadDB)
+                       (MonadDB)
 import           Pos.DB.Error
-    (DBError (..))
+                       (DBError (..))
 import           Pos.Lrc.DB.Common
-    (prepareLrcCommon)
+                       (prepareLrcCommon)
 import           Pos.Lrc.DB.Issuers
-    (prepareLrcIssuers)
+                       (prepareLrcIssuers)
 import           Pos.Lrc.DB.Leaders
-    (prepareLrcLeaders)
+                       (prepareLrcLeaders)
 import           Pos.Lrc.DB.Richmen
-    (prepareLrcRichmen, tryGetUSRichmen)
+                       (prepareLrcRichmen, tryGetUSRichmen)
 import           Pos.Lrc.DB.Seed
-    (prepareLrcSeed)
+                       (prepareLrcSeed)
 
 import           Pos.Util
-    (maybeThrow)
+                       (maybeThrow)
 
 -- | Put missing initial data into LRC DB.
 prepareLrcDB :: MonadDB m => m ()

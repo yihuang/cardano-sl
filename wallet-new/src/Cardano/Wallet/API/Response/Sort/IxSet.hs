@@ -1,13 +1,13 @@
 module Cardano.Wallet.API.Response.Sort.IxSet where
 
 import           Universum hiding
-    (toList)
+                       (toList)
 
 import           Cardano.Wallet.API.Indices
-    (IsIndexOf', IxSet')
+                       (IsIndexOf', IxSet')
 import qualified Cardano.Wallet.API.Request.Sort as S
 import           Data.IxSet.Typed
-    (toAscList, toDescList, toList)
+                       (toAscList, toDescList, toList)
 
 -- | Sort the data, stopping at the first encountered sort operation. This is because
 -- sorting on multiple fields doesn't make sense with the current data model.

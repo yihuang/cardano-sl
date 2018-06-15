@@ -7,14 +7,14 @@ module Pos.Core.Slotting.EpochIndex
 import           Universum
 
 import           Control.Lens
-    (choosing)
+                       (choosing)
 import           Data.Ix
-    (Ix)
+                       (Ix)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting
-    (bprint, int, (%))
+                       (bprint, int, (%))
 import           Pos.Util.Some
-    (Some, liftLensSome)
+                       (Some, liftLensSome)
 
 -- | Index of epoch.
 newtype EpochIndex = EpochIndex

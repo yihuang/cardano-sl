@@ -6,20 +6,21 @@ module Main where
 import           Universum
 
 import           Crypto.PubKey.RSA
-    (PrivateKey, PublicKey)
+                       (PrivateKey, PublicKey)
 import           Data.Hourglass
-    (Minutes (..), Period (..), dateAddPeriod, timeAdd)
+                       (Minutes (..), Period (..), dateAddPeriod, timeAdd)
 import           Data.Semigroup
-    ((<>))
+                       ((<>))
 import           Data.X509
-    (Certificate (..), Extensions (..), PubKey (PubKeyRSA), SignedCertificate)
+                       (Certificate (..), Extensions (..), PubKey (PubKeyRSA),
+                       SignedCertificate)
 import           Options.Applicative
 import           System.FilePath.Posix
-    (FilePath, (</>))
+                       (FilePath, (</>))
 import           Time.System
-    (dateCurrent)
+                       (dateCurrent)
 import           Time.Types
-    (DateTime (..))
+                       (DateTime (..))
 
 import           Configuration
 import           Data.X509.Extra

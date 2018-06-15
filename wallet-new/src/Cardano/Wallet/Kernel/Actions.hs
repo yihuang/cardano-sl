@@ -13,13 +13,13 @@ module Cardano.Wallet.Kernel.Actions
     ) where
 
 import           Control.Concurrent.Async
-    (async, link)
+                       (async, link)
 import           Control.Concurrent.Chan
 import           Control.Lens
-    (makeLenses, (%=), (+=), (-=), (.=))
+                       (makeLenses, (%=), (+=), (-=), (.=))
 import qualified Data.Text.Buildable
 import           Formatting
-    (bprint, build, shown, (%))
+                       (bprint, build, shown, (%))
 import           Universum
 
 import           Pos.Core.Chrono

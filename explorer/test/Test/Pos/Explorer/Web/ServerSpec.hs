@@ -9,41 +9,39 @@ module Test.Pos.Explorer.Web.ServerSpec
 import           Universum
 
 import           Test.Hspec
-    (Spec, describe, shouldBe)
+                       (Spec, describe, shouldBe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (arbitrary, counterexample, forAll, (==>))
+                       (arbitrary, counterexample, forAll, (==>))
 import           Test.QuickCheck.Monadic
-    (assert, monadicIO, run)
+                       (assert, monadicIO, run)
 
-import           Pos.Arbitrary.Block
-    ()
-import qualified Pos.Communication
-    ()
+import           Pos.Arbitrary.Block ()
+import qualified Pos.Communication ()
 import           Pos.Core
-    (EpochIndex (..))
+                       (EpochIndex (..))
 import           Pos.Explorer.ExplorerMode
-    (runExplorerTestMode)
+                       (runExplorerTestMode)
 import           Pos.Explorer.ExtraContext
-    (ExtraContext (..), makeExtraCtx, makeMockExtraCtx)
+                       (ExtraContext (..), makeExtraCtx, makeMockExtraCtx)
 import           Pos.Explorer.TestUtil
-    (emptyBlk, generateValidBlocksSlotsNumber,
-    generateValidExplorerMockableMode, leftToCounter)
+                       (emptyBlk, generateValidBlocksSlotsNumber,
+                       generateValidExplorerMockableMode, leftToCounter)
 import           Pos.Explorer.Web.ClientTypes
-    (CBlockEntry)
+                       (CBlockEntry)
 import           Pos.Explorer.Web.Server
-    (getBlockDifficulty, getBlocksLastPage, getBlocksPage, getBlocksPagesTotal,
-    getBlocksTotal, getEpochPage, getEpochSlot)
+                       (getBlockDifficulty, getBlocksLastPage, getBlocksPage,
+                       getBlocksPagesTotal, getBlocksTotal, getEpochPage,
+                       getEpochSlot)
 import           Pos.Launcher.Configuration
-    (HasConfigurations)
+                       (HasConfigurations)
 import           Pos.Util
-    (divRoundUp)
+                       (divRoundUp)
 -- Orphan mockable instances.
-import           Pos.Util.Mockable
-    ()
+import           Pos.Util.Mockable ()
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 
 
 ----------------------------------------------------------------

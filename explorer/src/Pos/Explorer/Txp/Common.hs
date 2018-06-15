@@ -6,28 +6,28 @@ module Pos.Explorer.Txp.Common
        ) where
 
 import           Universum hiding
-    (keys)
+                       (keys)
 
 import           Control.Lens
-    (at, non)
+                       (at, non)
 import qualified Data.HashMap.Strict as HM
 
 import           Pos.Core
-    (Address, Coin)
+                       (Address, Coin)
 import           Pos.Core.Chrono
-    (NewestFirst (..))
+                       (NewestFirst (..))
 import           Pos.Core.Txp
-    (Tx (..), TxAux (..), toaOut, txOutAddress)
+                       (Tx (..), TxAux (..), toaOut, txOutAddress)
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import qualified Pos.Explorer.DB as ExDB
 import           Pos.Txp.Toil
-    (Utxo)
+                       (Utxo)
 
 import           Pos.Explorer.Core
-    (AddrHistory)
+                       (AddrHistory)
 import           Pos.Explorer.Txp.Toil
-    (ExplorerExtraLookup (..))
+                       (ExplorerExtraLookup (..))
 
 -- | Build 'ExplorerExtraLookup' for given transactions using access
 -- to DB and 'Utxo' corresponding to inputs of these transactions.

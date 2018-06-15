@@ -8,51 +8,51 @@ module Test.Pos.Wallet.Web.AddressSpec
 import           Universum
 
 import           Data.Default
-    (def)
+                       (def)
 import           Formatting
-    (sformat, (%))
+                       (sformat, (%))
 import           Serokell.Data.Memory.Units
-    (memory)
+                       (memory)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Discard (..), arbitrary)
+                       (Discard (..), arbitrary)
 import           Test.QuickCheck.Monadic
-    (pick, stop)
+                       (pick, stop)
 
 import           Pos.Binary
-    (biSize)
+                       (biSize)
 import           Pos.Client.Txp.Addresses
-    (getFakeChangeAddress, getNewAddress)
+                       (getFakeChangeAddress, getNewAddress)
 import           Pos.Core.Common
-    (Address)
+                       (Address)
 import           Pos.Crypto
-    (PassPhrase)
+                       (PassPhrase)
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 
 import           Pos.Wallet.Web.Account
-    (GenSeed (..), genUniqueAddress)
+                       (GenSeed (..), genUniqueAddress)
 import           Pos.Wallet.Web.ClientTypes
-    (AccountId, CAccountInit (..), caId)
+                       (AccountId, CAccountInit (..), caId)
 import           Pos.Wallet.Web.Error
-    (WalletError (..))
+                       (WalletError (..))
 import           Pos.Wallet.Web.Methods.Logic
-    (newAccount)
+                       (newAccount)
 import           Pos.Wallet.Web.State
-    (askWalletSnapshot, getWalletAddresses, wamAddress)
+                       (askWalletSnapshot, getWalletAddresses, wamAddress)
 import           Pos.Wallet.Web.Util
-    (decodeCTypeOrFail)
+                       (decodeCTypeOrFail)
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 import           Test.Pos.Util.QuickCheck.Property
-    (assertProperty, expectedOne)
+                       (assertProperty, expectedOne)
 import           Test.Pos.Wallet.Web.Mode
-    (WalletProperty)
+                       (WalletProperty)
 import           Test.Pos.Wallet.Web.Util
-    (importSingleWallet, mostlyEmptyPassphrases)
+                       (importSingleWallet, mostlyEmptyPassphrases)
 
 spec :: Spec
 spec = withDefConfigurations $ \_ ->

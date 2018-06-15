@@ -16,26 +16,27 @@ module Pos.Crypto.Signing.Types.Safe
 
 import qualified Cardano.Crypto.Wallet as CC
 import           Crypto.Random
-    (MonadRandom)
+                       (MonadRandom)
 import           Data.ByteArray
-    (ByteArray, ByteArrayAccess, ScrubbedBytes)
+                       (ByteArray, ByteArrayAccess, ScrubbedBytes)
 import qualified Data.ByteArray as ByteArray
 import qualified Data.ByteString as BS
 import           Data.Default
-    (Default (..))
+                       (Default (..))
 import           Data.Text.Buildable
-    (build)
+                       (build)
 import qualified Data.Text.Buildable as B
 import           Formatting
-    (int, sformat, (%))
+                       (int, sformat, (%))
 import qualified Prelude
 import           Universum
 
 import           Pos.Binary.Class
-    (Bi (..), encodeListLen, enforceSize, toCborError)
+                       (Bi (..), encodeListLen, enforceSize, toCborError)
 import qualified Pos.Crypto.Scrypt as S
 import           Pos.Crypto.Signing.Types.Signing
-    (PublicKey (..), SecretKey (..), decodeXPrv, encodeXPrv, toPublic)
+                       (PublicKey (..), SecretKey (..), decodeXPrv, encodeXPrv,
+                       toPublic)
 
 -- | Encrypted HD secret key.
 data EncryptedSecretKey = EncryptedSecretKey

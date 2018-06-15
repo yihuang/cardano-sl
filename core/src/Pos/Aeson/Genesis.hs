@@ -33,47 +33,48 @@ module Pos.Aeson.Genesis
        ) where
 
 import           Universum hiding
-    (elems)
+                       (elems)
 
 import           Control.Lens
-    (_Left)
+                       (_Left)
 import           Data.Aeson
-    (FromJSON (..), FromJSONKey (..), FromJSONKeyFunction (..), ToJSON (..),
-    ToJSONKey (..), ToJSONKeyFunction (..))
+                       (FromJSON (..), FromJSONKey (..),
+                       FromJSONKeyFunction (..), ToJSON (..), ToJSONKey (..),
+                       ToJSONKeyFunction (..))
 import           Data.Aeson.Encoding
-    (text)
+                       (text)
 import           Data.Aeson.TH
-    (deriveJSON)
+                       (deriveJSON)
 import qualified Data.HashMap.Strict as HM
 import           Formatting
-    (sformat)
+                       (sformat)
 import           Serokell.Aeson.Options
-    (defaultOptions)
+                       (defaultOptions)
 
-import           Pos.Aeson.Core
-    ()
-import           Pos.Binary.Core.Address
-    ()
+import           Pos.Aeson.Core ()
+import           Pos.Binary.Core.Address ()
 import           Pos.Core.Common
-    (Address, Coin, StakeholderId, unsafeGetCoin)
+                       (Address, Coin, StakeholderId, unsafeGetCoin)
 import           Pos.Core.Delegation
-    (ProxySKHeavy)
+                       (ProxySKHeavy)
 import           Pos.Core.Genesis
-    (FakeAvvmOptions, GenesisAvvmBalances (..), GenesisDelegation,
-    GenesisInitializer, GenesisNonAvvmBalances (..),
-    GenesisProtocolConstants (..), GenesisSpec, GenesisVssCertificatesMap (..),
-    GenesisWStakeholders (..), TestnetBalanceOptions,
-    convertNonAvvmDataToBalances, recreateGenesisDelegation,
-    unGenesisDelegation)
+                       (FakeAvvmOptions, GenesisAvvmBalances (..),
+                       GenesisDelegation, GenesisInitializer,
+                       GenesisNonAvvmBalances (..),
+                       GenesisProtocolConstants (..), GenesisSpec,
+                       GenesisVssCertificatesMap (..),
+                       GenesisWStakeholders (..), TestnetBalanceOptions,
+                       convertNonAvvmDataToBalances, recreateGenesisDelegation,
+                       unGenesisDelegation)
 import           Pos.Core.ProtocolConstants
-    (VssMaxTTL (..), VssMinTTL (..))
+                       (VssMaxTTL (..), VssMinTTL (..))
 import           Pos.Core.Ssc
-    (VssCertificatesMap (..), getVssCertificatesMap,
-    validateVssCertificatesMap)
+                       (VssCertificatesMap (..), getVssCertificatesMap,
+                       validateVssCertificatesMap)
 import           Pos.Crypto
-    (RedeemPublicKey, fromAvvmPk, redeemPkB64UrlF)
+                       (RedeemPublicKey, fromAvvmPk, redeemPkB64UrlF)
 import           Pos.Util.Util
-    (toAesonError)
+                       (toAesonError)
 
 instance ToJSONKey RedeemPublicKey where
     toJSONKey = ToJSONKeyText render (text . render)

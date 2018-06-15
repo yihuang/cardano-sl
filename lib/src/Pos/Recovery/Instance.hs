@@ -10,23 +10,23 @@ import           Universum
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Monad.Except
-    (runExceptT, throwError)
+                       (runExceptT, throwError)
 
-import           Pos.Block.BHelpers
-    ()
+import           Pos.Block.BHelpers ()
 import           Pos.Block.Types
-    (RecoveryHeader, RecoveryHeaderTag)
+                       (RecoveryHeader, RecoveryHeaderTag)
 import           Pos.Core
-    (HasProtocolConstants, epochOrSlotG, epochOrSlotToSlot, flattenSlotId)
+                       (HasProtocolConstants, epochOrSlotG, epochOrSlotToSlot,
+                       flattenSlotId)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class
-    (MonadDBRead)
+                       (MonadDBRead)
 import           Pos.Infra.Recovery.Info
-    (MonadRecoveryInfo (..), SyncStatus (..))
+                       (MonadRecoveryInfo (..), SyncStatus (..))
 import           Pos.Infra.Slotting
-    (MonadSlots (getCurrentSlot))
+                       (MonadSlots (getCurrentSlot))
 import           Pos.Util.Util
-    (HasLens (..))
+                       (HasLens (..))
 
 instance ( Monad m
          , MonadIO m

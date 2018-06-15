@@ -15,17 +15,16 @@ import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import qualified Data.Map.Strict as M
 
-import           Pos.Binary.Core
-    ()
+import           Pos.Binary.Core ()
 import           Pos.Core
-    (Address, Coin, HasGenesisData, StakesMap, sumCoins, unsafeAddCoin,
-    unsafeIntegerToCoin)
+                       (Address, Coin, HasGenesisData, StakesMap, sumCoins,
+                       unsafeAddCoin, unsafeIntegerToCoin)
 import           Pos.Core.Txp
-    (TxOut (txOutValue), TxOutAux (..), _TxOut)
+                       (TxOut (txOutValue), TxOutAux (..), _TxOut)
 import           Pos.Txp.Base
-    (addrBelongsTo, addrBelongsToSet, txOutStake)
+                       (addrBelongsTo, addrBelongsToSet, txOutStake)
 import           Pos.Txp.Toil.Types
-    (Utxo)
+                       (Utxo)
 
 -- | Select only TxOuts for given address
 filterUtxoByAddr :: Address -> Utxo -> Utxo

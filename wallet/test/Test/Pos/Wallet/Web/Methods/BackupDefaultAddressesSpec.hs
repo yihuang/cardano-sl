@@ -8,26 +8,26 @@ module Test.Pos.Wallet.Web.Methods.BackupDefaultAddressesSpec
 import           Universum
 
 import           Pos.Launcher
-    (HasConfigurations)
+                       (HasConfigurations)
 
 import           Pos.Wallet.Web.ClientTypes
-    (CWallet (..))
+                       (CWallet (..))
 import           Pos.Wallet.Web.Methods.Restore
-    (restoreWalletFromBackup)
+                       (restoreWalletFromBackup)
 import           Test.Hspec
-    (Spec, describe)
+                       (Spec, describe)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess)
+                       (modifyMaxSuccess)
 import           Test.Pos.Configuration
-    (withDefConfigurations)
+                       (withDefConfigurations)
 import           Test.Pos.Util.QuickCheck.Property
-    (assertProperty)
+                       (assertProperty)
 import           Test.Pos.Wallet.Web.Mode
-    (walletPropertySpec)
+                       (walletPropertySpec)
 import           Test.QuickCheck
-    (Arbitrary (..))
+                       (Arbitrary (..))
 import           Test.QuickCheck.Monadic
-    (pick)
+                       (pick)
 
 spec :: Spec
 spec = withDefConfigurations $ \_ ->

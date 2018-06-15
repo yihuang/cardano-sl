@@ -12,14 +12,14 @@ module Pos.Explorer.Txp.Toil.Types
 import           Universum
 
 import           Control.Lens
-    (makeLenses)
+                       (makeLenses)
 import           Data.Default
-    (Default, def)
+                       (Default, def)
 
 import           Pos.Core
-    (Address, Coin, TxId)
+                       (Address, Coin, TxId)
 import           Pos.Explorer.Core
-    (AddrHistory, TxExtra)
+                       (AddrHistory, TxExtra)
 import qualified Pos.Util.Modifier as MM
 
 type TxMapExtra = MM.MapModifier TxId TxExtra

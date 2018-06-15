@@ -6,11 +6,11 @@ import           Universum
 
 import qualified Data.Aeson as J
 import           Pos.Core
-    (HasConfiguration, withGenesisSpec)
+                       (HasConfiguration, withGenesisSpec)
 import           Pos.Launcher.Configuration
-    (Configuration (..))
+                       (Configuration (..))
 import           Pos.Util.Config
-    (embedYamlConfigCT)
+                       (embedYamlConfigCT)
 
 benchConf :: Configuration
 benchConf = case J.fromJSON $ J.Object jobj of

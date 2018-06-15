@@ -3,26 +3,26 @@ module Test.Pos.Util.MnemonicsSpec (spec, Entropy(..)) where
 import           Universum
 
 import           Data.ByteString.Char8
-    (pack)
+                       (pack)
 import           Data.Set
-    (Set)
+                       (Set)
 import           Test.Hspec
-    (Spec, it, shouldSatisfy, xit)
+                       (Spec, it, shouldSatisfy, xit)
 import           Test.Hspec.QuickCheck
-    (modifyMaxSuccess, prop)
+                       (modifyMaxSuccess, prop)
 import           Test.QuickCheck
-    (Arbitrary (..), forAll, property)
+                       (Arbitrary (..), forAll, property)
 import           Test.QuickCheck.Gen
-    (oneof, vectorOf)
+                       (oneof, vectorOf)
 
 import           Pos.Util.BackupPhrase
-    (BackupPhrase (..), safeKeysFromPhrase)
+                       (BackupPhrase (..), safeKeysFromPhrase)
 import           Pos.Util.Mnemonics
-    (defMnemonic, fromMnemonic, toMnemonic)
+                       (defMnemonic, fromMnemonic, toMnemonic)
 import           Pos.Wallet.Web.ClientTypes.Functions
-    (encToCId)
+                       (encToCId)
 import           Pos.Wallet.Web.ClientTypes.Types
-    (CId)
+                       (CId)
 
 import qualified Data.Set as Set
 

@@ -22,52 +22,52 @@ module Bench.Network.Commons
        ) where
 
 import           Control.Applicative
-    ((<|>))
+                       ((<|>))
 import           Control.Lens
-    (zoom, (?=))
+                       (zoom, (?=))
 import           Control.Monad
-    (join)
+                       (join)
 import           Control.Monad.Trans
-    (MonadIO (..))
+                       (MonadIO (..))
 
 import           Data.Attoparsec.Text
-    (Parser, char, decimal, string, takeWhile)
+                       (Parser, char, decimal, string, takeWhile)
 import           Data.Binary
-    (Binary)
+                       (Binary)
 import           Data.Binary
-    (Binary (..))
+                       (Binary (..))
 import qualified Data.ByteString.Lazy as BL
 import           Data.Data
-    (Data)
+                       (Data)
 import           Data.Functor
-    (($>))
+                       (($>))
 import           Data.Int
-    (Int64)
+                       (Int64)
 import           Data.Monoid
-    ((<>))
+                       ((<>))
 import           Data.Text
-    (Text)
+                       (Text)
 import           Data.Text.Buildable
-    (Buildable (build))
+                       (Buildable (build))
 import           Data.Time.Units
-    (toMicroseconds)
+                       (toMicroseconds)
 
 import qualified Formatting as F
 import           GHC.Generics
-    (Generic)
+                       (Generic)
 import           Prelude hiding
-    (takeWhile)
+                       (takeWhile)
 import           System.Wlog
-    (LoggerConfig (..), errorPlus, fromScratch, infoPlus, lcTree, ltSeverity,
-    maybeLogsDirB, parseLoggerConfig, productionB, setupLogging, warningPlus,
-    zoomLogger)
+                       (LoggerConfig (..), errorPlus, fromScratch, infoPlus,
+                       lcTree, ltSeverity, maybeLogsDirB, parseLoggerConfig,
+                       productionB, setupLogging, warningPlus, zoomLogger)
 
 import           Mockable.CurrentTime
-    (realTime)
+                       (realTime)
 import           Node
-    (Message (..))
+                       (Message (..))
 import           Pos.Util.Trace
-    (Trace, traceWith)
+                       (Trace, traceWith)
 
 -- * Transfered data types
 

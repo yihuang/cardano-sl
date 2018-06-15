@@ -17,14 +17,14 @@ module Pos.Core.Configuration.Protocol
 import           Universum
 
 import           Data.Reflection
-    (Given (..), give)
+                       (Given (..), give)
 
 import           Pos.Core.Common
-    (BlockCount (..))
+                       (BlockCount (..))
 import           Pos.Core.ProtocolConstants
-    (ProtocolConstants (..), VssMaxTTL (..), VssMinTTL (..))
+                       (ProtocolConstants (..), VssMaxTTL (..), VssMinTTL (..))
 import           Pos.Core.Slotting.SlotCount
-    (SlotCount)
+                       (SlotCount)
 
 type HasProtocolConstants = Given ProtocolConstants
 

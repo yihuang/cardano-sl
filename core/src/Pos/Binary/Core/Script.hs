@@ -7,7 +7,7 @@ module Pos.Binary.Core.Script () where
 import           Universum
 
 import           Data.Hashable
-    (Hashable, hashWithSalt)
+                       (Hashable, hashWithSalt)
 import qualified PlutusCore.Program as PLCore
 import qualified PlutusCore.Term as PLCore
 import qualified PlutusTypes.ConSig as PLTypes
@@ -17,9 +17,8 @@ import qualified Utils.Names as Names
 import qualified Utils.Vars as Vars
 
 import           Pos.Binary.Class
-    (Bi (..), genericDecode, genericEncode, serialize')
-import           Pos.Core.Script
-    ()
+                       (Bi (..), genericDecode, genericEncode, serialize')
+import           Pos.Core.Script ()
 
 
 instance Bi Vars.FreeVar where

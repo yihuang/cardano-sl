@@ -14,21 +14,21 @@ module KeygenOptions
 import           Universum
 
 import           Data.Version
-    (showVersion)
+                       (showVersion)
 import           Options.Applicative
-    (Parser, auto, command, execParser, fullDesc, header, help, helper, info,
-    infoOption, long, metavar, option, progDesc, short, strOption, subparser,
-    switch, value)
+                       (Parser, auto, command, execParser, fullDesc, header,
+                       help, helper, info, infoOption, long, metavar, option,
+                       progDesc, short, strOption, subparser, switch, value)
 
 import           Pos.Client.CLI
-    (configurationOptionsParser)
+                       (configurationOptionsParser)
 import           Pos.Core.Genesis
-    (FakeAvvmOptions (..), TestnetBalanceOptions (..))
+                       (FakeAvvmOptions (..), TestnetBalanceOptions (..))
 import           Pos.Launcher
-    (ConfigurationOptions)
+                       (ConfigurationOptions)
 
 import           Paths_cardano_sl
-    (version)
+                       (version)
 
 data KeygenOptions = KeygenOptions
     { koCommand              :: KeygenCommand

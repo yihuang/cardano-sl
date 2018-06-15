@@ -34,19 +34,19 @@ module Lang.Value
 import           Universum
 
 import           Control.Lens
-    (makePrisms)
+                       (makePrisms)
 import           Data.Scientific
-    (Scientific)
+                       (Scientific)
 
 import           Pos.Core
-    (AddrStakeDistribution, Address, BlockVersion, CoinPortion,
-    SoftwareVersion, StakeholderId)
+                       (AddrStakeDistribution, Address, BlockVersion,
+                       CoinPortion, SoftwareVersion, StakeholderId)
 import           Pos.Core.Txp
-    (TxOut)
+                       (TxOut)
 import           Pos.Crypto
-    (AHash, PublicKey)
+                       (AHash, PublicKey)
 import           Pos.Update
-    (BlockVersionData, BlockVersionModifier, SystemTag)
+                       (BlockVersionData, BlockVersionModifier, SystemTag)
 
 data AddrDistrPart = AddrDistrPart
     { adpStakeholderId :: !StakeholderId

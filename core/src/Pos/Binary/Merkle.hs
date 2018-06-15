@@ -9,11 +9,11 @@ import           Universum
 import qualified Data.Foldable as Foldable
 
 import           Pos.Binary.Class
-    (Bi (..), Raw)
+                       (Bi (..), Raw)
 import           Pos.Crypto.Hashing
-    (Hash)
+                       (Hash)
 import           Pos.Merkle
-    (MerkleRoot (..), MerkleTree (..), mkMerkleTree)
+                       (MerkleRoot (..), MerkleTree (..), mkMerkleTree)
 
 -- This instance is both faster and more space-efficient (as confirmed by a
 -- benchmark). Hashing turns out to be faster than decoding extra data.

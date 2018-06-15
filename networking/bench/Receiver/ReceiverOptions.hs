@@ -8,12 +8,12 @@ module ReceiverOptions
        ) where
 
 import           Data.Monoid
-    ((<>))
+                       ((<>))
 import           Data.Word
-    (Word16)
+                       (Word16)
 import           Options.Applicative.Simple
-    (Parser, auto, help, long, metavar, option, optional, short, showDefault,
-    strOption, switch, value)
+                       (Parser, auto, help, long, metavar, option, optional,
+                       short, showDefault, strOption, switch, value)
 
 data Args = Args
     { logConfig  :: !(Maybe FilePath)

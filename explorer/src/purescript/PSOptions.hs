@@ -8,12 +8,13 @@ module PSOptions
 import           Universum
 
 import           Data.Version
-    (showVersion)
+                       (showVersion)
 import           Options.Applicative.Simple
-    (Parser, help, long, metavar, simpleOptions, strOption, value)
+                       (Parser, help, long, metavar, simpleOptions, strOption,
+                       value)
 
 import           Paths_cardano_sl_explorer
-    (version)
+                       (version)
 
 
 newtype Args = Args

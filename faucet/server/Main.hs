@@ -27,10 +27,10 @@ main = do
     _ -> error "Need a --config argument pointing to a json file"
   fEnv <- runInitLogger config $ initEnv config (serverMetricStore ekg)
   _statsd <- forkStatsd (config ^. fcStatsdOpts . _Wrapped') (fEnv ^. feStore)
-  run (config ^. fcPort) (serve serverAPI $ s fEnv)
+  run (config ^. fcPort) (serve faucetServerAPI $ s fEnv)
   where
       nat :: FaucetEnv -> M a -> Handler a
       nat e = Handler . ExceptT . runM e
-      s env = hoistServer serverAPI (nat env) server
+      s env = hoistServer faucetServerAPI (nat env) faucetServer
       -- runInitLogger :: FaucetConfig -> LoggerNameBox IO FaucetEnv -> IO FaucetEnv
       runInitLogger c = launchFromFile (c ^. fcLoggerConfigFile) (LoggerName "faucet")

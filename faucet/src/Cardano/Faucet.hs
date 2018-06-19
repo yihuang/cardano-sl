@@ -4,8 +4,8 @@
 {-# LANGUAGE TypeOperators     #-}
 {-# OPTIONS_GHC -Wall #-}
 module Cardano.Faucet (
-    server
-  , serverAPI
+    faucetServer
+  , faucetServerAPI
   , module Cardano.Faucet.Types
   , module Cardano.Faucet.Init
   ) where
@@ -22,9 +22,11 @@ import           Cardano.Wallet.API.Response (WalletResponse (..))
 import           Cardano.Wallet.API.V1.Types (txAmount, unV1)
 import qualified Cardano.WalletClient as Client
 
+-- | Top level type of the faucet API
 type API = "withdraw" :> ReqBody '[JSON] WithDrawlRequest :> Post '[JSON] WithDrawlResult
-      :<|> "deposit" :> ReqBody '[JSON] DepositRequest :> Post '[JSON] DepositResult
+      -- :<|> "_deposit" :> ReqBody '[JSON] DepositRequest :> Post '[JSON] DepositResult
 
+-- | Handler for the withdrawl of ADA from the faucet
 withdraw :: (MonadFaucet c m) => WithDrawlRequest -> m WithDrawlResult
 withdraw wd = withSublogger (LoggerName "withdraw") $ do
     resp <- Client.withdraw (wd ^. wAddress)
@@ -41,15 +43,15 @@ withdraw wd = withSublogger (LoggerName "withdraw") $ do
                                               <> (amount ^. to show . packed))
             incWithDrawn amount
             return $ WithdrawlSuccess txn
-
-deposit :: (MonadFaucet c m) => DepositRequest -> m DepositResult
-deposit dr = withSublogger (LoggerName "deposit") $ do
-    decrWithDrawn (dr ^. dAmount)
+-- | Function to _deposit funds back into the faucet /not implemented/
+_deposit :: (MonadFaucet c m) => DepositRequest -> m DepositResult
+_deposit dr = withSublogger (LoggerName "_deposit") $ do
+    -- decrWithDrawn (dr ^. dAmount)
     logInfo ((dr ^. to show . packed) <> " deposited")
     return DepositResult
 
-server :: ServerT API M
-server = withdraw :<|> deposit
+faucetServer :: ServerT API M
+faucetServer = withdraw -- :<|> _deposit
 
-serverAPI :: Proxy API
-serverAPI = Proxy
+faucetServerAPI :: Proxy API
+faucetServerAPI = Proxy

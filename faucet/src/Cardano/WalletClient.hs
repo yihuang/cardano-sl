@@ -30,6 +30,9 @@ randomAmount = do
     f <- liftIO $ randomRIO ((-1), 1)
     return $ V1 $ Coin $ round (amt + (var * f))
 
+-- | Client function for the handler for the @/withdraw@ action
+--
+-- Simply sends a 'randomAmount' of ADA to the supplied 'Address'
 withdraw :: (MonadFaucet c m) => V1 Address -> Resp m Transaction
 withdraw addr = do
     paymentSource <- view (feSourceWallet . to cfgToPaymentSource)
@@ -41,7 +44,7 @@ withdraw addr = do
         payment = Payment paymentSource paymentDist Nothing sp
     postTransaction client payment
 
-
+-- | Hashes bytestring password to the form expected by the wallet API
 hashPwd :: ByteString -> PassPhrase
 hashPwd  bs =
     let blake = CryptoHash.hash bs :: Digest (Blake2b_256)

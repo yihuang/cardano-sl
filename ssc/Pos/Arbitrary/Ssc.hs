@@ -23,26 +23,27 @@ import qualified Data.List.NonEmpty as NE
 import           Test.QuickCheck (Arbitrary (..), Gen, choose, elements, listOf, oneof)
 import           Test.QuickCheck.Arbitrary.Generic (genericArbitrary, genericShrink)
 
-import           Pos.Arbitrary.Core (genVssCertificate)
-import           Pos.Arbitrary.Core.Unsafe ()
 import           Pos.Binary.Ssc ()
 import           Pos.Core (EpochIndex, SlotId (..), VssCertificate (..), VssCertificatesMap,
                            mkVssCertificate, mkVssCertificatesMapLossy)
 import           Pos.Core.Configuration (HasProtocolConstants, protocolConstants)
 import           Pos.Core.ProtocolConstants (ProtocolConstants (..), VssMaxTTL (..), VssMinTTL (..))
 import           Pos.Core.Ssc (Commitment (..), CommitmentsMap, Opening (..), SignedCommitment,
-                               SscPayload (..), SscProof (..), mkCommitmentsMap)
+                               SscPayload (..), SscProof (..), mkCommitmentsMap,
+                               randCommitmentAndOpening)
 import           Pos.Crypto (ProtocolMagic, SecretKey, deterministic, randomNumberInRange,
                              toVssPublicKey, vssKeyGen)
 import           Pos.Infra.Communication.Types.Relay (DataMsg (..))
-import           Pos.Ssc.Base (genCommitmentAndOpening, isCommitmentIdExplicit, isOpeningIdExplicit,
-                               isSharesIdExplicit, mkSignedCommitment)
+import           Pos.Ssc.Base (isCommitmentIdExplicit, isOpeningIdExplicit, isSharesIdExplicit,
+                               mkSignedCommitment)
 import           Pos.Ssc.Message (MCCommitment (..), MCOpening (..), MCShares (..),
                                   MCVssCertificate (..), SscTag (..))
 import           Pos.Ssc.Toss.Types (TossModifier (..))
 import           Pos.Ssc.Types (SscGlobalState (..), SscSecretStorage (..))
 import           Pos.Ssc.VssCertData (VssCertData (..))
 
+import           Test.Pos.Core.Arbitrary (genVssCertificate)
+import           Test.Pos.Core.Arbitrary.Unsafe ()
 import           Test.Pos.Crypto.Arbitrary (genSignature)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 import           Test.Pos.Util.QuickCheck.Arbitrary (Nonrepeating (..), sublistN)
@@ -100,7 +101,7 @@ commitmentsAndOpenings =
       t <- randomNumberInRange 3 10
       n <- randomNumberInRange (t*2-1) (t*2)
       vssKeys <- replicateM (fromInteger n) $ toVssPublicKey <$> vssKeyGen
-      genCommitmentAndOpening (fromIntegral t) (NE.fromList vssKeys)
+      randCommitmentAndOpening (fromIntegral t) (NE.fromList vssKeys)
 
 instance Arbitrary CommitmentOpening where
     arbitrary = elements commitmentsAndOpenings

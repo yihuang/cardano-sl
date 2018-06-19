@@ -44,7 +44,6 @@ import           Serokell.Util (listJson, mapJson, pairF)
 import           Serokell.Util.Base16 (base16F)
 import           Universum
 
-import           Pos.Block.Base
 import           Pos.Core
 import           Pos.Crypto
 import           Pos.Lrc.Genesis
@@ -79,7 +78,7 @@ data CardanoContext = CardanoContext {
 initCardanoContext :: HasConfiguration => ProtocolMagic -> CardanoContext
 initCardanoContext pm = CardanoContext{..}
   where
-    ccLeaders  = genesisLeaders
+    ccLeaders  = genesisLeaders epochSlots
     ccStakes   = genesisStakes
     ccBlock0   = genesisBlock0 pm (GenesisHash genesisHash) ccLeaders
     ccData     = genesisData

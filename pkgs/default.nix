@@ -5007,7 +5007,7 @@ version = "0.14.2";
 src = fetchgit {
 
 url = "https://github.com/serokell/acid-state.git";
-sha256 = "0gxy0n08mqq09c2gyzpp6fdxz13lx9xfr6ir2dwr705i3b0k4j8b";
+sha256 = "12ryxw17d5cagzsnmpch8cf5mhy433yjjva13hg2caw3vxfd28vl";
 rev = "1049699df411c9584523ba7424cba1f3f82ac419";
 
 };
@@ -14480,7 +14480,7 @@ version = "1.0.0";
 src = fetchgit {
 
 url = "https://github.com/input-output-hk/cardano-crypto";
-sha256 = "05i1z01fzg0la4hk2ff0l89sk0a5ada81w60kwj9i8ix74jchp94";
+sha256 = "033f9ww9qj25zwinxxdf1iimwz6nyszqkhs3iikf5brva99ww004";
 rev = "287cc575fafe86af9d24af9d012c47f9d3f04da0";
 
 };
@@ -14543,7 +14543,7 @@ version = "0.4.10";
 src = fetchgit {
 
 url = "https://github.com/input-output-hk/cardano-report-server.git";
-sha256 = "0chhbnrl68aqjfhkqvq53v572zsg52mj8pjxl3n7nnbc006cqs49";
+sha256 = "1jnmsmscgqv60b6xwjim4hym3kfwhdz3cs1vwr557qgjny4s9qjq";
 rev = "81eea7361a75923f9402fcb7840fb36722dbf88e";
 
 };
@@ -16382,10 +16382,12 @@ license = stdenv.lib.licenses.mit;
 , connection
 , cryptonite
 , data-default
+, directory
 , ekg
 , ekg-core
 , ekg-statsd
 , exceptions
+, filepath
 , http-client
 , http-client-tls
 , lens
@@ -16432,9 +16434,11 @@ cardano-sl-wallet-new
 connection
 cryptonite
 data-default
+directory
 ekg-core
 ekg-statsd
 exceptions
+filepath
 http-client
 http-client-tls
 lens
@@ -18854,7 +18858,7 @@ version = "0.2.0.0";
 src = fetchgit {
 
 url = "https://github.com/well-typed/cborg";
-sha256 = "1w06annk6nm01brd60hzl15143cvjvsaam9lhwzpmppyvgb0cdyz";
+sha256 = "0qi2brq5nf3p2vcw97yc25qw92w3xr6jhcsrhay2059lkx9qp8r8";
 rev = "3d274c14ca3077c3a081ba7ad57c5182da65c8c1";
 
 };
@@ -27527,7 +27531,7 @@ version = "0.0.5.0";
 src = fetchgit {
 
 url = "https://github.com/thoughtpolice/hs-ed25519";
-sha256 = "0fah4vkmqdkjsdh3s3x27yfaif2fbdg6049xvp54b5mh50yvxkfq";
+sha256 = "097mxmq1vghzxwxlfmga9wqqzksjcnrfp06g2ah6wkb1d8szimvf";
 rev = "da4247b5b3420120e20451e6a252e2a2ca15b43c";
 
 };
@@ -28186,7 +28190,7 @@ version = "1.2.20";
 src = fetchgit {
 
 url = "https://github.com/input-output-hk/engine.io.git";
-sha256 = "139c0yfnj57cpwg4k0am2rp35sh959394nvlb98011rjy68200qc";
+sha256 = "12nfllna3i802wh9j56l3sphr3m3r685hg36a8ixx18r88gi5g4d";
 rev = "d3c55f51bb81cee7d0d551de930ce65fe7d76756";
 
 };
@@ -28244,7 +28248,7 @@ version = "1.0.8";
 src = fetchgit {
 
 url = "https://github.com/input-output-hk/engine.io.git";
-sha256 = "139c0yfnj57cpwg4k0am2rp35sh959394nvlb98011rjy68200qc";
+sha256 = "12nfllna3i802wh9j56l3sphr3m3r685hg36a8ixx18r88gi5g4d";
 rev = "d3c55f51bb81cee7d0d551de930ce65fe7d76756";
 
 };
@@ -38334,7 +38338,7 @@ version = "0.6";
 src = fetchgit {
 
 url = "https://github.com/input-output-hk/haskell-hedgehog.git";
-sha256 = "07pvrslv6h3rz053lfxp0racnqj70yazik6mrn612i09vfaxis6b";
+sha256 = "11k68b1kmji1sr0cakvxly9k1s4dxasdd1ybbwkmrh3kw4zdhr7m";
 rev = "2c9e51804e8217dff89f5c32cbe0d79ce20bc508";
 
 };
@@ -47907,7 +47911,7 @@ version = "1.1.0.1";
 src = fetchgit {
 
 url = "https://github.com/serokell/kademlia.git";
-sha256 = "1k1wp9dwhzzqfivxc28vhxfqplnyh916crr7bhsiv829d6qifhw1";
+sha256 = "00vkanwr4mk82lffcngql4r7hmkk64fjrl58a78pl80iiypyvjyw";
 rev = "7120bb4d28e708acd52dfd61d3dca7914fac7d7f";
 
 };
@@ -51242,7 +51246,7 @@ version = "1.8.10.1";
 src = fetchgit {
 
 url = "https://github.com/input-output-hk/log-warper.git";
-sha256 = "1m0px1187p1xkdp978jh45vpgkdbvrlm3ippg3jlv0zdzrfnx53s";
+sha256 = "0cql9lkcqih5kmxnswhkj3hxv1xigxks3q49q1ak9hp55whg14h3";
 rev = "fa925f9dadf239b38e2ffcc35f9d241a9fcb7d55";
 
 };
@@ -57271,7 +57275,7 @@ version = "0.5.2";
 src = fetchgit {
 
 url = "https://github.com/serokell/network-transport";
-sha256 = "0lqa26l2ikpq6a4s7qm9b2favx59w82i0wngakhfyax66fpixp8q";
+sha256 = "0qr3z60zdnwzcmh9d9wcgfpjvcvrv3i6g7lz2i6p05h1ixia43bq";
 rev = "018a50b9042c2115c3ec9c9fd5ca5f28737dd29c";
 
 };
@@ -57334,7 +57338,7 @@ version = "0.5.1";
 src = fetchgit {
 
 url = "https://github.com/avieth/network-transport-inmemory";
-sha256 = "0ak64rks3lk3kk5wyndrrk2swmd84h9diribzix305xwz1jhjj9w";
+sha256 = "00nk1c16pcsfpm02br67cs6iwrc2zx4zxhpgidk39b2vxr49znl6";
 rev = "5d8ff2b07b9df35cf61329a3d975e2c8cf95c12a";
 
 };
@@ -57373,7 +57377,7 @@ version = "0.6.0";
 src = fetchgit {
 
 url = "https://github.com/serokell/network-transport-tcp";
-sha256 = "1cim8867kf36kv6ax9jx5shlqd7hhs1i4jf101x4pk3wriwbxsds";
+sha256 = "1d1wbc38iy7616kwrndhqrsbw1skyvzj5952mdgl0jklfjdd3wzy";
 rev = "3d56652123bd296dc759cd31947eb2a17924e68a";
 
 };
@@ -62385,7 +62389,7 @@ version = "0.1.0.0";
 src = fetchgit {
 
 url = "https://github.com/avieth/plutus-prototype";
-sha256 = "1s932rghn4zn441waansp408b5bwk20rc1wsa5693a2nwnp4dijw";
+sha256 = "1ddqc6bvcf8rk1r1m8my3ck1rbgy29qxf3vsgi20ncdiim4fqk9w";
 rev = "d094be301195fcd8ab864d793f114970426a4478";
 
 };
@@ -68103,7 +68107,7 @@ version = "0.0.0";
 src = fetchgit {
 
 url = "https://github.com/input-output-hk/rocksdb-haskell-ng.git";
-sha256 = "02jvri8ik8jgrxwa6qmh3xcwqvm4s27iv3sxpjpny79nlhlxvfzp";
+sha256 = "0d1jf2mgxqszmw82i7rywqdgz7hra339hd2yyr5x9gs4i8v47mk5";
 rev = "49f501a082d745f3b880677220a29cafaa181452";
 
 };
@@ -70804,7 +70808,7 @@ version = "0.0.7.0";
 src = fetchgit {
 
 url = "https://github.com/avieth/servant-quickcheck.git";
-sha256 = "1rq493iz8asavjwxfi7vnkrvbxwsnxy1j8w5b3slcg8l7g8ikz6z";
+sha256 = "05skxjgjbf658v9wz3sk3q0maxb1b2jzwfi392bkmljm6aasrs6n";
 rev = "e4e879abca99d0d56015765859fb37af59a81dbb";
 
 };
@@ -73348,7 +73352,7 @@ version = "1.3.9";
 src = fetchgit {
 
 url = "https://github.com/input-output-hk/engine.io.git";
-sha256 = "139c0yfnj57cpwg4k0am2rp35sh959394nvlb98011rjy68200qc";
+sha256 = "12nfllna3i802wh9j56l3sphr3m3r685hg36a8ixx18r88gi5g4d";
 rev = "d3c55f51bb81cee7d0d551de930ce65fe7d76756";
 
 };

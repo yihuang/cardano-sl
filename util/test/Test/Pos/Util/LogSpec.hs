@@ -18,7 +18,7 @@ import           Pos.Util.Log
 import           Pos.Util.Log.Internal (getLinesLogged)
 import           Pos.Util.Log.LogSafe (logDebugS, logErrorS, logInfoS, logNoticeS, logWarningS)
 import           Pos.Util.Log.Severity (Severity (..))
-import           Pos.Util.LoggerConfig (defaultTestConfiguration)
+import           Pos.Util.LoggerConfig (defaultInteractiveConfiguration, defaultTestConfiguration)
 
 nominalDiffTimeToMicroseconds :: POSIXTime -> Microsecond
 nominalDiffTimeToMicroseconds = fromMicroseconds . round . (* 1000000)
@@ -92,7 +92,7 @@ run_loggingS :: Severity -> Int -> Integer -> Integer-> IO (Microsecond, Integer
 run_loggingS sev n n0 n1= do
         startTime <- getPOSIXTime
 {- -}
-        setupLogging $ defaultTestConfiguration sev
+        setupLogging $ defaultInteractiveConfiguration sev
         forM_ [1..n0] $ \_ ->
             usingLoggerName "test_log" $
                 forM_ [1..n1] $ \_ -> do

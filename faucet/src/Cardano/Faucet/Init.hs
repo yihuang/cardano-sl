@@ -60,10 +60,12 @@ import           Cardano.Faucet.Types
 
 
 --------------------------------------------------------------------------------
+-- | Parses a 'SourceWalletConfig' from a file containing JSON
 readSourceWalletConfig :: FilePath -> IO (Either String SourceWalletConfig)
 readSourceWalletConfig = fmap eitherDecode . BSL.readFile
 
 --------------------------------------------------------------------------------
+-- | Generate a random 12 word wallet recovery phrase
 generateBackupPhrase :: IO BackupPhrase
 generateBackupPhrase = do
     -- The size 16 should give us 12-words mnemonic after BIP-39 encoding.
@@ -80,6 +82,7 @@ generateBackupPhrase = do
 completelySynced :: SyncPercentage
 completelySynced = mkSyncPercentage 100
 
+-- | Looks up the 'SyncPercentage' using 'getNodeInfo' from the 'WalletClient'
 getSyncState
     :: (HasLoggerName m, MonadIO m)
     => WalletClient m
@@ -89,6 +92,12 @@ getSyncState client = do
     return (nfoSyncProgress . wrData <$> r)
 
 --------------------------------------------------------------------------------
+-- | Creates a new wallet
+--
+-- Returns 'SourceWalletConfig' for the 'FaucetEnv', the 'BackupPhrase' mnemonics
+-- and the 'Address' of the created wallet. Before creating the wallet the
+-- 'SyncState' of the node the 'WalletClient' is pointing at checked. If it's less
+-- than 100% we wait 5 seconds and try again
 createWallet
     :: (HasLoggerName m, CanLog m, MonadIO m)
     => WalletClient m
@@ -145,6 +154,9 @@ createWallet client = do
         runClient err m = ExceptT $ (fmap (first err)) $ fmap (fmap wrData) m
 
 --------------------------------------------------------------------------------
+-- | Writes a JSON encoded 'CreatedWallet' to the given 'FilePath'
+--
+-- Creates the parent directory if required
 writeCreatedWalletInfo :: FilePath -> CreatedWallet -> IO ()
 writeCreatedWalletInfo fp cw = do
     let theDir = takeDirectory fp
@@ -152,6 +164,9 @@ writeCreatedWalletInfo fp cw = do
     Text.writeFile fp $ encodeToLazyText cw
 
 --------------------------------------------------------------------------------
+-- | Reads the balance of an existing wallet
+--
+-- Fails with 'CouldntReadBalance'
 readWalletBalance
     :: (HasLoggerName m, MonadIO m)
     => WalletClient m
@@ -159,8 +174,16 @@ readWalletBalance
     -> m (Either InitFaucetError Int64)
 readWalletBalance client (psWalletId -> wId) = do
     r <- getWallet client wId
-    return $ first CouldntReadBalance $ fmap (fromIntegral . getCoin . unV1 . walBalance . wrData) $ r
+    return $ first CouldntReadBalance
+           $ fmap (fromIntegral . getCoin . unV1 . walBalance . wrData) $ r
 
+-- | Creates the 'IntializedWallet' for a given config
+--
+-- * In the case of 'Provided' it will use the details of an (existing) wallet by
+-- reading from a JSON serialised 'SourceWalletConfig' (and looking up its balance)
+-- * If the 'FaucetConfig''s `fcSourceWallet` is 'Generate' a new wallet is
+-- created with 'createWallet' and the details are written to the provided
+-- 'FilePath'
 makeInitializedWallet
     :: (HasLoggerName m, CanLog m, MonadIO m)
     => FaucetConfig
@@ -182,7 +205,9 @@ makeInitializedWallet fc client = withSublogger "makeInitializedWallet" $ do
                         createdWallet = CreatedWallet wallet phrase accIdx addr
                     liftIO $ writeCreatedWalletInfo fp createdWallet
                     return iw
-
+-- | Creates a 'FaucetEnv' from a given 'FaucetConfig'
+--
+-- Also sets the 'Gauge.Gauge' for the 'feWalletBalance'
 initEnv :: FaucetConfig -> Store -> LoggerNameBox IO FaucetEnv
 initEnv fc store = withSublogger "init" $ do
     walletBalanceGauge <- liftIO $ createGauge "wallet-balance" store
@@ -204,6 +229,7 @@ initEnv fc store = withSublogger "init" $ do
                       fc
                       client
 
+-- | Makes a http client 'Manager' for communicating with the wallet node
 createManager :: FaucetConfig -> IO Manager
 createManager fc = do
     pubCert <- BS.readFile (fc ^. fcPubCertFile)

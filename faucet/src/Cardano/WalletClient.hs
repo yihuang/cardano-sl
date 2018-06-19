@@ -22,6 +22,7 @@ import           System.Random
 
 import           Cardano.Faucet.Types
 
+-- | Computes the amount to of ADA to send in 'withdraw'
 randomAmount :: (MonadFaucet c m) => m (V1 Coin)
 randomAmount = do
     amt <- fromIntegral <$> view (feFaucetConfig . fcPaymentAmount . _Wrapped')

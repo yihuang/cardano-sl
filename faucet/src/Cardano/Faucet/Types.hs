@@ -39,8 +39,7 @@ import           Control.Exception (Exception)
 import           Control.Lens hiding ((.=))
 import           Control.Monad.Except
 import           Control.Monad.Reader
-import           Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:),
-                             (.:?), (.=))
+import           Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:), (.:?), (.=))
 import           Data.Int (Int64)
 import           Data.Text (Text)
 -- import           Data.Text (Text)
@@ -65,6 +64,7 @@ import           Pos.Util.BackupPhrase (BackupPhrase (..))
 
 
 --------------------------------------------------------------------------------
+-- | A request to withdraw ADA from the faucet wallet
 data WithDrawlRequest = WithDrawlRequest {
     _wAddress :: !(V1 Address)
   } deriving (Show, Typeable, Generic)
@@ -79,9 +79,10 @@ instance ToJSON WithDrawlRequest where
     toJSON (WithDrawlRequest w) =
         object [ "address" .= w ]
 
+-- | The result of processing a 'WithDrawlRequest'
 data WithDrawlResult =
-    WithdrawlError ClientError
-  | WithdrawlSuccess Transaction
+    WithdrawlError ClientError   -- ^ Error with http client error
+  | WithdrawlSuccess Transaction -- ^ Success with transaction details
   deriving (Show, Typeable, Generic)
 
 instance ToJSON WithDrawlResult where
@@ -92,6 +93,7 @@ instance ToJSON WithDrawlResult where
 
 
 --------------------------------------------------------------------------------
+-- | A request to deposit ADA back into the wallet __not currently used__
 data DepositRequest = DepositRequest {
     _dWalletId :: Text
   , _dAmount   :: Coin
@@ -104,12 +106,14 @@ instance FromJSON DepositRequest where
     <$> v .: "wallet"
     <*> (Coin <$> v .: "amount")
 
+-- | The result of processing a 'DepositRequest' __not currently used__
 data DepositResult = DepositResult
   deriving (Show, Typeable, Generic)
 
 instance ToJSON DepositResult
 
 --------------------------------------------------------------------------------
+-- | Newtype for 'StatsdOptions' for the 'FromJSON' instance
 newtype FaucetStatsdOpts = FaucetStatsdOpts StatsdOptions deriving (Generic)
 
 makeWrapped ''FaucetStatsdOpts
@@ -125,12 +129,19 @@ instance FromJSON FaucetStatsdOpts where
           <*> pure "")
 
 --------------------------------------------------------------------------------
+-- | Configuration for making the faucet use an existing wallet
+--
+-- /This wallet may have just been created by the faucet starting up/
 data SourceWalletConfig = SourceWalletConfig {
+    -- | An ID for an existing wallet
     _srcWalletId         :: !WalletId
+    -- | The index of an existing account in the wallet
   , _srcAccountIndex     :: !AccountIndex
+    -- | Optional spending password for the account ('Nothing' if no password)
   , _srcSpendingPassword :: !(Maybe Text)
   } deriving (Generic, Show)
 
+-- | 'Lens' to the spending password
 srcSpendingPassword :: Lens' SourceWalletConfig (Maybe Text)
 srcSpendingPassword f = \(SourceWalletConfig w a p) ->
     SourceWalletConfig w a <$> f p
@@ -141,10 +152,21 @@ instance FromJSON SourceWalletConfig where
       <*> v .: "account-index"
       <*> v .:? "spending-password"
 
+-- | Turns a 'SourceWalletConfig' into a 'PaymentSource' needed to construct a 'Payment'
+--
+-- See 'Cardano.WalletClient.withdraw'
 cfgToPaymentSource :: SourceWalletConfig -> PaymentSource
 cfgToPaymentSource (SourceWalletConfig wId aIdx _) = PaymentSource wId aIdx
 
 --------------------------------------------------------------------------------
+-- | Config for the centre point of the payment amount distribution
+--
+-- The amount of ADA to send from the faucet is calculated using this and
+-- 'PaymentVariation' to compute
+--
+-- @
+--   'PaymentCenter' + randomFloat(-1, 1) * 'PaymentVariation'
+-- @
 newtype PaymentCenter = PaymentCenter Int deriving (Generic, Show, Eq, Ord)
 
 makeWrapped ''PaymentCenter
@@ -152,6 +174,7 @@ makeWrapped ''PaymentCenter
 instance FromJSON PaymentCenter
 
 --------------------------------------------------------------------------------
+-- | See 'PaymentCenter'
 newtype PaymentVariation = PaymentVariation Float deriving (Generic, Show, Eq, Ord)
 
 makeWrapped ''PaymentVariation
@@ -159,30 +182,52 @@ makeWrapped ''PaymentVariation
 instance FromJSON PaymentVariation
 
 --------------------------------------------------------------------------------
-data SourceWallet = Generate !FilePath
-                  | Provided !FilePath
+-- | Config for the wallet used by the faucet as a source of ADA
+data SourceWallet
+    -- | Tells the faucet to generate its own wallet at start up
+    --
+    -- After 'CreatedWallet' will be written to 'FilePath'
+    = Generate !FilePath
+    -- | Tells the faucet to read a 'SourceWalletConfig' from the 'FilePath'
+    | Provided !FilePath
 
 instance FromJSON SourceWallet where
     parseJSON = withObject "SourceWallet" $ \v ->
         (Generate <$> v .: "generate-to") <|> (Provided <$> v .: "read-from")
 
+--------------------------------------------------------------------------------
+-- | Once a wallet is created or read 'FaucetEnv' gets one of these
 data InitializedWallet = InitializedWallet {
-    _walletConfig   :: !SourceWalletConfig
+    -- | The details of the wallet
+    _walletConfig  :: !SourceWalletConfig
+    -- | The wallet's balance (0 if just created otherwise queried)
   , _walletBalance :: !Int64
   } deriving (Show, Generic)
 
 makeLenses ''InitializedWallet
+
 --------------------------------------------------------------------------------
+-- | Static config provided to the faucet
 data FaucetConfig = FaucetConfig {
+    -- | Host the wallet API is running on
     _fcWalletApiHost    :: !String
+    -- | Port the wallet API is running on
   , _fcWalletApiPort    :: !Int
+    -- | Port to serve the faucet on
   , _fcPort             :: !Int
+    -- | Midpoint for withdrawls (defaults to 1000)
   , _fcPaymentAmount    :: !PaymentCenter
+    -- | Variation for withdrawls (defaults to 500)
   , _fcPaymentVariation :: !PaymentVariation
+    -- | Statsd server details
   , _fcStatsdOpts       :: !FaucetStatsdOpts
+    -- | Config for wallet to use for funds
   , _fcSourceWallet     :: !SourceWallet
+    -- | Logging config file
   , _fcLoggerConfigFile :: !FilePath
+    -- | TLS public certificate
   , _fcPubCertFile      :: !FilePath
+    -- | TLS private key
   , _fcPrivKeyFile      :: !FilePath
   }
 
@@ -202,14 +247,19 @@ instance FromJSON FaucetConfig where
           <*> v .: "public-certificate"
           <*> v .: "private-key"
 
+--------------------------------------------------------------------------------
+-- | Details of a wallet created by the faucet at run time if 'Generate' is used
 data CreatedWallet = CreatedWallet {
+    -- | ID of the created wallet
     _createdWalletId :: WalletId
+    -- | 12 word recovery mnemonic
   , _createdPhrase   :: BackupPhrase
+    -- | Index of the account present in the created wallet
   , _createdAcctIdx  :: AccountIndex
+    -- | Sending address within the account in the created wallet
   , _createdAddress  :: Address
   } deriving (Show, Generic)
 
---------------------------------------------------------------------------------
 instance ToJSON CreatedWallet where
     toJSON (CreatedWallet wId phrase acctIdx addr) =
         object [ "wallet-id" .= wId
@@ -217,33 +267,57 @@ instance ToJSON CreatedWallet where
                , "account-index" .= acctIdx
                , "address" .= addr
                ]
+
 --------------------------------------------------------------------------------
+-- | Sum type for possible errors encountered at faucet startup time
 data InitFaucetError =
+    -- | Bad parse on the file suplying existing wallet details
     SourceWalletParseError String
+    -- | Error reading sync state from wallet API
   | CouldntReadSyncState ClientError
+    -- | Error creating a new wallet
   | WalletCreationError ClientError
+    -- | Error reading the balance of an existing wallet
   | CouldntReadBalance ClientError
+    -- | Error thrown if created wallet doesn't have an account (shouldn't happen)
   | NoWalletAccounts WalletId
+    -- | Error thrown if created wallet has > 1 account (shouldn't happen)
   | MultipleWalletAccounts WalletId
+    -- | Error thrown if exactly one address isn't found (shouln't happen)
   | BadAddress WalletId AccountIndex
   deriving (Typeable, Show)
 
 instance Exception InitFaucetError
 
 --------------------------------------------------------------------------------
+-- | Run time environment for faucet's reader Monad
 data FaucetEnv = FaucetEnv {
+    -- | Counter for total amount withdawn from a wallet while faucet is running
     _feWithdrawn     :: !Counter
+    -- | Counter for number of withdrawls made
   , _feNumWithdrawn  :: !Counter
+    -- | Gauge for wallet balance
   , _feWalletBalance :: !Gauge
+    -- | Metrics store
   , _feStore         :: !Store
+    -- | Config for source of funds
   , _feSourceWallet  :: !SourceWalletConfig
+    -- | Original static config object
   , _feFaucetConfig  :: !FaucetConfig
+    -- | Client for communicating with wallet API
   , _feWalletClient  :: !(WalletClient IO)
   }
 
 makeClassy ''FaucetEnv
 
+-- |
+-- === Metrics functions
 
+-- | Record a withdrawl
+--
+-- * Adds to 'feWithDrawn' 'Counter'
+-- * Increments 'feNumWithDrawn' 'Counter'
+-- * Adds to 'feWalletBalance'
 incWithDrawn :: (MonadReader e m, HasFaucetEnv e, MonadIO m) => Coin -> m ()
 incWithDrawn (Coin (fromIntegral -> c)) = do
   wd <- view feWithdrawn
@@ -254,6 +328,9 @@ incWithDrawn (Coin (fromIntegral -> c)) = do
     Counter.inc wc
     Gauge.add bal c
 
+-- | Record a deposit
+--
+-- * Subtracts from 'feWalletBalance'
 decrWithDrawn :: (MonadReader e m, HasFaucetEnv e, MonadIO m) => Coin -> m ()
 decrWithDrawn (Coin (fromIntegral -> c)) = do
   -- wd <- view feWithdrawn
@@ -264,15 +341,20 @@ decrWithDrawn (Coin (fromIntegral -> c)) = do
     -- Counter.inc wc
     Gauge.subtract bal c
 
+-- | Resets the wallet balance in 'feWalletBalance'
 setWalletBalance :: (MonadReader e m, HasFaucetEnv e, MonadIO m) => Coin -> m ()
 setWalletBalance (Coin (fromIntegral -> c)) = do
   bal <- view feWalletBalance
   liftIO $ Gauge.set bal c
 
 --------------------------------------------------------------------------------
+-- | === Faucet monad
+--
+-- | Concrete monad stack for server server
 newtype M a = M { unM :: ReaderT FaucetEnv (ExceptT ServantErr (LoggerNameBox IO)) a }
   deriving (Functor, Applicative, Monad, MonadReader FaucetEnv, CanLog, HasLoggerName, MonadIO)
 
+-- | Runs the 'M' monad
 runM :: FaucetEnv -> M a -> IO (Either ServantErr a)
 runM c = launchFromFile (c ^. feFaucetConfig . fcLoggerConfigFile) (LoggerName "faucet")
        . runExceptT

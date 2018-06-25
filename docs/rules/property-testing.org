@@ -1,0 +1,29 @@
+#+TITLE: Property Testing
+* What properties should we be testing?
+** Chain extension
+*** Predecessor
+*** Not past slot
+*** Issuer is the slot leader
+*** Transaction validation
+**** Valid outputs
+**** No double-spending
+**** Unspent inputs
+**** Total amount of outputs must not exceed total amount of inputs
+**** Witnesses match inputs
+*** Bootstrap stake delegation
+*** Delegation certificates
+    No two delegation certificates from the same person
+*** Seed computation
+**** Commitment
+***** Phase is correct
+***** Delegator is rich
+***** Commitment is fresh
+**** Opening
+***** Phase is correct
+***** Opening is for a commitment
+***** Opening is fresh
+**** Recovery
+***** Phase is correct
+***** Recovery is for a commitment
+***** Recovery is fresh
+** Mempool behaviour

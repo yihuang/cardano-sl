@@ -22,7 +22,7 @@ import           System.Random
 
 import           Cardano.Faucet.Types
 
--- | Computes the amount to of ADA to send in 'withdraw'
+-- | Computes the amount of ADA (units in lovelace) to send in 'withdraw'
 randomAmount :: (MonadFaucet c m) => m (V1 Coin)
 randomAmount = do
     amt <- fromIntegral <$> view (feFaucetConfig . fcPaymentAmount . _Wrapped')
@@ -32,7 +32,8 @@ randomAmount = do
 
 -- | Client function for the handler for the @/withdraw@ action
 --
--- Simply sends a 'randomAmount' of ADA to the supplied 'Address'
+-- Simply sends a 'randomAmount' of ADA (units in lovelace )to the supplied
+-- 'Address'
 withdraw :: (MonadFaucet c m) => V1 Address -> Resp m Transaction
 withdraw addr = do
     paymentSource <- view (feSourceWallet . to cfgToPaymentSource)

@@ -96,7 +96,7 @@ createWallet client = do
         Left err -> do
             logError $ "Error getting sync state: " <> (Text.pack $ show err)
             return . Left $ CouldntReadBalance err
-        Right ss | ss == completelySynced -> do
+        Right ss | ss >= completelySynced -> do
                        logInfo "Node fully synced, creating wallet"
                        mkWallet
                  | otherwise -> do

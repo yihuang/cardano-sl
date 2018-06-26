@@ -116,41 +116,39 @@ createWallet client = do
                        liftIO $ threadDelay 5000000
                        createWallet client
     where
+        listToEitherT err errMsg successMsg as = case as of
+            [a] -> logInfo successMsg >> return a
+            _   -> logError errMsg >> throwError err
         mkWallet = do
           phrase <- liftIO generateBackupPhrase
           let w = NewWallet (V1 phrase) Nothing NormalAssurance "Faucet-Wallet" CreateWallet
           runExceptT $ do
               wId <- walId <$> (runClient WalletCreationError $ postWallet client w)
-              logInfo $ "Created wallet with ID: " <> (Text.pack $ show wId)
+              let wIdLog = Text.pack $ show wId
+              logInfo $ "Created wallet with ID: " <> wIdLog
               accounts <- runClient WalletCreationError $
                             getAccountIndexPaged
                               client
                               wId
                               Nothing
                               Nothing
-              case accounts of
-                  [a] -> do
-                      let aIdx = accIndex a
-                      logInfo $ "Found a single account for wallet with ID: "
-                                <> (Text.pack $ show wId)
-                                <> " account index: " <> (Text.pack $ show aIdx)
-                      case accAddresses a of
-                          [addr] -> do
-                              logInfo $ "Found a single account for wallet with ID: "
-                                        <> (Text.pack $ show wId)
-                                        <> " account index: " <> (Text.pack $ show aIdx)
-                              return (SourceWalletConfig wId aIdx Nothing, phrase, unV1 $ addrId addr)
-                          _ -> do
-                              logInfo $ "Didn't find an address for wallet with ID: "
-                                        <> (Text.pack $ show wId)
-                                        <> " account index: " <> (Text.pack $ show aIdx)
-                              throwError $ BadAddress wId aIdx
-                  [] -> do
-                      logError $ "No accounts found for wallet with ID: " <> (Text.pack $ show wId)
-                      throwError $ NoWalletAccounts wId
-                  _ -> do
-                      logError $ "Multiple accounts found for wallet with ID: " <> (Text.pack $ show wId)
-                      throwError $ MultipleWalletAccounts wId
+              acc <- listToEitherT
+                          (NoWalletAccounts wId)
+                          ("Didn't find an account for wallet with ID: " <> wIdLog)
+                          ("Found a single account for wallet with ID: " <> wIdLog)
+                          accounts
+              let aIdx = accIndex acc
+                  aIdxLog = Text.pack $ show aIdx
+              address <- listToEitherT
+                          (BadAddress wId aIdx)
+                          ("Didn't find an address for wallet with ID: "
+                                        <> wIdLog
+                                        <> " account index: " <> aIdxLog)
+                          ("Found a single address for wallet with ID: "
+                                        <> wIdLog
+                                        <> " account index: " <> aIdxLog)
+                          (accAddresses acc)
+              return (SourceWalletConfig wId aIdx Nothing, phrase, unV1 $ addrId address)
         runClient err m = ExceptT $ (fmap (first err)) $ fmap (fmap wrData) m
 
 --------------------------------------------------------------------------------

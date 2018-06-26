@@ -58,7 +58,10 @@ library
                      , tls
   exposed-modules:
                       Cardano.Faucet
+                    , Cardano.Faucet.Types.Config
+                    , Cardano.Faucet.Types.API
                     , Cardano.Faucet.Types
+                    , Cardano.Faucet.Metrics
                     , Cardano.Faucet.Init
                     , Cardano.WalletClient
   default-language: Haskell2010

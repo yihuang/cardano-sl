@@ -16,11 +16,13 @@ import           Data.Text.Lens
 import           Servant
 import           System.Wlog (LoggerName (..), logError, logInfo, withSublogger)
 
-import           Cardano.Faucet.Init
-import           Cardano.Faucet.Types
 import           Cardano.Wallet.API.Response (WalletResponse (..))
 import           Cardano.Wallet.API.V1.Types (txAmount, unV1)
 import qualified Cardano.WalletClient as Client
+
+import           Cardano.Faucet.Init
+import           Cardano.Faucet.Metrics
+import           Cardano.Faucet.Types
 
 -- | Top level type of the faucet API
 type API = "withdraw" :> ReqBody '[JSON] WithdrawlRequest :> Post '[JSON] WithdrawlResult

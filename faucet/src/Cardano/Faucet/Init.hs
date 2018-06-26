@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds            #-}
+{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE DuplicateRecordFields      #-}
 {-# LANGUAGE FlexibleInstances          #-}
@@ -13,11 +14,10 @@
 {-# OPTIONS_GHC -Wall #-}
 module Cardano.Faucet.Init (initEnv) where
 
-import Control.Concurrent (threadDelay)
+import           Control.Concurrent (threadDelay)
 import           Control.Exception (throw)
 import           Control.Lens hiding ((.=))
 import           Control.Monad.Except
-import           Crypto.Random.Entropy (getEntropy)
 import           Data.Aeson (eitherDecode)
 import           Data.Aeson.Text (encodeToLazyText)
 import           Data.Bifunctor (first)
@@ -26,7 +26,6 @@ import qualified Data.ByteString.Lazy as BSL
 import           Data.Default (def)
 import           Data.Int (Int64)
 import           Data.Monoid ((<>))
-import           Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.Lazy.IO as Text
 import           Data.Text.Lens (packed)
@@ -53,8 +52,7 @@ import           Cardano.Wallet.Client (ClientError (..), WalletClient (..), Wal
                                         liftClient)
 import           Cardano.Wallet.Client.Http (mkHttpClient)
 import           Pos.Core (Address (..), Coin (..))
-import           Pos.Util.BackupPhrase (BackupPhrase (..))
-import           Pos.Util.Mnemonics (toMnemonic)
+import           Pos.Util.Mnemonic (Mnemonic, entropyToMnemonic, genEntropy)
 
 import           Cardano.Faucet.Types
 
@@ -65,18 +63,8 @@ readSourceWalletConfig :: FilePath -> IO (Either String SourceWalletConfig)
 readSourceWalletConfig = fmap eitherDecode . BSL.readFile
 
 --------------------------------------------------------------------------------
--- | Generate a random 12 word wallet recovery phrase
-generateBackupPhrase :: IO BackupPhrase
-generateBackupPhrase = do
-    -- The size 16 should give us 12-words mnemonic after BIP-39 encoding.
-    genMnemonic <- getEntropy 16
-    let newMnemonic = either (error . show) id $ toMnemonic genMnemonic
-    return $ mkBackupPhrase12 $ Text.words newMnemonic
-  where
-    mkBackupPhrase12 :: [Text] -> BackupPhrase
-    mkBackupPhrase12 ls
-        | length ls == 12 = BackupPhrase ls
-        | otherwise = error "Invalid number of words in backup phrase! Expected 12 words."
+generateBackupPhrase :: IO (Mnemonic 12)
+generateBackupPhrase = entropyToMnemonic <$> genEntropy
 
 --------------------------------------------------------------------------------
 completelySynced :: SyncPercentage
@@ -101,7 +89,7 @@ getSyncState client = do
 createWallet
     :: (HasLoggerName m, CanLog m, MonadIO m)
     => WalletClient m
-    -> m (Either InitFaucetError (SourceWalletConfig, BackupPhrase, Address))
+    -> m (Either InitFaucetError (SourceWalletConfig, Mnemonic 12, Address))
 createWallet client = do
     sync <- getSyncState client
     case sync of

@@ -6,6 +6,15 @@ module Pos.Core.Configuration
        , withCoreConfigurations
        , withGenesisSpec
 
+       , Config (..)
+       , configK
+       , configVssMinTTL
+       , configVssMaxTTL
+       , configBlkSecurityParam
+       , configSlotSecurityParam
+       , configChainQualityThreshold
+       , configEpochSlots
+
        , canonicalGenesisJson
        , prettyGenesisJson
 
@@ -16,10 +25,12 @@ import           Universum
 
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BSL
+import           Data.Coerce (coerce)
 import           System.FilePath ((</>))
 import qualified Text.JSON.Canonical as Canonical
 
 import           Pos.Binary.Class (Raw)
+import           Pos.Core.Common (BlockCount)
 import           Pos.Core.Configuration.BlockVersionData as E
 import           Pos.Core.Configuration.Core as E
 import           Pos.Core.Configuration.GeneratedSecrets as E
@@ -33,8 +44,10 @@ import           Pos.Core.Genesis (GenesisData (..), GenesisDelegation,
 import           Pos.Core.Genesis.Canonical (SchemaError)
 import           Pos.Core.Genesis.Generate (GeneratedGenesisData (..),
                      generateGenesisData)
-import           Pos.Core.ProtocolConstants (ProtocolConstants)
-import           Pos.Core.Slotting (Timestamp)
+import           Pos.Core.ProtocolConstants (ProtocolConstants (..), VssMaxTTL,
+                     VssMinTTL, pcBlkSecurityParam, pcChainQualityThreshold,
+                     pcEpochSlots, pcSlotSecurityParam)
+import           Pos.Core.Slotting (SlotCount, Timestamp)
 import           Pos.Crypto.Configuration as E
 import           Pos.Crypto.Hashing (Hash, hashRaw, unsafeHash)
 import           Pos.Util.Util (leftToPanic)
@@ -43,10 +56,36 @@ import           Pos.Util.Util (leftToPanic)
 type HasConfiguration =
     ( HasCoreConfiguration
     , HasGenesisData
-    , HasGenesisHash
     , HasGeneratedSecrets
     , HasGenesisBlockVersionData
     )
+
+data Config = Config
+  { configProtocolMagic     :: ProtocolMagic
+  , configProtocolConstants :: ProtocolConstants
+  , configGenesisHash       :: GenesisHash
+  }
+
+configK :: Config -> Int
+configK = pcK . configProtocolConstants
+
+configVssMinTTL :: Config -> VssMinTTL
+configVssMinTTL = pcVssMinTTL . configProtocolConstants
+
+configVssMaxTTL :: Config -> VssMaxTTL
+configVssMaxTTL = pcVssMaxTTL . configProtocolConstants
+
+configBlkSecurityParam :: Config -> BlockCount
+configBlkSecurityParam = pcBlkSecurityParam . configProtocolConstants
+
+configSlotSecurityParam :: Config -> SlotCount
+configSlotSecurityParam = pcSlotSecurityParam . configProtocolConstants
+
+configChainQualityThreshold :: Fractional f => Config -> f
+configChainQualityThreshold = pcChainQualityThreshold . configProtocolConstants
+
+configEpochSlots :: Config -> SlotCount
+configEpochSlots = pcEpochSlots . configProtocolConstants
 
 canonicalGenesisJson :: GenesisData -> (BSL.ByteString, Hash Raw)
 canonicalGenesisJson theGenesisData = (canonicalJsonBytes, jsonHash)
@@ -73,10 +112,8 @@ prettyGenesisJson theGenesisData =
 -- If the configuration gives a testnet genesis spec, then a start time must
 -- be provided, probably sourced from command line arguments.
 withCoreConfigurations
-    :: forall m r.
-       ( MonadThrow m
-       , MonadIO m
-       )
+    :: forall m r
+     . (MonadThrow m, MonadIO m)
     => CoreConfiguration
     -> FilePath
     -- ^ Directory where 'configuration.yaml' is stored.
@@ -86,107 +123,121 @@ withCoreConfigurations
     -> Maybe Integer
     -- ^ Optional seed which overrides one from testnet initializer if
     -- provided.
-    -> (HasConfiguration => ProtocolMagic -> ProtocolConstants -> m r)
+    -> (HasConfiguration => Config -> m r)
     -> m r
-withCoreConfigurations conf@CoreConfiguration{..} confDir mSystemStart mSeed act = case ccGenesis of
+withCoreConfigurations conf@CoreConfiguration {..} confDir mSystemStart mSeed act
+    = case ccGenesis of
     -- If a 'GenesisData' source file is given, we check its hash against the
     -- given expected hash, parse it, and use the GenesisData to fill in all of
     -- the obligations.
-    GCSrc fp expectedHash -> do
-        !bytes <- liftIO $ BS.readFile (confDir </> fp)
+        GCSrc fp expectedHash -> do
+            !bytes <- liftIO $ BS.readFile (confDir </> fp)
 
-        whenJust mSeed $ const $
-            throwM $ MeaninglessSeed
-                "Seed doesn't make sense when genesis data itself is provided"
+            whenJust mSeed
+                $ const
+                $ throwM
+                $ MeaninglessSeed
+                      "Seed doesn't make sense when genesis data itself is provided"
 
-        gdataJSON <- case Canonical.parseCanonicalJSON (BSL.fromStrict bytes) of
-            Left str -> throwM $ GenesisDataParseFailure (fromString str)
-            Right it -> return it
+            gdataJSON <-
+                case Canonical.parseCanonicalJSON (BSL.fromStrict bytes) of
+                    Left str ->
+                        throwM $ GenesisDataParseFailure (fromString str)
+                    Right it -> return it
 
-        theGenesisData <- case Canonical.fromJSON gdataJSON of
-            Left err -> throwM $ GenesisDataSchemaError err
-            Right it -> return it
+            theGenesisData <- case Canonical.fromJSON gdataJSON of
+                Left  err -> throwM $ GenesisDataSchemaError err
+                Right it  -> return it
 
-        let (_, theGenesisHash) = canonicalGenesisJson theGenesisData
-            pc = genesisProtocolConstantsToProtocolConstants (gdProtocolConsts theGenesisData)
-            pm = gpcProtocolMagic (gdProtocolConsts theGenesisData)
-        when (theGenesisHash /= expectedHash) $
-            throwM $ GenesisHashMismatch
-                     (show theGenesisHash) (show expectedHash)
+            let (_, theGenesisHash) = canonicalGenesisJson theGenesisData
+                pc = genesisProtocolConstantsToProtocolConstants
+                    (gdProtocolConsts theGenesisData)
+                pm = gpcProtocolMagic (gdProtocolConsts theGenesisData)
+            when (theGenesisHash /= expectedHash) $ throwM $ GenesisHashMismatch
+                (show theGenesisHash)
+                (show expectedHash)
 
-        withCoreConfiguration conf $
-            withGenesisBlockVersionData (gdBlockVersionData theGenesisData) $
-            withGenesisData theGenesisData $
-            withGenesisHash theGenesisHash $
-            withGeneratedSecrets Nothing $
-            act pm pc
+            withCoreConfiguration conf
+                $ withGenesisBlockVersionData
+                      (gdBlockVersionData theGenesisData)
+                $ withGenesisData theGenesisData
+                $ withGeneratedSecrets Nothing
+                $ act
+                $ Config pm pc (GenesisHash (coerce theGenesisHash))
 
-    -- If a 'GenesisSpec' is given, we ensure we have a start time (needed if
-    -- it's a testnet initializer) and then make a 'GenesisData' from it.
-    GCSpec spec -> do
+        -- If a 'GenesisSpec' is given, we ensure we have a start time (needed if
+        -- it's a testnet initializer) and then make a 'GenesisData' from it.
+        GCSpec spec -> do
 
-        theSystemStart <- case mSystemStart of
-            Just it -> do
-                return it
-            Nothing -> throwM MissingSystemStartTime
+            theSystemStart <- case mSystemStart of
+                Just it -> do
+                    return it
+                Nothing -> throwM MissingSystemStartTime
 
-        -- Override seed if necessary
-        let overrideSeed :: Integer -> GenesisInitializer -> GenesisInitializer
-            overrideSeed newSeed gi = gi {giSeed = newSeed}
+            -- Override seed if necessary
+            let overrideSeed
+                    :: Integer -> GenesisInitializer -> GenesisInitializer
+                overrideSeed newSeed gi = gi { giSeed = newSeed }
 
-        let theSpec = case mSeed of
-                Nothing -> spec
-                Just newSeed -> spec
-                    { gsInitializer = overrideSeed newSeed (gsInitializer spec)
-                    }
+            let
+                theSpec = case mSeed of
+                    Nothing      -> spec
+                    Just newSeed -> spec
+                        { gsInitializer = overrideSeed newSeed
+                                                       (gsInitializer spec)
+                        }
 
-        let theConf = conf {ccGenesis = GCSpec theSpec}
+            let theConf = conf { ccGenesis = GCSpec theSpec }
 
-        withGenesisSpec theSystemStart theConf act
+            withGenesisSpec theSystemStart theConf act
 
 withGenesisSpec
-    :: Timestamp
-    -> CoreConfiguration
-    -> (HasConfiguration => ProtocolMagic -> ProtocolConstants -> r)
-    -> r
-withGenesisSpec theSystemStart conf@CoreConfiguration{..} val = case ccGenesis of
-    GCSrc {} -> error "withGenesisSpec called with GCSrc"
-    GCSpec spec ->
-        withGenesisBlockVersionData (gsBlockVersionData spec) $
-            let
-                -- Generate
-                GeneratedGenesisData {..} =
-                    generateGenesisData pm pc (gsInitializer spec) (gsAvvmDistr spec)
+    :: Timestamp -> CoreConfiguration -> (HasConfiguration => Config -> r) -> r
+withGenesisSpec theSystemStart conf@CoreConfiguration {..} val =
+    case ccGenesis of
+        GCSrc{} -> error "withGenesisSpec called with GCSrc"
+        GCSpec spec ->
+            withGenesisBlockVersionData (gsBlockVersionData spec)
+                $ let
+                      -- Generate
+                      GeneratedGenesisData {..} = generateGenesisData
+                          pm
+                          pc
+                          (gsInitializer spec)
+                          (gsAvvmDistr spec)
 
-                -- Unite with generated
-                finalHeavyDelegation :: GenesisDelegation
-                finalHeavyDelegation =
-                    leftToPanic "withGenesisSpec" $ mkGenesisDelegation $
-                    (toList $ gsHeavyDelegation spec) <> toList ggdDelegation
+                      -- Unite with generated
+                      finalHeavyDelegation :: GenesisDelegation
+                      finalHeavyDelegation =
+                          leftToPanic "withGenesisSpec"
+                              $  mkGenesisDelegation
+                              $  (toList $ gsHeavyDelegation spec)
+                              <> toList ggdDelegation
 
-                -- Construct the final value
-                theGenesisData =
-                   GenesisData
-                      { gdBootStakeholders = ggdBootStakeholders
-                      , gdHeavyDelegation  = finalHeavyDelegation
-                      , gdStartTime        = theSystemStart
-                      , gdVssCerts         = ggdVssCerts
-                      , gdNonAvvmBalances  = ggdNonAvvm
-                      , gdBlockVersionData = genesisBlockVersionData
-                      , gdProtocolConsts   = gsProtocolConstants spec
-                      , gdAvvmDistr        = ggdAvvm
-                      , gdFtsSeed          = gsFtsSeed spec
-                      }
-                -- Anything will do for the genesis hash. A hash of "patak" was used
-                -- before, and so it remains.
-                theGenesisHash = unsafeHash @Text "patak"
-             in withCoreConfiguration conf $
-                  withGenesisHash theGenesisHash $
-                  withGeneratedSecrets (Just ggdSecrets) $
-                  withGenesisData theGenesisData $ val pm pc
-      where
-        pm = gpcProtocolMagic (gsProtocolConstants spec)
-        pc = genesisProtocolConstantsToProtocolConstants (gsProtocolConstants spec)
+                      -- Construct the final value
+                      theGenesisData = GenesisData
+                          { gdBootStakeholders = ggdBootStakeholders
+                          , gdHeavyDelegation  = finalHeavyDelegation
+                          , gdStartTime        = theSystemStart
+                          , gdVssCerts         = ggdVssCerts
+                          , gdNonAvvmBalances  = ggdNonAvvm
+                          , gdBlockVersionData = genesisBlockVersionData
+                          , gdProtocolConsts   = gsProtocolConstants spec
+                          , gdAvvmDistr        = ggdAvvm
+                          , gdFtsSeed          = gsFtsSeed spec
+                          }
+                      -- Anything will do for the genesis hash. A hash of "patak" was used
+                      -- before, and so it remains.
+                      theGenesisHash = unsafeHash @Text "patak"
+                  in  withCoreConfiguration conf
+                      $ withGeneratedSecrets (Just ggdSecrets)
+                      $ withGenesisData theGenesisData
+                      $ val
+                      $ Config pm pc (GenesisHash $ coerce theGenesisHash)
+          where
+            pm = gpcProtocolMagic (gsProtocolConstants spec)
+            pc = genesisProtocolConstantsToProtocolConstants
+                (gsProtocolConstants spec)
 
 data ConfigurationError =
       -- | A system start time must be given when a testnet genesis is used.

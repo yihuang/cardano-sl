@@ -24,14 +24,15 @@ import           Pos.Block.Lrc (lrcSingleShot)
 import           Pos.Block.Slog (ShouldCallBListener (..))
 import           Pos.Block.Types (Blund)
 import           Pos.Communication.Message ()
-import           Pos.Core (EpochOrSlot (..), ProtocolConstants, SlotId (..),
-                     addressHash, epochIndexL, epochOrSlotEnumFromTo,
-                     epochOrSlotFromEnum, epochOrSlotSucc, epochOrSlotToEnum,
-                     getEpochOrSlot, getSlotIndex, localSlotIndexMinBound,
-                     pcBlkSecurityParam, pcEpochSlots)
+import           Pos.Core as Core (Config (..), EpochOrSlot (..), SlotId (..),
+                     addressHash, configEpochSlots, epochIndexL,
+                     epochOrSlotEnumFromTo, epochOrSlotFromEnum,
+                     epochOrSlotSucc, epochOrSlotToEnum, getEpochOrSlot,
+                     getSlotIndex, localSlotIndexMinBound, pcBlkSecurityParam,
+                     pcEpochSlots)
 import           Pos.Core.Block (Block)
 import           Pos.Core.Block.Constructors (mkGenesisBlock)
-import           Pos.Crypto (ProtocolMagic, pskDelegatePk)
+import           Pos.Crypto (pskDelegatePk)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.Delegation.Logic (getDlgTransPsk)
 import           Pos.Delegation.Types (ProxySKBlockInfo)
@@ -67,18 +68,18 @@ type BlockTxpGenMode g ctx m =
 -- Intermediate results will be forced. Blocks can be generated, written to
 -- disk, then collected by using '()' as the monoid and 'const ()' as the
 -- injector, for example.
-genBlocks ::
-       forall g ctx m t . (HasTxpConfiguration, BlockTxpGenMode g ctx m, Semigroup t, Monoid t)
-    => ProtocolMagic
-    -> ProtocolConstants
+genBlocks
+    :: forall g ctx m t
+     . (HasTxpConfiguration, BlockTxpGenMode g ctx m, Semigroup t, Monoid t)
+    => Core.Config
     -> BlockGenParams
     -> (Maybe Blund -> t)
     -> RandT g m t
-genBlocks pm pc params inj = do
+genBlocks config params inj = do
     ctx <- lift $ mkBlockGenContext @(MempoolExt m) epochSlots params
     mapRandT (`runReaderT` ctx) genBlocksDo
   where
-    epochSlots = pcEpochSlots pc
+    epochSlots = configEpochSlots config
     genBlocksDo = do
         let numberOfBlocks = params ^. bgpBlockCount
         tipEOS <- getEpochOrSlot <$> lift DB.getTipHeader
@@ -91,7 +92,7 @@ genBlocks pm pc params inj = do
                mempty
                (epochOrSlotEnumFromTo epochSlots startEOS finishEOS)
 
-    genOneBlock t eos = ((t <>) . inj) <$> genBlock pm pc eos
+    genOneBlock t eos = ((t <>) . inj) <$> genBlock config eos
 
     foldM' combine = go
       where
@@ -108,13 +109,12 @@ genBlock
        , MonadTxpLocal (BlockGenMode (MempoolExt m) m)
        , HasTxpConfiguration
        )
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> EpochOrSlot
     -> BlockGenRandMode (MempoolExt m) g m (Maybe Blund)
-genBlock pm pc eos = do
+genBlock config@(Config pm pc _) eos = do
     let epoch = eos ^. epochIndexL
-    lift $ unlessM ((epoch ==) <$> LrcDB.getEpoch) (lrcSingleShot pm pc epoch)
+    lift $ unlessM ((epoch ==) <$> LrcDB.getEpoch) (lrcSingleShot config epoch)
     -- We need to know leaders to create any block.
     leaders <- lift
         $ lrcActionOnEpochReason epoch "genBlock" LrcDB.getLeadersForEpoch

@@ -31,10 +31,11 @@ import           Pos.Block.Logic.Util (calcChainQualityM)
 import           Pos.Block.Logic.VAR (verifyBlocksPrefix)
 import           Pos.Block.Lrc (LrcModeFull, lrcSingleShot)
 import           Pos.Block.Slog (HasSlogGState (..), ShouldCallBListener (..))
-import           Pos.Core (BlockCount, Blockchain (..), EpochIndex,
-                     EpochOrSlot (..), HeaderHash, ProtocolConstants,
-                     SlotId (..), epochIndexL, flattenSlotId, getEpochOrSlot,
-                     headerHash, kChainQualityThreshold, kEpochSlots,
+import           Pos.Core as Core (BlockCount, Blockchain (..), Config (..),
+                     EpochIndex, EpochOrSlot (..), HeaderHash,
+                     ProtocolConstants, SlotId (..), configBlkSecurityParam,
+                     epochIndexL, flattenSlotId, getEpochOrSlot, headerHash,
+                     kChainQualityThreshold, kEpochSlots,
                      localSlotIndexMinBound, pcBlkSecurityParam, pcEpochSlots)
 import           Pos.Core.Block (BlockHeader (..), GenesisBlock, MainBlock,
                      MainBlockchain)
@@ -125,35 +126,33 @@ createGenesisBlockAndApply
              (StateLockMetrics MemPoolModifyReason)
        , HasMisbehaviorMetrics ctx
        )
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> EpochIndex
     -> m (Maybe GenesisBlock)
 -- Genesis block for 0-th epoch is hardcoded.
-createGenesisBlockAndApply _ _ 0 = pure Nothing
-createGenesisBlockAndApply pm pc epoch = do
+createGenesisBlockAndApply _ 0 = pure Nothing
+createGenesisBlockAndApply config epoch = do
     tipHeader <- DB.getTipHeader
     -- preliminary check outside the lock,
     -- must be repeated inside the lock
-    needGen <- needCreateGenesisBlock (pcBlkSecurityParam pc) epoch tipHeader
+    needGen <- needCreateGenesisBlock (configBlkSecurityParam config) epoch tipHeader
     if needGen
         then modifyStateLock
                  HighPriority
                  ApplyBlock
-                 (\_ -> createGenesisBlockDo pm pc epoch)
+                 (\_ -> createGenesisBlockDo config epoch)
         else return Nothing
 
 createGenesisBlockDo
     :: forall ctx m
      . (MonadCreateBlock ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> EpochIndex
     -> m (HeaderHash, Maybe GenesisBlock)
-createGenesisBlockDo pm pc epoch = do
+createGenesisBlockDo config@(Config pm pc _) epoch = do
     tipHeader <- DB.getTipHeader
     logDebug $ sformat msgTryingFmt epoch tipHeader
-    needCreateGenesisBlock (pcBlkSecurityParam pc) epoch tipHeader >>= \case
+    needCreateGenesisBlock (configBlkSecurityParam config) epoch tipHeader >>= \case
         False -> (BC.blockHeaderHash tipHeader, Nothing) <$ logShouldNot
         True -> actuallyCreate tipHeader
   where
@@ -162,7 +161,7 @@ createGenesisBlockDo pm pc epoch = do
     -- Note that it shouldn't fail, because 'shouldCreate' guarantees that we
     -- have enough blocks for LRC.
     actuallyCreate tipHeader = do
-        lrcSingleShot pm pc epoch
+        lrcSingleShot config epoch
         leaders <- lrcActionOnEpochReason epoch "createGenesisBlockDo "
             LrcDB.getLeadersForEpoch
         let blk = mkGenesisBlock pm (Right tipHeader) epoch leaders

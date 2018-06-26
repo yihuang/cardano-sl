@@ -37,7 +37,7 @@ import           Pos.Util (HasLens', _neLast)
 
 import           Test.Pos.Block.Logic.Mode (BlockProperty, BlockTestContext,
                      btcSlotIdL)
-import           Test.Pos.Core.Dummy (dummyProtocolConstants)
+import           Test.Pos.Core.Dummy (dummyConfig)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 
 -- | Wrapper for 'bpGenBlocks' to clarify the meaning of the argument.
@@ -97,13 +97,7 @@ bpGenBlocks blkCnt enableTxPayload inplaceDB = do
     g      <- pick $ MkGen $ \qc _ -> qc
     lift
         $   OldestFirst
-        <$> evalRandT
-                (genBlocks dummyProtocolMagic
-                           dummyProtocolConstants
-                           params
-                           maybeToList
-                )
-                g
+        <$> evalRandT (genBlocks dummyConfig params maybeToList) g
 
 -- | A version of 'bpGenBlocks' which generates exactly one
 -- block. Allows one to avoid unsafe functions sometimes.

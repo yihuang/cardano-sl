@@ -37,9 +37,9 @@ import qualified Pos.Block.Logic as L
 import           Pos.Block.RetrievalQueue (BlockRetrievalQueue,
                      BlockRetrievalQueueTag, BlockRetrievalTask (..))
 import           Pos.Block.Types (Blund, LastKnownHeaderTag)
-import           Pos.Core (HasHeaderHash (..), HeaderHash, ProtocolConstants,
-                     SlotCount, gbHeader, headerHashG, isMoreDifficult,
-                     pcEpochSlots, prevBlockL)
+import           Pos.Core as Core (Config (..), HasHeaderHash (..), HeaderHash,
+                     SlotCount, configEpochSlots, gbHeader, headerHashG,
+                     isMoreDifficult, prevBlockL)
 import           Pos.Core.Block (Block, BlockHeader, blockHeader)
 import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..),
                      _NewestFirst, _OldestFirst)
@@ -226,42 +226,45 @@ updateLastKnownHeader lastKnownH header = do
 handleBlocks
     :: forall ctx m
      . (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> OldestFirst NE Block
     -> Diffusion m
     -> m ()
-handleBlocks pm pc blocks diffusion = do
+handleBlocks config blocks diffusion = do
     logDebug "handleBlocks: processing"
-    inAssertMode $ logInfo $
-        sformat ("Processing sequence of blocks: " % buildListBounds % "...") $
-            getOldestFirst $ map headerHash blocks
-    maybe onNoLca handleBlocksWithLca =<<
-        lcaWithMainChain (map (view blockHeader) blocks)
+    inAssertMode
+        $ logInfo
+        $ sformat ("Processing sequence of blocks: " % buildListBounds % "...")
+        $ getOldestFirst
+        $ map headerHash blocks
+    maybe onNoLca handleBlocksWithLca
+        =<< lcaWithMainChain (map (view blockHeader) blocks)
     inAssertMode $ logDebug $ "Finished processing sequence of blocks"
   where
-    onNoLca = logWarning $
-        "Sequence of blocks can't be processed, because there is no LCA. " <>
-        "Probably rollback happened in parallel"
+    onNoLca =
+        logWarning
+            $ "Sequence of blocks can't be processed, because there is no LCA. "
+            <> "Probably rollback happened in parallel"
 
     handleBlocksWithLca :: HeaderHash -> m ()
     handleBlocksWithLca lcaHash = do
-        logDebug $ sformat ("Handling block w/ LCA, which is "%shortHashF) lcaHash
+        logDebug $ sformat ("Handling block w/ LCA, which is " % shortHashF)
+                           lcaHash
         -- Head blund in result is the youngest one.
-        toRollback <- DB.loadBlundsFromTipWhile $ \blk -> headerHash blk /= lcaHash
-        maybe (applyWithoutRollback pm pc diffusion blocks)
-              (applyWithRollback pm pc diffusion blocks lcaHash)
+        toRollback <- DB.loadBlundsFromTipWhile (configGenesisHash config)
+            $ \blk -> headerHash blk /= lcaHash
+        maybe (applyWithoutRollback config diffusion blocks)
+              (applyWithRollback config diffusion blocks lcaHash)
               (_NewestFirst nonEmpty toRollback)
 
 applyWithoutRollback
     :: forall ctx m
      . (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Diffusion m
     -> OldestFirst NE Block
     -> m ()
-applyWithoutRollback pm pc diffusion blocks = do
+applyWithoutRollback config diffusion blocks = do
     logInfo . sformat ("Trying to apply blocks w/o rollback. " % multilineBounds 6)
        . getOldestFirst . map (view blockHeader) $ blocks
     modifyStateLock HighPriority ApplyBlock applyWithoutRollbackDo >>= \case
@@ -281,7 +284,7 @@ applyWithoutRollback pm pc diffusion blocks = do
                     & map (view blockHeader)
                 applied = NE.fromList $
                     getOldestFirst prefix <> one (toRelay ^. blockHeader)
-            relayBlock (pcEpochSlots pc) diffusion toRelay
+            relayBlock (configEpochSlots config) diffusion toRelay
             logInfo $ blocksAppliedMsg applied
             for_ blocks $ jsonLog . jlAdoptedBlock
   where
@@ -290,21 +293,20 @@ applyWithoutRollback pm pc diffusion blocks = do
         :: HeaderHash -> m (HeaderHash, Either ApplyBlocksException HeaderHash)
     applyWithoutRollbackDo curTip = do
         logInfo "Verifying and applying blocks..."
-        res <- verifyAndApplyBlocks pm pc False blocks
+        res <- verifyAndApplyBlocks config False blocks
         logInfo "Verifying and applying blocks done"
         let newTip = either (const curTip) identity res
         pure (newTip, res)
 
 applyWithRollback
     :: (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Diffusion m
     -> OldestFirst NE Block
     -> HeaderHash
     -> NewestFirst NE Blund
     -> m ()
-applyWithRollback pm pc diffusion toApply lca toRollback = do
+applyWithRollback config diffusion toApply lca toRollback = do
     logInfo
         . sformat ("Trying to apply blocks w/o rollback. " % multilineBounds 6)
         . getOldestFirst
@@ -312,7 +314,7 @@ applyWithRollback pm pc diffusion toApply lca toRollback = do
         $ toApply
     logInfo $ sformat ("Blocks to rollback " % listJson) toRollbackHashes
     res <- modifyStateLock HighPriority ApplyBlockWithRollback $ \curTip -> do
-        res <- L.applyWithRollback pm pc toRollback toApplyAfterLca
+        res <- L.applyWithRollback config toRollback toApplyAfterLca
         pure (either (const curTip) identity res, res)
     case res of
         Left (pretty -> err) ->
@@ -327,7 +329,7 @@ applyWithRollback pm pc diffusion toApply lca toRollback = do
             logInfo $ blocksRolledBackMsg (getNewestFirst toRollback)
             logInfo $ blocksAppliedMsg (getOldestFirst toApply)
             for_ (getOldestFirst toApply) $ jsonLog . jlAdoptedBlock
-            relayBlock (pcEpochSlots pc) diffusion
+            relayBlock (configEpochSlots config) diffusion
                 $  toApply
                 ^. _OldestFirst
                 .  _neLast

@@ -42,12 +42,11 @@ import           System.Wlog (WithLogger, logError)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Binary.Class (serialize')
-import           Pos.Core (Address, Coin, EpochIndex (..), HasConfiguration,
-                     HeaderHash, ProtocolConstants, coinToInteger,
+import           Pos.Core as Core (Address, Coin, Config, EpochIndex (..),
+                     HasConfiguration, HeaderHash, coinToInteger,
                      unsafeAddCoin)
 import           Pos.Core.Chrono (NewestFirst (..))
 import           Pos.Core.Txp (Tx, TxId, TxOut (..), TxOutAux (..))
-import           Pos.Crypto (ProtocolMagic)
 import           Pos.DB (DBError (..), DBIteratorClass (..), DBTag (GStateDB),
                      MonadDB, MonadDBRead (dbGet), RocksBatchOp (..),
                      dbIterSource, dbSerializeValue, encodeWithKeyPrefix)
@@ -62,10 +61,9 @@ import           Pos.Util.Util (maybeThrow)
 explorerInitDB
     :: forall ctx m
      . (MonadReader ctx m, MonadUnliftIO m, MonadDB m)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> m ()
-explorerInitDB pm pc = initNodeDBs pm pc >> prepareExplorerDB
+explorerInitDB config = initNodeDBs config >> prepareExplorerDB
 
 ----------------------------------------------------------------------------
 -- Types

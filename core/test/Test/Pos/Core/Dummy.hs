@@ -3,11 +3,19 @@ module Test.Pos.Core.Dummy
        , dummyK
        , dummyEpochSlots
        , dummySlotSecurityParam
+       , dummyGenesisHash
+       , dummyConfig
        ) where
 
-import           Pos.Core (BlockCount, ProtocolConstants (..), SlotCount,
-                     VssMaxTTL (..), VssMinTTL (..), kEpochSlots,
-                     kSlotSecurityParam, pcBlkSecurityParam)
+import           Universum
+
+import           Pos.Core (BlockCount, Config (..), GenesisHash (..),
+                     ProtocolConstants (..), SlotCount, VssMaxTTL (..),
+                     VssMinTTL (..), kEpochSlots, kSlotSecurityParam,
+                     pcBlkSecurityParam)
+import           Pos.Crypto (unsafeHash)
+
+import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 
 dummyProtocolConstants :: ProtocolConstants
 dummyProtocolConstants = ProtocolConstants
@@ -24,3 +32,9 @@ dummyEpochSlots = kEpochSlots dummyK
 
 dummySlotSecurityParam :: SlotCount
 dummySlotSecurityParam = kSlotSecurityParam dummyK
+
+dummyGenesisHash :: GenesisHash
+dummyGenesisHash = GenesisHash $ unsafeHash @Text "patak"
+
+dummyConfig :: Config
+dummyConfig = Config dummyProtocolMagic dummyProtocolConstants dummyGenesisHash

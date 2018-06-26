@@ -17,11 +17,10 @@ import           Pos.Block.Logic (BypassSecurityCheck (..),
                      rollbackBlocksUnsafe)
 import           Pos.Block.Slog (ShouldCallBListener (..))
 import           Pos.Block.Types (Blund)
-import           Pos.Core (ProtocolConstants, difficultyL, epochIndexL)
+import           Pos.Core as Core (Config (..), difficultyL, epochIndexL)
 import           Pos.Core.Block (mainBlockTxPayload)
 import           Pos.Core.Chrono (NewestFirst, _NewestFirst)
 import           Pos.Core.Txp (TxAux)
-import           Pos.Crypto (ProtocolMagic)
 import qualified Pos.DB.Block.Load as DB
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.Infra.StateLock (Priority (..), withStateLock)
@@ -34,16 +33,15 @@ import           Mode (MonadAuxxMode)
 -- from it to the given file.
 rollbackAndDump
     :: MonadAuxxMode m
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Word
     -> FilePath
     -> m ()
-rollbackAndDump pm pc numToRollback outFile =
+rollbackAndDump (Config pm pc genesisHash) numToRollback outFile =
     withStateLock HighPriority ApplyBlockWithRollback $ \_ -> do
         printTipDifficulty
         blundsMaybeEmpty <- modifyBlunds
-            <$> DB.loadBlundsFromTipByDepth (fromIntegral numToRollback)
+            <$> DB.loadBlundsFromTipByDepth genesisHash (fromIntegral numToRollback)
         logInfo $ sformat ("Loaded " % int % " blunds")
                           (length blundsMaybeEmpty)
         case _Wrapped nonEmpty blundsMaybeEmpty of

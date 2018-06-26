@@ -7,10 +7,9 @@ module Pos.DB.DB
 
 import           Universum
 
-import           Pos.Core (BlockVersionData, GenesisHash (..),
-                     ProtocolConstants, genesisHash, headerHash, pcEpochSlots)
+import           Pos.Core as Core (BlockVersionData, Config (..), headerHash,
+                     pcEpochSlots)
 import           Pos.Core.Block.Constructors (genesisBlock0)
-import           Pos.Crypto (ProtocolMagic)
 import           Pos.DB.Block (prepareBlockDB)
 import           Pos.DB.Class (MonadDB, MonadDBRead (..))
 import           Pos.GState.GState (prepareGStateDB)
@@ -22,17 +21,16 @@ import           Pos.Update.DB (getAdoptedBVData)
 initNodeDBs
     :: forall ctx m
      . (MonadReader ctx m, MonadDB m)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> m ()
-initNodeDBs pm pc = do
+initNodeDBs (Config pm pc genesisHash) = do
     let initialTip = headerHash gb
     prepareBlockDB gb
-    prepareGStateDB pc initialTip
+    prepareGStateDB pc genesisHash initialTip
     prepareLrcDB epochSlots
   where
     epochSlots = pcEpochSlots pc
-    gb = genesisBlock0 pm (GenesisHash genesisHash) (genesisLeaders epochSlots)
+    gb = genesisBlock0 pm genesisHash (genesisLeaders epochSlots)
 
 ----------------------------------------------------------------------------
 -- MonadGState instance

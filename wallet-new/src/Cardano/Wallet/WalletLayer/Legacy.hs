@@ -26,7 +26,7 @@ import           Cardano.Wallet.API.V1.Types (Account, AccountIndex,
 import           Cardano.Wallet.Kernel.Diffusion (WalletDiffusion (..))
 
 import           Pos.Client.KeyStorage (MonadKeys)
-import           Pos.Core (ChainDifficulty)
+import           Pos.Core (ChainDifficulty, GenesisHash)
 import           Pos.Crypto (PassPhrase)
 
 import           Pos.Util (HasLens', maybeThrow)
@@ -62,15 +62,15 @@ type MonadLegacyWallet ctx m =
 -- The passive wallet cannot send new transactions.
 bracketPassiveWallet
     :: forall ctx m n a. (MonadMask n, MonadLegacyWallet ctx m)
-    => (PassiveWalletLayer m -> n a) -> n a
-bracketPassiveWallet =
+    => GenesisHash -> (PassiveWalletLayer m -> n a) -> n a
+bracketPassiveWallet genesisHash =
     bracket
         (pure passiveWalletLayer)
         (\_ -> return ())
   where
     passiveWalletLayer :: PassiveWalletLayer m
     passiveWalletLayer = PassiveWalletLayer
-        { _pwlCreateWallet   = pwlCreateWallet
+        { _pwlCreateWallet   = pwlCreateWallet genesisHash
         , _pwlGetWalletIds   = pwlGetWalletIds
         , _pwlGetWallet      = pwlGetWallet
         , _pwlUpdateWallet   = pwlUpdateWallet
@@ -107,9 +107,10 @@ bracketActiveWallet walletPassiveLayer _walletDiffusion =
 
 pwlCreateWallet
     :: forall ctx m. (MonadLegacyWallet ctx m)
-    => NewWallet
+    => GenesisHash
+    -> NewWallet
     -> m Wallet
-pwlCreateWallet NewWallet{..} = do
+pwlCreateWallet genesisHash NewWallet{..} = do
 
     let spendingPassword = fromMaybe mempty $ coerce newwalSpendingPassword
     let backupPhrase     = CBackupPhrase $ coerce newwalBackupPhrase
@@ -130,7 +131,7 @@ pwlCreateWallet NewWallet{..} = do
     -- | We have two functions which are very similar.
     newWalletHandler :: WalletOperation -> PassPhrase -> CWalletInit -> m CWallet
     newWalletHandler CreateWallet  = newWallet
-    newWalletHandler RestoreWallet = restoreWalletFromSeed
+    newWalletHandler RestoreWallet = restoreWalletFromSeed genesisHash
     -- NOTE: this is temporary solution until we get rid of V0 error handling and/or we lift error handling into types:
     --   https://github.com/input-output-hk/cardano-sl/pull/2811#discussion_r183469153
     --   https://github.com/input-output-hk/cardano-sl/pull/2811#discussion_r183472103

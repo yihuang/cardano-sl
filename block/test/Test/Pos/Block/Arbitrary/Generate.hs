@@ -11,7 +11,7 @@ import           Test.QuickCheck (arbitrary)
 import qualified Test.QuickCheck.Gen as QC
 import qualified Test.QuickCheck.Random as QC
 
-import           Pos.Core (HasGenesisHash, MainBlock, ProtocolMagic)
+import           Pos.Core (MainBlock, ProtocolMagic)
 
 -- Also brings in the 'Arbitrary' instance for 'MainBlock'.
 import           Test.Pos.Block.Arbitrary (genMainBlock)
@@ -19,8 +19,7 @@ import           Test.Pos.Block.Arbitrary (genMainBlock)
 -- | Use 'Arbitrary' instances to generate a 'MainBlock'.
 -- These require magical configurations.
 generateMainBlockWithConfiguration
-    :: HasGenesisHash
-    => Int -- ^ Seed for random generator.
+    :: Int -- ^ Seed for random generator.
     -> Int -- ^ Size of the generated value (see QuickCheck docs).
     -> MainBlock
 generateMainBlockWithConfiguration genSeed = QC.unGen arbitrary qcGen

@@ -43,7 +43,7 @@ import           Test.Pos.Block.Logic.Util (EnableTxPayload (..),
 import           Test.Pos.Block.Property (blockPropertySpec)
 import           Test.Pos.Configuration (defaultTestBlockVersionData,
                      withStaticConfigurations)
-import           Test.Pos.Core.Dummy (dummyEpochSlots, dummyK,
+import           Test.Pos.Core.Dummy (dummyConfig, dummyEpochSlots, dummyK,
                      dummyProtocolConstants)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 import           Test.Pos.Util.QuickCheck (maybeStopProperty, stopProperty)
@@ -146,7 +146,7 @@ lrcCorrectnessProp = do
     () <$ bpGenBlocks (Just blkCount1)
                       (EnableTxPayload False)
                       (InplaceDB True)
-    lift $ Lrc.lrcSingleShot dummyProtocolMagic dummyProtocolConstants 1
+    lift $ Lrc.lrcSingleShot dummyConfig 1
     leaders1 <-
         maybeStopProperty "No leaders for epoch#1!" =<< lift (Lrc.getLeadersForEpoch 1)
     -- Here we use 'genesisSeed' (which is the seed for the 0-th
@@ -289,7 +289,7 @@ lessThanKAfterCrucialProp = do
             )
     let unexpectedFailMsg    = sformat (mkFormat "succeed") inLast2K
     let unexpectedSuccessMsg = sformat (mkFormat "fail") inLast2K
-    lift (try $ Lrc.lrcSingleShot dummyProtocolMagic dummyProtocolConstants 1)
+    lift (try $ Lrc.lrcSingleShot dummyConfig 1)
         >>= \case
                 Left Lrc.UnknownBlocksForLrc
                     | shouldSucceed -> stopProperty unexpectedFailMsg

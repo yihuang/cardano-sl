@@ -28,8 +28,8 @@ import           Serokell.Util.Text (listJson)
 
 import           Pos.Binary.Class (serialize')
 import           Pos.Block.Slog.Types (LastBlkSlots, noLastBlkSlots)
-import           Pos.Core (FlatSlotId, HasCoreConfiguration, HasHeaderHash,
-                     HeaderHash, SlotCount, genesisHash, headerHash, slotIdF,
+import           Pos.Core (FlatSlotId, GenesisHash (..), HasCoreConfiguration,
+                     HasHeaderHash, HeaderHash, SlotCount, headerHash, slotIdF,
                      unflattenSlotId)
 import           Pos.Core.Block (Block, BlockHeader)
 import           Pos.Core.Chrono (OldestFirst (..))
@@ -65,9 +65,9 @@ getLastSlots =
     gsGetBi lastSlotsKey
 
 -- | Retrieves first genesis block hash.
-getFirstGenesisBlockHash :: MonadDBRead m => m HeaderHash
-getFirstGenesisBlockHash =
-    resolveForwardLink (genesisHash :: HeaderHash) >>=
+getFirstGenesisBlockHash :: MonadDBRead m => GenesisHash -> m HeaderHash
+getFirstGenesisBlockHash genesisHash =
+    resolveForwardLink (getGenesisHash genesisHash :: HeaderHash) >>=
     maybeThrow (DBMalformed "Can't retrieve genesis block, maybe db is not initialized?")
 
 ----------------------------------------------------------------------------
@@ -205,10 +205,10 @@ loadBlocksUpWhile = loadUpWhile getBlock
 -- Initialization
 ----------------------------------------------------------------------------
 
-initGStateBlockExtra :: MonadDB m => HeaderHash -> m ()
-initGStateBlockExtra firstGenesisHash = do
+initGStateBlockExtra :: MonadDB m => GenesisHash -> HeaderHash -> m ()
+initGStateBlockExtra genesisHash firstGenesisHash = do
     gsPutBi (mainChainKey firstGenesisHash) ()
-    gsPutBi (forwardLinkKey genesisHash) firstGenesisHash
+    gsPutBi (forwardLinkKey $ getGenesisHash genesisHash) firstGenesisHash
     gsPutBi lastSlotsKey noLastBlkSlots
 
 ----------------------------------------------------------------------------

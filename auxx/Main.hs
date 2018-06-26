@@ -14,9 +14,8 @@ import           System.Wlog (LoggerName, logInfo)
 
 import qualified Pos.Client.CLI as CLI
 import           Pos.Context (NodeContext (..))
-import           Pos.Core (ConfigurationError, ProtocolConstants,
-                     pcBlkSecurityParam)
-import           Pos.Crypto (ProtocolMagic)
+import           Pos.Core as Core (Config (..), ConfigurationError,
+                     configBlkSecurityParam)
 import           Pos.DB.DB (initNodeDBs)
 import           Pos.Infra.Diffusion.Types (Diffusion, hoistDiffusion)
 import           Pos.Infra.Network.Types (NetworkConfig (..), Topology (..),
@@ -75,14 +74,13 @@ correctNodeParams AuxxOptions {..} np = do
 
 runNodeWithSinglePlugin
     :: (HasConfigurations, HasCompileInfo)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> NodeResources EmptyMempoolExt
     -> (Diffusion AuxxMode -> AuxxMode ())
     -> Diffusion AuxxMode
     -> AuxxMode ()
-runNodeWithSinglePlugin pm pc nr plugin =
-    runNode pm pc nr [plugin]
+runNodeWithSinglePlugin config nr plugin =
+    runNode config nr [plugin]
 
 action
     :: HasCompileInfo
@@ -102,16 +100,15 @@ action opts@AuxxOptions {..} command = do
     runWithoutNode :: PrintAction Production -> Production ()
     runWithoutNode printAction =
         printAction "Mode: light"
-            >> rawExec Nothing Nothing Nothing opts Nothing command
+            >> rawExec Nothing Nothing opts Nothing command
 
     runWithConfig
         :: HasConfigurations
         => PrintAction Production
         -> NtpConfiguration
-        -> ProtocolMagic
-        -> ProtocolConstants
+        -> Core.Config
         -> Production ()
-    runWithConfig printAction ntpConfig pm pc = do
+    runWithConfig printAction ntpConfig config@(Config pm pc _) = do
         printAction "Mode: with-config"
         CLI.printInfoOnStart aoCommonNodeArgs ntpConfig
         (nodeParams, tempDbUsed) <-
@@ -131,20 +128,20 @@ action opts@AuxxOptions {..} command = do
             sscParams =
                 CLI.gtSscParams cArgs vssSK (npBehaviorConfig nodeParams)
 
-        bracketNodeResources (pcBlkSecurityParam pc)
+        bracketNodeResources (configBlkSecurityParam config)
                              nodeParams
                              sscParams
                              (txpGlobalSettings pm)
-                             (initNodeDBs pm pc)
+                             (initNodeDBs config)
             $ \nr ->
                   Production
                       $ let
                             NodeContext {..} = nrContext nr
                             modifier         = if aoStartMode == WithNode
-                                then runNodeWithSinglePlugin pm pc nr
+                                then runNodeWithSinglePlugin config nr
                                 else identity
                             auxxModeAction =
-                                modifier (auxxPlugin pm pc opts command)
+                                modifier (auxxPlugin config opts command)
                         in
                             runRealMode pm pc nr $ \diffusion ->
                                 toRealMode $ auxxModeAction $ hoistDiffusion

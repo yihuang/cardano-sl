@@ -49,7 +49,7 @@ import           Pos.Crypto
 import           Pos.Lrc.Genesis
 import           Pos.Txp
 
-import           Test.Pos.Core.Dummy (dummyEpochSlots)
+import           Test.Pos.Core.Dummy (dummyEpochSlots, dummyGenesisHash)
 
 import           UTxO.Crypto
 
@@ -82,7 +82,7 @@ initCardanoContext pm = CardanoContext{..}
   where
     ccLeaders  = genesisLeaders dummyEpochSlots
     ccStakes   = genesisStakes
-    ccBlock0   = genesisBlock0 pm (GenesisHash genesisHash) ccLeaders
+    ccBlock0   = genesisBlock0 pm dummyGenesisHash ccLeaders
     ccData     = genesisData
     ccUtxo     = unGenesisUtxo genesisUtxo
     ccSecrets  = fromMaybe (error "initCardanoContext: secrets unavailable") $

@@ -7,8 +7,8 @@ import           UnliftIO (MonadUnliftIO)
 import qualified Data.Map as M
 import           System.Wlog (WithLogger, logInfo, modifyLoggerName)
 
-import           Pos.Core (Address, HasConfiguration, HasDifficulty (..),
-                     headerHash)
+import           Pos.Core (Address, GenesisHash, HasConfiguration,
+                     HasDifficulty (..), headerHash)
 import           Pos.Core.Txp (TxIn, TxOut (..), TxOutAux (..))
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class (MonadDBRead (..))
@@ -30,19 +30,23 @@ import           Pos.Wallet.Web.Tracking.Types (SyncQueue, newRestoreRequest,
 
 -- | Restores a wallet from seed, by synchronously restoring its balance (and the initial address
 -- set) from the global UTXO, and then asynchronously restoring this wallet transaction history.
-restoreWallet :: ( WalletDbReader ctx m
-                 , MonadDBRead m
-                 , WithLogger m
-                 , HasLens SyncQueue ctx SyncQueue
-                 , MonadSlotsData ctx m
-                 , MonadUnliftIO m
-                 ) => WalletDecrCredentials -> m ()
-restoreWallet credentials = do
+restoreWallet
+    :: ( WalletDbReader ctx m
+       , MonadDBRead m
+       , WithLogger m
+       , HasLens SyncQueue ctx SyncQueue
+       , MonadSlotsData ctx m
+       , MonadUnliftIO m
+       )
+    => GenesisHash
+    -> WalletDecrCredentials
+    -> m ()
+restoreWallet genesisHash credentials = do
     db <- askWalletDB
     let (_, walletId) = credentials
     modifyLoggerName (const "syncWalletWorker") $ do
         logInfo "New Restoration request for a wallet..."
-        genesisBlockHeaderE <- firstGenesisHeader
+        genesisBlockHeaderE <- firstGenesisHeader genesisHash
         case genesisBlockHeaderE of
             Left syncError -> processSyncError syncError
             Right genesisBlock -> do

@@ -93,7 +93,7 @@ withDefTxpConfiguration :: (HasTxpConfiguration => r) -> r
 withDefTxpConfiguration = withTxpConfiguration (ccTxp defaultTestConf)
 
 withDefConfiguration :: (HasConfiguration => r) -> r
-withDefConfiguration f = withGenesisSpec 0 (ccCore defaultTestConf) (\_ _ -> f)
+withDefConfiguration f = withGenesisSpec 0 (ccCore defaultTestConf) (\_ -> f)
 
 withStaticConfigurations
     :: (HasStaticConfigurations => NtpConfiguration -> r) -> r

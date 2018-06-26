@@ -79,40 +79,39 @@ instance Bi (Attributes X2) where
 
 
 spec :: Spec
-spec = withGenesisSpec 0 defaultCoreConfiguration $ \_ _ ->
-    describe "Cbor Bi instances" $ do
-        describe "Core.Address" $ do
-            binaryTest @Address
-            binaryTest @Address'
-            binaryTest @AddrType
-            binaryTest @AddrStakeDistribution
-            binaryTest @AddrSpendingData
-        describe "Core.Types" $ do
-            binaryTest @Timestamp
-            binaryTest @TimeDiff
-            binaryTest @EpochIndex
-            binaryTest @Coin
-            binaryTest @CoinPortion
-            binaryTest @LocalSlotIndex
-            binaryTest @SlotId
-            binaryTest @EpochOrSlot
-            binaryTest @SharedSeed
-            binaryTest @ChainDifficulty
-            binaryTest @SoftforkRule
-            binaryTest @BlockVersionData
-            binaryTest @(Attributes ())
-            binaryTest @(Attributes AddrAttributes)
-        describe "Core.Fee" $ do
-            binaryTest @Coeff
-            binaryTest @TxSizeLinear
-            binaryTest @TxFeePolicy
-        describe "Core.Script" $ do
-            binaryTest @Script
-        describe "Core.Vss" $ do
-            binaryTest @VssCertificate
-        describe "Core.Version" $ do
-            binaryTest @ApplicationName
-            binaryTest @SoftwareVersion
-            binaryTest @BlockVersion
-        describe "Merkle" $ do
-            binaryTest @(MerkleTree Int32)
+spec = describe "Cbor Bi instances" $ do
+    describe "Core.Address" $ do
+        binaryTest @Address
+        binaryTest @Address'
+        binaryTest @AddrType
+        binaryTest @AddrStakeDistribution
+        binaryTest @AddrSpendingData
+    describe "Core.Types" $ do
+        binaryTest @Timestamp
+        binaryTest @TimeDiff
+        binaryTest @EpochIndex
+        binaryTest @Coin
+        binaryTest @CoinPortion
+        binaryTest @LocalSlotIndex
+        binaryTest @SlotId
+        binaryTest @EpochOrSlot
+        binaryTest @SharedSeed
+        binaryTest @ChainDifficulty
+        binaryTest @SoftforkRule
+        binaryTest @BlockVersionData
+        binaryTest @(Attributes ())
+        binaryTest @(Attributes AddrAttributes)
+    describe "Core.Fee" $ do
+        binaryTest @Coeff
+        binaryTest @TxSizeLinear
+        binaryTest @TxFeePolicy
+    describe "Core.Script" $ do
+        binaryTest @Script
+    describe "Core.Vss" $ do
+        binaryTest @VssCertificate
+    describe "Core.Version" $ do
+        binaryTest @ApplicationName
+        binaryTest @SoftwareVersion
+        binaryTest @BlockVersion
+    describe "Merkle" $ do
+        binaryTest @(MerkleTree Int32)

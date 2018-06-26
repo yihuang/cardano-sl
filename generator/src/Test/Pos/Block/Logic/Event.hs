@@ -37,7 +37,7 @@ import           Pos.Util.Util (eitherToThrow, lensOf)
 import           Test.Pos.Block.Logic.Mode (BlockTestContext,
                      PureDBSnapshotsVar (..))
 import           Test.Pos.Block.Logic.Util (satisfySlotCheck)
-import           Test.Pos.Core.Dummy (dummyProtocolConstants)
+import           Test.Pos.Core.Dummy (dummyConfig, dummyProtocolConstants)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 
 data SnapshotMissingEx = SnapshotMissingEx SnapshotId
@@ -64,11 +64,7 @@ verifyAndApplyBlocks'
 verifyAndApplyBlocks' blunds = do
     satisfySlotCheck blocks $ do
         (_ :: HeaderHash) <-
-            eitherToThrow
-                =<< verifyAndApplyBlocks dummyProtocolMagic
-                                         dummyProtocolConstants
-                                         True
-                                         blocks
+            eitherToThrow =<< verifyAndApplyBlocks dummyConfig True blocks
         return ()
     where blocks = fst <$> blunds
 

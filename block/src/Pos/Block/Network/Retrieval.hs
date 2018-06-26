@@ -28,9 +28,9 @@ import           Pos.Block.Network.Logic (BlockNetLogicException (..),
 import           Pos.Block.RetrievalQueue (BlockRetrievalQueueTag,
                      BlockRetrievalTask (..))
 import           Pos.Block.Types (RecoveryHeaderTag)
-import           Pos.Core (Block, HasHeaderHash (..), HeaderHash,
-                     ProtocolConstants, SlotCount, difficultyL,
-                     isMoreDifficult, pcBlkSecurityParam, pcEpochSlots)
+import           Pos.Core as Core (Block, Config (..), HasHeaderHash (..),
+                     HeaderHash, SlotCount, difficultyL, isMoreDifficult,
+                     pcBlkSecurityParam, pcEpochSlots)
 import           Pos.Core.Block (BlockHeader)
 import           Pos.Core.Chrono (NE, OldestFirst (..), _OldestFirst)
 import           Pos.Crypto (ProtocolMagic, shortHashF)
@@ -59,11 +59,10 @@ import           Pos.Util.Util (HasLens (..))
 retrievalWorker
     :: forall ctx m
      . (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Diffusion m
     -> m ()
-retrievalWorker pm pc diffusion = do
+retrievalWorker config@(Config pm pc genesisHash) diffusion = do
     logInfo "Starting retrievalWorker loop"
     mainLoop
   where
@@ -115,7 +114,7 @@ retrievalWorker pm pc diffusion = do
         logDebug $ "handleContinues: " <> pretty hHash
         classifyNewHeader pm (pcEpochSlots pc) header >>= \case
             CHContinues ->
-                void $ getProcessBlocks pm pc diffusion nodeId (headerHash header) [hHash]
+                void $ getProcessBlocks config diffusion nodeId (headerHash header) [hHash]
             res -> logDebug $
                 "processContHeader: expected header to " <>
                 "be continuation, but it's " <> show res
@@ -170,8 +169,8 @@ retrievalWorker pm pc diffusion = do
             throwM $ DialogUnexpected $ "handleRecovery: recovery header is " <>
                                         "already present in db"
         logDebug "handleRecovery: fetching blocks"
-        checkpoints <- toList <$> getHeadersOlderExp (pcBlkSecurityParam pc) Nothing
-        void $ streamProcessBlocks pm pc diffusion nodeId (headerHash rHeader) checkpoints
+        checkpoints <- toList <$> getHeadersOlderExp (pcBlkSecurityParam pc) genesisHash Nothing
+        void $ streamProcessBlocks config diffusion nodeId (headerHash rHeader) checkpoints
 
 ----------------------------------------------------------------------------
 -- Entering and exiting recovery mode
@@ -283,14 +282,13 @@ dropRecoveryHeaderAndRepeat pm epochSlots diffusion nodeId = do
 getProcessBlocks
     :: forall ctx m
      . (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Diffusion m
     -> NodeId
     -> HeaderHash
     -> [HeaderHash]
     -> m ()
-getProcessBlocks pm pc diffusion nodeId desired checkpoints = do
+getProcessBlocks config diffusion nodeId desired checkpoints = do
     result <- Diffusion.getBlocks diffusion nodeId desired checkpoints
     case OldestFirst <$> nonEmpty (getOldestFirst result) of
       Nothing -> do
@@ -303,7 +301,7 @@ getProcessBlocks pm pc diffusion nodeId desired checkpoints = do
           logDebug $ sformat
               ("Retrieved "%int%" blocks")
               (blocks ^. _OldestFirst . to NE.length)
-          handleBlocks pm pc blocks diffusion
+          handleBlocks config blocks diffusion
           -- If we've downloaded any block with bigger
           -- difficulty than ncRecoveryHeader, we're
           -- gracefully exiting recovery mode.
@@ -327,20 +325,19 @@ getProcessBlocks pm pc diffusion nodeId desired checkpoints = do
 streamProcessBlocks
     :: forall ctx m
      . (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Diffusion m
     -> NodeId
     -> HeaderHash
     -> [HeaderHash]
     -> m ()
-streamProcessBlocks pm pc diffusion nodeId desired checkpoints = do
+streamProcessBlocks config diffusion nodeId desired checkpoints = do
     logInfo "streaming start"
     r <- Diffusion.streamBlocks diffusion nodeId desired checkpoints (loop 0 [])
     case r of
          Nothing -> do
              logInfo "streaming not supported, reverting to batch mode"
-             getProcessBlocks pm pc diffusion nodeId desired checkpoints
+             getProcessBlocks config diffusion nodeId desired checkpoints
          Just _  -> do
              logInfo "streaming done"
              return ()
@@ -369,4 +366,4 @@ streamProcessBlocks pm pc diffusion nodeId desired checkpoints = do
 
     addBlocks [] = return ()
     addBlocks (block : blocks) =
-        handleBlocks pm pc (OldestFirst (NE.reverse $ block :| blocks)) diffusion
+        handleBlocks config (OldestFirst (NE.reverse $ block :| blocks)) diffusion

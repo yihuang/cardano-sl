@@ -112,7 +112,7 @@ import           Test.Pos.Block.Logic.Emulation (Emulation (..), runEmulation,
                      sudoLiftIO)
 import           Test.Pos.Configuration (defaultTestBlockVersionData,
                      defaultTestConf, defaultTestGenesisSpec)
-import           Test.Pos.Core.Dummy (dummyEpochSlots, dummyProtocolConstants)
+import           Test.Pos.Core.Dummy (dummyConfig, dummyEpochSlots)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 
 ----------------------------------------------------------------------------
@@ -168,7 +168,7 @@ genGenesisInitializer = do
 -- uses it to satisfy 'HasConfiguration'.
 withTestParams :: TestParams -> (HasConfiguration => r) -> r
 withTestParams TestParams {..} f =
-    withGenesisSpec _tpStartTime coreConfiguration $ \_ _ -> f
+    withGenesisSpec _tpStartTime coreConfiguration $ \_ -> f
   where
     defaultCoreConf :: CoreConfiguration
     defaultCoreConf = ccCore defaultTestConf
@@ -239,29 +239,26 @@ instance HasAllSecrets BlockTestContext where
 -- Initialization
 ----------------------------------------------------------------------------
 
-initBlockTestContext ::
-       ( HasConfiguration
-       , HasDlgConfiguration
-       )
+initBlockTestContext
+    :: (HasConfiguration, HasDlgConfiguration)
     => TestParams
     -> (BlockTestContext -> Emulation a)
     -> Emulation a
 initBlockTestContext tp@TestParams {..} callback = do
-    clockVar <- Emulation ask
-    dbPureVar <- newDBPureVar
-    (futureLrcCtx, putLrcCtx) <- newInitFuture "lrcCtx"
+    clockVar                            <- Emulation ask
+    dbPureVar                           <- newDBPureVar
+    (futureLrcCtx     , putLrcCtx     ) <- newInitFuture "lrcCtx"
     (futureSlottingVar, putSlottingVar) <- newInitFuture "slottingVar"
-    systemStart <- Timestamp <$> currentTime
+    systemStart                         <- Timestamp <$> currentTime
     slottingState <- mkSimpleSlottingStateVar dummyEpochSlots
-    let initCtx =
-            TestInitModeContext
-                dbPureVar
-                futureSlottingVar
-                slottingState
-                systemStart
-                futureLrcCtx
+    let
+        initCtx = TestInitModeContext dbPureVar
+                                      futureSlottingVar
+                                      slottingState
+                                      systemStart
+                                      futureLrcCtx
         initBlockTestContextDo = do
-            initNodeDBs dummyProtocolMagic dummyProtocolConstants
+            initNodeDBs dummyConfig
             _gscSlottingVar <- newTVarIO =<< GS.getSlottingData
             putSlottingVar _gscSlottingVar
             let btcLoggerName = "testing"
@@ -269,22 +266,25 @@ initBlockTestContext tp@TestParams {..} callback = do
             let _gscLrcContext = LrcContext {..}
             putLrcCtx _gscLrcContext
             btcUpdateContext <- mkUpdateContext dummyEpochSlots
-            btcSscState <- mkSscState dummyEpochSlots
-            _gscSlogGState <- mkSlogGState
-            btcTxpMem <- mkTxpLocalData
+            btcSscState      <- mkSscState dummyEpochSlots
+            _gscSlogGState   <- mkSlogGState
+            btcTxpMem        <- mkTxpLocalData
             let btcTxpGlobalSettings = txpGlobalSettings dummyProtocolMagic
-            let btcSlotId = Nothing
-            let btcParams = tp
+            let btcSlotId            = Nothing
+            let btcParams            = tp
             let btcGState = GS.GStateContext {_gscDB = DB.PureDB dbPureVar, ..}
-            btcDelegation <- mkDelegationVar
+            btcDelegation      <- mkDelegationVar
             btcPureDBSnapshots <- PureDBSnapshotsVar <$> newIORef Map.empty
-            let secretKeys =
-                    case genesisSecretKeys of
-                        Nothing ->
-                            error "initBlockTestContext: no genesisSecretKeys"
-                        Just ks -> ks
+            let secretKeys = case genesisSecretKeys of
+                    Nothing ->
+                        error "initBlockTestContext: no genesisSecretKeys"
+                    Just ks -> ks
             let btcAllSecrets = mkAllSecretsSimple secretKeys
-            let btCtx = BlockTestContext {btcSystemStart = systemStart, btcSSlottingStateVar = slottingState, ..}
+            let btCtx = BlockTestContext
+                    { btcSystemStart       = systemStart
+                    , btcSSlottingStateVar = slottingState
+                    , ..
+                    }
             liftIO $ flip runReaderT clockVar $ unEmulation $ callback btCtx
     sudoLiftIO $ runTestInitMode initCtx $ initBlockTestContextDo
 

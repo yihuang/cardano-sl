@@ -18,10 +18,12 @@ import           Serokell.Util (listJson)
 import           System.Wlog (WithLogger, askLoggerName, logInfo)
 
 import           Pos.Context (getOurPublicKey)
-import           Pos.Core (GenesisData (gdBootStakeholders, gdHeavyDelegation),
-                     GenesisDelegation (..), GenesisWStakeholders (..),
-                     ProtocolConstants, addressHash, gdFtsSeed, genesisData)
-import           Pos.Crypto (ProtocolMagic, pskDelegatePk)
+import           Pos.Core as Core (Config (..),
+                     GenesisData (gdBootStakeholders, gdHeavyDelegation),
+                     GenesisDelegation (..), GenesisHash,
+                     GenesisWStakeholders (..), addressHash, gdFtsSeed,
+                     genesisData)
+import           Pos.Crypto (pskDelegatePk)
 import qualified Pos.DB.BlockIndex as DB
 import qualified Pos.GState as GS
 import           Pos.Infra.Diffusion.Types (Diffusion)
@@ -41,15 +43,15 @@ import           Pos.WorkMode.Class (WorkMode)
 -- | Entry point of full node.
 -- Initialization, running of workers, running of plugins.
 runNode'
-    :: forall ext ctx m.
-       ( HasCompileInfo
-       , WorkMode ctx m
-       )
-    => NodeResources ext
+    :: forall ext ctx m
+     . (HasCompileInfo, WorkMode ctx m)
+    => GenesisHash
+    -> NodeResources ext
     -> [Diffusion m -> m ()]
     -> [Diffusion m -> m ()]
-    -> Diffusion m -> m ()
-runNode' NodeResources {..} workers' plugins' = \diffusion -> do
+    -> Diffusion m
+    -> m ()
+runNode' genesisHash NodeResources {..} workers' plugins' = \diffusion -> do
     logInfo $ "Built with: " <> pretty compileInfo
     nodeStartMsg
     inAssertMode $ logInfo "Assert mode on"
@@ -73,7 +75,7 @@ runNode' NodeResources {..} workers' plugins' = \diffusion -> do
             $ HM.toList
             $ unGenesisDelegation genesisDelegation
 
-    firstGenesisHash <- GS.getFirstGenesisBlockHash
+    firstGenesisHash <- GS.getFirstGenesisBlockHash genesisHash
     logInfo $ sformat
         ("First genesis block hash: "%build%", genesis seed is "%build)
         firstGenesisHash
@@ -105,15 +107,16 @@ runNode' NodeResources {..} workers' plugins' = \diffusion -> do
 -- Initialization, running of workers, running of plugins.
 runNode
     :: (HasCompileInfo, HasTxpConfiguration, WorkMode ctx m)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> NodeResources ext
     -> [Diffusion m -> m ()]
     -> Diffusion m
     -> m ()
-runNode pm pc nr plugins = runNode' nr workers' plugins
-  where
-    workers' = allWorkers pm pc nr
+runNode config nr plugins = runNode' (configGenesisHash config)
+                                     nr
+                                     workers'
+                                     plugins
+    where workers' = allWorkers config nr
 
 -- | This function prints a very useful message when node is started.
 nodeStartMsg :: (HasUpdateConfiguration, WithLogger m) => m ()

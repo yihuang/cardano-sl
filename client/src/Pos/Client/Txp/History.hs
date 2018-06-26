@@ -38,9 +38,9 @@ import           Mockable (CurrentTime, Mockable)
 import           Serokell.Util.Text (listJson)
 import           System.Wlog (WithLogger)
 
-import           Pos.Core (Address, ChainDifficulty, GenesisHash (..),
+import           Pos.Core as Core (Address, ChainDifficulty, Config (..),
                      HasConfiguration, SlotCount, Timestamp (..), difficultyL,
-                     genesisHash, headerHash)
+                     headerHash, pcEpochSlots)
 import           Pos.Core.Block (Block, MainBlock, mainBlockSlot,
                      mainBlockTxPayload)
 import           Pos.Core.Block.Constructors (genesisBlock0)
@@ -170,16 +170,14 @@ genesisUtxoLookup = utxoToLookup . unGenesisUtxo $ genesisUtxo
 
 -- | A class which have methods to get transaction history
 class Monad m => MonadTxHistory m where
-    getBlockHistory
-        :: ProtocolMagic -> SlotCount -> [Address] -> m (Map TxId TxHistoryEntry)
-    getLocalHistory
-        :: [Address] -> m (Map TxId TxHistoryEntry)
+    getBlockHistory :: Core.Config -> [Address] -> m (Map TxId TxHistoryEntry)
+    getLocalHistory :: [Address] -> m (Map TxId TxHistoryEntry)
     saveTx :: ProtocolMagic -> SlotCount -> (TxId, TxAux) -> m ()
 
     default getBlockHistory
         :: (MonadTrans t, MonadTxHistory m', t m' ~ m)
-        => ProtocolMagic -> SlotCount -> [Address] -> m (Map TxId TxHistoryEntry)
-    getBlockHistory pm epochSlots = lift . getBlockHistory pm epochSlots
+        => Core.Config -> [Address] -> m (Map TxId TxHistoryEntry)
+    getBlockHistory config = lift . getBlockHistory config
 
     default getLocalHistory
         :: (MonadTrans t, MonadTxHistory m', t m' ~ m)
@@ -217,12 +215,14 @@ type TxHistoryEnv ctx m =
 getBlockHistoryDefault
     :: forall ctx m
      . (HasConfiguration, TxHistoryEnv ctx m)
-    => ProtocolMagic
-    -> SlotCount
+    => Core.Config
     -> [Address]
     -> m (Map TxId TxHistoryEntry)
-getBlockHistoryDefault pm epochSlots addrs = do
-    let bot      = headerHash (genesisBlock0 pm (GenesisHash genesisHash) (genesisLeaders epochSlots))
+getBlockHistoryDefault (Config pm pc genesisHash) addrs = do
+    let bot = headerHash $ genesisBlock0 pm
+                                         genesisHash
+                                         (genesisLeaders $ pcEpochSlots pc)
+
     sd          <- GS.getSlottingData
     systemStart <- getSystemStartM
 
@@ -232,15 +232,14 @@ getBlockHistoryDefault pm epochSlots addrs = do
 
     let filterFunc _blk _depth = True
 
-    let foldStep ::
-               (Map TxId TxHistoryEntry, UtxoModifier)
+    let foldStep
+            :: (Map TxId TxHistoryEntry, UtxoModifier)
             -> Block
             -> (Map TxId TxHistoryEntry, UtxoModifier)
-        foldStep (hist, modifier) blk =
-            runUtxoM
-                modifier
-                genesisUtxoLookup
-                (deriveAddrHistoryBlk addrs getBlockTimestamp hist blk)
+        foldStep (hist, modifier) blk = runUtxoM
+            modifier
+            genesisUtxoLookup
+            (deriveAddrHistoryBlk addrs getBlockTimestamp hist blk)
 
     fst <$> GS.foldlUpWhileM getBlock bot filterFunc (pure ... foldStep) mempty
 

@@ -15,7 +15,7 @@ import           Test.QuickCheck (Property, (===), (==>))
 
 import           Pos.Binary (Bi)
 import qualified Pos.Block.Logic.Integrity as T
-import           Pos.Core (GenesisHash (..), HasConfiguration, genesisHash)
+import           Pos.Core (GenesisHash (..))
 import qualified Pos.Core as T
 import           Pos.Core.Chrono (NewestFirst (..))
 import           Pos.Crypto (ProtocolMagic (..), ProxySecretKey (pskIssuerPk),
@@ -24,27 +24,22 @@ import           Pos.Crypto (ProtocolMagic (..), ProxySecretKey (pskIssuerPk),
 import           Pos.Data.Attributes (mkAttributes)
 
 import           Test.Pos.Block.Arbitrary as T
-import           Test.Pos.Configuration (withDefConfiguration)
+import           Test.Pos.Core.Dummy (dummyGenesisHash)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 
 -- This tests are quite slow, hence max success is at most 20.
 spec :: Spec
-spec =
-    withDefConfiguration
-        $ describe "Block properties"
-        $ modifyMaxSuccess (min 20)
-        $ do
-              describe "mkMainHeader" $ do
-                  prop mainHeaderFormationDesc mainHeaderFormation
-              describe "mkGenesisHeader" $ do
-                  prop genesisHeaderFormationDesc genesisHeaderFormation
-              describe "verifyHeader" $ do
-                  prop verifyHeaderDesc validateGoodMainHeader
-                  prop invalidProtocolMagicHeaderDesc
-                       validateBadProtocolMagicMainHeader
-              describe "verifyHeaders" $ modifyMaxSuccess (const 1) $ do
-                  prop verifyHeadersDesc validateGoodHeaderChain
-                  emptyHeaderChain (NewestFirst [])
+spec = describe "Block properties" $ modifyMaxSuccess (min 20) $ do
+    describe "mkMainHeader" $ do
+        prop mainHeaderFormationDesc mainHeaderFormation
+    describe "mkGenesisHeader" $ do
+        prop genesisHeaderFormationDesc genesisHeaderFormation
+    describe "verifyHeader" $ do
+        prop verifyHeaderDesc               validateGoodMainHeader
+        prop invalidProtocolMagicHeaderDesc validateBadProtocolMagicMainHeader
+    describe "verifyHeaders" $ modifyMaxSuccess (const 1) $ do
+        prop verifyHeadersDesc validateGoodHeaderChain
+        emptyHeaderChain (NewestFirst [])
   where
     mainHeaderFormationDesc
         = "Manually generating a main header block and using\
@@ -58,11 +53,11 @@ spec =
     verifyHeadersDesc =
         "Successfully verifies a correct chain of block headers"
     verifyEmptyHsDesc = "Successfully validates an empty header chain"
-    emptyHeaderChain
-        :: NewestFirst [] T.BlockHeader
-        -> Spec
-    emptyHeaderChain l =
-        it verifyEmptyHsDesc $ isVerSuccess $ T.verifyHeaders dummyProtocolMagic Nothing l
+    emptyHeaderChain :: NewestFirst [] T.BlockHeader -> Spec
+    emptyHeaderChain l = it verifyEmptyHsDesc $ isVerSuccess $ T.verifyHeaders
+        dummyProtocolMagic
+        Nothing
+        l
 
 -- | Both of the following tests are boilerplate - they use `mkGenericHeader` to create
 -- headers and then compare these with manually built headers.
@@ -71,8 +66,7 @@ spec =
 -- the ensuing failed tests.
 
 genesisHeaderFormation
-    :: HasConfiguration
-    => Maybe T.BlockHeader
+    :: Maybe T.BlockHeader
     -> T.EpochIndex
     -> T.GenesisBody
     -> Property
@@ -80,7 +74,7 @@ genesisHeaderFormation prevHeader epoch body = header === manualHeader
   where
     header = T.mkGenesisHeader
         dummyProtocolMagic
-        (maybe (Left (GenesisHash genesisHash)) Right prevHeader)
+        (maybe (Left dummyGenesisHash) Right prevHeader)
         epoch
         body
     manualHeader = T.UnsafeGenericBlockHeader
@@ -90,7 +84,7 @@ genesisHeaderFormation prevHeader epoch body = header === manualHeader
         , T._gbhConsensus     = consensus h proof
         , T._gbhExtra         = T.GenesisExtraHeaderData $ mkAttributes ()
         }
-    h          = maybe genesisHash T.headerHash prevHeader
+    h          = maybe (getGenesisHash dummyGenesisHash) T.headerHash prevHeader
     proof      = T.mkBodyProof @T.GenesisBlockchain body
     difficulty = maybe 0 (view T.difficultyL) prevHeader
     consensus _ _ = T.GenesisConsensusData
@@ -99,8 +93,7 @@ genesisHeaderFormation prevHeader epoch body = header === manualHeader
         }
 
 mainHeaderFormation
-    :: HasConfiguration
-    => Maybe T.BlockHeader
+    :: Maybe T.BlockHeader
     -> T.SlotId
     -> Either SecretKey (SecretKey, SecretKey, Bool)
     -> T.MainBody
@@ -124,7 +117,7 @@ mainHeaderFormation prevHeader slotId signer body extra =
         , T._gbhConsensus = consensus proof
         , T._gbhExtra = extra
         }
-    prevHash = maybe genesisHash T.headerHash prevHeader
+    prevHash = maybe (getGenesisHash dummyGenesisHash) T.headerHash prevHeader
     proof = T.mkBodyProof @T.MainBlockchain body
     (sk, pSk) = either (, Nothing) mkProxySk signer
     mkProxySk (issuerSK, delegateSK, isSigEpoch) =

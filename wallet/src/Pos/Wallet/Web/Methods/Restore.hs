@@ -24,6 +24,7 @@ import           System.Wlog (logDebug)
 
 import qualified Data.HashMap.Strict as HM
 import           Pos.Client.KeyStorage (addSecretKey)
+import           Pos.Core (GenesisHash)
 import           Pos.Core.Configuration (genesisSecretsPoor)
 import           Pos.Core.Genesis (poorSecretToEncKey)
 import           Pos.Crypto (EncryptedSecretKey, PassPhrase, emptyPassphrase,
@@ -92,30 +93,43 @@ newWallet passphrase cwInit = do
 -- 1. Recover this wallet balance from the global Utxo (fast, and synchronous);
 -- 2. Recover the full transaction history from the blockchain (slow, asynchronous).
 -}
-restoreWalletFromSeed :: ( L.MonadWalletLogic ctx m
-                         , MonadUnliftIO m
-                         , HasLens SyncQueue ctx SyncQueue
-                         ) => PassPhrase -> CWalletInit -> m CWallet
-restoreWalletFromSeed passphrase cwInit = do
+restoreWalletFromSeed
+    :: ( L.MonadWalletLogic ctx m
+       , MonadUnliftIO m
+       , HasLens SyncQueue ctx SyncQueue
+       )
+    => GenesisHash
+    -> PassPhrase
+    -> CWalletInit
+    -> m CWallet
+restoreWalletFromSeed genesisHash passphrase cwInit = do
     (sk, _) <- mkWallet passphrase cwInit False
-    restoreWallet sk
+    restoreWallet genesisHash sk
 
-restoreWallet :: ( L.MonadWalletLogic ctx m
-                 , MonadUnliftIO m
-                 , HasLens SyncQueue ctx SyncQueue
-                 ) => EncryptedSecretKey -> m CWallet
-restoreWallet sk = do
+restoreWallet
+    :: ( L.MonadWalletLogic ctx m
+       , MonadUnliftIO m
+       , HasLens SyncQueue ctx SyncQueue
+       )
+    => GenesisHash
+    -> EncryptedSecretKey
+    -> m CWallet
+restoreWallet genesisHash sk = do
     db <- WS.askWalletDB
     let credentials@(_, wId) = eskToWalletDecrCredentials sk
-    Restore.restoreWallet credentials
+    Restore.restoreWallet genesisHash credentials
     WS.setWalletReady db wId True
     L.getWallet wId
 
-restoreWalletFromBackup :: ( L.MonadWalletLogic ctx m
-                           , MonadUnliftIO m
-                           , HasLens SyncQueue ctx SyncQueue
-                           ) => WalletBackup -> m CWallet
-restoreWalletFromBackup WalletBackup {..} = do
+restoreWalletFromBackup
+    :: ( L.MonadWalletLogic ctx m
+       , MonadUnliftIO m
+       , HasLens SyncQueue ctx SyncQueue
+       )
+    => GenesisHash
+    -> WalletBackup
+    -> m CWallet
+restoreWalletFromBackup genesisHash WalletBackup {..} = do
     db <- askWalletDB
     ws <- getWalletSnapshot db
     let wId = encToCId wbSecretKey
@@ -159,23 +173,24 @@ restoreWalletFromBackup WalletBackup {..} = do
                     Just [] -> void $ L.newAddress defaultAccAddrIdx emptyPassphrase accId
                     Just _  -> pure ()
 
-            restoreWallet wbSecretKey
+            restoreWallet genesisHash wbSecretKey
 
 importWallet
     :: ( L.MonadWalletLogic ctx m
        , MonadUnliftIO m
        , HasLens SyncQueue ctx SyncQueue
        )
-    => PassPhrase
+    => GenesisHash
+    -> PassPhrase
     -> CFilePath
     -> m CWallet
-importWallet passphrase (CFilePath (toString -> fp)) = do
+importWallet genesisHash passphrase (CFilePath (toString -> fp)) = do
     secret <-
         rewrapToWalletError isDoesNotExistError noFile $
         rewrapToWalletError (\UserSecretDecodingError{} -> True) decodeFailed $
         readUserSecret fp
     wSecret <- maybeThrow noWalletSecret (secret ^. usWallet)
-    importWalletDo passphrase wSecret
+    importWalletDo genesisHash passphrase wSecret
   where
     noWalletSecret = RequestError "This key doesn't contain HD wallet info"
     noFile _ = RequestError "File doesn't exist"
@@ -187,11 +202,12 @@ importWalletDo
        , MonadUnliftIO m
        , HasLens SyncQueue ctx SyncQueue
        )
-    => PassPhrase
+    => GenesisHash
+    -> PassPhrase
     -> WalletUserSecret
     -> m CWallet
-importWalletDo passphrase wSecret = do
-    wId <- cwId <$> importWalletSecret emptyPassphrase wSecret
+importWalletDo genesisHash passphrase wSecret = do
+    wId <- cwId <$> importWalletSecret genesisHash emptyPassphrase wSecret
     _ <- L.changeWalletPassphrase wId emptyPassphrase passphrase
     L.getWallet wId
 
@@ -200,10 +216,11 @@ importWalletSecret
        , MonadUnliftIO m
        , HasLens SyncQueue ctx SyncQueue
        )
-    => PassPhrase
+    => GenesisHash
+    -> PassPhrase
     -> WalletUserSecret
     -> m CWallet
-importWalletSecret passphrase WalletUserSecret{..} = do
+importWalletSecret genesisHash passphrase WalletUserSecret{..} = do
     let key    = _wusRootKey
         wid    = encToCId key
         wMeta  = def { cwName = _wusWalletName }
@@ -223,19 +240,23 @@ importWalletSecret passphrase WalletUserSecret{..} = do
         let accId = AccountId wid walletIndex
         L.newAddress (DeterminedSeed accountIndex) passphrase accId
 
-    restoreWallet key
+    restoreWallet genesisHash key
 
 -- | Creates wallet with given genesis hd-wallet key.
 -- For debug purposes
-addInitialRichAccount :: ( L.MonadWalletLogic ctx m
-                         , MonadUnliftIO m
-                         , HasLens SyncQueue ctx SyncQueue
-                         ) => Int -> m ()
-addInitialRichAccount keyId =
+addInitialRichAccount
+    :: ( L.MonadWalletLogic ctx m
+       , MonadUnliftIO m
+       , HasLens SyncQueue ctx SyncQueue
+       )
+    => GenesisHash
+    -> Int
+    -> m ()
+addInitialRichAccount genesisHash keyId =
     E.handleAny wSetExistsHandler $ do
         let hdwSecretKeys = fromMaybe (error "Hdw secrets keys are unknown") genesisSecretsPoor
         key <- maybeThrow noKey (map poorSecretToEncKey $ hdwSecretKeys ^? ix keyId)
-        void $ importWalletSecret emptyPassphrase $
+        void $ importWalletSecret genesisHash emptyPassphrase $
             mkGenesisWalletUserSecret key
                 & wusWalletName .~ "Precreated wallet full of money"
                 & wusAccounts . traversed . _2 .~ "Initial account"

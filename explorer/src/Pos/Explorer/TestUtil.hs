@@ -35,10 +35,9 @@ import           Pos.Block.Logic (RawPayload (..), createMainBlockPure)
 import           Pos.Block.Types (Blund, SlogUndo (..), Undo (..))
 import qualified Pos.Communication ()
 import           Pos.Core (Address, BlockCount (..), ChainDifficulty (..),
-                     EpochIndex (..), GenesisHash (..), HasConfiguration,
-                     HeaderHash, LocalSlotIndex (..), SlotId (..), SlotLeaders,
-                     StakeholderId, difficultyL, genesisHash, headerHash,
-                     makePubKeyAddressBoot)
+                     EpochIndex (..), HeaderHash, LocalSlotIndex (..),
+                     SlotId (..), SlotLeaders, StakeholderId, difficultyL,
+                     headerHash, makePubKeyAddressBoot)
 import           Pos.Core.Block (Block, BlockHeader, GenesisBlock, MainBlock,
                      getBlockHeader)
 import           Pos.Core.Block.Constructors (mkGenesisBlock)
@@ -56,7 +55,7 @@ import           Pos.Update.Configuration (HasUpdateConfiguration)
 
 import           Test.Pos.Block.Arbitrary ()
 import           Test.Pos.Configuration (withDefConfigurations)
-import           Test.Pos.Core.Dummy (dummyK)
+import           Test.Pos.Core.Dummy (dummyGenesisHash, dummyK)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 
 
@@ -244,7 +243,8 @@ leftToCounter x c = either (\t -> counterexample (toString t) False) (property .
 
 -- | Function that should generate arbitrary blocks that we can use in tests.
 produceBlocksByBlockNumberAndSlots
-    :: forall m. (HasConfiguration, HasUpdateConfiguration, MonadIO m)
+    :: forall m
+     . (HasUpdateConfiguration, MonadIO m)
     => BlockNumber
     -> SlotsPerEpoch
     -> SlotLeaders
@@ -298,7 +298,7 @@ produceBlocksByBlockNumberAndSlots blockNumber slotsNumber producedSlotLeaders s
       where
         epochGenesisBlock :: GenesisBlock
         epochGenesisBlock = mkGenesisBlock dummyProtocolMagic
-                                           (maybe (Left (GenesisHash genesisHash)) Right mBlockHeader)
+                                           (maybe (Left dummyGenesisHash) Right mBlockHeader)
                                            epochIndex
                                            producedSlotLeaders
 

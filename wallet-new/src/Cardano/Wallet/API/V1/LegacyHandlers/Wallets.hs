@@ -34,8 +34,8 @@ import           Servant
 
 -- | All the @Servant@ handlers for wallet-specific operations.
 handlers :: HasConfigurations
-         => Core.BlockCount -> ServerT Wallets.API MonadV1
-handlers k = newWallet k
+         => Core.BlockCount -> Core.GenesisHash -> ServerT Wallets.API MonadV1
+handlers k genesisHash = newWallet k genesisHash
     :<|> listWallets
     :<|> updatePassword
     :<|> deleteWallet
@@ -70,9 +70,10 @@ newWallet
        , HasLens SyncQueue ctx SyncQueue
        )
     => Core.BlockCount
+    -> Core.GenesisHash
     -> NewWallet
     -> m (WalletResponse Wallet)
-newWallet k NewWallet{..} = do
+newWallet k genesisHash NewWallet{..} = do
 
     spV0 <- V0.syncProgress
     syncPercentage <- migrate spV0
@@ -82,7 +83,7 @@ newWallet k NewWallet{..} = do
     unless (isNodeSufficientlySynced k spV0) $ throwM (NodeIsStillSyncing syncPercentage)
 
     let newWalletHandler CreateWallet  = V0.newWallet
-        newWalletHandler RestoreWallet = V0.restoreWalletFromSeed
+        newWalletHandler RestoreWallet = V0.restoreWalletFromSeed genesisHash
         (V1 spendingPassword) = fromMaybe (V1 mempty) newwalSpendingPassword
         (V1 backupPhrase) = newwalBackupPhrase
     initMeta <- V0.CWalletMeta <$> pure newwalName

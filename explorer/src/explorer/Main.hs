@@ -22,7 +22,8 @@ import           Pos.Client.CLI (CommonNodeArgs (..), NodeArgs (..),
                      getNodeParams)
 import qualified Pos.Client.CLI as CLI
 import           Pos.Context (NodeContext (..))
-import           Pos.Core (ProtocolConstants, pcBlkSecurityParam, pcEpochSlots)
+import           Pos.Core (Config (..), ProtocolConstants,
+                     configBlkSecurityParam, configEpochSlots)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Explorer.DB (explorerInitDB)
 import           Pos.Explorer.ExtraContext (makeExtraCtx)
@@ -58,7 +59,7 @@ main = do
 
 action :: ExplorerNodeArgs -> Production ()
 action (ExplorerNodeArgs (cArgs@CommonNodeArgs {..}) ExplorerArgs {..}) =
-    withConfigurations blPath conf $ \ntpConfig pm pc ->
+    withConfigurations blPath conf $ \ntpConfig config@(Config pm pc _) ->
         withCompileInfo $ do
             CLI.printInfoOnStart cArgs ntpConfig
             logInfo $ "Explorer is enabled!"
@@ -69,7 +70,7 @@ action (ExplorerNodeArgs (cArgs@CommonNodeArgs {..}) ExplorerArgs {..}) =
                     cArgs
                     vssSK
                     (npBehaviorConfig currentParams)
-            let epochSlots = pcEpochSlots pc
+            let epochSlots = configEpochSlots config
 
             let
                 plugins :: [Diffusion ExplorerProd -> ExplorerProd ()]
@@ -80,16 +81,16 @@ action (ExplorerNodeArgs (cArgs@CommonNodeArgs {..}) ExplorerArgs {..}) =
                         NotifierSettings {nsPort = notifierPort}
                     , updateTriggerWorker
                     ]
-            bracketNodeResources (pcBlkSecurityParam pc)
+            bracketNodeResources (configBlkSecurityParam config)
                                  currentParams
                                  sscParams
                                  (explorerTxpGlobalSettings pm)
-                                 (explorerInitDB pm pc)
+                                 (explorerInitDB config)
                 $ \nr@NodeResources {..} -> Production $ runExplorerRealMode
                       pm
                       pc
                       nr
-                      (runNode pm pc nr plugins)
+                      (runNode config nr plugins)
   where
 
     blPath :: Maybe AssetLockPath

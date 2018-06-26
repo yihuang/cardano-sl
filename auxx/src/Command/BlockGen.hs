@@ -1,3 +1,5 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 -- | Block generation.
 
 module Command.BlockGen
@@ -13,8 +15,8 @@ import           System.Wlog (logInfo)
 
 import           Pos.AllSecrets (mkAllSecretsSimple)
 import           Pos.Client.KeyStorage (getSecretKeysPlain)
-import           Pos.Core (ProtocolConstants, gdBootStakeholders, genesisData)
-import           Pos.Crypto (ProtocolMagic, encToSecret)
+import           Pos.Core as Core (Config (..), gdBootStakeholders, genesisData)
+import           Pos.Crypto (encToSecret)
 import           Pos.Generator.Block (BlockGenParams (..), genBlocks,
                      tgpTxCountRange)
 import           Pos.Infra.StateLock (Priority (..), withStateLock)
@@ -25,13 +27,8 @@ import           Pos.Util.CompileInfo (withCompileInfo)
 import           Lang.Value (GenBlocksParams (..))
 import           Mode (MonadAuxxMode)
 
-generateBlocks
-    :: MonadAuxxMode m
-    => ProtocolMagic
-    -> ProtocolConstants
-    -> GenBlocksParams
-    -> m ()
-generateBlocks pm pc GenBlocksParams {..} =
+generateBlocks :: MonadAuxxMode m => Core.Config -> GenBlocksParams -> m ()
+generateBlocks config@Config { configProtocolMagic } GenBlocksParams {..} =
     withStateLock HighPriority ApplyBlock $ \_ -> do
         seed <- liftIO $ maybe randomIO pure bgoSeed
         logInfo $ "Generating with seed " <> show seed
@@ -39,7 +36,8 @@ generateBlocks pm pc GenBlocksParams {..} =
         allSecrets <-
             mkAllSecretsSimple . map encToSecret <$> getSecretKeysPlain
 
-        let bgenParams = BlockGenParams
+        let
+            bgenParams = BlockGenParams
                 { _bgpSecrets           = allSecrets
                 , _bgpGenStakeholders   = gdBootStakeholders genesisData
                 , _bgpBlockCount        = fromIntegral bgoBlockN
@@ -47,9 +45,9 @@ generateBlocks pm pc GenBlocksParams {..} =
                 , _bgpTxGenParams       = def & tgpTxCountRange .~ (0, 0)
                 , _bgpInplaceDB         = True
                 , _bgpSkipNoKey         = True
-                , _bgpTxpGlobalSettings = txpGlobalSettings pm
+                , _bgpTxpGlobalSettings = txpGlobalSettings configProtocolMagic
                 }
-        withCompileInfo $ evalRandT (genBlocks pm pc bgenParams (const ()))
+        withCompileInfo $ evalRandT (genBlocks config bgenParams (const ()))
                                     (mkStdGen seed)
         -- We print it twice because there can be a ton of logs and
         -- you don't notice the first message.

@@ -61,11 +61,10 @@ import           Serokell.Util (listJson)
 
 import           Pos.AllSecrets (AllSecrets)
 import           Pos.Block.Types (Blund)
-import           Pos.Core (GenesisWStakeholders, HeaderHash, ProtocolConstants,
+import           Pos.Core as Core (Config, GenesisWStakeholders, HeaderHash,
                      headerHash, prevBlockL)
 import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..),
                      toNewestFirst, toOldestFirst, _OldestFirst)
-import           Pos.Crypto (ProtocolMagic)
 import           Pos.Crypto.Hashing (hashHexF)
 import           Pos.Generator.Block (BlockGenParams (..), BlockTxpGenMode,
                      MonadBlockGen, TxGenParams (..), genBlocks)
@@ -158,25 +157,23 @@ flattenBlockchainTree prePath tree = do
 
 genBlocksInForest
     :: (HasTxpConfiguration, BlockTxpGenMode g ctx m)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> AllSecrets
     -> GenesisWStakeholders
     -> BlockchainForest BlockDesc
     -> RandT g m (BlockchainForest Blund)
-genBlocksInForest pm pc secrets bootStakeholders =
+genBlocksInForest config secrets bootStakeholders =
     traverse $ mapRandT withClonedGState .
-    genBlocksInTree pm pc secrets bootStakeholders
+    genBlocksInTree config secrets bootStakeholders
 
 genBlocksInTree
     :: (HasTxpConfiguration, BlockTxpGenMode g ctx m)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> AllSecrets
     -> GenesisWStakeholders
     -> BlockchainTree BlockDesc
     -> RandT g m (BlockchainTree Blund)
-genBlocksInTree pm pc secrets bootStakeholders blockchainTree = do
+genBlocksInTree config secrets bootStakeholders blockchainTree = do
     txpSettings <- view (lensOf' @TxpGlobalSettings)
     let BlockchainTree blockDesc blockchainForest = blockchainTree
         txGenParams = case blockDesc of
@@ -191,7 +188,7 @@ genBlocksInTree pm pc secrets bootStakeholders blockchainTree = do
             , _bgpSkipNoKey       = False
             , _bgpTxpGlobalSettings = txpSettings
             }
-    blocks <- genBlocks pm pc blockGenParams maybeToList
+    blocks <- genBlocks config blockGenParams maybeToList
     block <- case blocks of
         [block] -> return block
         _ ->
@@ -199,22 +196,19 @@ genBlocksInTree pm pc secrets bootStakeholders blockchainTree = do
             -- exactly one block.
             error "genBlocksInTree: impossible - 'genBlocks' generated unexpected amount of blocks"
     forestBlocks <-
-        genBlocksInForest pm pc secrets bootStakeholders blockchainForest
+        genBlocksInForest config secrets bootStakeholders blockchainForest
     return $ BlockchainTree block forestBlocks
 
 -- Precondition: paths in the structure are non-empty.
-genBlocksInStructure ::
-       ( HasTxpConfiguration
-       , BlockTxpGenMode g ctx m
-       , Functor t, Foldable t)
-    => ProtocolMagic
-    -> ProtocolConstants
+genBlocksInStructure
+    :: (HasTxpConfiguration, BlockTxpGenMode g ctx m, Functor t, Foldable t)
+    => Core.Config
     -> AllSecrets
     -> GenesisWStakeholders
     -> Map Path BlockDesc
     -> t Path
     -> RandT g m (t Blund)
-genBlocksInStructure pm pc secrets bootStakeholders annotations s = do
+genBlocksInStructure config secrets bootStakeholders annotations s = do
     let
         getAnnotation :: Path -> BlockDesc
         getAnnotation path =
@@ -224,7 +218,7 @@ genBlocksInStructure pm pc secrets bootStakeholders annotations s = do
         descForest :: BlockchainForest BlockDesc
         descForest = buildBlockchainForest BlockDescDefault paths
     blockForest :: BlockchainForest Blund <-
-        genBlocksInForest pm pc secrets bootStakeholders descForest
+        genBlocksInForest config secrets bootStakeholders descForest
     let
         getBlock :: Path -> Blund
         getBlock path = Map.findWithDefault

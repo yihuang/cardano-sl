@@ -17,6 +17,8 @@ import           Universum
 
 import           System.Wlog (Severity)
 
+import           Pos.Core (GenesisHash)
+
 import           Cardano.Wallet.Kernel.Diffusion (WalletDiffusion (..))
 
 import           Cardano.Wallet.Kernel (PassiveWallet)
@@ -48,7 +50,7 @@ bracketKernelActiveWallet  = Kernel.bracketActiveWallet
 
 bracketLegacyPassiveWallet
     :: forall ctx m n a. (MonadMask n, Legacy.MonadLegacyWallet ctx m)
-    => (PassiveWalletLayer m -> n a) -> n a
+    => GenesisHash -> (PassiveWalletLayer m -> n a) -> n a
 bracketLegacyPassiveWallet = Legacy.bracketPassiveWallet
 
 bracketLegacyActiveWallet

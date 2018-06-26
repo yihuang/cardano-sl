@@ -41,7 +41,8 @@ import           Pos.Wallet.Web.Tracking.Types (newSyncRequest)
 import           Test.Pos.Block.Logic.Util (EnableTxPayload (..),
                      InplaceDB (..))
 import           Test.Pos.Configuration (withDefConfigurations)
-import           Test.Pos.Core.Dummy (dummyK, dummyProtocolConstants)
+import           Test.Pos.Core.Dummy (dummyGenesisHash, dummyK,
+                     dummyProtocolConstants)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 import           Test.Pos.Util.QuickCheck.Property (assertProperty)
 import           Test.Pos.Wallet.Web.Mode (walletPropertySpec)
@@ -67,19 +68,17 @@ twoApplyTwoRollbacksSpec = walletPropertySpec twoApplyTwoRollbacksDesc $ do
     -- way of restoring.
     void $ importSomeWallets (pure emptyPassphrase)
     sks <- lift getSecretKeysPlain
-    lift $ forM_ sks $ \s -> syncWalletWithBlockchain dummyK (newSyncRequest (eskToWalletDecrCredentials s))
+    lift $ forM_ sks $ \s -> syncWalletWithBlockchain dummyK dummyGenesisHash (newSyncRequest (eskToWalletDecrCredentials s))
 
     -- Testing starts here
     genesisWalletDB <- lift WS.askWalletSnapshot
     applyBlocksCnt1 <- pick $ choose (1, k `div` 2)
     applyBlocksCnt2 <- pick $ choose (1, k `div` 2)
-    blunds1 <- wpGenBlocks dummyProtocolMagic
-                           (Just $ BlockCount applyBlocksCnt1)
+    blunds1 <- wpGenBlocks (Just $ BlockCount applyBlocksCnt1)
                            (EnableTxPayload True)
                            (InplaceDB True)
     after1ApplyDB <- lift WS.askWalletSnapshot
-    blunds2 <- wpGenBlocks dummyProtocolMagic
-                           (Just $ BlockCount applyBlocksCnt2)
+    blunds2 <- wpGenBlocks (Just $ BlockCount applyBlocksCnt2)
                            (EnableTxPayload True)
                            (InplaceDB True)
     after2ApplyDB <- lift WS.askWalletSnapshot

@@ -48,7 +48,7 @@ import           Test.Pos.Block.Logic.Util (EnableTxPayload (..),
 import           Test.Pos.Block.Property (blockPropertySpec)
 import           Test.Pos.Configuration (HasStaticConfigurations,
                      withStaticConfigurations)
-import           Test.Pos.Core.Dummy (dummyEpochSlots, dummyK,
+import           Test.Pos.Core.Dummy (dummyConfig, dummyEpochSlots, dummyK,
                      dummyProtocolConstants)
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 import           Test.Pos.Util.QuickCheck.Property (splitIntoChunks,
@@ -132,7 +132,7 @@ verifyAndApplyBlocksSpec =
     applier blunds =
         let blocks = map fst blunds
         in satisfySlotCheck blocks $
-           whenLeftM (verifyAndApplyBlocks dummyProtocolMagic dummyProtocolConstants True blocks) throwM
+           whenLeftM (verifyAndApplyBlocks dummyConfig True blocks) throwM
     applyByOneOrAllAtOnceDesc =
         "verifying and applying blocks one by one leads " <>
         "to the same GState as verifying and applying them all at once " <>
@@ -294,8 +294,7 @@ blockPropertyScenarioGen m = do
     allSecrets <- getAllSecrets
     let genStakeholders = gdBootStakeholders genesisData
     g <- pick $ MkGen $ \qc _ -> qc
-    lift $ flip evalRandT g $ runBlockEventGenT dummyProtocolMagic
-                                                dummyProtocolConstants
+    lift $ flip evalRandT g $ runBlockEventGenT dummyConfig
                                                 allSecrets
                                                 genStakeholders
                                                 m

@@ -13,8 +13,8 @@ import           Pos.Block.Worker (blkWorkers)
 -- Message instances.
 import           Pos.Communication.Message ()
 import           Pos.Context (NodeContext (..))
-import           Pos.Core (ProtocolConstants, pcBlkSecurityParam, pcEpochSlots)
-import           Pos.Crypto (ProtocolMagic)
+import           Pos.Core as Core (Config (..), pcBlkSecurityParam,
+                     pcEpochSlots)
 import           Pos.Delegation.Worker (dlgWorkers)
 import           Pos.Infra.Diffusion.Types (Diffusion)
 import           Pos.Infra.Network.CLI (launchStaticConfigMonitoring)
@@ -28,16 +28,15 @@ import           Pos.WorkMode (WorkMode)
 
 -- | All, but in reality not all, workers used by full node.
 allWorkers
-    :: forall ext ctx m .
-       (HasTxpConfiguration, WorkMode ctx m)
-    => ProtocolMagic
-    -> ProtocolConstants
+    :: forall ext ctx m
+     . (HasTxpConfiguration, WorkMode ctx m)
+    => Core.Config
     -> NodeResources ext
     -> [Diffusion m -> m ()]
-allWorkers pm pc NodeResources {..} = mconcat
+allWorkers config@(Config pm pc _) NodeResources {..} = mconcat
     [ sscWorkers pm pc
     , usWorkers (pcBlkSecurityParam pc)
-    , blkWorkers pm pc
+    , blkWorkers config
     , dlgWorkers
     , [properSlottingWorker, staticConfigMonitoringWorker]
     ]

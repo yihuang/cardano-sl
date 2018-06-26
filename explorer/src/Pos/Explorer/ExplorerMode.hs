@@ -60,8 +60,7 @@ import           Pos.WorkMode (MinWorkMode)
 
 import           Test.Pos.Block.Logic.Emulation (Emulation (..), runEmulation)
 import           Test.Pos.Block.Logic.Mode (TestParams (..))
-import           Test.Pos.Core.Dummy (dummyEpochSlots, dummyProtocolConstants)
-import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
+import           Test.Pos.Core.Dummy (dummyConfig, dummyEpochSlots)
 
 
 -------------------------------------------------------------------------------------
@@ -149,7 +148,7 @@ initExplorerTestContext tp@TestParams {..} = do
             { eticDBPureVar      = dbPureVar
             }
     liftIO $ runTestInitMode initCtx $ do
-        DB.initNodeDBs dummyProtocolMagic dummyProtocolConstants
+        DB.initNodeDBs dummyConfig
         lcLrcSync <- newTVarIO =<< mkLrcSyncData
         let _gscLrcContext = LrcContext {..}
         _gscSlogGState <- mkSlogGState

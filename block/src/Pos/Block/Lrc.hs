@@ -32,8 +32,8 @@ import           Pos.Core (Coin, EpochIndex, EpochOrSlot (..),
                      ProtocolConstants (..), SharedSeed, SlotCount,
                      StakeholderId, crucialSlot, epochIndexL, getEpochOrSlot,
                      pcBlkSecurityParam, pcEpochSlots)
+import           Pos.Core as Core (Config (..))
 import           Pos.Core.Chrono (NE, NewestFirst (..), toOldestFirst)
-import           Pos.Crypto (ProtocolMagic)
 import qualified Pos.DB.Block.Load as DB
 import           Pos.DB.Class (MonadDBRead, MonadGState)
 import qualified Pos.DB.GState.Stakes as GS (getRealStake, getRealTotalStake)
@@ -86,11 +86,10 @@ type LrcModeFull ctx m =
 lrcSingleShot
     :: forall ctx m
      . (LrcModeFull ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> EpochIndex
     -> m ()
-lrcSingleShot pm pc epoch = do
+lrcSingleShot config epoch = do
     lock <- views (lensOf @LrcContext) lcLrcSync
     logDebug $ sformat
         ("lrcSingleShot is trying to acquire LRC lock, the epoch is "
@@ -116,7 +115,7 @@ lrcSingleShot pm pc epoch = do
                     , expectedRichmenComp)
         when need $ do
             logInfo "LRC is starting actual computation"
-            lrcDo pm pc epoch filteredConsumers
+            lrcDo config epoch filteredConsumers
             logInfo "LRC has finished actual computation"
         putEpoch epoch
         logInfo ("LRC has updated LRC DB" <> for_thEpochMsg)
@@ -144,13 +143,12 @@ lrcDo
      . ( LrcModeFull ctx m
        , HasMisbehaviorMetrics ctx
        )
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> EpochIndex
     -> [LrcConsumer m]
     -> m ()
-lrcDo pm pc epoch consumers = do
-    blundsUpToGenesis <- DB.loadBlundsFromTipWhile upToGenesis
+lrcDo (Config pm pc genesisHash) epoch consumers = do
+    blundsUpToGenesis <- DB.loadBlundsFromTipWhile genesisHash upToGenesis
     -- If there are blocks from 'epoch' it means that we somehow accepted them
     -- before running LRC for 'epoch'. It's very bad.
     unless (null blundsUpToGenesis) $ throwM LrcAfterGenesis
@@ -161,7 +159,7 @@ lrcDo pm pc epoch consumers = do
     -- However, it's important to check that there are blocks to
     -- rollback before computing ssc seed (because if there are no
     -- blocks, it doesn't make sense to do it).
-    blundsToRollback <- DB.loadBlundsFromTipWhile whileAfterCrucial
+    blundsToRollback <- DB.loadBlundsFromTipWhile genesisHash whileAfterCrucial
     blundsToRollbackNE <-
         maybeThrow UnknownBlocksForLrc (atLeastKNewestFirst blundsToRollback)
     seed <- sscCalculateSeed epoch >>= \case

@@ -33,8 +33,9 @@ import           Pos.Block.Lrc (LrcModeFull, lrcSingleShot)
 import           Pos.Block.Slog (ShouldCallBListener (..), mustDataBeKnown,
                      slogVerifyBlocks)
 import           Pos.Block.Types (Blund, Undo (..))
-import           Pos.Core (Block, HeaderHash, ProtocolConstants, epochIndexL,
-                     headerHashG, pcBlkSecurityParam, prevBlockL)
+import           Pos.Core as Core (Block, Config (..), HeaderHash,
+                     ProtocolConstants, epochIndexL, headerHashG,
+                     pcBlkSecurityParam, prevBlockL)
 import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..),
                      toNewestFirst, toOldestFirst)
 import           Pos.Crypto (ProtocolMagic)
@@ -127,17 +128,16 @@ type BlockLrcMode ctx m = (MonadBlockApply ctx m, LrcModeFull ctx m)
 -- return the header hash of the new tip. It's up to the caller to log a
 -- warning that partial application has occurred.
 verifyAndApplyBlocks
-    :: forall ctx m.
-       ( BlockLrcMode ctx m
+    :: forall ctx m
+     . ( BlockLrcMode ctx m
        , MonadMempoolNormalization ctx m
        , HasMisbehaviorMetrics ctx
        )
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Bool
     -> OldestFirst NE Block
     -> m (Either ApplyBlocksException HeaderHash)
-verifyAndApplyBlocks pm pc rollback blocks = runExceptT $ do
+verifyAndApplyBlocks config@(Config pm pc _) rollback blocks = runExceptT $ do
     tip <- lift GS.getTip
     let assumedTip = blocks ^. _Wrapped . _neHead . prevBlockL
     when (tip /= assumedTip) $
@@ -199,7 +199,7 @@ verifyAndApplyBlocks pm pc rollback blocks = runExceptT $ do
             let epochIndex = prefixHead ^. epochIndexL
             logDebug $ "Rolling: Calculating LRC if needed for epoch "
                        <> pretty epochIndex
-            lift $ lrcSingleShot pm pc epochIndex
+            lift $ lrcSingleShot config epochIndex
         logDebug "Rolling: verifying"
         lift (verifyBlocksPrefix pm pc prefix) >>= \case
             Left (ApplyBlocksVerifyFailure -> failure)
@@ -231,22 +231,21 @@ applyBlocks
      . ( BlockLrcMode ctx m
        , HasMisbehaviorMetrics ctx
        )
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Bool
     -> Maybe PollModifier
     -> OldestFirst NE Blund
     -> m ()
-applyBlocks pm pc calculateLrc pModifier blunds = do
+applyBlocks config@(Config pm pc _) calculateLrc pModifier blunds = do
     when (isLeft prefixHead && calculateLrc) $
         -- Hopefully this lrc check is never triggered -- because
         -- caller most definitely should have computed lrc to verify
         -- the sequence beforehand.
-        lrcSingleShot pm pc (prefixHead ^. epochIndexL)
+        lrcSingleShot config (prefixHead ^. epochIndexL)
     applyBlocksUnsafe pm pc (ShouldCallBListener True) prefix pModifier
     case getOldestFirst suffix of
         []           -> pass
-        (genesis:xs) -> applyBlocks pm pc calculateLrc pModifier (OldestFirst (genesis:|xs))
+        (genesis:xs) -> applyBlocks config calculateLrc pModifier (OldestFirst (genesis:|xs))
   where
     prefixHead = prefix ^. _Wrapped . _neHead . _1
     (prefix, suffix) = spanEpoch blunds
@@ -279,12 +278,11 @@ applyWithRollback
        , MonadMempoolNormalization ctx m
        , HasMisbehaviorMetrics ctx
        )
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> NewestFirst NE Blund        -- ^ Blocks to rollbck
     -> OldestFirst NE Block        -- ^ Blocks to apply
     -> m (Either ApplyBlocksException HeaderHash)
-applyWithRollback pm pc toRollback toApply = runExceptT $ do
+applyWithRollback config@(Config pm pc _) toRollback toApply = runExceptT $ do
     tip <- lift GS.getTip
     when (tip /= newestToRollback) $
         throwError $ ApplyBlocksTipMismatch "applyWithRollback/rollback" tip newestToRollback
@@ -305,7 +303,7 @@ applyWithRollback pm pc toRollback toApply = runExceptT $ do
   where
     reApply = toOldestFirst toRollback
     applyBack :: m ()
-    applyBack = applyBlocks pm pc False Nothing reApply
+    applyBack = applyBlocks config False Nothing reApply
     expectedTipApply = toApply ^. _Wrapped . _neHead . prevBlockL
     newestToRollback = toRollback ^. _Wrapped . _neHead . _1 . headerHashG
 
@@ -313,6 +311,6 @@ applyWithRollback pm pc toRollback toApply = runExceptT $ do
         applyBack $> Left (ApplyBlocksTipMismatch "applyWithRollback/apply" tip newestToRollback)
 
     onGoodRollback =
-        verifyAndApplyBlocks pm pc True toApply >>= \case
+        verifyAndApplyBlocks config True toApply >>= \case
             Left err      -> applyBack $> Left err
             Right tipHash -> pure (Right tipHash)

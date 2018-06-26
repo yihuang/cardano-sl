@@ -10,7 +10,8 @@ import           System.Directory (canonicalizePath, doesDirectoryExist,
 
 import           Pos.Block.Types (Undo)
 import qualified Pos.Client.CLI as CLI
-import           Pos.Core (HasConfiguration, HeaderHash, headerHash)
+import           Pos.Core (Config (..), GenesisHash, HasConfiguration,
+                     HeaderHash, headerHash)
 import           Pos.Core.Block (Block)
 import           Pos.Core.Chrono (NewestFirst (..))
 import           Pos.DB (closeNodeDBs, openNodeDBs)
@@ -48,11 +49,16 @@ dbSizes root = do
     forM (root : parents) $ \f -> (toText f,) <$> du_s f
 
 -- | Analyse the blockchain, printing useful statistics.
-analyseBlockchain :: HasConfiguration => CLIOptions -> HeaderHash -> BlockchainInspector ()
-analyseBlockchain cli tip =
+analyseBlockchain
+    :: HasConfiguration
+    => CLIOptions
+    -> GenesisHash
+    -> HeaderHash
+    -> BlockchainInspector ()
+analyseBlockchain cli genesisHash tip =
     if incremental cli then do putText (renderHeader cli)
                                analyseBlockchainEagerly cli tip
-                       else analyseBlockchainLazily cli
+                       else analyseBlockchainLazily cli genesisHash
 
 -- | Tries to fetch a `Block` given its `HeaderHash`.
 fetchBlock :: HasConfiguration => HeaderHash -> BlockchainInspector (Maybe Block)
@@ -65,9 +71,13 @@ fetchUndo = getUndo . headerHash
 -- | Analyse the blockchain lazily by rendering all the blocks at once, loading the whole
 -- blockchain into memory. This mode generates very nice-looking tables, but using it for
 -- big DBs might not be feasible.
-analyseBlockchainLazily :: HasConfiguration => CLIOptions -> BlockchainInspector ()
-analyseBlockchainLazily cli = do
-    allBlocks <- map (bimap identity Just) . getNewestFirst <$> DB.loadBlundsFromTipWhile (const True)
+analyseBlockchainLazily
+    :: HasConfiguration => CLIOptions -> GenesisHash -> BlockchainInspector ()
+analyseBlockchainLazily cli genesisHash = do
+    allBlocks <-
+        map (bimap identity Just) . getNewestFirst <$> DB.loadBlundsFromTipWhile
+            genesisHash
+            (const True)
     putText (renderBlocks cli allBlocks)
 
 -- | Analyse the blockchain eagerly, rendering a block at time, without loading the whole
@@ -90,7 +100,7 @@ main = do
         action args
 
 action :: CLIOptions -> Production ()
-action cli@CLIOptions{..} = withConfigurations Nothing conf $ \_ _ _ -> do
+action cli@CLIOptions{..} = withConfigurations Nothing conf $ \_ config -> do
     -- Render the first report
     sizes <- liftIO (canonicalizePath dbPath >>= dbSizes)
     liftIO $ putText $ render uom printMode sizes
@@ -98,6 +108,6 @@ action cli@CLIOptions{..} = withConfigurations Nothing conf $ \_ _ _ -> do
     -- Now open the DB and inspect it, generating the second report
     bracket (openNodeDBs False dbPath) closeNodeDBs $ \db ->
         initBlockchainAnalyser db $
-            GS.getTip >>= analyseBlockchain cli
+            GS.getTip >>= analyseBlockchain cli (configGenesisHash config)
   where
     conf = CLI.configurationOptions commonArgs

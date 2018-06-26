@@ -55,7 +55,8 @@ import qualified Servant
 import           System.Wlog (logInfo, modifyLoggerName, usingLoggerName)
 
 import           Pos.Context (HasNodeContext)
-import           Pos.Core (BlockCount, ProtocolConstants)
+import           Pos.Core as Core (BlockCount, Config, GenesisHash,
+                     ProtocolConstants)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Util (lensOf)
 
@@ -122,12 +123,11 @@ walletDocumentation WalletBackendParams {..} = pure $ \_ ->
 
 -- | A @Plugin@ to start the wallet backend API.
 legacyWalletBackend :: (HasConfigurations, HasCompileInfo)
-                    => ProtocolMagic
-                    -> ProtocolConstants
+                    => Core.Config
                     -> WalletBackendParams
                     -> TVar NtpStatus
                     -> Plugin WalletWebMode
-legacyWalletBackend pm pc WalletBackendParams {..} ntpStatus = pure $ \diffusion -> do
+legacyWalletBackend config WalletBackendParams {..} ntpStatus = pure $ \diffusion -> do
     modifyLoggerName (const "legacyServantBackend") $ do
       logInfo $ sformat ("Production mode for API: "%build)
         walletProductionApi
@@ -156,16 +156,14 @@ legacyWalletBackend pm pc WalletBackendParams {..} ntpStatus = pure $ \diffusion
             if isDebugMode walletRunMode then
               Servant.serve API.walletDevAPI $ LegacyServer.walletDevServer
                 (V0.convertHandler ctx)
-                pm
-                pc
+                config
                 diffusion
                 ntpStatus
                 walletRunMode
             else
               Servant.serve API.walletAPI $ LegacyServer.walletServer
                 (V0.convertHandler ctx)
-                pm
-                pc
+                config
                 diffusion
                 ntpStatus
 
@@ -254,10 +252,10 @@ notifierPlugin :: HasConfigurations => Plugin WalletWebMode
 notifierPlugin = [const V0.notifierPlugin]
 
 -- | The @Plugin@ responsible for the restoration & syncing of a wallet.
-syncWalletWorker :: HasConfigurations => BlockCount -> Plugin WalletWebMode
-syncWalletWorker k = pure $ const $
+syncWalletWorker :: HasConfigurations => BlockCount -> GenesisHash -> Plugin WalletWebMode
+syncWalletWorker k genesisHash = pure $ const $
     modifyLoggerName (const "syncWalletWorker") $
-    (view (lensOf @SyncQueue) >>= processSyncRequest k)
+    (view (lensOf @SyncQueue) >>= processSyncRequest k genesisHash)
 
 -- | "Attaches" the middleware to this 'Application', if any.
 -- When running in debug mode, chances are we want to at least allow CORS to test the API

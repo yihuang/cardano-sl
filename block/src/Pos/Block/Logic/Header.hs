@@ -33,10 +33,11 @@ import           UnliftIO (MonadUnliftIO)
 import           Pos.Block.Logic.Integrity (VerifyHeaderParams (..),
                      verifyHeader, verifyHeaders)
 import           Pos.Block.Logic.Util (lcaWithMainChain)
-import           Pos.Core (BlockCount, EpochOrSlot (..), HeaderHash, SlotCount,
-                     SlotId (..), bvdMaxHeaderSize, difficultyL, epochIndexL,
-                     epochOrSlotG, getChainDifficulty, getEpochOrSlot,
-                     headerHash, headerHashG, headerSlotL, kEpochSlots,
+import           Pos.Core (BlockCount, EpochOrSlot (..), GenesisHash,
+                     HeaderHash, SlotCount, SlotId (..), bvdMaxHeaderSize,
+                     difficultyL, epochIndexL, epochOrSlotG,
+                     getChainDifficulty, getEpochOrSlot, headerHash,
+                     headerHashG, headerSlotL, kEpochSlots,
                      localSlotIndexMinBound, prevBlockL)
 import           Pos.Core.Block (BlockHeader (..))
 import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..),
@@ -312,9 +313,10 @@ getHeadersFromManyTo mLimit checkpoints startM = runExceptT $ do
 getHeadersOlderExp
     :: MonadDBRead m
     => BlockCount
+    -> GenesisHash
     -> Maybe HeaderHash
     -> m (OldestFirst NE HeaderHash)
-getHeadersOlderExp k upto = do
+getHeadersOlderExp k genesisHash upto = do
     tip <- GS.getTip
     let upToReal = fromMaybe tip upto
     -- Using 'blkSecurityParam + 1' because fork can happen on k+1th one.
@@ -322,7 +324,7 @@ getHeadersOlderExp k upto = do
         -- loadHeadersByDepth always returns nonempty list unless you
         -- pass depth 0 (we pass k+1). It throws if upToReal is
         -- absent. So it either throws or returns nonempty.
-        DB.loadHeadersByDepth (k + 1) upToReal
+        DB.loadHeadersByDepth genesisHash (k + 1) upToReal
     let toNE = fromMaybe (error "getHeadersOlderExp: couldn't create nonempty") .
                nonEmpty
     let selectedHashes :: NewestFirst [] HeaderHash

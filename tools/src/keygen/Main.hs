@@ -17,11 +17,11 @@ import qualified Text.JSON.Canonical as CanonicalJSON
 
 import           Pos.Binary (asBinary, serialize')
 import qualified Pos.Client.CLI as CLI
-import           Pos.Core (CoreConfiguration (..), GenesisConfiguration (..),
-                     ProtocolConstants, ProtocolMagic, RichSecrets (..),
-                     addressHash, ccGenesis, coreConfiguration,
-                     generateFakeAvvm, generateRichSecrets, mkVssCertificate,
-                     vcSigningKey, vssMaxTTL)
+import           Pos.Core (Config (..), CoreConfiguration (..),
+                     GenesisConfiguration (..), ProtocolConstants,
+                     ProtocolMagic, RichSecrets (..), addressHash, ccGenesis,
+                     coreConfiguration, generateFakeAvvm, generateRichSecrets,
+                     mkVssCertificate, vcSigningKey, vssMaxTTL)
 import           Pos.Crypto (EncryptedSecretKey (..), SecretKey (..),
                      VssKeyPair, fullPublicKeyF, hashHexF, noPassEncrypt,
                      redeemPkB64F, toPublic, toVssPublicKey)
@@ -157,16 +157,18 @@ genVssCert pm pc path = do
 
 main :: IO ()
 main = do
-    KeygenOptions{..} <- getKeygenOptions
+    KeygenOptions {..} <- getKeygenOptions
     setupLogging Nothing $ productionB <> termSeveritiesOutB debugPlus
-    usingLoggerName "keygen" $ withConfigurations Nothing koConfigurationOptions $ \_ pm pc -> do
-        logInfo "Processing command"
-        case koCommand of
-            RearrangeMask msk       -> rearrange msk
-            GenerateKey path        -> genPrimaryKey path
-            GenerateVss path        -> genVssCert pm pc path
-            ReadKey path            -> readKey path
-            DumpAvvmSeeds opts      -> dumpAvvmSeeds opts
-            GenerateKeysBySpec gkbg -> generateKeysByGenesis gkbg
-            DumpGenesisData dgdPath dgdCanonical
-                                    -> CLI.dumpGenesisData dgdCanonical dgdPath
+    usingLoggerName "keygen"
+        $ withConfigurations Nothing koConfigurationOptions
+        $ \_ (Config pm pc _) -> do
+              logInfo "Processing command"
+              case koCommand of
+                  RearrangeMask      msk  -> rearrange msk
+                  GenerateKey        path -> genPrimaryKey path
+                  GenerateVss        path -> genVssCert pm pc path
+                  ReadKey            path -> readKey path
+                  DumpAvvmSeeds      opts -> dumpAvvmSeeds opts
+                  GenerateKeysBySpec gkbg -> generateKeysByGenesis gkbg
+                  DumpGenesisData dgdPath dgdCanonical ->
+                      CLI.dumpGenesisData dgdCanonical dgdPath

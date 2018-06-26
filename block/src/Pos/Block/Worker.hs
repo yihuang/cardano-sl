@@ -35,9 +35,11 @@ import           Pos.Block.Slog (scCQFixedMonitorState, scCQOverallMonitorState,
                      scDifficultyMonitorState, scEpochMonitorState,
                      scGlobalSlotMonitorState, scLocalSlotMonitorState,
                      slogGetLastSlots)
-import           Pos.Core (BlockCount, BlockVersionData (..), ChainDifficulty,
-                     FlatSlotId, ProtocolConstants, SlotCount, SlotId (..),
-                     Timestamp (Timestamp), addressHash, difficultyL,
+import           Pos.Core as Core (BlockCount, BlockVersionData (..),
+                     ChainDifficulty, Config (..), FlatSlotId,
+                     ProtocolConstants, SlotCount, SlotId (..),
+                     Timestamp (Timestamp), addressHash,
+                     configBlkSecurityParam, configEpochSlots, difficultyL,
                      epochOrSlotToSlot, flattenSlotId, gbHeader,
                      getEpochOrSlot, getOurPublicKey, getSlotIndex,
                      kEpochSlots, kSlotSecurityParam, localSlotIndexFromEnum,
@@ -76,13 +78,12 @@ import           Pos.Update.DB (getAdoptedBVData)
 -- | All workers specific to block processing.
 blkWorkers
     :: (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> [Diffusion m -> m ()]
-blkWorkers pm pc =
-    [ blkCreatorWorker pm pc
+blkWorkers config@(Config pm pc _) =
+    [ blkCreatorWorker config
     , informerWorker (pcBlkSecurityParam pc)
-    , retrievalWorker pm pc
+    , retrievalWorker config
     , recoveryTriggerWorker pm (pcBlkSecurityParam pc)
     ]
 
@@ -117,15 +118,14 @@ informerWorker k _ =
 
 blkCreatorWorker
     :: (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> Diffusion m
     -> m ()
-blkCreatorWorker pm pc diffusion =
-    onNewSlot (pcEpochSlots pc) onsp $ \slotId ->
-        recoveryCommGuard (pcBlkSecurityParam pc)
+blkCreatorWorker config diffusion =
+    onNewSlot (configEpochSlots config) onsp $ \slotId ->
+        recoveryCommGuard (configBlkSecurityParam config)
                           "onNewSlot worker, blkCreatorWorker"
-            $          blockCreator pm pc slotId diffusion
+            $          blockCreator config slotId diffusion
             `catchAny` onBlockCreatorException
   where
     onBlockCreatorException = reportOrLogE "blockCreator failed: "
@@ -136,15 +136,14 @@ blkCreatorWorker pm pc diffusion =
 
 blockCreator
     :: (BlockWorkMode ctx m, HasMisbehaviorMetrics ctx)
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> SlotId
     -> Diffusion m
     -> m ()
-blockCreator pm pc (slotId@SlotId {..}) diffusion = do
+blockCreator config@(Config pm pc _) (slotId@SlotId {..}) diffusion = do
 
     -- First of all we create genesis block if necessary.
-    mGenBlock <- createGenesisBlockAndApply pm pc siEpoch
+    mGenBlock <- createGenesisBlockAndApply config siEpoch
     whenJust mGenBlock $ \createdBlk -> do
         logInfo $ sformat ("Created genesis block:\n" %build) createdBlk
         jsonLog $ jlCreatedBlock (pcEpochSlots pc) (Left createdBlk)

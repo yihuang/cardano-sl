@@ -18,7 +18,8 @@ import           Servant.Generic (AsServerT, GenericProduct, ToServant,
 import           Servant.Server (Handler, Server, ServerT, hoistServer)
 import           Servant.Swagger.UI (swaggerSchemaUIServer)
 
-import           Pos.Core (ProtocolConstants, pcEpochSlots)
+import           Pos.Core as Core (Config (..), GenesisHash, ProtocolConstants,
+                     pcEpochSlots)
 import           Pos.Core.Txp (TxAux)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Update.Configuration (curSoftwareVersion)
@@ -38,14 +39,13 @@ servantHandlersWithSwagger
     :: ( MonadFullWalletWebMode ctx m
        , HasCompileInfo
        )
-    => ProtocolMagic
-    -> ProtocolConstants
+    => Core.Config
     -> TVar NtpStatus
     -> (TxAux -> m Bool)
     -> (forall x. m x -> Handler x)
     -> Server A.WalletSwaggerApi
-servantHandlersWithSwagger pm pc ntpStatus submitTx nat =
-    hoistServer A.walletApi nat (servantHandlers pm pc ntpStatus submitTx)
+servantHandlersWithSwagger config ntpStatus submitTx nat =
+    hoistServer A.walletApi nat (servantHandlers config ntpStatus submitTx)
    :<|>
     swaggerSchemaUIServer swaggerSpecForWalletApi
 
@@ -54,29 +54,27 @@ servantHandlersWithSwagger pm pc ntpStatus submitTx nat =
 ----------------------------------------------------------------------------
 
 servantHandlers
-    :: ( MonadFullWalletWebMode ctx m
-       , HasCompileInfo
-       )
-    => ProtocolMagic
-    -> ProtocolConstants
+    :: (MonadFullWalletWebMode ctx m, HasCompileInfo)
+    => Core.Config
     -> TVar NtpStatus
     -> (TxAux -> m Bool)
     -> ServerT A.WalletApi m
-servantHandlers pm pc ntpStatus submitTx = toServant' A.WalletApiRecord
-    { _test        = testHandlers
-    , _wallets     = walletsHandlers
-    , _accounts    = accountsHandlers
-    , _addresses   = addressesHandlers
-    , _profile     = profileHandlers
-    , _txs         = txsHandlers pm pc submitTx
-    , _update      = updateHandlers
-    , _redemptions = redemptionsHandlers pm pc submitTx
-    , _reporting   = reportingHandlers
-    , _settings    = settingsHandlers ntpStatus
-    , _backup      = backupHandlers
-    , _info        = infoHandlers
-    , _system      = systemHandlers
-    }
+servantHandlers (Config pm pc genesisHash) ntpStatus submitTx = toServant'
+    A.WalletApiRecord
+        { _test        = testHandlers
+        , _wallets     = walletsHandlers genesisHash
+        , _accounts    = accountsHandlers
+        , _addresses   = addressesHandlers
+        , _profile     = profileHandlers
+        , _txs         = txsHandlers pm pc submitTx
+        , _update      = updateHandlers
+        , _redemptions = redemptionsHandlers pm pc submitTx
+        , _reporting   = reportingHandlers
+        , _settings    = settingsHandlers ntpStatus
+        , _backup      = backupHandlers genesisHash
+        , _info        = infoHandlers
+        , _system      = systemHandlers
+        }
 
 -- branches of the API
 
@@ -86,15 +84,16 @@ testHandlers = toServant' A.WTestApiRecord
     , _testState = M.dumpState
     }
 
-walletsHandlers :: MonadFullWalletWebMode ctx m => ServerT A.WWalletsApi m
-walletsHandlers = toServant' A.WWalletsApiRecord
+walletsHandlers
+    :: MonadFullWalletWebMode ctx m => GenesisHash -> ServerT A.WWalletsApi m
+walletsHandlers genesisHash = toServant' A.WWalletsApiRecord
     { _getWallet              = M.getWallet
     , _getWallets             = M.getWallets
     , _newWallet              = M.newWallet
     , _updateWallet           = M.updateWallet
-    , _restoreWallet          = M.restoreWalletFromSeed
+    , _restoreWallet          = M.restoreWalletFromSeed genesisHash
     , _deleteWallet           = M.deleteWallet
-    , _importWallet           = M.importWallet
+    , _importWallet           = M.importWallet genesisHash
     , _changeWalletPassphrase = M.changeWalletPassphrase
     }
 
@@ -167,9 +166,10 @@ settingsHandlers ntpStatus = toServant' A.WSettingsApiRecord
     , _localTimeDifference = fromMaybe 0 <$> M.localTimeDifference ntpStatus
     }
 
-backupHandlers :: MonadFullWalletWebMode ctx m => ServerT A.WBackupApi m
-backupHandlers = toServant' A.WBackupApiRecord
-    { _importBackupJSON = M.importWalletJSON
+backupHandlers
+    :: MonadFullWalletWebMode ctx m => GenesisHash -> ServerT A.WBackupApi m
+backupHandlers genesisHash = toServant' A.WBackupApiRecord
+    { _importBackupJSON = M.importWalletJSON genesisHash
     , _exportBackupJSON = M.exportWalletJSON
     }
 

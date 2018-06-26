@@ -65,7 +65,8 @@ import           GHC.IO.Exception (IOErrorType (..), IOException (..))
 
 import           Paths_cardano_sl (version)
 import           Pos.Client.CLI (readLoggerConfig)
-import           Pos.Core (HasConfiguration, ProtocolMagic, Timestamp (..))
+import           Pos.Core (Config (..), HasConfiguration, ProtocolMagic,
+                     Timestamp (..))
 import           Pos.DB.Block (dbGetSerBlockRealDefault,
                      dbGetSerUndoRealDefault, dbPutSerBlundsRealDefault)
 import           Pos.DB.Class (MonadDB (..), MonadDBRead (..))
@@ -303,7 +304,7 @@ main =
                       set Log.ltFiles [Log.HandlerWrap "launcher" Nothing] .
                       set Log.ltSeverity (Just Log.debugPlus)
     logException loggerName . Log.usingLoggerName loggerName $
-        withConfigurations Nothing loConfiguration $ \_ pm _ -> do
+        withConfigurations Nothing loConfiguration $ \_ (Config pm _ _) -> do
 
         -- Generate TLS certificates as needed
         generateTlsCertificates loConfiguration loX509ToolPath loTlsPath

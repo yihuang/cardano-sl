@@ -26,7 +26,7 @@ import           Servant.Server (Handler)
 import           System.Wlog (logInfo, usingLoggerName)
 
 import           Cardano.NodeIPC (startNodeJsIPC)
-import           Pos.Core (ProtocolConstants)
+import           Pos.Core as Core (Config (..), ProtocolConstants)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Infra.Diffusion.Types (Diffusion, hoistDiffusion)
 import           Pos.Infra.Shutdown.Class (HasShutdownContext (shutdownContext))
@@ -66,32 +66,35 @@ runWRealMode pm pc db conn syncRequests res action = Production $
             action (hoistDiffusion realModeToWalletWebMode (walletWebModeToRealMode db conn syncRequests) diffusion)
 
 walletServeWebFull
-    :: ( HasConfigurations
-       , HasCompileInfo
-       )
-    => ProtocolMagic
-    -> ProtocolConstants
+    :: (HasConfigurations, HasCompileInfo)
+    => Core.Config
     -> Diffusion WalletWebMode
     -> TVar NtpStatus
-    -> Bool                    -- ^ whether to include genesis keys
-    -> NetworkAddress          -- ^ IP and Port to listen
+    -> Bool
+    -- ^ whether to include genesis keys
+    -> NetworkAddress
+    -- ^ IP and Port to listen
     -> Maybe TlsParams
     -> WalletWebMode ()
-walletServeWebFull pm pc diffusion ntpStatus debug address mTlsParams = do
+walletServeWebFull config diffusion ntpStatus debug address mTlsParams = do
     ctx <- view shutdownContext
-    let
-      portCallback :: Word16 -> IO ()
-      portCallback port = usingLoggerName "NodeIPC" $ flip runReaderT ctx $ startNodeJsIPC port
+    let portCallback :: Word16 -> IO ()
+        portCallback port =
+            usingLoggerName "NodeIPC" $ flip runReaderT ctx $ startNodeJsIPC
+                port
     walletServeImpl action address mTlsParams Nothing (Just portCallback)
   where
     action :: WalletWebMode Application
     action = do
         logInfo "Wallet Web API has STARTED!"
-        when debug $ addInitialRichAccount 0
+        when debug $ addInitialRichAccount (configGenesisHash config) 0
 
         wwmc <- walletWebModeContext
-        walletApplication $
-            walletServer @WalletWebModeContext @WalletWebMode pm pc diffusion ntpStatus (convertHandler wwmc)
+        walletApplication $ walletServer @WalletWebModeContext @WalletWebMode
+            config
+            diffusion
+            ntpStatus
+            (convertHandler wwmc)
 
 walletWebModeContext :: WalletWebMode WalletWebModeContext
 walletWebModeContext = view (lensOf @WalletWebModeContextTag)

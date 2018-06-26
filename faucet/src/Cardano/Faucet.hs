@@ -23,11 +23,11 @@ import           Cardano.Wallet.API.V1.Types (txAmount, unV1)
 import qualified Cardano.WalletClient as Client
 
 -- | Top level type of the faucet API
-type API = "withdraw" :> ReqBody '[JSON] WithDrawlRequest :> Post '[JSON] WithDrawlResult
+type API = "withdraw" :> ReqBody '[JSON] WithdrawlRequest :> Post '[JSON] WithdrawlResult
       -- :<|> "_deposit" :> ReqBody '[JSON] DepositRequest :> Post '[JSON] DepositResult
 
 -- | Handler for the withdrawl of ADA from the faucet
-withdraw :: (MonadFaucet c m) => WithDrawlRequest -> m WithDrawlResult
+withdraw :: (MonadFaucet c m) => WithdrawlRequest -> m WithdrawlResult
 withdraw wd = withSublogger (LoggerName "withdraw") $ do
     resp <- Client.withdraw (wd ^. wAddress)
     case resp of

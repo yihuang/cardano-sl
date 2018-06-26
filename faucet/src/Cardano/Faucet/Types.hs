@@ -22,8 +22,8 @@ module Cardano.Faucet.Types (
  , incWithDrawn
  , decrWithDrawn
  , setWalletBalance
- , WithDrawlRequest(..), wAddress
- , WithDrawlResult(..)
+ , WithdrawlRequest(..), wAddress
+ , WithdrawlResult(..)
  , DepositRequest(..), dWalletId, dAmount
  , SourceWallet(..)
  , InitializedWallet(..), walletBalance, walletConfig
@@ -65,27 +65,27 @@ import           Pos.Util.BackupPhrase (BackupPhrase (..))
 
 --------------------------------------------------------------------------------
 -- | A request to withdraw ADA from the faucet wallet
-data WithDrawlRequest = WithDrawlRequest {
+data WithdrawlRequest = WithdrawlRequest {
     _wAddress :: !(V1 Address)
   } deriving (Show, Typeable, Generic)
 
-makeLenses ''WithDrawlRequest
+makeLenses ''WithdrawlRequest
 
-instance FromJSON WithDrawlRequest where
-  parseJSON = withObject "WithDrawlRequest" $ \v -> WithDrawlRequest
+instance FromJSON WithdrawlRequest where
+  parseJSON = withObject "WithdrawlRequest" $ \v -> WithdrawlRequest
     <$> v .: "address"
 
-instance ToJSON WithDrawlRequest where
-    toJSON (WithDrawlRequest w) =
+instance ToJSON WithdrawlRequest where
+    toJSON (WithdrawlRequest w) =
         object [ "address" .= w ]
 
--- | The result of processing a 'WithDrawlRequest'
-data WithDrawlResult =
+-- | The result of processing a 'WithdrawlRequest'
+data WithdrawlResult =
     WithdrawlError ClientError   -- ^ Error with http client error
   | WithdrawlSuccess Transaction -- ^ Success with transaction details
   deriving (Show, Typeable, Generic)
 
-instance ToJSON WithDrawlResult where
+instance ToJSON WithdrawlResult where
     toJSON (WithdrawlSuccess txn) =
         object ["success" .= txn]
     toJSON (WithdrawlError err) =

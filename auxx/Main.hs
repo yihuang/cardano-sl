@@ -87,10 +87,10 @@ action opts@AuxxOptions {..} command = do
             ->
                 handle @_ @ConfigurationException (\_ -> runWithoutNode pa)
               . handle @_ @ConfigurationError (\_ -> runWithoutNode pa)
-              $ withConfigurations conf (runWithConfig pa)
+              $ withConfigurations Nothing conf (runWithConfig pa)
         Light
             -> runWithoutNode pa
-        _   -> withConfigurations conf (runWithConfig pa)
+        _   -> withConfigurations Nothing conf (runWithConfig pa)
 
   where
     runWithoutNode :: PrintAction Production -> Production ()
@@ -122,7 +122,7 @@ action opts@AuxxOptions {..} command = do
                            else identity
                 auxxModeAction = modifier (auxxPlugin pm opts command)
              in runRealMode pm nr $ \diffusion ->
-                    toRealMode (auxxModeAction (hoistDiffusion realModeToAuxx diffusion))
+                    toRealMode (auxxModeAction (hoistDiffusion realModeToAuxx toRealMode diffusion))
 
     cArgs@CLI.CommonNodeArgs {..} = aoCommonNodeArgs
     conf = CLI.configurationOptions (CLI.commonArgs cArgs)

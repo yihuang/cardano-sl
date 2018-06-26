@@ -2,8 +2,11 @@
   "wallet-host": "127.0.0.1"
 , "wallet-port": 8090
 , "port": 8081
-, "payment-amount": 1000
-, "payment-variation": 500
+, "payment-distribution": {
+    "mean" : 1000
+  , "scale": 500
+
+  }
 , "statsd": {
     "host": "127.0.0.1"
   , "port": 8125

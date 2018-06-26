@@ -14,6 +14,7 @@
 module Cardano.Faucet.Types.Config (
    FaucetConfig(..)
  , HasFaucetConfig(..)
+ , PaymentDistribution(..), mean, scale
  , FaucetEnv(..)
  , HasFaucetEnv(..)
  , SourceWalletConfig(..)
@@ -40,7 +41,7 @@ import           System.Remote.Monitoring.Statsd (StatsdOptions (..))
 
 import           Cardano.Wallet.API.V1.Types (AccountIndex, PaymentSource (..), WalletId (..))
 import           Cardano.Wallet.Client (ClientError (..), WalletClient (..))
-import           Pos.Core (Address (..))
+import           Pos.Core (Address (..), Coin (..))
 import           Pos.Util.Mnemonic (Mnemonic)
 
 
@@ -91,27 +92,25 @@ cfgToPaymentSource :: SourceWalletConfig -> PaymentSource
 cfgToPaymentSource (SourceWalletConfig wId aIdx _) = PaymentSource wId aIdx
 
 --------------------------------------------------------------------------------
--- | Config for the centre point of the payment amount distribution
+-- | Config for the payment amount distribution
 --
--- The amount of ADA to send from the faucet is calculated using this and
--- 'PaymentVariation' to compute
+-- The amount of ADA (units in lovelace) to send from the faucet is calculated
+-- by
 --
 -- @
---   'PaymentCenter' + randomFloat(-1, 1) * 'PaymentVariation'
+--   'paymentMean' + randomFloat(-1, 1) * 'paymentScale'
 -- @
-newtype PaymentCenter = PaymentCenter Int deriving (Generic, Show, Eq, Ord)
+data PaymentDistribution = PaymentDistribution {
+    _mean :: Coin
+  , _scale :: Coin
+  }
 
-makeWrapped ''PaymentCenter
+makeLenses ''PaymentDistribution
 
-instance FromJSON PaymentCenter
-
---------------------------------------------------------------------------------
--- | See 'PaymentCenter'
-newtype PaymentVariation = PaymentVariation Float deriving (Generic, Show, Eq, Ord)
-
-makeWrapped ''PaymentVariation
-
-instance FromJSON PaymentVariation
+instance FromJSON PaymentDistribution where
+    parseJSON = withObject "PaymentDistibution" $ \v -> PaymentDistribution
+      <$> (Coin <$> v .: "mean")
+      <*> (Coin <$> v .: "scale")
 
 --------------------------------------------------------------------------------
 -- | Config for the wallet used by the faucet as a source of ADA
@@ -147,10 +146,8 @@ data FaucetConfig = FaucetConfig {
   , _fcWalletApiPort    :: !Int
     -- | Port to serve the faucet on
   , _fcPort             :: !Int
-    -- | Midpoint for withdrawls (defaults to 1000)
-  , _fcPaymentAmount    :: !PaymentCenter
-    -- | Variation for withdrawls (defaults to 500)
-  , _fcPaymentVariation :: !PaymentVariation
+    -- | Distribution for withdrawls (default to 1000 and 500)
+  , _fcPaymentDistribution    :: !PaymentDistribution
     -- | Statsd server details
   , _fcStatsdOpts       :: !FaucetStatsdOpts
     -- | Config for wallet to use for funds
@@ -171,8 +168,7 @@ instance FromJSON FaucetConfig where
           <$> v .: "wallet-host"
           <*> v .: "wallet-port"
           <*> v .: "port"
-          <*> v .: "payment-amount"
-          <*> v .: "payment-variation"
+          <*> v .: "payment-distribution"
           <*> v .: "statsd"
           <*> v .: "source-wallet"
           <*> v .: "logging-config"

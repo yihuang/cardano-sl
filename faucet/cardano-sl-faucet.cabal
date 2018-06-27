@@ -8,7 +8,7 @@ description:    Cardano SL - faucet
 license:        MIT
 author:         Ben Ford
 maintainer:     ben.ford@tweag.io
-copyright:      2016 IOHK
+copyright:      2018 IOHK
 build-type:     Simple
 cabal-version:  >= 1.10
 

@@ -18,34 +18,35 @@ import           Universum
 import           Control.Exception.Safe (bracketOnError)
 import           Control.Lens (_Wrapped)
 import           Control.Monad.Except (ExceptT (ExceptT), MonadError (throwError), runExceptT,
-                                       withExceptT)
+                                      withExceptT)
 import qualified Data.List.NonEmpty as NE
-import           Pos.Util.Log (logDebug)
 
 import           Pos.Block.Error (ApplyBlocksException (..), RollbackException (..),
-                                  VerifyBlocksException (..))
+                                 VerifyBlocksException (..))
 import           Pos.Block.Logic.Internal (BypassSecurityCheck (..), MonadBlockApply,
-                                           MonadBlockVerify, MonadMempoolNormalization,
-                                           applyBlocksUnsafe, normalizeMempool,
-                                           rollbackBlocksUnsafe, toSscBlock, toTxpBlock,
-                                           toUpdateBlock)
+                                          MonadBlockVerify, MonadMempoolNormalization,
+                                          applyBlocksUnsafe, normalizeMempool,
+                                          rollbackBlocksUnsafe, toSscBlock, toTxpBlock,
+                                          toUpdateBlock)
 import           Pos.Block.Lrc (LrcModeFull, lrcSingleShot)
 import           Pos.Block.Slog (ShouldCallBListener (..), mustDataBeKnown, slogVerifyBlocks)
 import           Pos.Block.Types (Blund, Undo (..))
 import           Pos.Core (Block, HeaderHash, epochIndexL, headerHashG, prevBlockL)
 import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..), toNewestFirst,
-                                  toOldestFirst)
+                                 toOldestFirst)
 import           Pos.Crypto (ProtocolMagic)
 import qualified Pos.DB.GState.Common as GS (getTip)
 import           Pos.Delegation.Logic (dlgVerifyBlocks)
 import           Pos.Infra.Reporting (HasMisbehaviorMetrics)
-import           Pos.Txp.Configuration (HasTxpConfiguration)
 import           Pos.Ssc.Logic (sscVerifyBlocks)
+import           Pos.Txp.Configuration (HasTxpConfiguration)
 import           Pos.Txp.Settings (TxpGlobalSettings (TxpGlobalSettings, tgsVerifyBlocks))
 import qualified Pos.Update.DB as GS (getAdoptedBV)
 import           Pos.Update.Logic (usVerifyBlocks)
 import           Pos.Update.Poll (PollModifier)
 import           Pos.Util (neZipWith4, spanSafe, _neHead)
+import           Pos.Util.Log (logDebug)
+import           Pos.Util.Trace (noTrace)
 import           Pos.Util.Util (HasLens (..))
 
 -- -- CHECK: @verifyBlocksLogic
@@ -92,13 +93,13 @@ verifyBlocksPrefix pm blocks = runExceptT $ do
     slogUndos <- withExceptT VerifyBlocksError $
         ExceptT $ slogVerifyBlocks pm blocks
     _ <- withExceptT (VerifyBlocksError . pretty) $
-        ExceptT $ sscVerifyBlocks pm (map toSscBlock blocks)
+        ExceptT $ sscVerifyBlocks noTrace pm (map toSscBlock blocks)
     TxpGlobalSettings {..} <- view (lensOf @TxpGlobalSettings)
     txUndo <- withExceptT (VerifyBlocksError . pretty) $
-        ExceptT $ tgsVerifyBlocks dataMustBeKnown $ map toTxpBlock blocks
+        ExceptT $ tgsVerifyBlocks noTrace dataMustBeKnown $ map toTxpBlock blocks
     pskUndo <- withExceptT VerifyBlocksError $ dlgVerifyBlocks pm blocks
     (pModifier, usUndos) <- withExceptT (VerifyBlocksError . pretty) $
-        ExceptT $ usVerifyBlocks pm dataMustBeKnown (map toUpdateBlock blocks)
+        ExceptT $ usVerifyBlocks noTrace pm dataMustBeKnown (map toUpdateBlock blocks)
 
     -- Eventually we do a sanity check just in case and return the result.
     when (length txUndo /= length pskUndo) $
@@ -146,9 +147,9 @@ verifyAndApplyBlocks pm rollback blocks = runExceptT $ do
     -- Spans input into @(a, b)@ where @a@ is either a single genesis
     -- block or a maximum prefix of main blocks from the same epoch.
     -- Examples (where g is for genesis and m is for main):
-    -- * gmmgm → g, mmgm
-    -- * mmgm → mm, gm
-    -- * ggmmg → g, gmmg
+    -- * gmmgm -> g, mmgm
+    -- * mmgm -> mm, gm
+    -- * ggmmg -> g, gmmg
     spanEpoch ::
            OldestFirst NE Block
         -> (OldestFirst NE Block, OldestFirst [] Block)

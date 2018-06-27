@@ -1,24 +1,14 @@
 help: ## Print documentation
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-lint: ## Run hlint for the project
-	./scripts/haskell/lint.sh
+ghcid: ## Run ghcid with the wallet-new project
+	ghcid \
+	    --command "stack ghci cardano-sl-block --ghci-options=-fno-code" \
+	    -o ghcid.txt
 
-stylish: ## Run stylish-haskell on the entire project
-	./scripts/haskell/stylish.sh
+ghcid-test: ## Have ghcid run the test suite for the wallet-new-specs on successful recompile
+	ghcid \
+	    --command "stack ghci cardano-sl-wallet-new:lib cardano-sl-wallet-new:test:wallet-new-specs --ghci-options=-fobject-code" \
+	    --test "main"
 
-ghcid: ## Pass DIR=package-directory to run that directory's ghcid command.
-ifeq ($(DIR),)
-	echo "You must specify the package directory for this command."
-else
-	cd $(DIR) && make ghcid
-endif
-
-ghcid-test: ## Pass DIR=package-directory to run that directory's ghcid command.
-ifeq ($(DIR),)
-	echo "You must specify the package directory for this command."
-else
-	cd $(DIR) && make ghcid-test
-endif
-
-.PHONY: help stylish lint ghcid ghcid-test
+.PHONY: ghcid ghcid-test help

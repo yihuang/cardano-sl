@@ -27,17 +27,16 @@ import           Pos.Block.Configuration (HasBlockConfiguration, fixedTimeCQ)
 import           Pos.Block.Slog.Context (slogGetLastSlots)
 import           Pos.Block.Slog.Types (HasSlogGState)
 import           Pos.Core (BlockCount, FlatSlotId, HasProtocolConstants, HeaderHash, Timestamp (..),
-                           difficultyL, flattenSlotId, headerHash, prevBlockL)
+                          difficultyL, flattenSlotId, headerHash, prevBlockL)
 import           Pos.Core.Block (BlockHeader)
+import           Pos.Core.Chrono (NE, OldestFirst (..))
 import           Pos.Core.Configuration (blkSecurityParam)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class (MonadBlockDBRead)
 import           Pos.Exception (reportFatalError)
 import           Pos.GState.BlockExtra (isBlockInMainChain)
-import           Pos.Infra.Slotting (MonadSlots (..), getCurrentSlotFlat,
-                                     slotFromTimestamp)
+import           Pos.Infra.Slotting (MonadSlots (..), getCurrentSlotFlat, slotFromTimestamp)
 import           Pos.Util (_neHead)
-import           Pos.Core.Chrono (NE, OldestFirst (..))
 
 -- | Find LCA of headers list and main chain, including oldest
 -- header's parent hash. Acts as it would iterate from newest to
@@ -98,7 +97,6 @@ calcChainQuality blockCount deepSlot newSlot
 calcChainQualityM ::
        ( MonadReader ctx m
        , HasSlogGState ctx
-       , MonadIO m
        , MonadThrow m
        , WithLogger m
        , Fractional res
@@ -174,7 +172,7 @@ calcChainQualityFixedTime = do
     -- 'lastSlots' contains slots of last 'k' blocks.
     -- We need to return 'Just' if we know now many blocks were created since
     -- 'olderSlotId'.
-    -- We know it if there is a slot which is ≤ than 'olderSlotId' in
+    -- We know it if there is a slot which is <= than 'olderSlotId' in
     -- 'lastSlots'.
     calcChainQualityFixedTimeDo ::
            FlatSlotId -> FlatSlotId -> OldestFirst [] FlatSlotId -> Maybe res

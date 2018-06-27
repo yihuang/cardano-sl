@@ -20,7 +20,7 @@ import           Control.Lens (uses, (-=), (.=), _Wrapped)
 import           Control.Monad.Except (MonadError (throwError), runExceptT)
 import           Data.Default (Default (def))
 import           Formatting (build, fixed, ords, sformat, stext, (%))
-import           JsonLog (CanJsonLog (..))
+--import           JsonLog (CanJsonLog (..))
 import           Pos.Util.Log (WithLogger, logDebug)
 import           Serokell.Data.Memory.Units (Byte, memory)
 
@@ -31,8 +31,8 @@ import           Pos.Block.Logic.VAR (verifyBlocksPrefix)
 import           Pos.Block.Lrc (LrcModeFull, lrcSingleShot)
 import           Pos.Block.Slog (HasSlogGState (..), ShouldCallBListener (..))
 import           Pos.Core (Blockchain (..), EpochIndex, EpochOrSlot (..), HasProtocolConstants,
-                           HeaderHash, SlotId (..), chainQualityThreshold, epochIndexL, epochSlots,
-                           flattenSlotId, getEpochOrSlot, headerHash)
+                          HeaderHash, SlotId (..), chainQualityThreshold, epochIndexL, epochSlots,
+                          flattenSlotId, getEpochOrSlot, headerHash)
 import           Pos.Core.Block (BlockHeader (..), GenesisBlock, MainBlock, MainBlockchain)
 import qualified Pos.Core.Block as BC
 import           Pos.Core.Block.Constructors (mkGenesisBlock, mkMainBlock)
@@ -44,8 +44,8 @@ import           Pos.Crypto (ProtocolMagic, SecretKey)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class (MonadDBRead)
 import           Pos.Delegation (DelegationVar, DlgPayload (..), ProxySKBlockInfo, clearDlgMemPool,
-                                 getDlgMempool)
-import           Pos.Exception (assertionFailed, reportFatalError)
+                                getDlgMempool)
+import           Pos.Exception (assertionFailed0, reportFatalError)
 import           Pos.Infra.Reporting (HasMisbehaviorMetrics, reportError)
 import           Pos.Infra.StateLock (Priority (..), StateLock, StateLockMetrics, modifyStateLock)
 import           Pos.Infra.Util.JsonLog.Events (MemPoolModifyReason (..))
@@ -57,15 +57,17 @@ import           Pos.Ssc.Logic (sscGetLocalPayload)
 import           Pos.Ssc.Mem (MonadSscMem)
 import           Pos.Ssc.State (sscResetLocal)
 import           Pos.Txp (MempoolExt, MonadTxpLocal (..), MonadTxpMem, clearTxpMemPool,
-                          txGetPayload, withTxpLocalData)
+                         txGetPayload, withTxpLocalData)
 import           Pos.Txp.Base (emptyTxPayload)
 import           Pos.Update (UpdateContext)
 import           Pos.Update.Configuration (HasUpdateConfiguration, curSoftwareVersion,
-                                           lastKnownBlockVersion)
+                                          lastKnownBlockVersion)
 import qualified Pos.Update.DB as UDB
 import           Pos.Update.Logic (clearUSMemPool, usCanCreateBlock, usPreparePayload)
 import           Pos.Util (_neHead)
-import           Pos.Util.Log.LogSafe (logInfoS)
+--import           Pos.Util.Log.LogSafe (logInfoS)
+import           Pos.Util.Log (logInfo)
+import           Pos.Util.Trace (noTrace)
 import           Pos.Util.Util (HasLens (..), HasLens')
 
 -- | A set of constraints necessary to create a block from mempool.
@@ -111,7 +113,7 @@ type MonadCreateBlock ctx m
 createGenesisBlockAndApply ::
        forall ctx m.
        ( MonadCreateBlock ctx m
-       , CanJsonLog m
+       --, CanJsonLog m
        , HasLens StateLock ctx StateLock
        , HasLens (StateLockMetrics MemPoolModifyReason) ctx (StateLockMetrics MemPoolModifyReason)
        , HasMisbehaviorMetrics ctx
@@ -128,6 +130,7 @@ createGenesisBlockAndApply pm epoch = do
     needGen <- needCreateGenesisBlock epoch tipHeader
     if needGen
         then modifyStateLock
+                 noTrace
                  HighPriority
                  ApplyBlock
                  (\_ -> createGenesisBlockDo pm epoch)
@@ -212,7 +215,7 @@ needCreateGenesisBlock epoch tipHeader = do
 createMainBlockAndApply ::
        forall ctx m.
        ( MonadCreateBlock ctx m
-       , CanJsonLog m
+       --, CanJsonLog m
        , HasLens' ctx StateLock
        , HasLens' ctx (StateLockMetrics MemPoolModifyReason)
        )
@@ -221,7 +224,7 @@ createMainBlockAndApply ::
     -> ProxySKBlockInfo
     -> m (Either Text MainBlock)
 createMainBlockAndApply pm sId pske =
-    modifyStateLock HighPriority ApplyBlock createAndApply
+    modifyStateLock noTrace HighPriority ApplyBlock createAndApply
   where
     createAndApply tip =
         createMainBlockInternal pm sId pske >>= \case
@@ -248,7 +251,7 @@ createMainBlockInternal ::
     -> m (Either Text MainBlock)
 createMainBlockInternal pm sId pske = do
     tipHeader <- DB.getTipHeader
-    logInfoS $ sformat msgFmt tipHeader
+    logInfo $ sformat msgFmt tipHeader     -- TODO was logInfoS
     canCreateBlock sId tipHeader >>= \case
         Left reason -> pure (Left reason)
         Right () -> runExceptT (createMainBlockFinish tipHeader)
@@ -263,7 +266,7 @@ createMainBlockInternal pm sId pske = do
         -- than limit. So i guess it's fine in general.
         sizeLimit <- (\x -> bool 0 (x - 100) (x > 100)) <$> lift UDB.getMaxBlockSize
         block <- createMainBlockPure pm sizeLimit prevHeader pske sId sk rawPay
-        logInfoS $
+        logInfo $     -- TODO was logInfoS
             "Created main block of size: " <> sformat memory (biSize block)
         block <$ evaluateNF_ block
 
@@ -385,11 +388,11 @@ applyCreatedBlock pm pske createdBlock = applyCreatedBlockDo False createdBlock
         logDebug $ "Creating empty block"
         createMainBlockInternal pm slotId pske >>= \case
             Left err ->
-                assertionFailed $
+                assertionFailed0 $
                 sformat ("Couldn't create a block in fallback: "%stext) err
             Right mainBlock -> applyCreatedBlockDo True mainBlock
     onFailedFallback =
-        assertionFailed .
+        assertionFailed0 .
         sformat
             ("We've created bad main block even with empty payload: "%stext)
 
@@ -409,9 +412,9 @@ getRawPayload :: MonadCreateBlock ctx m
     -> SlotId
     -> m RawPayload
 getRawPayload tip slotId = do
-    localTxs <- txGetPayload tip -- result is topsorted
-    sscData <- sscGetLocalPayload slotId
-    usPayload <- usPreparePayload tip slotId
+    localTxs <- txGetPayload noTrace tip -- result is topsorted
+    sscData <- sscGetLocalPayload noTrace slotId
+    usPayload <- usPreparePayload noTrace tip slotId
     dlgPayload <- getDlgMempool
     let rawPayload =
             RawPayload

@@ -12,6 +12,7 @@ module Pos.Exception
        , traceNamedFatalError
        , traceFatalError
        , assertionFailed
+       , assertionFailed0
        ) where
 
 import           Control.Exception.Safe (Exception (..))
@@ -19,7 +20,7 @@ import qualified Data.Text.Buildable
 import           Data.Typeable (cast)
 import           Formatting (bprint, stext, (%))
 import           Pos.Util.Log (WithLogger, logError)
-import           Pos.Util.Trace (Trace, traceWith, Severity (Error))
+import           Pos.Util.Trace (Severity (Error), Trace, traceWith)
 import qualified Pos.Util.Trace.Named as TN
 import           Serokell.Util (Color (Red), colorize)
 import qualified Text.Show
@@ -90,7 +91,13 @@ traceNamedFatalError tr msg = do
     TN.logError tr (colorize Red msg)
     throwM $ CardanoFatalError msg
 
--- | Report 'CardanoFatalError' for failed assertions.
+-- | Report 'CardanoFatalError' for failed assertions using Trace.
 assertionFailed :: MonadThrow m => Trace m (Severity, Text) -> Text -> m a
 assertionFailed logTrace msg =
     traceFatalError logTrace $ "assertion failed: " <> msg
+
+assertionFailed0
+    :: (WithLogger m, MonadThrow m)
+    => Text -> m a
+assertionFailed0 msg =
+    reportFatalError $ "assertion failed: " <> msg

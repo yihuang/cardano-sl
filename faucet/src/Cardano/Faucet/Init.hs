@@ -225,6 +225,7 @@ createManager fc = do
         Right credential ->
             let hooks = def {
                             onCertificateRequest = \_ -> return $ Just credential,
+                            -- Only connects to localhost so this isn't required
                             onServerCertificate  = \_ _ _ _ -> return []
                         }
                 clientParams = (defaultParamsClient "localhost" "") {

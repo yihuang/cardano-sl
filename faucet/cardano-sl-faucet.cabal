@@ -6,16 +6,11 @@ name:           cardano-sl-faucet
 version:        0.1.0.0
 description:    Cardano SL - faucet
 license:        MIT
-license-file:   LICENSE
 author:         Ben Ford
 maintainer:     ben.ford@tweag.io
 copyright:      2016 IOHK
 build-type:     Simple
 cabal-version:  >= 1.10
-
-extra-source-files:
-    ChangeLog.md
-    README.md
 
 library
   hs-source-dirs:

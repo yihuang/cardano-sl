@@ -17,11 +17,14 @@ library
       src
   build-depends:       QuickCheck
                      , aeson
+                     , aeson-pretty
                      , base
                      , base16-bytestring
                      , bytestring
                      , cardano-sl-core
                      , cardano-sl-crypto
+                     , cardano-sl-update
+                     , cardano-sl-util
                      , cardano-sl-wallet
                      , cardano-sl-wallet-new
                      , connection
@@ -39,6 +42,7 @@ library
                      , memory
                      , mmorph
                      , mtl
+                     , neat-interpolation
                      , random
                      , serokell-util
                      , servant
@@ -53,6 +57,7 @@ library
                      , tls
   exposed-modules:
                       Cardano.Faucet
+                      Cardano.Faucet.Swagger
                     , Cardano.Faucet.Types.Config
                     , Cardano.Faucet.Types.API
                     , Cardano.Faucet.Types
@@ -72,6 +77,8 @@ executable faucet
                 , bytestring
                 , cardano-sl-core
                 , cardano-sl-faucet
+                , cardano-sl-update
+                , cardano-sl-util
                 , cardano-sl-wallet
                 , cardano-sl-wallet-new
                 , ekg

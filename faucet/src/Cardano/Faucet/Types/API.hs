@@ -19,10 +19,13 @@ module Cardano.Faucet.Types.API (
 
 import           Control.Lens hiding ((.=))
 import           Data.Aeson (FromJSON (..), ToJSON (..), object, withObject, (.:), (.=))
+import Data.Monoid ((<>))
 import           Data.Text (Text)
 -- import           Data.Text (Text)
 import           Data.Typeable (Typeable)
 import           GHC.Generics (Generic)
+import           Data.Swagger
+import Data.Proxy
 
 import           Cardano.Wallet.API.V1.Types (Transaction, V1 (..))
 import           Cardano.Wallet.Client (ClientError (..))
@@ -45,6 +48,16 @@ instance ToJSON WithdrawlRequest where
     toJSON (WithdrawlRequest w) =
         object [ "address" .= w ]
 
+instance ToSchema WithdrawlRequest where
+    declareNamedSchema _ = do
+        addrSchema <- declareSchemaRef (Proxy :: Proxy (V1 Address))
+        return $ NamedSchema (Just "WithdrawlRequest") $ mempty
+          & type_ .~ SwaggerObject
+          & properties .~ (mempty & at "address" ?~ addrSchema)
+          & required .~ ["address"]
+
+
+--------------------------------------------------------------------------------
 -- | The result of processing a 'WithdrawlRequest'
 data WithdrawlResult =
     WithdrawlError ClientError   -- ^ Error with http client error
@@ -57,6 +70,20 @@ instance ToJSON WithdrawlResult where
     toJSON (WithdrawlError err) =
         object ["error" .= show err]
 
+wdDesc :: Text
+wdDesc = "An object with either a success field containing the transaction or "
+      <> "an error field containing the ClientError from the wallet as a string"
+
+instance ToSchema WithdrawlResult where
+    declareNamedSchema _ = do
+        txnSchema <- declareSchemaRef (Proxy :: Proxy Transaction)
+        errSchema <- declareSchemaRef (Proxy :: Proxy String)
+        return $ NamedSchema (Just "WithdrawlResult") $ mempty
+          & type_ .~ SwaggerObject
+          & properties .~ (mempty
+               & at "success" ?~ txnSchema
+               & at "error" ?~ errSchema)
+          & description .~ (Just $ wdDesc)
 
 --------------------------------------------------------------------------------
 -- | A request to deposit ADA back into the wallet __not currently used__

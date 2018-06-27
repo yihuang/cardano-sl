@@ -6,6 +6,7 @@
 module Cardano.Faucet (
     faucetServer
   , faucetServerAPI
+  , FaucetAPI
   , module Cardano.Faucet.Types
   , module Cardano.Faucet.Init
   ) where
@@ -25,7 +26,8 @@ import           Cardano.Faucet.Metrics
 import           Cardano.Faucet.Types
 
 -- | Top level type of the faucet API
-type API = "withdraw" :> ReqBody '[JSON] WithdrawlRequest :> Post '[JSON] WithdrawlResult
+type FaucetAPI = "withdraw" :> Summary "Requests some ADA from the faucet"
+                            :> ReqBody '[JSON] WithdrawlRequest :> Post '[JSON] WithdrawlResult
       -- :<|> "_deposit" :> ReqBody '[JSON] DepositRequest :> Post '[JSON] DepositResult
 
 -- | Handler for the withdrawl of ADA from the faucet
@@ -52,8 +54,8 @@ _deposit dr = withSublogger (LoggerName "_deposit") $ do
     logInfo ((dr ^. to show . packed) <> " deposited")
     return DepositResult
 
-faucetServer :: ServerT API M
+faucetServer :: ServerT FaucetAPI M
 faucetServer = withdraw -- :<|> _deposit
 
-faucetServerAPI :: Proxy API
+faucetServerAPI :: Proxy FaucetAPI
 faucetServerAPI = Proxy

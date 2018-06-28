@@ -10,11 +10,11 @@ import           Universum
 
 import           Control.Lens (ix, mapped, (?~))
 import           Data.Aeson (toJSON)
-import           Data.Swagger (NamedSchema (..), SwaggerType (..), ToParamSchema (..),
-                               ToSchema (..), declareNamedSchema, declareSchema, declareSchemaRef,
-                               defaultSchemaOptions, description, example, format,
-                               genericDeclareNamedSchema, name, properties, required, sketchSchema,
-                               type_)
+import           Data.Swagger (NamedSchema (..), SwaggerType (..),
+                     ToParamSchema (..), ToSchema (..), declareNamedSchema,
+                     declareSchema, declareSchemaRef, defaultSchemaOptions,
+                     description, example, format, genericDeclareNamedSchema,
+                     name, properties, required, sketchSchema, type_)
 import           Data.Swagger.Internal.Schema (named)
 import qualified Data.Swagger.Lens as Swagger
 import           Data.Typeable (Typeable, typeRep)
@@ -22,14 +22,16 @@ import           Data.Version (Version)
 import           Servant.Multipart (FileData (..))
 
 import           Pos.Client.Txp.Util (InputSelectionPolicy (..))
-import           Pos.Core (ApplicationName, BlockCount (..), BlockVersion, ChainDifficulty, Coin,
-                           SlotCount (..), SoftwareVersion, mkCoin)
+import           Pos.Core (ApplicationName, BlockCount (..), BlockVersion,
+                     ChainDifficulty, Coin, SlotCount (..), SoftwareVersion,
+                     mkCoin)
 import           Pos.Util.Mnemonic (Mnemonic)
 
 import qualified Pos.Wallet.Web.ClientTypes as CT
 import qualified Pos.Wallet.Web.Error.Types as ET
 
-import           Pos.Wallet.Web.Methods.Misc (PendingTxsSummary, WalletStateSnapshot)
+import           Pos.Wallet.Web.Methods.Misc (PendingTxsSummary,
+                     WalletStateSnapshot)
 
 -- | Instances we need to build Swagger-specification for 'walletApi':
 -- 'ToParamSchema' - for types in parameters ('Capture', etc.),

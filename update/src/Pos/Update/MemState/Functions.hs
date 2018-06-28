@@ -15,7 +15,7 @@ import           Pos.Core.Configuration ()
 import           Pos.Core.Update (UpdatePayload (..), UpdateVote (..))
 import           Pos.Crypto (PublicKey, hash)
 import           Pos.Infra.StateLock (Priority (..), StateLock,
-                                      withStateLockNoMetrics)
+                     withStateLockNoMetrics)
 import           Pos.Update.MemState.Types (MemPool (..))
 import           Pos.Update.Poll (LocalVotes)
 import           Pos.Util.Util (HasLens')

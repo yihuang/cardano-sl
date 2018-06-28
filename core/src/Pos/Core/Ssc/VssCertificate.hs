@@ -18,14 +18,17 @@ import           Universum
 import           Control.Lens (makeLensesFor)
 import           Control.Monad.Except (MonadError (throwError))
 import           Data.Hashable (Hashable (..))
+import           Data.SafeCopy (base, deriveSafeCopySimple)
 import qualified Data.Text.Buildable as Buildable
 import           Formatting (bprint, build, int, (%))
 import           Pos.Core.Common (StakeholderId, addressHash)
 
-import           Pos.Binary.Class (AsBinary)
+import           Pos.Binary.Class (AsBinary, Bi (..), encodeListLen,
+                     enforceSize)
 import           Pos.Core.Slotting (EpochIndex)
-import           Pos.Crypto (ProtocolMagic, PublicKey, SecretKey, SignTag (SignVssCert), Signature,
-                             VssPublicKey, checkSig, sign, toPublic)
+import           Pos.Crypto (ProtocolMagic, PublicKey, SecretKey,
+                     SignTag (SignVssCert), Signature, VssPublicKey, checkSig,
+                     sign, toPublic)
 
 -- | VssCertificate allows VssPublicKey to participate in MPC. Each
 -- stakeholder should create a Vss keypair, sign VSS public key with signing
@@ -71,6 +74,19 @@ instance Hashable VssCertificate where
     hashWithSalt s UnsafeVssCertificate{..} =
         hashWithSalt s (vcExpiryEpoch, vcVssKey, vcSigningKey, vcSignature)
 
+instance Bi VssCertificate where
+    encode vssCert = encodeListLen 4 <> encode (vcVssKey vssCert)
+                                     <> encode (vcExpiryEpoch vssCert)
+                                     <> encode (vcSignature vssCert)
+                                     <> encode (vcSigningKey vssCert)
+    decode = do
+        enforceSize "VssCertificate" 4
+        key <- decode
+        epo <- decode
+        sig <- decode
+        sky <- decode
+        pure $ UnsafeVssCertificate key epo sig sky
+
 -- | Make VssCertificate valid up to given epoch using 'SecretKey' to sign
 -- data.
 mkVssCertificate
@@ -106,3 +122,5 @@ getCertId = addressHash . vcSigningKey
 
 toCertPair :: VssCertificate -> (StakeholderId, VssCertificate)
 toCertPair vc = (getCertId vc, vc)
+
+deriveSafeCopySimple 0 'base ''VssCertificate

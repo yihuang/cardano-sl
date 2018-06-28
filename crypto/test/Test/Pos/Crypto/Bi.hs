@@ -20,19 +20,22 @@ import           Data.List.NonEmpty (fromList)
 import           Hedgehog (Gen, Property)
 import qualified Hedgehog as H
 
-import           Pos.Crypto (AbstractHash, EncShare, PassPhrase, ProtocolMagic (..), ProxyCert,
-                             ProxySecretKey, PublicKey (..), RedeemSignature,
-                             SafeSigner (FakeSigner), Secret, SecretKey (..), SecretProof,
-                             SignTag (SignForTestingOnly), Signature, VssKeyPair, WithHash,
-                             decryptShare, deriveHDPassphrase, deterministic,
-                             deterministicVssKeyGen, genSharedSecret, hash, mkSigned, noPassEncrypt,
-                             packHDAddressAttr, proxySign, redeemDeterministicKeyGen, redeemSign,
-                             safeCreateProxyCert, safeCreatePsk, sign, toPublic, toVssPublicKey)
+import           Pos.Crypto (AbstractHash, EncShare, PassPhrase,
+                     ProtocolMagic (..), ProxyCert, ProxySecretKey,
+                     PublicKey (..), RedeemSignature, SafeSigner (FakeSigner),
+                     Secret, SecretKey (..), SecretProof,
+                     SignTag (SignForTestingOnly), Signature, VssKeyPair,
+                     WithHash, decryptShare, deriveHDPassphrase, deterministic,
+                     deterministicVssKeyGen, genSharedSecret, hash, mkSigned,
+                     noPassEncrypt, packHDAddressAttr, proxySign,
+                     redeemDeterministicKeyGen, redeemSign,
+                     safeCreateProxyCert, safeCreatePsk, sign, toPublic,
+                     toVssPublicKey)
 
-import           Test.Pos.Binary.Helpers.GoldenRoundTrip (discoverGolden, discoverRoundTrip, eachOf,
-                                                          goldenTestBi, roundTripsAesonBuildable,
-                                                          roundTripsAesonShow,
-                                                          roundTripsBiBuildable, roundTripsBiShow)
+import           Test.Pos.Binary.Helpers.GoldenRoundTrip (discoverGolden,
+                     discoverRoundTrip, eachOf, goldenTestBi,
+                     roundTripsAesonBuildable, roundTripsAesonShow,
+                     roundTripsBiBuildable, roundTripsBiShow)
 import           Test.Pos.Crypto.Gen
 
 --------------------------------------------------------------------------------

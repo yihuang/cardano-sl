@@ -39,7 +39,7 @@ withdraw wd = withSublogger (LoggerName "withdraw") $ do
             logError ("Error withdrawing " <> (wd ^. to show . packed)
                                            <> " error: "
                                            <> (err ^. to show . packed))
-            return $ WithdrawlError err
+            return $ WithdrawlError (show err ^. packed)
         Right wr -> do
             let txn = wrData wr
                 amount = unV1 $ txAmount txn

@@ -41,7 +41,7 @@ incWithDrawn (Coin (fromIntegral -> c)) = do
   liftIO $ do
     Counter.add wd c
     Counter.inc wc
-    Gauge.add bal c
+    Gauge.subtract bal c
 
 --------------------------------------------------------------------------------
 -- | Record a deposit
@@ -55,7 +55,7 @@ decrWithDrawn (Coin (fromIntegral -> c)) = do
   liftIO $ do
     -- Counter.subtract wd c
     -- Counter.inc wc
-    Gauge.subtract bal c
+    Gauge.add bal c
 
 --------------------------------------------------------------------------------
 -- | Resets the wallet balance in 'feWalletBalance'

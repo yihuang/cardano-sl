@@ -19,7 +19,7 @@ import           System.Remote.Monitoring (forkServer, serverMetricStore)
 import           System.Remote.Monitoring.Statsd (forkStatsd)
 import           System.Wlog (LoggerName (..), launchFromFile)
 -- import           Cardano.Wallet.API.V1.Types (PaymentSource (..), WalletId(..), AccountIndex)
-import           Pos.Util.CompileInfo (retrieveCompileTimeInfo, withCompileInfo)
+import           Pos.Util.CompileInfo (withCompileInfo)
 -- import Pos.Update.Configuration (withUpdateConfiguration)
 
 import           Cardano.Faucet
@@ -32,7 +32,7 @@ import           Cardano.Faucet.Swagger
 
 
 main :: IO ()
-main = withCompileInfo $(retrieveCompileTimeInfo)  $ do
+main = withCompileInfo $ do
   ekg <- forkServer "localhost" 8001
   args <- getArgs
   config <- case args of

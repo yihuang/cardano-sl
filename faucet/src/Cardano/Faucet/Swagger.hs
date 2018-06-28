@@ -33,7 +33,7 @@ import           Cardano.Faucet
 import           Cardano.Faucet.Types
 import           Servant
 
-type FaucetDoc = "docs" :> SwaggerSchemaUI "index" "swagger.json"
+type FaucetDoc = SwaggerSchemaUI "docs" "swagger.json"
 
 type FaucetDocAPI = FaucetDoc :<|> FaucetAPI
 

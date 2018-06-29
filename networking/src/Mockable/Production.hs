@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -O2 #-}
 {-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE StandaloneDeriving         #-}
@@ -23,20 +24,24 @@ import qualified GHC.IO as GHC
 import qualified System.Metrics.Counter as EKG.Counter
 import qualified System.Metrics.Distribution as EKG.Distribution
 import qualified System.Metrics.Gauge as EKG.Gauge
---import           Pos.Util.Log (CanLog (..), HasLoggerName (..))
+
+import           Control.Monad.Trans.Reader (ask, local)
 
 import           Control.Monad.Base (MonadBase (..))
 import           Control.Monad.Trans.Control (MonadBaseControl (..))
 import           Mockable.Channel (Channel (..), ChannelT)
 import           Mockable.Class (Mockable (..))
 import           Mockable.Concurrent (Async (..), Concurrently (..), Delay (..), Fork (..),
-                                      LowLevelAsync (..), MyThreadId (..), Promise,
-                                      RunInUnboundThread (..), ThreadId)
+                                     LowLevelAsync (..), MyThreadId (..), Promise,
+                                     RunInUnboundThread (..), ThreadId)
 import           Mockable.CurrentTime (CurrentTime (..), realTime)
 import qualified Mockable.Metrics as Metrics
 import           Mockable.SharedAtomic (SharedAtomic (..), SharedAtomicT)
 import           Mockable.SharedExclusive (SharedExclusive (..), SharedExclusiveT)
+-- import           Pos.Util.Log (LogContext)
 
+import qualified Katip as K
+import qualified Katip.Monadic as KM
 
 newtype Production t = Production
     { runProduction :: IO t
@@ -47,7 +52,13 @@ deriving instance MonadUnliftIO Production
 deriving instance MonadFix Production
 deriving instance MonadThrow Production
 deriving instance MonadCatch Production
---deriving instance CanLog Production    -- TODO
+------
+-- instance K.Katip Production where
+-- deriving instance K.Katip (K.KatipContextT Production)
+-- instance K.Katip (K.KatipContextT Production) where
+    -- getLogEnv = K.KatipT ask
+    -- localLogEnv f (KM.KatipContextT m) = KM.KatipContextT $ local f m
+------
 deriving instance Rand.MonadRandom Production
 
 type instance ThreadId Production = Conc.ThreadId

@@ -9,9 +9,6 @@ module Pos.Launcher.Resource
        (
          -- * Full resources
          NodeResources (..)
-
-       , allocateNodeResources
-       , releaseNodeResources
        , bracketNodeResources
 
          -- * Smaller resources
@@ -29,8 +26,8 @@ import           Mockable (Production (..))
 import           System.IO (BufferMode (..), hClose, hSetBuffering)
 import qualified System.Metrics as Metrics
 --import           System.Wlog (LoggerConfig (..), WithLogger, consoleActionB, defaultHandleAction,
---                              logDebug, logInfo, maybeLogsDirB, productionB, removeAllHandlers,
---                              setupLogging, showTidB)
+--                              logDebug, logInfo, removeAllHandlers,
+--                              setupLogging)
 
 import           Network.Broadcast.OutboundQueue.Types (NodeType (..))
 import           Pos.Binary ()
@@ -56,19 +53,20 @@ import           Pos.Launcher.Param (BaseParams (..), LoggingParams (..), NodePa
 import           Pos.Lrc.Context (LrcContext (..), mkLrcSyncData)
 import           Pos.Ssc (SscParams, SscState, createSscContext, mkSscState)
 import           Pos.Txp (GenericTxpLocalData (..), TxpGlobalSettings, mkTxpLocalData,
-                          recordTxpMetrics)
+                         recordTxpMetrics)
 
 import           Pos.Launcher.Mode (InitMode, InitModeContext (..), runInitMode)
 import           Pos.Update.Context (mkUpdateContext)
 import qualified Pos.Update.DB as GState
 import           Pos.Util (bracketWithLogging, newInitFuture)
-import           Pos.Util.Log (WithLogger, LoggerConfig (..), logDebug, logInfo)
-import qualified Pos.Util.Log as Log (loggerBracket, setupLogging)
+import           Pos.Util.Log (LoggerConfig (..), Severity (..), WithLogger, logDebug, logInfo,
+                              loggerBracket, setupLogging)
+import           Pos.Util.LoggerConfig (defaultInteractiveConfiguration, setLogPrefix)
 import           Pos.Util.Trace (noTrace)
 
 #ifdef linux_HOST_OS
+import qualified Pos.Util.Log as Logger
 import qualified System.Systemd.Daemon as Systemd
-import qualified System.Wlog as Logger
 #endif
 
 -- Remove this once there's no #ifdef-ed Pos.Txp import
@@ -223,17 +221,16 @@ bracketNodeResources np sp txp initDB action = do
 
 getRealLoggerConfig :: MonadIO m => LoggingParams -> m LoggerConfig
 getRealLoggerConfig LoggingParams{..} = do
-    let cfgBuilder = productionB
-                  <> showTidB
-                  <> maybeLogsDirB lpHandlerPrefix
+    cfgBuilder <- liftIO $ setLogPrefix lpHandlerPrefix mempty
     cfg <- readLoggerConfig lpConfigPath
     pure $ overrideConsoleLog $ cfg <> cfgBuilder
   where
     overrideConsoleLog :: LoggerConfig -> LoggerConfig
     overrideConsoleLog = case lpConsoleLog of
-        Nothing    -> identity
-        Just True  -> (<>) (consoleActionB defaultHandleAction)
-        Just False -> (<>) (consoleActionB (\_ _ -> pass))
+        Just True -> (<>) (defaultInteractiveConfiguration Info)
+        _         -> identity
+--         Just False -> (<>) (consoleActionB (\_ _ -> pass))
+   --TODO decide if we will have a _lcConsoleAction like log-warper or handle this via configs
 
 --setupLoggers :: MonadIO m => LoggingParams -> m ()
 --setupLoggers params = setupLogging Nothing =<< getRealLoggerConfig params
@@ -242,8 +239,8 @@ getRealLoggerConfig LoggingParams{..} = do
 loggerBracket :: (MonadIO m, WithLogger n) => LoggingParams -> n a -> m a
 --loggerBracket lp = bracket_ (setupLoggers lp) removeAllHandlers
 loggerBracket params action = do
-    lh <- liftIO $ Log.setupLogging =<< getRealLoggerConfig params
-    Log.loggerBracket lh (lpDefaultName params) $
+    lh <- liftIO $ Logger.setupLogging =<< getRealLoggerConfig params
+    Logger.loggerBracket lh (lpDefaultName params) $
       action
 
 ----------------------------------------------------------------------------

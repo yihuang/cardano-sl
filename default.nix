@@ -45,6 +45,15 @@ let
   });
 
   cardanoPkgs = ((import ./pkgs { inherit pkgs; }).override {
+    cabal2nix = overrideCabal super.cabal2nix (drv: {
+      src = pkgs.fetchFromGitHub {
+        owner = "NixOS";
+        repo = "cabal2nix";
+        rev = "b330eb5bb88be9a68d40966ca4880f20915d3dbc";
+        sha256 = "1vbllx89pnwqrsmwl55bslz6s7bc5kiv0wydaljqv1hbabix9ngb";
+      };
+    });
+
     ghc = overrideDerivation pkgs.haskell.compiler.ghc822 (drv: {
       patches = drv.patches ++ [ ./ghc-8.0.2-darwin-rec-link.patch ];
     });

@@ -184,7 +184,7 @@ lrcDo logTrace pm epoch consumers = do
         then coerce (nonEmpty @a) l
         else Nothing
 
-    applyBack blunds = applyBlocksUnsafe pm scb blunds Nothing
+    applyBack blunds = applyBlocksUnsafe logTrace pm scb blunds Nothing
     upToGenesis b = b ^. epochIndexL >= epoch
     whileAfterCrucial b = getEpochOrSlot b > crucial
     crucial = EpochOrSlot $ Right $ crucialSlot epoch
@@ -199,7 +199,7 @@ lrcDo logTrace pm epoch consumers = do
         -- and outer viewers mustn't know about it.
         ShouldCallBListener False
     withBlocksRolledBack blunds =
-        bracket_ (rollbackBlocksUnsafe pm bsc scb blunds)
+        bracket_ (rollbackBlocksUnsafe logTrace pm bsc scb blunds)
                  (applyBack (toOldestFirst blunds))
 
 issuersComputationDo

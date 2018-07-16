@@ -92,6 +92,7 @@ library
                        Cardano.Wallet.Kernel.Mode
                        Cardano.Wallet.Kernel.PrefilterTx
                        Cardano.Wallet.Kernel.Compat
+                       Cardano.Wallet.Kernel.Restore
                        Cardano.Wallet.Kernel.Submission
                        Cardano.Wallet.Kernel.Submission.Worker
                        Cardano.Wallet.Kernel.Types

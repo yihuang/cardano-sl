@@ -69,6 +69,7 @@ library
                        Cardano.Wallet.Kernel.CoinSelection.Generic.Grouped
                        Cardano.Wallet.Kernel.CoinSelection.Generic.LargestFirst
                        Cardano.Wallet.Kernel.CoinSelection.Generic.Random
+                       Cardano.Wallet.Kernel.Compat
                        Cardano.Wallet.Kernel.DB.AcidState
                        Cardano.Wallet.Kernel.DB.BlockMeta
                        Cardano.Wallet.Kernel.DB.HdWallet
@@ -91,7 +92,6 @@ library
                        Cardano.Wallet.Kernel.Diffusion
                        Cardano.Wallet.Kernel.Mode
                        Cardano.Wallet.Kernel.PrefilterTx
-                       Cardano.Wallet.Kernel.Compat
                        Cardano.Wallet.Kernel.Restore
                        Cardano.Wallet.Kernel.Submission
                        Cardano.Wallet.Kernel.Submission.Worker

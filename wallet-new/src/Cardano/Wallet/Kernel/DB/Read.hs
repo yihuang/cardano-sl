@@ -4,6 +4,8 @@ module Cardano.Wallet.Kernel.DB.Read (
   , accountAvailableUtxo
   , accountTotalBalance
   , hdWallets
+  , accountTxSlot
+  , accountIsTxPending
   ) where
 
 import           Universum
@@ -11,7 +13,7 @@ import           Universum
 import           Formatting (build, sformat)
 import           Formatting.Buildable (Buildable)
 
-import           Pos.Core (Coin)
+import           Pos.Core (Coin, SlotId, TxId)
 import           Pos.Txp (Utxo)
 
 import           Cardano.Wallet.Kernel.DB.AcidState (DB, dbHdWallets)
@@ -63,3 +65,11 @@ accountTotalBalance snapshot accountId
 -- | Returns the total balance for this 'HdAccountId'.
 hdWallets :: DB -> HdWallets
 hdWallets snapshot = snapshot ^. dbHdWallets
+
+accountTxSlot :: DB -> HdAccountId -> TxId -> Maybe SlotId
+accountTxSlot snapshot accountId txId
+    = walletQuery' snapshot (Spec.queryTxSlotId txId accountId)
+
+accountIsTxPending :: DB -> HdAccountId -> TxId -> Bool
+accountIsTxPending snapshot accountId txId
+    = walletQuery' snapshot (Spec.queryTxIsPending txId accountId)

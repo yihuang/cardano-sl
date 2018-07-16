@@ -4,6 +4,8 @@ module Cardano.Wallet.Kernel.DB.Spec.Read (
     queryAccountTotalBalance
   , queryAccountUtxo
   , queryAccountAvailableUtxo
+  , queryTxSlotId
+  , queryTxIsPending
   ) where
 
 import           Universum
@@ -20,6 +22,7 @@ import           Cardano.Wallet.Kernel.DB.InDb
 import           Cardano.Wallet.Kernel.DB.Spec
 import           Cardano.Wallet.Kernel.DB.Spec.Util
 
+import           Cardano.Wallet.Kernel.DB.BlockMeta
 import           Cardano.Wallet.Kernel.DB.Util.IxSet (IxSet)
 import qualified Cardano.Wallet.Kernel.DB.Util.IxSet as IxSet
 
@@ -49,6 +52,16 @@ ourUtxo addrs = Map.filter (ourTxOut addrs)
 
 accountUtxo :: Checkpoint -> Utxo
 accountUtxo = view (checkpointUtxo . fromDb)
+
+txSlot :: Core.TxId -> Checkpoint -> (Maybe Core.SlotId)
+txSlot txId checkpoint = Map.lookup txId slots
+  where
+    slots = view (checkpointBlockMeta . blockMetaSlotId . fromDb) checkpoint
+
+isTxPending :: Core.TxId -> Checkpoint -> Bool
+isTxPending txId checkpoint = Map.member txId pendingTxs
+  where
+    pendingTxs = view (checkpointPending . pendingTransactions . fromDb) checkpoint
 
 accountUtxoBalance :: Checkpoint -> Core.Coin
 accountUtxoBalance = view (checkpointUtxoBalance . fromDb)
@@ -116,5 +129,15 @@ queryAccountUtxo accountId db
 queryAccountAvailableUtxo :: HdAccountId -> HD.HdQueryErr UnknownHdAccount Utxo
 queryAccountAvailableUtxo accountId db
     = accountAvailableUtxo <$> checkpoint
+
+queryTxSlotId :: Core.TxId -> HdAccountId -> HD.HdQueryErr UnknownHdAccount (Maybe Core.SlotId)
+queryTxSlotId txId accountId db
+    = txSlot txId <$> checkpoint
+    where
+        checkpoint = HD.readHdAccountCurrentCheckpoint accountId db
+
+queryTxIsPending :: Core.TxId -> HdAccountId -> HD.HdQueryErr UnknownHdAccount Bool
+queryTxIsPending txId accountId db
+    = isTxPending txId <$> checkpoint
     where
         checkpoint = HD.readHdAccountCurrentCheckpoint accountId db

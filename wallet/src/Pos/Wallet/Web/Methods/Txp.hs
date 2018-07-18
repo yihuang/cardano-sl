@@ -27,6 +27,7 @@ import           Pos.Core.Common (Coin)
 import           Pos.Core.Txp (Tx (..), TxAux (..), TxOut (..), TxOutAux (..))
 import           Pos.Crypto (PassPhrase, ProtocolMagic, hash)
 import           Pos.Util.Servant (encodeCType)
+import           Pos.Util.Trace.Named (TraceNamed)
 import           Pos.Wallet.Web.ClientTypes (AccountId, Addr, CId)
 import           Pos.Wallet.Web.Error (WalletError (..), rewrapToWalletError)
 import           Pos.Wallet.Web.Methods.History (MonadWalletHistory)
@@ -73,13 +74,14 @@ coinDistrToOutputs distr = do
 -- by the time of resubmission.
 submitAndSaveNewPtx
     :: TxSubmissionMode ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> WalletDB
     -> (TxAux -> m Bool)
     -> PendingTx
     -> m ()
-submitAndSaveNewPtx pm db submit =
-    submitAndSavePtx pm db submit ptxFirstSubmissionHandler
+submitAndSaveNewPtx logTrace pm db submit =
+    submitAndSavePtx logTrace pm db submit ptxFirstSubmissionHandler
 
 gatherPendingTxsSummary :: MonadWalletWebMode ctx m => m [PendingTxsSummary]
 gatherPendingTxsSummary =

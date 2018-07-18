@@ -18,7 +18,6 @@ import           Universum
 import           Control.Exception.Safe (Handler (..), catches, onException)
 import           Data.Time.Units (fromMicroseconds)
 import           Formatting (build, sformat, shown, stext, (%))
-import           System.Wlog (WithLogger, logDebug, logInfo)
 
 import           Pos.Client.Txp.History (saveTx, thTimestamp)
 import           Pos.Client.Txp.Network (TxMode)
@@ -26,8 +25,9 @@ import           Pos.Configuration (walletTxCreationDisabled)
 import           Pos.Core (diffTimestamp, getCurrentTimestamp)
 import           Pos.Core.Txp (TxAux)
 import           Pos.Crypto (ProtocolMagic)
-import           Pos.Infra.Util.LogSafe (buildSafe, logInfoSP, logWarningSP,
-                     secretOnlyF)
+import           Pos.Util.Log.LogSafe (buildSafe, secretOnlyF)
+import           Pos.Util.Trace.Named (TraceNamed, logDebug, logInfo, logInfoSP,
+                     logWarningSP)
 import           Pos.Util.Util (maybeThrow)
 import           Pos.Wallet.Web.Error (WalletError (InternalError))
 import           Pos.Wallet.Web.Pending.Functions (isReclaimableFailure,
@@ -62,11 +62,12 @@ ptxFirstSubmissionHandler =
     }
 
 ptxResubmissionHandler
-    :: forall m. (MonadIO m, MonadThrow m, WithLogger m)
-    => WalletDB
+    :: forall m. (MonadIO m, MonadThrow m)
+    => TraceNamed m
+    -> WalletDB
     -> PendingTx
     -> PtxSubmissionHandlers m
-ptxResubmissionHandler db PendingTx{..} =
+ptxResubmissionHandler logTrace db PendingTx{..} =
     PtxSubmissionHandlers
     { pshOnNonReclaimable = \e ->
         if | _ptxPeerAck ->
@@ -88,16 +89,16 @@ ptxResubmissionHandler db PendingTx{..} =
         reportCanceled
 
     reportPeerAppliedEarlier =
-        logInfoSP $ \sl ->
+        logInfoSP logTrace $ \sl ->
         sformat ("Some peer applied tx #"%secretOnlyF sl build%" earlier - continuing \
             \tracking")
             _ptxTxId
     reportCanceled =
-        logInfoSP $ \sl ->
+        logInfoSP logTrace $ \sl ->
         sformat ("Pending transaction #"%secretOnlyF sl build%" was canceled")
             _ptxTxId
     reportBadCondition =
-        logWarningSP $ \sl ->
+        logWarningSP logTrace $ \sl ->
         sformat ("Processing failure of "%secretOnlyF sl build%" resubmission, but \
             \this transaction has unexpected condition "%buildSafe sl)
             _ptxTxId _ptxCond
@@ -108,13 +109,14 @@ type TxSubmissionMode ctx m = ( TxMode m )
 -- but treats tx as future /pending/ transaction.
 submitAndSavePtx
     :: TxSubmissionMode ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> WalletDB
     -> (TxAux -> m Bool)
     -> PtxSubmissionHandlers m
     -> PendingTx
     -> m ()
-submitAndSavePtx pm db submitTx PtxSubmissionHandlers{..} ptx@PendingTx{..} = do
+submitAndSavePtx logTrace pm db submitTx PtxSubmissionHandlers{..} ptx@PendingTx{..} = do
     -- this should've been checked before, but just in case
     when walletTxCreationDisabled $
         throwM $ InternalError "Transaction creation is disabled by configuration!"
@@ -126,7 +128,7 @@ submitAndSavePtx pm db submitTx PtxSubmissionHandlers{..} ptx@PendingTx{..} = do
          diffTimestamp now creationTime > fromMicroseconds 3600000000 -> do
            let newCond = PtxWontApply "1h limit exceeded" poolInfo
            void $ casPtxCondition db _ptxWallet _ptxTxId _ptxCond newCond
-           logInfo $
+           logInfo logTrace $
              sformat ("Pending transaction #"%build%" discarded becauce \
                       \the 1h time limit was exceeded")
                       _ptxTxId
@@ -161,7 +163,7 @@ submitAndSavePtx pm db submitTx PtxSubmissionHandlers{..} ptx@PendingTx{..} = do
         pshOnNonReclaimable e
 
     reportError desc e outcome =
-        logInfoSP $ \sl ->
+        logInfoSP logTrace $ \sl ->
         sformat ("Transaction #"%secretOnlyF sl build%" application failed ("%shown%" - "
                 %stext%")"%stext) _ptxTxId e desc outcome
 
@@ -174,6 +176,6 @@ submitAndSavePtx pm db submitTx PtxSubmissionHandlers{..} ptx@PendingTx{..} = do
     badInitPtxCondition = InternalError "Expected PtxCreating as initial pending condition"
 
     reportSubmitted ack =
-        logDebug $
+        logDebug logTrace $
         sformat ("submitAndSavePtx: transaction submitted with confirmation?: "
                 %build) ack

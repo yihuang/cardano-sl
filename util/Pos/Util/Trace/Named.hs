@@ -11,26 +11,25 @@ module Pos.Util.Trace.Named
     , setupLogging
     , namedTrace
     , appendName
-    --, publicPrivateLogItem
     -- * log functions
     , logMessage, logMessageS, logMessageP
-    , logDebug,   logDebugS,   logDebugP
-    , logError,   logErrorS,   logErrorP
-    , logInfo,    logInfoS,    logInfoP
-    , logNotice,  logNoticeS,  logNoticeP
-    , logWarning, logWarningS, logWarningP
+    , logDebug,   logDebugS,   logDebugP,   logDebugSP,   logDebugUnsafeP
+    , logError,   logErrorS,   logErrorP,   logErrorSP,   logErrorUnsafeP
+    , logInfo,    logInfoS,    logInfoP,    logInfoSP,    logInfoUnsafeP
+    , logNotice,  logNoticeS,  logNoticeP,  logNoticeSP,  logNoticeUnsafeP
+    , logWarning, logWarningS, logWarningP, logWarningSP, logWarningUnsafeP
     ) where
 
 import           Universum
 
 import           Data.Functor.Contravariant (Op (..), contramap)
 import qualified Pos.Util.Log as Log
+import           Pos.Util.Log.LogSafe (SecuredText, logMCond, logMessageUnsafeP,
+                     selectPublicLogs, selectSecretLogs)
+import           Pos.Util.LoggerConfig (LogSecurityLevel (..))
 import           Pos.Util.Trace (Trace (..), traceWith)
 import qualified Pos.Util.Trace.Unstructured as TrU (LogItem (..),
                      LogPrivacy (..))
-
-import           Pos.Util.Log.LogSafe (logMCond, selectPublicLogs,
-                     selectSecretLogs)
 
 type TraceNamed m = Trace m (LogNamed TrU.LogItem)
 
@@ -62,23 +61,33 @@ logNotice logTrace  = traceNamedItem logTrace TrU.Both Log.Notice
 logWarning logTrace = traceNamedItem logTrace TrU.Both Log.Warning
 logError logTrace   = traceNamedItem logTrace TrU.Both Log.Error
 logDebugS, logInfoS, logNoticeS, logWarningS, logErrorS
-    :: Trace m (LogNamed TrU.LogItem) -> Text -> m ()
+    :: TraceNamed m -> Text -> m ()
 logDebugS logTrace   = traceNamedItem logTrace TrU.Private Log.Debug
 logInfoS logTrace    = traceNamedItem logTrace TrU.Private Log.Info
 logNoticeS logTrace  = traceNamedItem logTrace TrU.Private Log.Notice
 logWarningS logTrace = traceNamedItem logTrace TrU.Private Log.Warning
 logErrorS logTrace   = traceNamedItem logTrace TrU.Private Log.Error
 logDebugP, logInfoP, logNoticeP, logWarningP, logErrorP
-    :: Trace m (LogNamed TrU.LogItem) -> Text -> m ()
+    :: TraceNamed m -> Text -> m ()
 logDebugP logTrace   = traceNamedItem logTrace TrU.Public Log.Debug
 logInfoP logTrace    = traceNamedItem logTrace TrU.Public Log.Info
 logNoticeP logTrace  = traceNamedItem logTrace TrU.Public Log.Notice
 logWarningP logTrace = traceNamedItem logTrace TrU.Public Log.Warning
 logErrorP logTrace   = traceNamedItem logTrace TrU.Public Log.Error
-
--- | compatibility
---publicPrivateLogItem :: (Log.Severity, Text) -> TrU.LogItem
---publicPrivateLogItem = uncurry (TrU.LogItem TrU.Both)
+logDebugSP, logInfoSP, logNoticeSP, logWarningSP, logErrorSP
+    :: Monad m => TraceNamed m -> SecuredText -> m ()
+logDebugSP logTrace   f = logDebugS logTrace (f SecretLogLevel) >> logDebugP logTrace (f PublicLogLevel)
+logInfoSP logTrace    f = logInfoS logTrace (f SecretLogLevel) >> logInfoP logTrace (f PublicLogLevel)
+logNoticeSP logTrace  f = logNoticeS logTrace (f SecretLogLevel) >> logNoticeP logTrace (f PublicLogLevel)
+logWarningSP logTrace f = logWarningS logTrace (f SecretLogLevel) >> logWarningP logTrace (f PublicLogLevel)
+logErrorSP logTrace   f = logErrorS logTrace (f SecretLogLevel) >> logErrorP logTrace (f PublicLogLevel)
+logDebugUnsafeP, logInfoUnsafeP, logNoticeUnsafeP, logWarningUnsafeP, logErrorUnsafeP
+    :: TraceNamed m -> Text -> m ()
+logDebugUnsafeP logTrace   = traceNamedItem logTrace TrU.PublicUnsafe Log.Debug
+logInfoUnsafeP logTrace    = traceNamedItem logTrace TrU.PublicUnsafe Log.Info
+logNoticeUnsafeP logTrace  = traceNamedItem logTrace TrU.PublicUnsafe Log.Notice
+logWarningUnsafeP logTrace = traceNamedItem logTrace TrU.PublicUnsafe Log.Warning
+logErrorUnsafeP logTrace   = traceNamedItem logTrace TrU.PublicUnsafe Log.Error
 
 modifyName
     :: ([Log.LoggerName] -> [Log.LoggerName])
@@ -113,15 +122,20 @@ namedTrace
     => Log.LoggingHandler -> TraceNamed m
 namedTrace lh = Trace $ Op $ \namedLogitem ->
     let loggerNames =  lnName namedLogitem
-        privacy  = TrU.liPrivacy  (lnItem namedLogitem)
-        severity = TrU.liSeverity (lnItem namedLogitem)
-        message  = TrU.liMessage  (lnItem namedLogitem)
+        litem = lnItem namedLogitem
+        privacy  = TrU.liPrivacy litem
+        severity = TrU.liSeverity litem
+        message  = TrU.liMessage litem
     in
     liftIO $ case privacy of
         TrU.Both    -> Log.usingLoggerNames lh loggerNames $ Log.logMessage severity message
         -- pass to every logging scribe
         TrU.Public  -> Log.usingLoggerNames lh loggerNames $
             logMCond lh severity message selectPublicLogs
+        -- pass to logging scribes that are marked as
+        -- public (LogSecurityLevel == PublicLogLevel).
+        TrU.PublicUnsafe  -> Log.usingLoggerNames lh loggerNames $
+            logMessageUnsafeP severity lh message
         -- pass to logging scribes that are marked as
         -- public (LogSecurityLevel == PublicLogLevel).
         TrU.Private -> Log.usingLoggerNames lh loggerNames $

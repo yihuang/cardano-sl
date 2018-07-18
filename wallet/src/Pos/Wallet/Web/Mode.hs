@@ -30,7 +30,6 @@ import           Data.List (partition)
 import qualified Data.Map.Strict as M
 import           Mockable (LowLevelAsync, Mockable, Production)
 import           Pos.Wallet.Web.Tracking.Types (SyncQueue)
-import           System.Wlog (HasLoggerName (..))
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Block.Slog (HasSlogContext (..), HasSlogGState (..))
@@ -54,21 +53,17 @@ import           Pos.DB.Rocks (dbDeleteDefault, dbGetDefault,
                      dbIterSourceDefault, dbPutDefault, dbWriteBatchDefault)
 import           Pos.Infra.Network.Types (HasNodeType (..))
 import           Pos.Infra.Recovery.Info (MonadRecoveryInfo)
-import           Pos.Infra.Reporting (HasMisbehaviorMetrics (..),
-                     MonadReporting (..), Reporter (..))
-import           Pos.Infra.Shutdown (HasShutdownContext (..))
-import           Pos.Infra.Slotting.Class (MonadSlots (..))
 import           Pos.Infra.Slotting.Impl (currentTimeSlottingSimple,
                      getCurrentSlotBlockingSimple,
                      getCurrentSlotInaccurateSimple, getCurrentSlotSimple)
-import           Pos.Infra.Slotting.MemState (HasSlottingVar (..),
-                     MonadSlotsData)
 import           Pos.Infra.StateLock (StateLock)
-import           Pos.Infra.Util.JsonLog.Events (HasJsonLogConfig (..),
-                     jsonLogDefault)
-import           Pos.Infra.Util.TimeWarp (CanJsonLog (..))
 import           Pos.Launcher (HasConfigurations)
 import           Pos.Recovery ()
+import           Pos.Sinbin.Reporting (HasMisbehaviorMetrics (..),
+                     MonadReporting (..), Reporter (..))
+import           Pos.Sinbin.Shutdown (HasShutdownContext (..))
+import           Pos.Sinbin.Slotting.Class (HasSlottingVar (..),
+                     MonadSlots (..), MonadSlotsData)
 import           Pos.Ssc.Types (HasSscContext (..))
 import           Pos.Txp (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..),
                      MonadTxpMem, Utxo, addrBelongsToSet,
@@ -76,9 +71,8 @@ import           Pos.Txp (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..),
                      withTxpLocalData)
 import qualified Pos.Txp.DB as DB
 import           Pos.Util (postfixLFields)
-import           Pos.Util.LoggerName (HasLoggerName' (..), askLoggerNameDefault,
-                     modifyLoggerNameDefault)
 import qualified Pos.Util.Modifier as MM
+import           Pos.Util.Trace (noTrace)
 import           Pos.Util.UserSecret (HasUserSecret (..))
 import           Pos.Util.Util (HasLens (..))
 import           Pos.WorkMode (MinWorkMode, RealMode, RealModeContext (..))
@@ -173,18 +167,16 @@ instance {-# OVERLAPPABLE #-}
   where
     lensOf = wwmcRealModeContext_L . lensOf @tag
 
---instance HasLoggerName' WalletWebModeContext where
---    loggerName = wwmcRealModeContext_L . loggerName
-
 instance HasSlogContext WalletWebModeContext where
     slogContext = wwmcRealModeContext_L . slogContext
 
 instance HasSlogGState WalletWebModeContext where
     slogGState = wwmcRealModeContext_L . slogGState
 
+{- TODO
 instance HasJsonLogConfig WalletWebModeContext where
     jsonLogConfig = wwmcRealModeContext_L . jsonLogConfig
-
+-}
 instance HasNodeType WalletWebModeContext where
     getNodeType = getNodeType . wwmcRealModeContext
 
@@ -244,13 +236,10 @@ instance (HasConfiguration, MonadSlotsData ctx WalletWebMode)
     getCurrentSlotInaccurate = getCurrentSlotInaccurateSimple
     currentTimeSlotting = currentTimeSlottingSimple
 
---instance {-# OVERLAPPING #-} HasLoggerName WalletWebMode where
---    askLoggerName = askLoggerNameDefault
---    modifyLoggerName = modifyLoggerNameDefault
-
+{- TODO
 instance {-# OVERLAPPING #-} CanJsonLog WalletWebMode where
     jsonLog = jsonLogDefault
-
+-}
 instance HasConfiguration => MonadDBRead WalletWebMode where
     dbGet = dbGetDefault
     dbIterSource = dbIterSourceDefault
@@ -268,12 +257,12 @@ instance HasConfiguration => MonadGState WalletWebMode where
 
 instance (HasConfiguration)
        => MonadBListener WalletWebMode where
-    onApplyBlocks = onApplyBlocksWebWallet
-    onRollbackBlocks = onRollbackBlocksWebWallet
+    onApplyBlocks = onApplyBlocksWebWallet noTrace
+    onRollbackBlocks = onRollbackBlocksWebWallet noTrace
 
 instance MonadUpdates WalletWebMode where
     waitForUpdate = waitForUpdateWebWallet
-    applyLastUpdate = applyLastUpdateWebWallet
+    applyLastUpdate = applyLastUpdateWebWallet noTrace
 
 instance (HasConfiguration) =>
          MonadBlockchainInfo WalletWebMode where
@@ -334,7 +323,7 @@ type instance MempoolExt WalletWebMode = WalletMempoolExt
 instance (HasConfiguration, HasTxpConfiguration) =>
          MonadTxpLocal WalletWebMode where
     txpNormalize = txpNormalizeWebWallet
-    txpProcessTx = txpProcessTxWebWallet
+    txpProcessTx = txpProcessTxWebWallet noTrace
 
 instance MonadKeysRead WalletWebMode where
     getSecret = getSecretDefault

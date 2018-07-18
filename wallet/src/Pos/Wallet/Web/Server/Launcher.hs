@@ -22,7 +22,6 @@ import           Network.Wai (Application)
 import           Network.Wai.Handler.Warp (Settings)
 import           Serokell.AcidState.ExtendedState (ExtendedState)
 import           Servant.Server (Handler, Server, serve)
-import           System.Wlog (WithLogger, logInfo)
 
 import qualified Data.ByteString.Char8 as BS8
 
@@ -33,8 +32,10 @@ import           Pos.Communication (OutSpecs)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Infra.Diffusion.Types (Diffusion (sendTx))
 import           Pos.Infra.Util.TimeWarp (NetworkAddress)
-import           Pos.Util (bracketWithLogging)
+import           Pos.Util (bracketWithTrace)
 import           Pos.Util.CompileInfo (HasCompileInfo)
+import           Pos.Util.Trace (natTrace)
+import           Pos.Util.Trace.Named (TraceNamed, logInfo)
 import           Pos.Wallet.Web.Account (findKey, myRootAddresses)
 import           Pos.Wallet.Web.Api (WalletSwaggerApi, swaggerWalletApi)
 import           Pos.Wallet.Web.Mode (MonadFullWalletWebMode,
@@ -72,24 +73,27 @@ walletDocumentationImpl
 walletDocumentationImpl app (ip, port) = serveDocImpl app (BS8.unpack ip) port
 
 walletApplication
-    :: (MonadWalletWebMode ctx m, MonadWalletWebSockets ctx m)
-    => m (Server WalletSwaggerApi)
+    :: ( MonadWalletWebMode ctx m
+       , MonadWalletWebSockets ctx m)
+    => TraceNamed IO
+    -> m (Server WalletSwaggerApi)
     -> m Application
-walletApplication serv = do
+walletApplication logTrace serv = do
     wsConn <- getWalletWebSockets
-    upgradeApplicationWS wsConn . serve swaggerWalletApi <$> serv
+    upgradeApplicationWS logTrace wsConn . serve swaggerWalletApi <$> serv
 
 walletServer
     :: forall ctx m.
        ( MonadFullWalletWebMode ctx m, HasCompileInfo )
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> Diffusion m
     -> TVar NtpStatus
     -> (forall x. m x -> Handler x)
     -> m (Server WalletSwaggerApi)
-walletServer pm diffusion ntpStatus nat = do
+walletServer logTrace pm diffusion ntpStatus nat = do
     mapM_ (findKey >=> syncWallet . eskToWalletDecrCredentials) =<< myRootAddresses
-    return $ servantHandlersWithSwagger pm ntpStatus submitTx nat
+    return $ servantHandlersWithSwagger logTrace pm ntpStatus submitTx nat
   where
     -- Diffusion layer takes care of submitting transactions.
     submitTx = sendTx diffusion
@@ -97,27 +101,27 @@ walletServer pm diffusion ntpStatus nat = do
 bracketWalletWebDB
     :: ( MonadIO m
        , MonadMask m
-       , WithLogger m
        )
-    => FilePath  -- ^ Path to wallet acid-state
+    => TraceNamed m
+    -> FilePath  -- ^ Path to wallet acid-state
     -> Bool      -- ^ Rebuild flag for acid-state
     -> (ExtendedState WalletStorage -> m a)
     -> m a
-bracketWalletWebDB daedalusDbPath dbRebuild =
-    bracketWithLogging msg (openState dbRebuild daedalusDbPath) closeState
+bracketWalletWebDB logTrace daedalusDbPath dbRebuild =
+    bracketWithTrace logTrace msg (openState dbRebuild daedalusDbPath) closeState
   where
     msg = "bracketWalletWebDB"
 
 bracketWalletWS
     :: ( MonadIO m
        , MonadMask m
-       , WithLogger m
        )
-    => (ConnectionsVar -> m a)
+    => TraceNamed m
+    -> (ConnectionsVar -> m a)
     -> m a
-bracketWalletWS = bracketWithLogging msg initWS closeWSConnections
+bracketWalletWS logTrace = bracketWithTrace logTrace msg initWS closeWSConnections
   where
-    initWS = logInfo "walletServeImpl initWsConnection" >> initWSConnections
+    initWS = logInfo logTrace "walletServeImpl initWsConnection" >> initWSConnections
     msg = "bracketWalletWS"
 
 walletServerOuts :: OutSpecs

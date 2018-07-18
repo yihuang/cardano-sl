@@ -452,16 +452,16 @@ sleep :: MonadIO m => NominalDiffTime -> m ()
 sleep n = liftIO (threadDelay (truncate (n * 10^(6::Int))))
 
 -- | 'tMeasure' with 'logDebug'.
-tMeasureLog :: (Log.WithLogger m) => Text -> m a -> m a
-tMeasureLog label = fmap fst . tMeasure Log.logDebug label
+tMeasureLog :: MonadIO m => TN.TraceNamed m -> Text -> m a -> m a
+tMeasureLog logTrace label = fmap fst . tMeasure (TN.logDebug logTrace) label
 
 -- | 'tMeasure' with 'putText'. For places you don't have
 -- 'WithLogger' constraint.
-tMeasureIO :: (MonadIO m) => Text -> m a -> m a
+tMeasureIO :: MonadIO m => Text -> m a -> m a
 tMeasureIO label = fmap fst . tMeasure putText label
 
-timed :: (Log.WithLogger m) => Text -> m a -> m (a, Microsecond)
-timed = tMeasure Log.logDebug
+timed :: MonadIO m => TN.TraceNamed m -> Text -> m a -> m (a, Microsecond)
+timed logTrace = tMeasure (TN.logDebug logTrace)
 
 -- | Takes the first time sample, executes action (forcing its
 -- result), takes the second time sample, logs it.

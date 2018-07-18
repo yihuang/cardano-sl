@@ -19,7 +19,6 @@ import qualified Data.Map as M
 import           Data.Time.Units (Second)
 import           Mockable (Concurrently, Delay, Mockable, concurrently, delay)
 import           Servant.Server (err403, err405, errReasonPhrase)
-import           System.Wlog (logDebug)
 
 import           Pos.Client.KeyStorage (getSecretKeys)
 import           Pos.Client.Txp.Addresses (MonadAddresses)
@@ -39,6 +38,7 @@ import           Pos.DB (MonadGState)
 import           Pos.Txp (TxFee (..), Utxo)
 import           Pos.Util (eitherToThrow, maybeThrow)
 import           Pos.Util.Servant (encodeCType)
+import           Pos.Util.Trace.Named (TraceNamed, logDebug)
 import           Pos.Wallet.Aeson.ClientTypes ()
 import           Pos.Wallet.Aeson.WalletBackup ()
 import           Pos.Wallet.Web.Account (getSKByAddressPure, getSKById)
@@ -61,7 +61,8 @@ import           Pos.Wallet.Web.Util (decodeCTypeOrFail, getAccountAddrsOrThrow,
 
 newPayment
     :: MonadWalletTxFull ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> (TxAux -> m Bool)
     -> PassPhrase
     -> AccountId
@@ -69,13 +70,14 @@ newPayment
     -> Coin
     -> InputSelectionPolicy
     -> m CTx
-newPayment pm submitTx passphrase srcAccount dstAddress coin policy =
+newPayment logTrace pm submitTx passphrase srcAccount dstAddress coin policy =
     -- This is done for two reasons:
     -- 1. In order not to overflow relay.
     -- 2. To let other things (e. g. block processing) happen if
     -- `newPayment`s are done continuously.
     notFasterThan (6 :: Second) $ do
       sendMoney
+          logTrace
           pm
           submitTx
           passphrase
@@ -85,15 +87,17 @@ newPayment pm submitTx passphrase srcAccount dstAddress coin policy =
 
 newPaymentBatch
     :: MonadWalletTxFull ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> (TxAux -> m Bool)
     -> PassPhrase
     -> NewBatchPayment
     -> m CTx
-newPaymentBatch pm submitTx passphrase NewBatchPayment {..} = do
+newPaymentBatch logTrace pm submitTx passphrase NewBatchPayment {..} = do
     src <- decodeCTypeOrFail npbFrom
     notFasterThan (6 :: Second) $ do
       sendMoney
+          logTrace
           pm
           submitTx
           passphrase
@@ -172,14 +176,15 @@ getMoneySourceUtxo ws =
 
 sendMoney
     :: (MonadWalletTxFull ctx m)
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> (TxAux -> m Bool)
     -> PassPhrase
     -> MoneySource
     -> NonEmpty (CId Addr, Coin)
     -> InputSelectionPolicy
     -> m CTx
-sendMoney pm submitTx passphrase moneySource dstDistr policy = do
+sendMoney logTrace pm submitTx passphrase moneySource dstDistr policy = do
     db <- askWalletDB
     ws <- getWalletSnapshot db
     when walletTxCreationDisabled $
@@ -201,7 +206,7 @@ sendMoney pm submitTx passphrase moneySource dstDistr policy = do
 
     let srcAddrs = map (view wamAddress) addrMetas
 
-    logDebug "sendMoney: processed addrs"
+    logDebug logTrace "sendMoney: processed addrs"
 
     let metasAndAddresses = M.fromList $ zip (toList srcAddrs) (toList addrMetas)
     allSecrets <- getSecretKeys
@@ -230,7 +235,7 @@ sendMoney pm submitTx passphrase moneySource dstDistr policy = do
             th = THEntry txHash tx Nothing inpTxOuts dstAddrs ts
         ptx <- mkPendingTx ws srcWallet txHash txAux th
 
-        th <$ submitAndSaveNewPtx pm db submitTx ptx
+        th <$ submitAndSaveNewPtx logTrace pm db submitTx ptx
 
     -- We add TxHistoryEntry's meta created by us in advance
     -- to make TxHistoryEntry in CTx consistent with entry in history.
@@ -239,7 +244,7 @@ sendMoney pm submitTx passphrase moneySource dstDistr policy = do
     ws' <- getWalletSnapshot db
     let srcWalletAddrsDetector = getWalletAddrsDetector ws' Ever srcWallet
 
-    logDebug "sendMoney: constructing response"
+    logDebug logTrace "sendMoney: constructing response"
     fst <$> constructCTx ws' srcWallet srcWalletAddrsDetector diff th
 
 ----------------------------------------------------------------------------

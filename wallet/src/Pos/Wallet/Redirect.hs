@@ -24,7 +24,6 @@ import           Universum hiding (id)
 import           Control.Lens (views)
 import qualified Data.HashMap.Strict as HM
 import           Data.Time.Units (Millisecond)
-import           System.Wlog (WithLogger, logWarning)
 
 import           Pos.Block.Types (LastKnownHeaderTag, MonadLastKnownHeader)
 import qualified Pos.Context as PC
@@ -44,6 +43,8 @@ import           Pos.Txp (MempoolExt, MonadTxpLocal (..), ToilVerFailure,
                      withTxpLocalData)
 import           Pos.Update.Context (UpdateContext (ucDownloadedUpdate))
 import           Pos.Update.Poll.Types (ConfirmedProposalState)
+import           Pos.Util.Trace (noTrace)
+import           Pos.Util.Trace.Named (TraceNamed, logWarning)
 import           Pos.Util.Util (HasLens (..))
 import           Pos.Wallet.WalletMode (MonadBlockchainInfo (..),
                      MonadUpdates (..))
@@ -111,7 +112,6 @@ blockchainSlotDurationWebWallet = getNextEpochSlotDuration
 
 type UpdatesEnv ctx m =
     ( MonadIO m
-    , WithLogger m
     , HasShutdownContext ctx
     , MonadReader ctx m
     , HasLens UpdateContext ctx UpdateContext
@@ -121,8 +121,8 @@ waitForUpdateWebWallet :: UpdatesEnv ctx m => m ConfirmedProposalState
 waitForUpdateWebWallet =
     takeMVar =<< views (lensOf @UpdateContext) ucDownloadedUpdate
 
-applyLastUpdateWebWallet :: UpdatesEnv ctx m => m ()
-applyLastUpdateWebWallet = triggerShutdown
+applyLastUpdateWebWallet :: UpdatesEnv ctx m => TraceNamed m -> m ()
+applyLastUpdateWebWallet logTrace = triggerShutdown logTrace
 
 ----------------------------------------------------------------------------
 -- Txp Local
@@ -134,17 +134,18 @@ txpProcessTxWebWallet
     , AccountMode ctx m
     , WS.WalletDbReader ctx m
     )
-    => ProtocolMagic -> (TxId, TxAux) -> m (Either ToilVerFailure ())
-txpProcessTxWebWallet pm tx@(txId, txAux) = do
+    => TraceNamed m
+    -> ProtocolMagic -> (TxId, TxAux) -> m (Either ToilVerFailure ())
+txpProcessTxWebWallet logTrace pm tx@(txId, txAux) = do
     db <- WS.askWalletDB
-    txProcessTransaction pm tx >>= traverse (const $ addTxToWallets db)
+    txProcessTransaction logTrace noTrace pm tx >>= traverse (const $ addTxToWallets db)
   where
     addTxToWallets :: WS.WalletDB -> m ()
     addTxToWallets db = do
         txUndos <- withTxpLocalData getLocalUndos
         case HM.lookup txId txUndos of
             Nothing ->
-                logWarning "Node processed a tx but corresponding tx undo not found"
+                logWarning logTrace "Node processed a tx but corresponding tx undo not found"
             Just txUndo -> do
                 ws <- WS.getWalletSnapshot db
                 ts <- getCurrentTimestamp

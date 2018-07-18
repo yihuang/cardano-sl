@@ -131,6 +131,7 @@ library
                       , cardano-sl-txp
                       , cardano-sl-networking
                       , cardano-sl-node-ipc
+                      , cardano-sl-sinbin
                       , cardano-sl-update
                       , cardano-sl-util
                       , containers

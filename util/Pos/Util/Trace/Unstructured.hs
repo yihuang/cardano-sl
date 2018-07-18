@@ -56,6 +56,8 @@ import           Pos.Util.Trace (Trace (..), traceWith)
 data LogPrivacy where
     -- | Only to public logs.
     Public  :: LogPrivacy
+    -- | Only to public logs, not console.
+    PublicUnsafe  :: LogPrivacy
     -- | Only to private logs.
     Private :: LogPrivacy
     -- | To public and private logs.

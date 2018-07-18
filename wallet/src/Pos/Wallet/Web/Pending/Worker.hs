@@ -15,7 +15,6 @@ import           Data.Time.Units (Microsecond, Second, convertUnit)
 import           Formatting (build, sformat, (%))
 import           Mockable (delay, forConcurrently)
 import           Serokell.Util (enumerate, listJson)
-import           System.Wlog (logDebug, logInfo, modifyLoggerName)
 
 import           Pos.Client.Txp.Addresses (MonadAddresses)
 import           Pos.Client.Txp.Network (TxMode)
@@ -34,7 +33,9 @@ import           Pos.Infra.Shutdown (HasShutdownContext)
 import           Pos.Infra.Slotting (MonadSlots, OnNewSlotParams (..),
                      defaultOnNewSlotParams, getNextEpochSlotDuration,
                      onNewSlot)
-import           Pos.Infra.Util.LogSafe (logInfoSP, secretOnlyF, secureListF)
+import           Pos.Util.Log.LogSafe (secretOnlyF, secureListF)
+import           Pos.Util.Trace.Named (TraceNamed, appendName, logDebug,
+                     logInfo, logInfoSP)
 import           Pos.Wallet.Web.Pending.Functions (usingPtxCoords)
 import           Pos.Wallet.Web.Pending.Submission (ptxResubmissionHandler,
                      submitAndSavePtx)
@@ -58,35 +59,39 @@ type MonadPendings ctx m =
     , HasNodeConfiguration
     )
 
-processPtxInNewestBlocks :: MonadPendings ctx m => WalletDB -> PendingTx -> m ()
-processPtxInNewestBlocks db PendingTx{..} = do
+processPtxInNewestBlocks
+    :: MonadPendings ctx m
+    => TraceNamed m
+    -> WalletDB -> PendingTx -> m ()
+processPtxInNewestBlocks logTrace db PendingTx{..} = do
     ws <- getWalletSnapshot db
     tipDiff <- view difficultyL <$> DB.getTipHeader
     if | PtxInNewestBlocks ptxDiff <- _ptxCond,
          Just depth <- getWalletAssuredDepth ws _ptxWallet,
          longAgo depth ptxDiff tipDiff -> do
              void $ casPtxCondition db _ptxWallet _ptxTxId _ptxCond PtxPersisted
-             logInfoSP $ \sl -> sformat ("Transaction "%secretOnlyF sl build%" got persistent") _ptxTxId
+             logInfoSP logTrace $ \sl -> sformat ("Transaction "%secretOnlyF sl build%" got persistent") _ptxTxId
        | otherwise -> pass
   where
      longAgo depth (ChainDifficulty ptxDiff) (ChainDifficulty tipDiff) =
          ptxDiff + depth <= tipDiff
 
 resubmitTx :: MonadPendings ctx m
-           => ProtocolMagic
+           => TraceNamed m
+           -> ProtocolMagic
            -> WalletDB
            -> (TxAux -> m Bool)
            -> PendingTx
            -> m ()
-resubmitTx pm db submitTx ptx =
+resubmitTx logTrace pm db submitTx ptx =
     handleAny (\_ -> pass) $ do
-        logInfoSP $ \sl -> sformat ("Resubmitting tx "%secretOnlyF sl build) (_ptxTxId ptx)
-        let submissionH = ptxResubmissionHandler db ptx
-        submitAndSavePtx pm db submitTx submissionH ptx
+        logInfoSP logTrace $ \sl -> sformat ("Resubmitting tx "%secretOnlyF sl build) (_ptxTxId ptx)
+        let submissionH = ptxResubmissionHandler logTrace db ptx
+        submitAndSavePtx logTrace pm db submitTx submissionH ptx
         updateTiming
   where
     reportNextCheckTime time =
-        logInfoSP $ \sl ->
+        logInfoSP logTrace $ \sl ->
         sformat ("Next resubmission of transaction "%secretOnlyF sl build%" is scheduled at "
                 %build) (_ptxTxId ptx) time
 
@@ -99,16 +104,17 @@ resubmitTx pm db submitTx ptx =
 -- | Distributes pending txs submition over current slot ~evenly
 resubmitPtxsDuringSlot
     :: MonadPendings ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> WalletDB
     -> (TxAux -> m Bool)
     -> [PendingTx]
     -> m ()
-resubmitPtxsDuringSlot pm db submitTx ptxs = do
+resubmitPtxsDuringSlot logTrace pm db submitTx ptxs = do
     interval <- evalSubmitDelay (length ptxs)
     void . forConcurrently (enumerate ptxs) $ \(i, ptx) -> do
         delay (interval * i)
-        resubmitTx pm db submitTx ptx
+        resubmitTx logTrace pm db submitTx ptx
   where
     submitionEta = 5 :: Second
     evalSubmitDelay toResubmitNum = do
@@ -119,13 +125,14 @@ resubmitPtxsDuringSlot pm db submitTx ptxs = do
 
 processPtxsToResubmit
     :: MonadPendings ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> WalletDB
     -> (TxAux -> m Bool)
     -> SlotId
     -> [PendingTx]
     -> m ()
-processPtxsToResubmit pm db submitTx _curSlot ptxs = do
+processPtxsToResubmit logTrace pm db submitTx _curSlot ptxs = do
     ptxsPerSlotLimit <- evalPtxsPerSlotLimit
     let toResubmit =
             take (min 1 ptxsPerSlotLimit) $  -- for now the limit will be 1,
@@ -134,11 +141,11 @@ processPtxsToResubmit pm db submitTx _curSlot ptxs = do
             filter (has _PtxApplying . _ptxCond) $
             ptxs
     unless (null toResubmit) $ do
-        logInfo $ "We are going to resubmit some transactions"
-        logInfoSP $ \sl -> sformat (fmt sl) (map _ptxTxId toResubmit)
+        logInfo logTrace $ "We are going to resubmit some transactions"
+        logInfoSP logTrace $ \sl -> sformat (fmt sl) (map _ptxTxId toResubmit)
     when (null toResubmit) $
-        logDebug "There are no transactions to resubmit"
-    resubmitPtxsDuringSlot pm db submitTx toResubmit
+        logDebug logTrace "There are no transactions to resubmit"
+    resubmitPtxsDuringSlot logTrace pm db submitTx toResubmit
   where
     fmt sl = "Transactions to resubmit on current slot: "%secureListF sl listJson
     evalPtxsPerSlotLimit = do
@@ -146,7 +153,7 @@ processPtxsToResubmit pm db submitTx _curSlot ptxs = do
         let limit = fromIntegral $
                 convertUnit slotDuration `div` pendingTxResubmitionPeriod
         when (limit <= 0) $
-            logInfo "'pendingTxResubmitionPeriod' is larger than slot duration,\
+            logInfo logTrace "'pendingTxResubmitionPeriod' is larger than slot duration,\
                     \ won't resubmit any pending transaction"
         return limit
 
@@ -154,42 +161,45 @@ processPtxsToResubmit pm db submitTx _curSlot ptxs = do
 -- if needed.
 processPtxs
     :: MonadPendings ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> WalletDB
     -> (TxAux -> m Bool)
     -> SlotId
     -> [PendingTx]
     -> m ()
-processPtxs pm db submitTx curSlot ptxs = do
-    mapM_ (processPtxInNewestBlocks db) ptxs
+processPtxs logTrace pm db submitTx curSlot ptxs = do
+    mapM_ (processPtxInNewestBlocks logTrace db) ptxs
     if walletTxCreationDisabled
-    then logDebug "Transaction resubmission is disabled"
-    else processPtxsToResubmit pm db submitTx curSlot ptxs
+    then logDebug logTrace "Transaction resubmission is disabled"
+    else processPtxsToResubmit logTrace pm db submitTx curSlot ptxs
 
 processPtxsOnSlot
     :: MonadPendings ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> WalletDB
     -> (TxAux -> m Bool)
     -> SlotId
     -> m ()
-processPtxsOnSlot pm db submitTx curSlot = do
+processPtxsOnSlot logTrace pm db submitTx curSlot = do
     ws <- getWalletSnapshot db
     let ptxs = getPendingTxs ws
     let sortedPtxs = getOldestFirst $ sortPtxsChrono ptxs
-    processPtxs pm db submitTx curSlot sortedPtxs
+    processPtxs logTrace pm db submitTx curSlot sortedPtxs
 
 -- | On each slot this takes several pending transactions and resubmits them if
 -- needed and possible.
 startPendingTxsResubmitter
     :: MonadPendings ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> WalletDB
     -> (TxAux -> m Bool)
     -> m ()
-startPendingTxsResubmitter pm db submitTx =
-    setLogger $ onNewSlot onsp (processPtxsOnSlot pm db submitTx)
+startPendingTxsResubmitter logTrace0 pm db submitTx =
+    onNewSlot logTrace onsp (processPtxsOnSlot logTrace pm db submitTx)
   where
-    setLogger = modifyLoggerName (<> "tx" <> "resubmitter")
+    logTrace = appendName "tx.resubmitter" logTrace0
     onsp :: OnNewSlotParams
     onsp = defaultOnNewSlotParams { onspStartImmediately = False }

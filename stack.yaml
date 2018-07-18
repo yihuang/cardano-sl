@@ -42,6 +42,7 @@ packages:
 - explorer
 - node
 - tools
+- utxo
 - wallet
 - wallet-new # The new (unreleased) version of the wallet
 - node-ipc

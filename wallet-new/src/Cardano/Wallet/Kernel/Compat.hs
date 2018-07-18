@@ -5,10 +5,13 @@
 {-# LANGUAGE RankNTypes #-}
 
 module Cardano.Wallet.Kernel.Compat
-  ( runDBReadT
+  ( DBReadT(DBReadT, unDBReadT)
+  , runDBReadT
   ) where
 
 import Universum
+import Control.Monad.IO.Unlift
+  (MonadUnliftIO(askUnliftIO), unliftIO, UnliftIO(UnliftIO), withUnliftIO)
 import Control.Monad.Trans.Class (MonadTrans)
 import Control.Monad.Trans.Reader (ReaderT(ReaderT), runReaderT)
 import Control.Monad.Trans.Resource (transResourceT)
@@ -31,7 +34,11 @@ import Pos.DB.Rocks.Types (MonadRealDB, NodeDBs)
 -- | This monad transformer exists solely to provide a 'MonadRealDB' instance,
 -- as required by upstream libraries.
 newtype DBReadT m a = DBReadT { unDBReadT :: ReaderT NodeDBs m a }
-  deriving (Functor, Applicative, Monad, MonadThrow, MonadTrans)
+  deriving (Functor, Applicative, Monad, MonadThrow, MonadTrans, MonadIO)
+
+instance MonadUnliftIO m => MonadUnliftIO (DBReadT m) where
+  askUnliftIO =
+    DBReadT (withUnliftIO (\u -> pure (UnliftIO (unliftIO u . unDBReadT))))
 
 instance (HasConfiguration, MonadThrow (DBReadT m), MonadRealDB NodeDBs (ReaderT NodeDBs m))
     => MonadDBRead (DBReadT m) where

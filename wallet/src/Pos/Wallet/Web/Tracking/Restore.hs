@@ -37,14 +37,6 @@ restoreWallet :: ( WalletDbReader ctx m
                  , MonadSlotsData ctx m
                  , MonadUnliftIO m
                  ) => WalletDecrCredentials -> m ()
-restoreWallet :: ( WalletDbReader ctx m
-                 , MonadDBRead m
-                 , WithLogger m
-                 , HasLens SyncQueue ctx SyncQueue
-                 , MonadSlotsData ctx m
-                 , MonadUnliftIO m
-                 ) => WalletDecrCredentials -> m ()
-restoreWallet credentials = do
 restoreWallet credentials = do
     db <- askWalletDB
     let (_, walletId) = credentials

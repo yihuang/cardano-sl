@@ -51,7 +51,6 @@ import           Pos.Txp (GenericTxpLocalData, MonadTxpMem, TxAux, TxId,
                      UndoMap, applyUtxoModToAddrCoinMap, getLocalTxs,
                      getLocalUndos, withTxpLocalData)
 import           Pos.Util (maybeThrow)
---import qualified Pos.Util.Log as Log
 import qualified Pos.Util.Modifier as MM
 import           Pos.Util.Servant (encodeCType)
 import           Pos.Util.Trace.Named (TraceNamed)
@@ -86,7 +85,6 @@ import           Pos.Wallet.Web.Util (decodeCTypeOrFail, getAccountAddrsOrThrow,
 type MonadWalletLogicRead ctx m =
     ( MonadIO m
     , MonadThrow m
-    --, Log.WithLogger m        -- new logging context
     , MonadRandom m
     , MonadSlots ctx m
     , MonadKeysRead m

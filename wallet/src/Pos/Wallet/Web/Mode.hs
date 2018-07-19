@@ -53,17 +53,17 @@ import           Pos.DB.Rocks (dbDeleteDefault, dbGetDefault,
                      dbIterSourceDefault, dbPutDefault, dbWriteBatchDefault)
 import           Pos.Infra.Network.Types (HasNodeType (..))
 import           Pos.Infra.Recovery.Info (MonadRecoveryInfo)
+import           Pos.Infra.Reporting (HasMisbehaviorMetrics (..),
+                     MonadReporting (..), Reporter (..))
+import           Pos.Infra.Shutdown (HasShutdownContext (..))
+import           Pos.Infra.Slotting.Class (HasSlottingVar (..), MonadSlots (..),
+                     MonadSlotsData)
 import           Pos.Infra.Slotting.Impl (currentTimeSlottingSimple,
                      getCurrentSlotBlockingSimple,
                      getCurrentSlotInaccurateSimple, getCurrentSlotSimple)
 import           Pos.Infra.StateLock (StateLock)
 import           Pos.Launcher (HasConfigurations)
 import           Pos.Recovery ()
-import           Pos.Sinbin.Reporting (HasMisbehaviorMetrics (..),
-                     MonadReporting (..), Reporter (..))
-import           Pos.Sinbin.Shutdown (HasShutdownContext (..))
-import           Pos.Sinbin.Slotting.Class (HasSlottingVar (..),
-                     MonadSlots (..), MonadSlotsData)
 import           Pos.Ssc.Types (HasSscContext (..))
 import           Pos.Txp (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..),
                      MonadTxpMem, Utxo, addrBelongsToSet,

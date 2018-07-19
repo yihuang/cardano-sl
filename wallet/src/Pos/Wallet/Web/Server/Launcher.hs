@@ -21,7 +21,8 @@ import           Universum
 import           Network.Wai (Application)
 import           Network.Wai.Handler.Warp (Settings)
 import           Serokell.AcidState.ExtendedState (ExtendedState)
-import           Servant.Server (Handler, Server, serve)
+import           Servant.Server (Context (..), Handler, Server,
+                     serveWithContext)
 
 import qualified Data.ByteString.Char8 as BS8
 
@@ -34,8 +35,7 @@ import           Pos.Infra.Diffusion.Types (Diffusion (sendTx))
 import           Pos.Infra.Util.TimeWarp (NetworkAddress)
 import           Pos.Util (bracketWithTrace)
 import           Pos.Util.CompileInfo (HasCompileInfo)
---import           Pos.Util.Trace (natTrace)
-import           Pos.Util.Trace.Named (TraceNamed, logInfo)
+import           Pos.Util.Trace.Named (TraceNamed, appendName, logInfo)
 import           Pos.Wallet.Web.Account (findKey, myRootAddresses)
 import           Pos.Wallet.Web.Api (WalletSwaggerApi, swaggerWalletApi)
 import           Pos.Wallet.Web.Mode (MonadFullWalletWebMode,
@@ -76,11 +76,13 @@ walletApplication
     :: ( MonadWalletWebMode ctx m
        , MonadWalletWebSockets ctx m)
     => TraceNamed IO
-    -> m (Server (WalletSwaggerApi (TraceNamed m)))
+    -> m (Server WalletSwaggerApi)
     -> m Application
 walletApplication logTrace serv = do
     wsConn <- getWalletWebSockets
-    upgradeApplicationWS logTrace wsConn . serve (swaggerWalletApi logTrace) <$> serv
+    upgradeApplicationWS logTrace wsConn . serveWithContext swaggerWalletApi (logTrace' :. EmptyContext) <$> serv
+      where
+        logTrace' = appendName "servant" logTrace
 
 walletServer
     :: forall ctx m.
@@ -90,7 +92,7 @@ walletServer
     -> Diffusion m
     -> TVar NtpStatus
     -> (forall x. m x -> Handler x)
-    -> m (Server (WalletSwaggerApi (TraceNamed m)))
+    -> m (Server WalletSwaggerApi)
 walletServer logTrace pm diffusion ntpStatus nat = do
     mapM_ (findKey >=> syncWallet . eskToWalletDecrCredentials) =<< myRootAddresses
     return $ servantHandlersWithSwagger logTrace pm ntpStatus submitTx nat

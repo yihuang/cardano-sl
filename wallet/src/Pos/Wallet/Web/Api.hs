@@ -65,7 +65,6 @@ import           Pos.Util.Servant (ApiLoggingConfig (..), CCapture, CQueryParam,
                      ModifiesApiRes (..), ReportDecodeError (..), VerbMod,
                      serverHandlerL')
 import           Pos.Util.Trace (noTrace)
-import           Pos.Util.Trace.Named (TraceNamed)
 import           Pos.Wallet.Web.ClientTypes (Addr, CAccount, CAccountId,
                      CAccountInit, CAccountMeta, CAddress, CCoin, CFilePath,
                      CId, CInitialized, CPaperVendWalletRedeem, CPassPhrase,
@@ -92,14 +91,12 @@ instance ReportDecodeError (WalletVerb (Verb (mt :: k1) (st :: Nat) (ct :: [*]) 
     reportDecodeError _ err = throwM (DecodeError err) ^. from serverHandlerL'
 
 -- | Specifes servant logging config.
-data WalletLoggingConfig m
-  -- = WalletLoggingConfig
-  --  { _trace :: TraceNamed m }
+data WalletLoggingConfig
 
 -- If logger config will ever be determined in runtime, 'Data.Reflection.reify'
 -- can be used.
-instance Reifies (WalletLoggingConfig m) ApiLoggingConfig where
-    reflect _ = ApiLoggingConfig $ noTrace    -- TODO pass on the trace
+instance Reifies (WalletLoggingConfig ) ApiLoggingConfig where
+  reflect _ = ApiLoggingConfig ("node" <> "wallet" <> "servant")
 
 -- | Shortcut for common api result types.
 type WRes verbType a = WalletVerb (verbType '[JSON] a)
@@ -112,14 +109,14 @@ type SwaggerApi =
     -- this serves both: swagger.json and swagger-ui
     SwaggerSchemaUI "docs" "swagger.json"
 
-type WalletSwaggerApi m =
-     LoggingApi (WalletLoggingConfig m) WalletApi
+type WalletSwaggerApi =
+     LoggingApi WalletLoggingConfig WalletApi
     :<|>
      SwaggerApi
 
 -- | Helper Proxy.
-swaggerWalletApi :: TraceNamed m -> Proxy (WalletSwaggerApi (m a))
-swaggerWalletApi _ = Proxy
+swaggerWalletApi :: Proxy WalletSwaggerApi
+swaggerWalletApi = Proxy
 
 ----------------------------------------------------------------------------
 -- Wallet API

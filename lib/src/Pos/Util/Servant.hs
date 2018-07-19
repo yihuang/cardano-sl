@@ -1,6 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes       #-}
 {-# LANGUAGE DataKinds                 #-}
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts          #-}
 {-# LANGUAGE KindSignatures            #-}
 {-# LANGUAGE Rank2Types                #-}
 {-# LANGUAGE TypeFamilies              #-}
@@ -58,7 +59,8 @@ import           Universum hiding (id)
 
 --import           Control.Exception.Safe (handleAny)
 import           Control.Lens (Iso, iso, makePrisms)
-import           Control.Monad.Except (ExceptT (..), MonadError (..))
+import           Control.Monad.Except (ExceptT (..), MonadError (..),
+                     catchError, throwError)
 import           Data.Constraint ((\\))
 import           Data.Constraint.Forall (Forall, inst)
 import           Data.Default (Default (..))
@@ -70,7 +72,6 @@ import           Formatting (bprint, build, builder, fconst, formatToString,
                      sformat, shown, stext, string, (%))
 import           GHC.IO.Unsafe (unsafePerformIO)
 import           GHC.TypeLits (KnownSymbol, symbolVal)
-import           Pos.Util.Log (LoggerName)
 import           Serokell.Util (listJsonIndent)
 import           Serokell.Util.ANSI (Color (..), colorizeDull)
 import           Servant.API ((:<|>) (..), (:>), Capture, Description,
@@ -78,21 +79,19 @@ import           Servant.API ((:<|>) (..), (:>), Capture, Description,
 import           Servant.Client (Client, HasClient (..))
 import           Servant.Client.Core (RunClient)
 import           Servant.Server (Handler (..), HasServer (..), ServantErr (..),
-                     Server, runHandler)
+                     Server)
 import qualified Servant.Server.Internal as SI
 import           Servant.Swagger (HasSwagger (toSwagger))
 
 import           Pos.Util.Log.LogSafe (BuildableSafe, SecureLog, SecuredText,
                      buildSafe, plainOrSecureF, secretOnlyF)
-import           Pos.Util.Trace (natTrace, noTrace)
+import           Pos.Util.Trace (natTrace)
 import           Pos.Util.Trace.Named (TraceNamed, logInfoSP)
 
 -------------------------------------------------------------------------
 -- Utility functions
 -------------------------------------------------------------------------
 
---  Iso s t a b
---  iso (s->a) (b->t) = Iso s t a b
 serverHandlerL :: Iso (Handler a) (Handler b) (ExceptT ServantErr IO a) (ExceptT ServantErr IO b)
 serverHandlerL = iso runHandler' Handler
 
@@ -356,10 +355,10 @@ data LoggingApi config api
 -- | Helper to traverse servant api and apply logging.
 data LoggingApiRec config api
 
-newtype ApiLoggingConfig m = ApiLoggingConfig
-    { --apiLoggerName :: LoggerName
-      apiLogTrace :: TraceNamed m
-    } -- deriving Show
+newtype ApiLoggingConfig = ApiLoggingConfig
+    {
+      apiLogTrace :: TraceNamed IO
+    }
 
 -- | Used to incrementally collect info about passed parameters.
 data ApiParamsLogInfo
@@ -423,8 +422,7 @@ instance ( HasServer (LoggingApiRec config api) ctx
 -- in actual 'HasServer' instance once and forever.
 class HasServer api ctx => HasLoggingServer config api ctx where
     routeWithLog
-        :: TraceNamed (ExceptT ServantErr IO)       -- log through Trace
-        -> Proxy (LoggingApiRec config api)
+        :: Proxy (LoggingApiRec config api)
         -> SI.Context ctx
         -> SI.Delayed env (Server (LoggingApiRec config api))
         -> SI.Router env
@@ -434,7 +432,7 @@ instance HasLoggingServer config api ctx =>
     type ServerT (LoggingApiRec config api) m =
          (ApiParamsLogInfo, ServerT api m)
 
-    route = routeWithLog noTrace
+    route = routeWithLog
 
     hoistServerWithContext _ pc nt s =
         hoistServerWithContext (Proxy :: Proxy api) pc nt <$> s
@@ -443,7 +441,7 @@ instance ( HasLoggingServer config api1 ctx
          , HasLoggingServer config api2 ctx
          ) =>
          HasLoggingServer config (api1 :<|> api2) ctx where
-    routeWithLog logTrace =
+    routeWithLog =
         inRouteServer
             @(LoggingApiRec config api1 :<|> LoggingApiRec config api2)
             route $
@@ -453,7 +451,7 @@ instance ( KnownSymbol path
          , HasLoggingServer config res ctx
          ) =>
          HasLoggingServer config (path :> res) ctx where
-    routeWithLog logTrace =
+    routeWithLog =
         inRouteServer @(path :> LoggingApiRec config res) route $
         first updateParamsInfo
       where
@@ -506,12 +504,11 @@ paramRouteWithLog
        , ApiCanLogArg subApi
        , BuildableSafe (ApiArgToLog subApi)
        )
-    => TraceNamed (ExceptT ServantErr IO)
-    -> Proxy (LoggingApiRec config api)
+    => Proxy (LoggingApiRec config api)
     -> SI.Context ctx
     -> SI.Delayed env (Server (LoggingApiRec config api))
     -> SI.Router env
-paramRouteWithLog logTrace =
+paramRouteWithLog =
     inRouteServer @(subApi :> LoggingApiRec config res) route $
         \(paramsInfo, f) a -> (a `updateParamsInfo` paramsInfo, f a)
   where
@@ -535,11 +532,11 @@ instance ( HasServer (subApi :> res) ctx
 
 instance HasLoggingServer config res ctx =>
          HasLoggingServer config (Summary s :> res) ctx where
-    routeWithLog logTrace = inRouteServer @(Summary s :> LoggingApiRec config res) route identity
+    routeWithLog = inRouteServer @(Summary s :> LoggingApiRec config res) route identity
 
 instance HasLoggingServer config res ctx =>
          HasLoggingServer config (Description d :> res) ctx where
-    routeWithLog logTrace = inRouteServer @(Description d :> LoggingApiRec config res) route identity
+    routeWithLog = inRouteServer @(Description d :> LoggingApiRec config res) route identity
 
 
 -- | Unique identifier for request-response pair.
@@ -564,17 +561,16 @@ applyServantLogging
     :: ( MonadIO m
        , MonadCatch m
        , MonadError ServantErr m
-       , Reifies config (ApiLoggingConfig m)
+       , Reifies config ApiLoggingConfig
        , ReflectMethod (method :: k)
        )
-    => TraceNamed m
-    -> Proxy config
+    => Proxy config
     -> Proxy method
     -> ApiParamsLogInfo
     -> (a -> Text)
     -> m a
     -> m a
-applyServantLogging logTrace configP methodP paramsInfo showResponse action = do
+applyServantLogging configP methodP paramsInfo showResponse action = do
     timer <- mkTimer
     reqId <- nextRequestId
     catchErrors reqId timer $ do
@@ -598,10 +594,9 @@ applyServantLogging logTrace configP methodP paramsInfo showResponse action = do
         return $ do
             endTime <- liftIO getPOSIXTime
             return $ sformat shown (endTime - startTime)
-    --inLogCtx :: LoggerNameBox m a -> m a
-    --inLogCtx logAction = do
-    --    let ApiLoggingConfig{..} = reflect configP
-    --    usingLoggerName apiLoggingHandler apiLoggerName logAction
+    logTrace = do
+        let ApiLoggingConfig{..} = reflect configP
+        (natTrace liftIO apiLogTrace)
     eParamLogs :: Either Text SecuredText
     eParamLogs = case paramsInfo of
         ApiParamsLogInfo info -> Right $ \sl ->
@@ -610,7 +605,6 @@ applyServantLogging logTrace configP methodP paramsInfo showResponse action = do
                     (colorizeDull White ":>")
                     (securedParamsInfo sl)
         ApiNoParamsLogInfo why -> Left why
-    --reportRequest :: MonadIO m => RequestId -> m ()
     reportRequest reqId =
         case eParamLogs of
             Left e ->
@@ -656,53 +650,45 @@ applyServantLogging logTrace configP methodP paramsInfo showResponse action = do
         throwM e
 
 applyLoggingToHandler
-    :: forall config method a m.
+    :: forall config method a.
        ( Buildable (WithTruncatedLog a)
-       , MonadIO m
-       , Reifies config (ApiLoggingConfig m)
+       , Reifies config ApiLoggingConfig
        , ReflectMethod method
        )
-    => TraceNamed (ExceptT ServantErr IO)
-    -> Proxy config
+    => Proxy config
     -> Proxy (method :: k)
     -> (ApiParamsLogInfo, Handler a)
     -> Handler a
-applyLoggingToHandler logTrace configP methodP (paramsInfo, handler) =
+applyLoggingToHandler configP methodP (paramsInfo, handler) =
     handler & serverHandlerL %~ withLogging paramsInfo
-    --handler & (runExceptT serverHandlerL) %~ withLogging paramsInfo
-    --runExceptT $ withLogging paramsInfo (serverHandlerL handler)
   where
-    --srvhndlr = runHandler' . serverHandlerL
     display = sformat build . WithTruncatedLog
-    -- withLogging :: ApiParamsLogInfo -> m a -> m a
-    withLogging params = applyServantLogging logTrace configP methodP params display
+    withLogging params = applyServantLogging configP methodP params display
 
 instance ( HasServer (Verb mt st ct a) ctx
-         , MonadIO m
-         , Reifies config (ApiLoggingConfig m)
+         , Reifies config ApiLoggingConfig
          , ReflectMethod mt
          , Buildable (WithTruncatedLog a)
          ) =>
          HasLoggingServer config (Verb (mt :: k) (st :: Nat) (ct :: [*]) a) ctx where
-    routeWithLog logTrace =
+    routeWithLog =
         inRouteServer @(Verb mt st ct a) route $
-        applyLoggingToHandler logTrace (Proxy @config) (Proxy @mt)
+        applyLoggingToHandler (Proxy @config) (Proxy @mt)
 
 instance ( HasServer (Verb mt st ct $ ApiModifiedRes mod a) ctx
          , HasServer (VerbMod mod (Verb mt st ct a)) ctx
          , ModifiesApiRes mod
          , ReflectMethod mt
-         , MonadIO m
-         , Reifies config (ApiLoggingConfig m)
+         , Reifies config ApiLoggingConfig
          , Buildable (WithTruncatedLog $ ApiModifiedRes mod a)
          ) =>
          HasLoggingServer config (VerbMod mod (Verb (mt :: k1) (st :: Nat) (ct :: [*]) a)) ctx where
-    routeWithLog logTrace =
+    routeWithLog =
         -- TODO [CSM-466] avoid manually rewriting rule for composite api modification
         inRouteServer @(Verb mt st ct $ ApiModifiedRes mod a) route $
         \(paramsInfo, handler) ->
             handler & serverHandlerL' %~ modifyApiResult (Proxy @mod)
-                    & applyLoggingToHandler logTrace (Proxy @config) (Proxy @mt) . (paramsInfo, )
+                    & applyLoggingToHandler (Proxy @config) (Proxy @mt) . (paramsInfo, )
 
 instance ReportDecodeError api =>
          ReportDecodeError (LoggingApiRec config api) where

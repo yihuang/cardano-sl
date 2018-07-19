@@ -33,6 +33,7 @@ import           Pos.Launcher.Configuration (HasConfigurations)
 import           Pos.Launcher.Resource (NodeResources (..))
 import           Pos.Launcher.Runner (runRealMode)
 import           Pos.Util.CompileInfo (HasCompileInfo)
+import qualified Pos.Util.Log as Log
 import           Pos.Util.Trace.Named (TraceNamed, logInfo)
 import           Pos.Util.Util (HasLens (..))
 import           Pos.Wallet.WalletMode (WalletMempoolExt)
@@ -53,15 +54,17 @@ runWRealMode
        ( HasConfigurations
        , HasCompileInfo
        )
-    => ProtocolMagic
+    => TraceNamed IO
+    -> Log.LoggingHandler
+    -> ProtocolMagic
     -> WalletDB
     -> ConnectionsVar
     -> SyncQueue
     -> NodeResources WalletMempoolExt
     -> (Diffusion WalletWebMode -> WalletWebMode a)
     -> Production a
-runWRealMode pm db conn syncRequests res action = Production $
-    runRealMode pm res $ \diffusion ->
+runWRealMode logTrace lh pm db conn syncRequests res action = --Production $
+    runRealMode logTrace lh pm res $ \diffusion ->
         walletWebModeToRealMode db conn syncRequests $
             action (hoistDiffusion realModeToWalletWebMode (walletWebModeToRealMode db conn syncRequests) diffusion)
 
@@ -111,7 +114,7 @@ convertHandler wwmc handler =
     excHandlers = [E.Handler catchServant]
     catchServant = throwError
 
-notifierPlugin :: (HasConfigurations) => WalletWebMode ()
-notifierPlugin = do
+notifierPlugin :: (HasConfigurations) => TraceNamed IO -> WalletWebMode ()
+notifierPlugin logTrace = do
     wwmc <- walletWebModeContext
-    launchNotifier (convertHandler wwmc)
+    launchNotifier logTrace (convertHandler wwmc)

@@ -43,7 +43,7 @@ servantHandlersWithSwagger
     -> TVar NtpStatus
     -> (TxAux -> m Bool)
     -> (forall x. m x -> Handler x)
-    -> Server A.WalletSwaggerApi
+    -> Server (A.WalletSwaggerApi (TraceNamed m))
 servantHandlersWithSwagger logTrace pm ntpStatus submitTx nat =
     hoistServer A.walletApi nat (servantHandlers logTrace pm ntpStatus submitTx)
    :<|>

@@ -12,7 +12,7 @@ import qualified Control.Concurrent.STM as STM
 --import           Pos.Util.Log (WithLogger)
 
 import           Pos.DB (MonadDBRead)
-import           Pos.Sinbin.Slotting (MonadSlots)
+import           Pos.Infra.Slotting (MonadSlots)
 import           Pos.Ssc.Types (SscState (..))
 
 -- Reexports

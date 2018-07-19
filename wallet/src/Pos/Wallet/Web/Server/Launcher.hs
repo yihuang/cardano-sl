@@ -34,7 +34,7 @@ import           Pos.Infra.Diffusion.Types (Diffusion (sendTx))
 import           Pos.Infra.Util.TimeWarp (NetworkAddress)
 import           Pos.Util (bracketWithTrace)
 import           Pos.Util.CompileInfo (HasCompileInfo)
-import           Pos.Util.Trace (natTrace)
+--import           Pos.Util.Trace (natTrace)
 import           Pos.Util.Trace.Named (TraceNamed, logInfo)
 import           Pos.Wallet.Web.Account (findKey, myRootAddresses)
 import           Pos.Wallet.Web.Api (WalletSwaggerApi, swaggerWalletApi)
@@ -76,11 +76,11 @@ walletApplication
     :: ( MonadWalletWebMode ctx m
        , MonadWalletWebSockets ctx m)
     => TraceNamed IO
-    -> m (Server WalletSwaggerApi)
+    -> m (Server (WalletSwaggerApi (TraceNamed m)))
     -> m Application
 walletApplication logTrace serv = do
     wsConn <- getWalletWebSockets
-    upgradeApplicationWS logTrace wsConn . serve swaggerWalletApi <$> serv
+    upgradeApplicationWS logTrace wsConn . serve (swaggerWalletApi logTrace) <$> serv
 
 walletServer
     :: forall ctx m.
@@ -90,7 +90,7 @@ walletServer
     -> Diffusion m
     -> TVar NtpStatus
     -> (forall x. m x -> Handler x)
-    -> m (Server WalletSwaggerApi)
+    -> m (Server (WalletSwaggerApi (TraceNamed m)))
 walletServer logTrace pm diffusion ntpStatus nat = do
     mapM_ (findKey >=> syncWallet . eskToWalletDecrCredentials) =<< myRootAddresses
     return $ servantHandlersWithSwagger logTrace pm ntpStatus submitTx nat

@@ -28,8 +28,9 @@ import           Database.Beam.Backend.SQL (FromBackendRow,
                      varCharType)
 import           Database.Beam.Backend.SQL.SQL92 (Sql92OrderingExpressionSyntax,
                      Sql92SelectOrderingSyntax)
-import           Database.Beam.Query (HasSqlEqualityCheck, (&&.), (<.), (<=.),
-                     (==.), (>.), (>=.), (||.))
+import           Database.Beam.Query (HasSqlEqualityCheck, (&&.), (==.))
+--                     , (&&.), (<.), (<=.),
+--                      (>.), (>=.))
 import qualified Database.Beam.Query as SQL
 import qualified Database.Beam.Query.Internal as SQL
 import           Database.Beam.Schema (Beamable, Database, DatabaseSettings,
@@ -57,10 +58,9 @@ import           Database.Beam.Migrate (CheckedDatabaseSettings, DataType (..),
 import           Formatting (sformat)
 import           GHC.Generics (Generic)
 
-import           Cardano.Wallet.Kernel.DB.TxMeta.Types (AccountFops,
-                     FilterOperation (..), FilterOrdering (..), Limit (..),
-                     Offset (..), SortCriteria (..), SortDirection (..),
-                     Sorting (..))
+import           Cardano.Wallet.Kernel.DB.TxMeta.Types (AccountFops (..),
+                     FilterOperation (..), Limit (..), Offset (..),
+                     SortCriteria (..), SortDirection (..), Sorting (..))
 import qualified Cardano.Wallet.Kernel.DB.TxMeta.Types as Kernel
 import qualified Pos.Core as Core
 import           Pos.Crypto.Hashing (decodeAbstractHash, hashHexF)
@@ -228,6 +228,8 @@ instance HasSqlValueSyntax SqliteValueSyntax Core.Address where
 
 
 instance HasSqlEqualityCheck SqliteExpressionSyntax Core.TxId
+
+instance HasSqlEqualityCheck SqliteExpressionSyntax Core.Address
 
 instance FromField Core.TxId where
     fromField f = do
@@ -408,6 +410,7 @@ toTxMeta txMeta inputs outputs = Kernel.TxMeta {
     , _txMetaIsLocal    = _txMetaTableIsLocal txMeta
     , _txMetaIsOutgoing = _txMetaTableIsOutgoing txMeta
     , _txMetaAccountId  = _txMetaTableAccountId txMeta
+    , _txMetaWalletId   = _txMetaTableWalletId txMeta
     }
     where
         -- | Reifies the input 'TxCoinDistributionTableT' into a tuple suitable
@@ -456,7 +459,7 @@ getTxMetas :: Sqlite.Connection
            -> FilterOperation Core.Timestamp
            -> Maybe Sorting
            -> IO [Kernel.TxMeta]
-getTxMetas conn (Offset offset) (Limit limit) accountFops fopTxId _ mbSorting = do
+getTxMetas conn (Offset offset) (Limit limit) accountFops _ _ mbSorting = do
     res <- Sqlite.runDBAction $ runBeamSqlite conn $ do
         metasWithInputs  <- nonEmpty <$> SQL.runSelectReturningList paginatedInputs
         metasWithOutputs <- nonEmpty <$> SQL.runSelectReturningList paginatedOutputs
@@ -496,20 +499,53 @@ getTxMetas conn (Offset offset) (Limit limit) accountFops fopTxId _ mbSorting = 
         -- Doing two separaste queries is yes more I/O taxing, but spares us from doing
         -- duplicate filtering on the Haskell side.
         paginatedInputs = SQL.select $ do
-            meta   <- SQL.limit_ limit (SQL.offset_ offset metaQuery)
-            SQL.guard_ $ exprTxId meta
+            meta <- SQL.limit_ limit (SQL.offset_ offset metaQuery)
+            SQL.guard_ $ filterAccs meta accountFops
+            SQL.guard_ $ SQL.QExpr (pure (valueE (sqlValueSyntax True)))
+--            SQL.guard_ $ filterTxId meta
+--            SQL.guard_ $ filterTimestamp meta
 --            SQL.guard $ error "TODO" -- exprDate meta
---            SQL.guard_ $ mkExpr meta
-            inputs  <- SQL.oneToMany_ (_mDbInputs metaDB)  (getTx _getTxInput) meta
+            SQL.guard_ $ mkExpr meta
+            inputs  <- SQL.oneToMany_ (_mDbInputs metaDB) (getTx _getTxInput) meta
             pure (meta, inputs)
 
         paginatedOutputs = SQL.select $ do
-            meta   <- SQL.limit_ limit (SQL.offset_ offset metaQuery)
+            meta <- SQL.limit_ limit (SQL.offset_ offset metaQuery)
+--            SQL.guard_ $ filterTxId meta
 --            SQL.guard_ $ mkExpr meta
             outputs <- SQL.oneToMany_ (_mDbOutputs metaDB) (getTx _getTxOutput) meta
             pure (meta, outputs)
+--        x = SQL.val_ True
 
-        exprTxId meta =
+--        filterAccs :: TxMetaT
+--            (SQL.QGenExpr
+--            SQL.QValueContext
+--            SqliteExpressionSyntax
+--            Database.Beam.Query.QueryInaccessible) -> AccountFops -> Int
+--        filterAccs :: Int
+        filterAccs _ Everything = SQL.QExpr (pure (valueE (sqlValueSyntax True)))
+        filterAccs meta (AccountFops rootAddr (mbAccountId)) =
+            (_txMetaTableWalletId meta ==. SQL.val_ rootAddr) &&.
+                case mbAccountId of
+                    Nothing -> SQL.QExpr (pure (valueE (sqlValueSyntax True)))
+                    Just accountId -> _txMetaTableAccountId meta ==. SQL.val_ accountId
+
+        mkExpr meta = case Just ([] :: [Kernel.AccountId]) of
+            Nothing         -> SQL.QExpr (pure (valueE (sqlValueSyntax True))) -- SQL.val_ True
+            Just accountIds -> inE expressions
+                where
+                expressions = map (\acc -> (_txMetaTableAccountId meta) ==. SQL.val_ acc) accountIds
+
+        inE es =
+            let tr = (SQL.QExpr (pure (valueE (sqlValueSyntax True))))
+            in
+                fromMaybe tr $
+                    foldl (\expr x ->
+                            Just $ maybe x (\e -> e SQL.||. x) expr)
+                        Nothing es
+
+{-}
+        filterTxId meta =
             let inputData = _txMetaTableId meta
                 byPredicate o i = case o of
                     Equal            -> inputData ==. i
@@ -522,22 +558,28 @@ getTxMetas conn (Offset offset) (Limit limit) accountFops fopTxId _ mbSorting = 
                 FilterByIndex a -> byPredicate Equal (SQL.val_ a)
                 FilterByPredicate ford a -> byPredicate ford (SQL.val_ a)
                 FilterByRange from to -> inputData >=. (SQL.val_ from) &&. inputData <=. (SQL.val_ to)
-                FilterIn arr -> SQL.val_ True -- TODO
-{-}
-        mkExpr meta = case mbAccountIds of
-            Nothing         -> SQL.val_ True
-            Just accountIds -> inE expressions
-              where
-                expressions = map (\acc -> (_txMetaTableAccountId meta) ==. SQL.val_ acc) accountIds
--}
-        inE es =
-          let tr = (SQL.QExpr (pure (valueE (sqlValueSyntax True))))
-          in
-              fromMaybe tr $
-                 foldl (\expr x ->
-                          Just $ maybe x (\e -> e ||. x) expr)
-                       Nothing es
+                FilterIn _ -> SQL.val_ True -- TODO
 
+        filterTimestamp meta =
+            let inputData = _txMetaTableCreatedAt meta
+                byPredicate o i = case o of
+                    Equal            -> inputData ==. i
+                    LesserThan       -> inputData <. i
+                    GreaterThan      -> inputData >. i
+                    LesserThanEqual  -> inputData <=. i
+                    GreaterThanEqual -> inputData >=. i
+            in case fopTimestamp of
+                NoFilterOp -> SQL.val_ True
+                FilterByIndex a -> byPredicate Equal (SQL.val_ a)
+                FilterByPredicate ford a -> byPredicate ford (SQL.val_ a)
+                FilterByRange from to -> inputData >=. (SQL.val_ from) &&. inputData <=. (SQL.val_ to)
+                FilterIn _ -> SQL.val_ True -- TODO
+-}
+--        mkExpr :: Int
+--        TxMetaT (SQL.QExpr SqliteExpressionSyntax Database.Beam.Query.QueryInaccessible)
+--                 -> SQL.QExpr SqliteExpressionSyntax Database.Beam.Query.QueryInaccessible Bool
+                       {-}
+-}
         -- | Groups the inputs or the outputs under the same 'TxMeta'.
         transform :: NonEmpty (TxMeta, a) -> M.Map OrdByCreationDate (NonEmpty a)
         transform = Foldable.foldl' updateFn M.empty

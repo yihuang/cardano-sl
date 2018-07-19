@@ -11,6 +11,7 @@ module Cardano.Wallet.Kernel.Internal (
     PassiveWallet(..)
   , ActiveWallet(..)
   , walletKeystore
+  , walletMeta
   , wallets
   , walletLogMessage
   ) where

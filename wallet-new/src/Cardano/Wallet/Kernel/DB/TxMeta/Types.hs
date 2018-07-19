@@ -138,8 +138,9 @@ isomorphicTo t1 t2 =
         ]
 
 type AccountId = Word32
-
-data AccountFops = Everything | AccountFops Core.Address (Maybe AccountId)
+type WalletId = Core.Address
+-- | Filter Operations on Accounts. This is hiererchical: you can`t have AccountId without WalletId.
+data AccountFops = Everything | AccountFops WalletId (Maybe AccountId)
 
 data InvariantViolation =
         DuplicatedTransactionWithDifferentHash Core.TxId

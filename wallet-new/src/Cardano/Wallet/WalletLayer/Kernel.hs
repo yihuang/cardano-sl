@@ -14,20 +14,18 @@ import           Data.Maybe (fromJust)
 import           Data.Time.Units (Second)
 import           System.Wlog (Severity (Debug))
 
+import           GHC.TypeLits (symbolVal)
 import           Pos.Block.Types (Blund, Undo (..))
 
 import qualified Cardano.Wallet.Kernel as Kernel
 import qualified Cardano.Wallet.Kernel.Addresses as Kernel
 import qualified Cardano.Wallet.Kernel.Transactions as Kernel
 
-import           Cardano.Wallet.Kernel.DB.HdWallet (HdAccountId (..),
-                     HdAccountIx (..), HdRootId (..))
 import qualified Cardano.Wallet.Kernel.DB.HdWallet as HD
 import           Cardano.Wallet.Kernel.DB.InDb (InDb (..))
 import           Cardano.Wallet.Kernel.DB.Resolved (ResolvedBlock)
-import           Cardano.Wallet.Kernel.DB.TxMeta (AccountFops (..),
-                     FilterOperation (..), Limit (..), Offset (..),
-                     TxMeta (..), getTxMetas)
+import           Cardano.Wallet.Kernel.DB.TxMeta (TxMeta (..))
+import qualified Cardano.Wallet.Kernel.DB.TxMeta as TxMeta
 import           Cardano.Wallet.Kernel.Diffusion (WalletDiffusion (..))
 import           Cardano.Wallet.Kernel.Keystore (Keystore)
 import           Cardano.Wallet.Kernel.Types (AccountId (..),
@@ -36,38 +34,31 @@ import           Cardano.Wallet.WalletLayer.ExecutionTimeLimit
                      (limitExecutionTimeTo)
 import           Cardano.Wallet.WalletLayer.Types (ActiveWalletLayer (..),
                      CreateAddressError (..), EstimateFeesError (..),
-                     GetAccountsError (..), GetTxError (..),
-                     NewPaymentError (..), PassiveWalletLayer (..),
-                     WalletLayerError (..))
+                     GetTxError (..), NewPaymentError (..),
+                     PassiveWalletLayer (..), WalletLayerError (..))
 
 import           Cardano.Wallet.Kernel.CoinSelection.FromGeneric
                      (CoinSelectionOptions (..), ExpenseRegulation,
                      InputGrouping, newOptions)
 
+import           Cardano.Wallet.API.Indices
 import           Pos.Core (Address, Coin, decodeTextAddress)
 import qualified Pos.Core as Core
 import           Pos.Core.Chrono (OldestFirst (..))
-import           Pos.Crypto (AbstractHash (AbstractHash),
-                     safeDeterministicKeyGen)
+import           Pos.Crypto (safeDeterministicKeyGen)
 import           Pos.Util.Mnemonic (Mnemonic, mnemonicToSeed)
 
-import           Cardano.Wallet.API.Request (RequestParams (..))
-import           Cardano.Wallet.API.Request.Filter (FilterOperations (..))
-import           Cardano.Wallet.API.Request.Sort (SortOperations (..))
-import           Cardano.Wallet.API.V1.Errors
-import           Cardano.Wallet.API.V1.Types (V1 (..))
+-- import           Cardano.Wallet.API.Request (RequestParams (..))
+-- import           Cardano.Wallet.API.Request.Filter (FilterOperations (..))
+-- import qualified Cardano.Wallet.API.Request.Parameters as Parameters
+import qualified Cardano.Wallet.API.Request.Sort as S
 import qualified Cardano.Wallet.API.V1.Types as V1
 import qualified Cardano.Wallet.Kernel.Actions as Actions
 
-import qualified Data.ByteString as B
 import qualified Data.Map.Strict as Map
-import           Pos.Crypto.Signing
--- import qualified Data.ByteString.Base16 as Base16
-import           Crypto.Hash (digestFromByteString)
--- import qualified Data.HashMap.Strict as HM
-import qualified Data.Text.Encoding as T
 import           Pos.Core as Core
 import qualified Pos.Crypto as Core
+import           Pos.Crypto.Signing
 
 
 import           Cardano.Wallet.API.V1.Types (Payment (..),
@@ -120,7 +111,7 @@ bracketPassiveWallet logFunction keystore f =
             , _pwlDeleteWallet   = error "Not implemented!"
 
             , _pwlCreateAccount  = error "Not implemented!"
-            , _pwlGetAccounts    = getAccounts wallet
+            , _pwlGetAccounts    = error "Not implemented!"
             , _pwlGetAccount     = error "Not implemented!"
             , _pwlUpdateAccount  = error "Not implemented!"
             , _pwlDeleteAccount  = error "Not implemented!"
@@ -142,7 +133,25 @@ bracketPassiveWallet logFunction keystore f =
                                      Right newAddr -> return (Right newAddr)
                                      Left  err     -> return (Left $ CreateAddressError err)
             , _pwlGetAddresses   = error "Not implemented!"
-            , _pwlGetTransactions = getTransactions wallet
+            , _pwlGetTransactions =
+                \ mbWalletId mbAccountIndex _ _ _ sop -> liftIO $ do
+                    case toAccountFops mbWalletId mbAccountIndex of
+                        Left x            -> return $ Left x
+                        Right accountFops -> do
+                            db <- Kernel.getWalletSnapshot wallet
+                            let k = (2000 :: Word)         -- TODO: retrieve this constant from Core
+                            let currentSlot = error "TODO" -- TODO: retrieve this constant from Core
+                            case toSorting sop of
+                                Left err -> return $ Left err
+                                Right mSop -> do
+                                    meta <- TxMeta.getTxMetas (wallet ^. Kernel.walletMeta)
+                                                            (TxMeta.Offset 0)
+                                                            (TxMeta.Limit (fromIntegral (maxBound :: Int)))
+                                                            accountFops
+                                                            TxMeta.NoFilterOp
+                                                            TxMeta.NoFilterOp
+                                                            mSop
+                                    return $ Right $ map (metaToTx db k currentSlot) meta
 
             , _pwlApplyBlocks    = liftIO . invoke . Actions.ApplyBlocks
             , _pwlRollbackBlocks = liftIO . invoke . Actions.RollbackBlocks
@@ -158,90 +167,6 @@ bracketPassiveWallet logFunction keystore f =
         where
             spentOutputs' = map (map fromJust) $ undoTx u
             rightToJust   = either (const Nothing) Just
-
-getAccounts ::  MonadIO m
-            => Kernel.PassiveWallet
-            -> V1.WalletId
-            -> m (Either GetAccountsError [V1.Account])
-getAccounts pwallet walletId@(V1.WalletId wId) = liftIO $ do -- wId
-    case decodeTextAddress wId of
-        Left _         -> return $ Left (GetAccountsErrorDecodingFailed wId)
-        Right rootAddr -> return $ Right [] -- $ Kernel.getAccounts pwallet wID Nothing
-
---    _ <- Kernel.getWalletSnapshotMaybe pwallet mbShnapshot
-    return $ error "TODO"
-
-getTransactions
-    :: MonadIO m
-    => Kernel.PassiveWallet
-    -> Maybe V1.WalletId
-    -> Maybe V1.AccountIndex
-    -> Maybe (V1 Core.Address)
-    -> RequestParams
-    -> FilterOperations V1.Transaction
-    -> SortOperations V1.Transaction
-    -> m (Either GetTxError [V1.Transaction])
-getTransactions pwallet mbWalletId mbAccountIndex _ _ _ _ = liftIO $ do
-    case toAccountFops mbWalletId mbAccountIndex of
-        Left x            -> return $ Left x
-        Right accountFops -> do
-            db <- Kernel.getWalletSnapshot pwallet
-            let k = (2000 :: Word) -- TODO: retrieve this constant
-            let currentSlot = error "TODO" -- TODO: retrieve this constant
-            meta <- getTxMetas (pwallet ^. Kernel.walletMeta) (Offset 0) (Limit 1024) accountFops NoFilterOp NoFilterOp Nothing
-            return $ Right $ map (metaToTx db k currentSlot) meta
-
-toAccountFops :: Maybe V1.WalletId -> Maybe V1.AccountIndex -> Either GetTxError AccountFops
-toAccountFops mbWalletId mbAccountIndex =
-    case (mbWalletId, mbAccountIndex) of
-        (Nothing, Nothing) -> Right Everything
-        (Nothing, Just _)  -> Left GetTxMissingWalletIdError
-        -- AccountIndex doesn`t uniquely identify an Account, so we shouldn`t continue without a WalletId.
-        (Just walletId@(V1.WalletId wId), _) ->
-            case decodeTextAddress wId of
-                Left _         -> Left $ GetTxAddressDecodingFailed wId
-                Right rootAddr -> Right $ AccountFops rootAddr mbAccountIndex
-
--- transformFops :: FilterOperations Transaction -> FilterOperation
--- transformFops = error "TODO"
-
-metaToTx :: Kernel.DB -> Word -> Word -> TxMeta -> V1.Transaction
-metaToTx db k current TxMeta{..} =
-    V1.Transaction {
-        txId = V1 _txMetaId,
-        txConfirmations = confirmations,
-        txAmount = V1 _txMetaAmount,
-        txInputs = toPayDistr <$> _txMetaInputs,
-        txOutputs = toPayDistr <$> _txMetaOutputs,
-        txType = if _txMetaIsLocal then V1.LocalTransaction else V1.ForeignTransaction,
-        txDirection = if _txMetaIsOutgoing then V1.OutgoingTransaction else V1.IncomingTransaction,
-        txCreationTime = V1 _txMetaCreationAt,
-        txStatus = status
-    }
-
-        where
-            hdAccountId = HdAccountId (HD.HdRootId $ InDb _txMetaWalletId)
-                                      (HdAccountIx _txMetaAccountId)
-
-            toPayDistr :: (Address, Coin) -> V1.PaymentDistribution
-            toPayDistr (addr, c) = V1.PaymentDistribution (V1 addr) (V1 c)
-
-            mSlot = Kernel.accountTxSlot db hdAccountId _txMetaId
-            isPending = Kernel.accountIsTxPending db hdAccountId _txMetaId
-
-            (status, confirmations) = dynamicTxMeta mSlot k current isPending
-
-
-dynamicTxMeta :: Maybe SlotId -> Word -> Word -> Bool -> (V1.TransactionStatus, Word)
-dynamicTxMeta mSlot k currentSlot isPending = case isPending of
-    True  -> (V1.Applying, 0)
-    False ->
-      case mSlot of
-        Nothing     -> (V1.WontApply, 0)
-        Just (SlotId (EpochIndex w64) (UnsafeLocalSlotIndex w16)) ->
-          case ((fromIntegral currentSlot) - w64*(fromIntegral k) + (fromIntegral w16) >= fromIntegral k) of -- TODO: fix
-            True  -> (V1.InNewestBlocks, fromIntegral w64) -- TODO: fix
-            False -> (V1.Persisted, fromIntegral w16)      -- TODO: fix
 
 -- | Initialize the active wallet.
 -- The active wallet is allowed to send transactions, as it has the full
@@ -328,3 +253,79 @@ setupPayment grouping regulation payment = do
                  <$> (pmtDestinations payment)
 
     return (opts , accountId , payees)
+
+-- | Type Casting for Account filtering from V1 to MetaData Types.
+toAccountFops :: Maybe V1.WalletId -> Maybe V1.AccountIndex -> Either GetTxError TxMeta.AccountFops
+toAccountFops mbWalletId mbAccountIndex =
+    case (mbWalletId, mbAccountIndex) of
+        (Nothing, Nothing) -> Right TxMeta.Everything
+        (Nothing, Just _)  -> Left GetTxMissingWalletIdError
+        -- AccountIndex doesn`t uniquely identify an Account, so we shouldn`t continue without a WalletId.
+        (Just (V1.WalletId wId), _) ->
+            case decodeTextAddress wId of
+                Left _         -> Left $ GetTxAddressDecodingFailed wId
+                Right rootAddr -> Right $ TxMeta.AccountFops rootAddr mbAccountIndex
+
+metaToTx :: Kernel.DB -> Word -> Word -> TxMeta -> V1.Transaction
+metaToTx db k current TxMeta{..} =
+    V1.Transaction {
+        txId = V1 _txMetaId,
+        txConfirmations = confirmations,
+        txAmount = V1 _txMetaAmount,
+        txInputs = toPayDistr <$> _txMetaInputs,
+        txOutputs = toPayDistr <$> _txMetaOutputs,
+        txType = if _txMetaIsLocal then V1.LocalTransaction else V1.ForeignTransaction,
+        txDirection = if _txMetaIsOutgoing then V1.OutgoingTransaction else V1.IncomingTransaction,
+        txCreationTime = V1 _txMetaCreationAt,
+        txStatus = status
+    }
+
+        where
+            hdAccountId = HD.HdAccountId (HD.HdRootId $ InDb _txMetaWalletId)
+                                      (HD.HdAccountIx _txMetaAccountId)
+
+            toPayDistr :: (Address, Coin) -> V1.PaymentDistribution
+            toPayDistr (addr, c) = V1.PaymentDistribution (V1 addr) (V1 c)
+
+            mSlot = Kernel.accountTxSlot db hdAccountId _txMetaId
+            isPending = Kernel.accountIsTxPending db hdAccountId _txMetaId
+
+            (status, confirmations) = dynamicTxMeta mSlot k current isPending
+
+dynamicTxMeta :: Maybe SlotId -> Word -> Word -> Bool -> (V1.TransactionStatus, Word)
+dynamicTxMeta mSlot k currentSlot isPending = case isPending of
+    True  -> (V1.Applying, 0)
+    False ->
+        case mSlot of
+        Nothing     -> (V1.WontApply, 0)
+        Just (SlotId (EpochIndex w64) (UnsafeLocalSlotIndex w16)) ->
+            case ((fromIntegral currentSlot) - w64*(fromIntegral k) + (fromIntegral w16) >= fromIntegral k) of -- TODO: fix
+            True  -> (V1.InNewestBlocks, fromIntegral w64) -- TODO: fix
+            False -> (V1.Persisted, fromIntegral w16)      -- TODO: fix
+
+toSorting :: S.SortOperations V1.Transaction -> Either GetTxError (Maybe TxMeta.Sorting)
+toSorting S.NoSorts = Right Nothing
+toSorting (S.SortOp (sop :: S.SortOperation ix V1.Transaction) _) =
+    case symbolVal (Proxy @(IndexToQueryParam V1.Transaction ix)) of
+        -- :x :x type-safe?
+        "created_at" -> Right $ Just $ TxMeta.Sorting TxMeta.SortByCreationAt (toSortingDirection sop)
+        txt -> Left $ GetTxInvalidSortingOpearation txt
+
+
+toSortingDirection :: S.SortOperation ix a -> TxMeta.SortDirection
+toSortingDirection (S.SortByIndex srt _) = case srt of
+    S.SortAscending  -> TxMeta.Ascending
+    S.SortDescending -> TxMeta.Descending
+
+{-}
+getTransactions
+    :: MonadIO m
+    => Kernel.PassiveWallet
+    -> Maybe V1.WalletId
+    -> Maybe V1.AccountIndex
+    -> Maybe (V1 Core.Address)
+    -> RequestParams
+    -> FilterOperations V1.Transaction
+    -> SortOperations V1.Transaction
+    -> m (Either GetTxError [V1.Transaction])
+-}

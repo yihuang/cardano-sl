@@ -129,6 +129,8 @@ queryAccountUtxo accountId db
 queryAccountAvailableUtxo :: HdAccountId -> HD.HdQueryErr UnknownHdAccount Utxo
 queryAccountAvailableUtxo accountId db
     = accountAvailableUtxo <$> checkpoint
+    where
+        checkpoint = HD.readHdAccountCurrentCheckpoint accountId db
 
 queryTxSlotId :: Core.TxId -> HdAccountId -> HD.HdQueryErr UnknownHdAccount (Maybe Core.SlotId)
 queryTxSlotId txId accountId db

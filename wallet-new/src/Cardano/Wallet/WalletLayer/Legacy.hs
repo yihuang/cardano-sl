@@ -15,8 +15,7 @@ import           Data.Coerce (coerce)
 
 import           Cardano.Wallet.WalletLayer.Error (WalletLayerError (..))
 import           Cardano.Wallet.WalletLayer.Types (ActiveWalletLayer (..),
-                     CreateAddressError (..), GetAccountsError,
-                     PassiveWalletLayer (..))
+                     CreateAddressError (..), PassiveWalletLayer (..))
 
 import           Cardano.Wallet.API.V1.Migration (migrate)
 import           Cardano.Wallet.API.V1.Migration.Types ()
@@ -231,8 +230,8 @@ pwlCreateAccount wId newAcc@NewAccount{..} = do
 pwlGetAccounts
     :: forall ctx m. (MonadLegacyWallet ctx m)
     => WalletId
-    -> m (Either GetAccountsError [Account])
-pwlGetAccounts wId = Right <$> do
+    -> m [Account]
+pwlGetAccounts wId = do
     cWId        <- migrate wId
     cAccounts   <- V0.getAccounts $ Just cWId
     migrate  cAccounts

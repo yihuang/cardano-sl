@@ -294,6 +294,3 @@ getWalletSnapshotMaybe pwallet mbDB =
     case mbDB of
         Just db -> return db
         Nothing -> getWalletSnapshot pwallet
-
-getAccounts :: PassiveWallet -> Maybe DB -> WalletId -> IO [HdAccountIx]
-getAccounts = error "TODO"

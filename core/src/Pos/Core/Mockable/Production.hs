@@ -48,6 +48,7 @@ import qualified Katip.Monadic as KM
 
 newtype Production t = Production
     { runProduction :: Log.LogContextT IO t
+    -- what about runProduction :: TraceNamed IO -> IO t
     } deriving (Functor, Applicative, Monad)
 
 deriving instance MonadIO Production

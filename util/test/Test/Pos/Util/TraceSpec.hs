@@ -5,12 +5,13 @@ where
 import           Universum hiding (replicate)
 
 import           Control.Concurrent (threadDelay)
+import           Control.Monad (when)
 
 import           Data.Text (append, replicate)
 import           Data.Time.Clock.POSIX (POSIXTime, getPOSIXTime)
 import           Data.Time.Units (Microsecond, fromMicroseconds)
 import           Test.Hspec (Spec, describe, it)
-import           Test.Hspec.Core.QuickCheck (modifyMaxSize, modifyMaxSuccess)
+import           Test.Hspec.QuickCheck (modifyMaxSize, modifyMaxSuccess)
 import           Test.QuickCheck (Property, property)
 import           Test.QuickCheck.Monadic (assert, monadicIO, run)
 
@@ -21,6 +22,8 @@ import           Pos.Util.LoggerConfig (defaultInteractiveConfiguration,
 import qualified Pos.Util.Trace as Tr
 import qualified Pos.Util.Trace.Named as Tn
 import qualified Pos.Util.Trace.Unstructured as Tu
+
+{-# ANN module ("HLint: ignore Reduce duplication" :: String) #-}
 
 nominalDiffTimeToMicroseconds :: POSIXTime -> Microsecond
 nominalDiffTimeToMicroseconds = fromMicroseconds . round . (* 1000000)
@@ -83,7 +86,7 @@ run_logging sev n n0 n1= do
 {- -}
     endTime <- getPOSIXTime
     threadDelay $ fromIntegral (5000 * n0)
-    diffTime <- return $ nominalDiffTimeToMicroseconds (endTime - startTime)
+    let diffTime = nominalDiffTimeToMicroseconds (endTime - startTime)
     putStrLn $ "  time for " ++ (show (n0*n1)) ++ " iterations: " ++ (show diffTime)
     linesLogged <- getLinesLogged lh
     putStrLn $ "  lines logged :" ++ (show linesLogged)
@@ -109,7 +112,7 @@ run_loggingS sev n n0 n1= do
 {- -}
     endTime <- getPOSIXTime
     threadDelay $ fromIntegral (5000 * n0)
-    diffTime <- return $ nominalDiffTimeToMicroseconds (endTime - startTime)
+    let diffTime = nominalDiffTimeToMicroseconds (endTime - startTime)
     putStrLn $ "  time for " ++ (show (n0*n1)) ++ " iterations: " ++ (show diffTime)
     linesLogged <- getLinesLogged lh
     putStrLn $ "  lines logged :" ++ (show linesLogged)
@@ -153,9 +156,8 @@ example_named = do
         --complexWork :: MonadIO m => TraceIO -> Text -> m ()
         complexWork tr msg = do
             Tn.logDebug tr ("let's see: " `append` msg)
-            if msg == "42" then
+            when (msg == "42") $
                  complexWork (Tn.appendName "work" tr) "done."
-            else return ()
 
 
 spec :: Spec

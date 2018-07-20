@@ -17,8 +17,6 @@ import           Universum hiding (try)
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Yaml as Yaml
 import           Formatting (sformat, shown, (%))
-import           Mockable (CurrentTime, Mockable, currentTime)
-
 import           Text.Parsec (parserFail, try)
 import qualified Text.Parsec.Char as P
 import qualified Text.Parsec.Text as P
@@ -31,10 +29,11 @@ import           Pos.Core (StakeholderId, Timestamp (..))
 import           Pos.Core.Configuration (HasConfiguration, canonicalGenesisJson,
                      coreConfiguration, genesisData, prettyGenesisJson)
 import           Pos.Core.Genesis (gdStartTime)
+import           Pos.Core.Mockable (CurrentTime, Mockable, currentTime)
+import           Pos.Core.NetworkAddress (addrParser)
 import           Pos.Crypto (decodeAbstractHash)
 import           Pos.Delegation.Configuration (dlgConfiguration)
 import           Pos.Infra.Ntp.Configuration (NtpConfiguration)
-import           Pos.Infra.Util.TimeWarp (addrParser)
 import           Pos.Launcher.Configuration (Configuration (..),
                      HasConfigurations)
 import           Pos.Security.Params (AttackTarget (..), AttackType (..))
@@ -87,8 +86,7 @@ attackTargetParser =
 -- | Default logger config. Will be used if `--log-config` argument is
 -- not passed.
 defaultLoggerConfig :: LoggerConfig
-defaultLoggerConfig = --productionB
-    mempty :: LoggerConfig
+defaultLoggerConfig = mempty :: LoggerConfig
 
 -- | Reads logger config from given path. By default returns
 -- 'defaultLoggerConfig'.

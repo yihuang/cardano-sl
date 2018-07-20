@@ -12,6 +12,7 @@ import qualified Cardano.Wallet.Kernel.Keystore as Keystore
 import           Pos.Core (Coeff (..), TxSizeLinear (..))
 
 import           Test.Infrastructure.Generator
+import           Test.Pos.Configuration (withDefConfiguration)
 import           Util.Buildable.Hspec
 import           Util.Buildable.QuickCheck
 import           UTxO.Bootstrap
@@ -69,8 +70,8 @@ spec =
 -- | Initialize passive wallet in a manner suitable for the unit tests
 bracketPassiveWallet :: (Kernel.PassiveWallet -> IO a) -> IO a
 bracketPassiveWallet postHook = do
-      keystore <- Keystore.newTestKeystore
-      Kernel.bracketPassiveWallet logMessage keystore postHook
+      Keystore.bracketTestKeystore $ \keystore ->
+          Kernel.bracketPassiveWallet logMessage keystore postHook
   where
    -- TODO: Decide what to do with logging.
    -- For now we are not logging them to stdout to not alter the output of
@@ -81,9 +82,10 @@ bracketPassiveWallet postHook = do
 -- | Initialize active wallet in a manner suitable for generator-based testing
 bracketActiveWallet :: (Kernel.ActiveWallet -> IO a) -> IO a
 bracketActiveWallet test =
-    bracketPassiveWallet $ \passive ->
-      Kernel.bracketActiveWallet passive diffusion $ \active ->
-        test active
+    withDefConfiguration $ \pm -> do
+        bracketPassiveWallet $ \passive ->
+          Kernel.bracketActiveWallet pm passive diffusion $ \active ->
+            test active
 
 -- TODO: Decide what we want to do with submitted transactions
 diffusion :: Kernel.WalletDiffusion

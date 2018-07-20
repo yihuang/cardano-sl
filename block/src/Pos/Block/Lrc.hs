@@ -20,7 +20,9 @@ import           Data.Conduit (ConduitT, runConduitRes, (.|))
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import           Formatting (build, ords, sformat, (%))
-import           Mockable (forConcurrently)
+import qualified System.Metrics.Counter as Metrics
+import           UnliftIO (MonadUnliftIO)
+
 import           Pos.Block.Logic.Internal (BypassSecurityCheck (..),
                      MonadBlockApply, applyBlocksUnsafe, rollbackBlocksUnsafe)
 import           Pos.Block.Slog.Logic (ShouldCallBListener (..))
@@ -28,15 +30,16 @@ import           Pos.Core (Coin, EpochIndex, EpochOrSlot (..), SharedSeed,
                      StakeholderId, blkSecurityParam, crucialSlot, epochIndexL,
                      epochSlots, getEpochOrSlot)
 import           Pos.Core.Chrono (NE, NewestFirst (..), toOldestFirst)
+import           Pos.Core.Mockable (forConcurrently)
+import           Pos.Core.Reporting (HasMisbehaviorMetrics (..),
+                     MisbehaviorMetrics (..))
+import           Pos.Core.Util.TimeLimit (logWarningWaitLinear)
 import           Pos.Crypto (ProtocolMagic)
 import qualified Pos.DB.Block.Load as DB
 import           Pos.DB.Class (MonadDBRead, MonadGState)
 import qualified Pos.DB.GState.Stakes as GS (getRealStake, getRealTotalStake)
 import           Pos.Delegation (getDelegators, isIssuerByAddressHash)
 import qualified Pos.GState.SanityCheck as DB (sanityCheckDB)
-import           Pos.Infra.Reporting (HasMisbehaviorMetrics (..),
-                     MisbehaviorMetrics (..))
-import           Pos.Infra.Slotting (MonadSlots)
 import           Pos.Lrc.Consumer (LrcConsumer (..))
 import           Pos.Lrc.Consumers (allLrcConsumers)
 import           Pos.Lrc.Context (LrcContext (lcLrcSync), LrcSyncData (..))
@@ -48,21 +51,15 @@ import           Pos.Lrc.Error (LrcError (..))
 import           Pos.Lrc.Fts (followTheSatoshiM)
 import           Pos.Lrc.Mode (LrcMode)
 import           Pos.Lrc.Types (RichmenStakes)
-import           Pos.Sinbin.Util.TimeLimit (logWarningWaitLinear)
-import           Pos.Ssc (MonadSscMem, noReportNoSecretsForEpoch1,
-                     sscCalculateSeed)
-import           Pos.Ssc.Message (SscMessageConstraints)
+import           Pos.Ssc (noReportNoSecretsForEpoch1, sscCalculateSeed)
 import           Pos.Txp.Configuration (HasTxpConfiguration)
 import qualified Pos.Txp.DB.Stakes as GS (stakeSource)
 import           Pos.Update.DB (getCompetingBVStates)
 import           Pos.Update.Poll.Types (BlockVersionState (..))
 import           Pos.Util (maybeThrow)
---import           Pos.Util.Trace (noTrace)
 import           Pos.Util.Trace.Named (TraceNamed, logDebug, logInfo,
                      logWarning)
 import           Pos.Util.Util (HasLens (..))
-import qualified System.Metrics.Counter as Metrics
-import           UnliftIO (MonadUnliftIO)
 
 ----------------------------------------------------------------------------
 -- Single shot
@@ -74,9 +71,6 @@ type LrcModeFull ctx m =
     , LrcMode ctx m
     , MonadBlockApply ctx m
     , MonadReader ctx m
-    , MonadSlots ctx m
-    , MonadSscMem ctx m
-    , SscMessageConstraints
     )
 
 -- | Run leaders and richmen computation for given epoch. If stable

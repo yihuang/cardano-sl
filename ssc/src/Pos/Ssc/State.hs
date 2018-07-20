@@ -9,10 +9,9 @@ module Pos.Ssc.State
 import           Universum
 
 import qualified Control.Concurrent.STM as STM
---import           Pos.Util.Log (WithLogger)
 
+import           Pos.Core.Slotting (MonadSlots)
 import           Pos.DB (MonadDBRead)
-import           Pos.Infra.Slotting (MonadSlots)
 import           Pos.Ssc.Types (SscState (..))
 
 -- Reexports

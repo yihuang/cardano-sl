@@ -24,22 +24,21 @@ import           Control.Monad (join)
 import           Control.Monad.Trans (MonadIO (..))
 
 import           Data.Attoparsec.Text (Parser, char, decimal, string, takeWhile)
-import           Data.Binary (Binary)
 import           Data.Binary (Binary (..))
 import qualified Data.ByteString.Lazy as BL
 import           Data.Data (Data)
 import           Data.Functor (($>))
 import           Data.Int (Int64)
 import           Data.Monoid ((<>))
-import           Data.Text.Buildable (Buildable (build))
 import           Data.Time.Units (toMicroseconds)
+import           Formatting.Buildable (Buildable (build))
 
 import qualified Formatting as F
 import           GHC.Generics (Generic)
 import           Prelude hiding (takeWhile)
 
-import           Mockable.CurrentTime (realTime)
 import           Node (Message (..))
+import           Pos.Util (realTime)
 import           Pos.Util.Trace.Named (TraceNamed, logInfo)
 
 -- * Transfered data types
@@ -170,5 +169,5 @@ instance Buildable a => Buildable (LogMessage a) where
 
 logMessageParser :: Parser a -> Parser (Maybe (LogMessage a))
 logMessageParser p = (takeWhile (/= '#') >>) . join $ do
-        (char '#' *> pure (Just . LogMessage <$> p))
+        (char '#' $> (Just . LogMessage <$> p))
     <|> pure (pure Nothing)

@@ -18,14 +18,14 @@ import           Control.Monad.Except (ExceptT (..), withExceptT)
 import           Data.Constraint (Dict (..))
 import           Data.Time.Units (Second)
 import           Formatting (float, int, sformat, (%))
-import           Mockable (Delay, Mockable, delay)
-import           Pos.Util.Log (CanLog, HasLoggerName, logInfo)
 import           System.IO (hFlush, stdout)
 
+import           Pos.Core.Mockable (Delay, Mockable, delay)
 import           Pos.Crypto (AHash (..), ProtocolMagic, fullPublicKeyF,
                      hashHexF)
 import           Pos.Infra.Diffusion.Types (Diffusion)
 import           Pos.Txp (genesisUtxo, unGenesisUtxo)
+import           Pos.Util.Log (CanLog, HasLoggerName, logInfo)
 
 import           AuxxOptions (AuxxOptions (..))
 import           Command (createCommandProcs)

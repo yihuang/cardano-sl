@@ -26,11 +26,11 @@ import           Paths_cardano_sl (version)
 
 import           Pos.Client.CLI.Options (CommonArgs (..), commonArgsParser,
                      optionalJSONPath)
+import           Pos.Core.NetworkAddress (NetworkAddress)
 import           Pos.Infra.HealthCheck.Route53 (route53HealthCheckOption)
 import           Pos.Infra.Network.CLI (NetworkConfigOpts, networkConfigOption)
 import           Pos.Infra.Statistics (EkgParams, StatsdParams, ekgParamsOption,
                      statsdParamsOption)
-import           Pos.Infra.Util.TimeWarp (NetworkAddress)
 import           Pos.Util.CompileInfo (CompileTimeInfo (..), HasCompileInfo,
                      compileInfo)
 
@@ -154,7 +154,7 @@ usageExample :: Maybe Doc
 usageExample = (Just . fromString @Doc . toString @Text) [text|
 Command example:
 
-  stack exec -- cardano-node                                             \
+  stack exec -- cardano-node-simple                                      \
     --db-path node-db0                                                   \
     --rebuild-db                                                         \
     --keyfile secrets/secret-1.key                                       \

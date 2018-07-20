@@ -55,8 +55,8 @@ library
     Pos.Security.Params
     Pos.Security.Util
 
-  build-depends:       QuickCheck
-                     , aeson
+  build-depends:       aeson
+                     , aeson-options
                      , array
                      , base
                      , bytestring
@@ -64,10 +64,7 @@ library
                      , cardano-sl-core
                      , cardano-sl-crypto
                      , cardano-sl-db
-                     , cardano-sl-infra
                      , cardano-sl-lrc
-                     , cardano-sl-networking
-                     , cardano-sl-sinbin
                      , cardano-sl-util
                      , containers
                      , contravariant
@@ -75,10 +72,8 @@ library
                      , data-default
                      , dlist
                      , ether
-                     , ekg-core
                      , exceptions
                      , formatting
-                     , generic-arbitrary
                      , lens
                      , memory
                      , mmorph
@@ -91,7 +86,7 @@ library
                      , stm
                      , tagged
                      , text
-                     , text-format
+                     , formatting
                      , time-units
                      , transformers
                      , universum

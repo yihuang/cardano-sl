@@ -36,7 +36,6 @@ import qualified Pos.Wallet.Web.Error.Types as V0
 import           Control.Exception (fromException)
 import           Data.Aeson
 import           Formatting (build, sformat, (%))
-import           Mockable
 import           Network.HTTP.Types.Status (badRequest400)
 import           Network.Wai (Application, Middleware, Response, responseLBS)
 import           Network.Wai.Handler.Warp (defaultSettings,
@@ -45,6 +44,7 @@ import           Network.Wai.Middleware.Cors (cors, corsMethods,
                      corsRequestHeaders, simpleCorsResourcePolicy,
                      simpleMethods)
 import           Ntp.Client (NtpStatus)
+import           Pos.Core.Mockable
 import           Pos.Infra.Diffusion.Types (Diffusion (..))
 import           Pos.Wallet.Web (cleanupAcidStatePeriodically)
 import           Pos.Wallet.Web.Pending.Worker (startPendingTxsResubmitter)
@@ -52,19 +52,18 @@ import qualified Pos.Wallet.Web.Server.Runner as V0
 import           Pos.Wallet.Web.Sockets (getWalletWebSockets,
                      upgradeApplicationWS)
 import qualified Servant
---import           System.Wlog (logInfo, modifyLoggerName, usingLoggerName)
 
 import           Pos.Context (HasNodeContext)
 import           Pos.Crypto (ProtocolMagic)
-import           Pos.Util (lensOf)
-import           Pos.Util.Trace.Named (TraceNamed, appendName, logInfo)
 
 import           Cardano.NodeIPC (startNodeJsIPC)
 import           Pos.Configuration (walletProductionApi,
                      walletTxCreationDisabled)
 import           Pos.Infra.Shutdown.Class (HasShutdownContext (shutdownContext))
 import           Pos.Launcher.Configuration (HasConfigurations)
+import           Pos.Util (lensOf)
 import           Pos.Util.CompileInfo (HasCompileInfo)
+import           Pos.Util.Trace.Named (TraceNamed, appendName, logInfo)
 import           Pos.Wallet.Web.Mode (WalletWebMode)
 import           Pos.Wallet.Web.Server.Launcher (walletDocumentationImpl,
                      walletServeImpl)
@@ -209,16 +208,16 @@ legacyWalletBackend logTrace pm WalletBackendParams {..} ntpStatus = pure $ \dif
 -- | A 'Plugin' to start the wallet REST server
 --
 -- NOTE: There is no web socket support in the new wallet for now.
-walletBackend
-    :: TraceNamed IO
-    -> NewWalletBackendParams
-    -> (PassiveWalletLayer Production, PassiveWallet)
-    -> Plugin Kernel.WalletMode
-walletBackend logTrace (NewWalletBackendParams WalletBackendParams{..}) (passiveLayer, passiveWallet) =
+walletBackend :: TraceNamed IO
+              -> ProtocolMagic
+              -> NewWalletBackendParams
+              -> (PassiveWalletLayer Production, PassiveWallet)
+              -> Plugin Kernel.WalletMode
+walletBackend logTrace protocolMagic (NewWalletBackendParams WalletBackendParams{..}) (passiveLayer, passiveWallet) =
     pure $ \diffusion -> do
         env <- ask
         let diffusion' = Kernel.fromDiffusion (lower env) diffusion
-        bracketKernelActiveWallet passiveLayer passiveWallet diffusion' $ \active -> do
+        bracketKernelActiveWallet protocolMagic passiveLayer passiveWallet diffusion' $ \active _ -> do
           ctx <- view shutdownContext
           let portCallback :: Word16 -> IO ()
               portCallback port = {-usingLoggerName "NodeIPC" $-} flip runReaderT ctx $ startNodeJsIPC logTrace port

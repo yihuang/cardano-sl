@@ -1,3 +1,4 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE DataKinds           #-}
 {-# LANGUAGE Rank2Types          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -19,16 +20,16 @@ import           Universum
 import qualified Control.Exception.Safe as E
 import           Control.Monad.Except (MonadError (throwError))
 import qualified Control.Monad.Reader as Mtl
-import           Mockable (Production (..), runProduction)
 import           Network.Wai (Application)
 import           Ntp.Client (NtpStatus)
 import           Servant.Server (Handler)
 
 import           Cardano.NodeIPC (startNodeJsIPC)
+import           Pos.Core.Mockable (Production (..), runProduction)
+import           Pos.Core.NetworkAddress (NetworkAddress)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Infra.Diffusion.Types (Diffusion, hoistDiffusion)
 import           Pos.Infra.Shutdown.Class (HasShutdownContext (shutdownContext))
-import           Pos.Infra.Util.TimeWarp (NetworkAddress)
 import           Pos.Launcher.Configuration (HasConfigurations)
 import           Pos.Launcher.Resource (NodeResources (..))
 import           Pos.Launcher.Runner (runRealMode)
@@ -38,7 +39,7 @@ import           Pos.Util.Trace (natTrace)
 import           Pos.Util.Trace.Named (TraceNamed, logInfo)
 import           Pos.Util.Util (HasLens (..))
 import           Pos.Wallet.WalletMode (WalletMempoolExt)
-import           Pos.Wallet.Web.Methods (addInitialRichAccount)
+import qualified Pos.Wallet.Web.Methods as M
 import           Pos.Wallet.Web.Mode (WalletWebMode, WalletWebModeContext (..),
                      WalletWebModeContextTag, realModeToWalletWebMode,
                      walletWebModeToRealMode)
@@ -70,8 +71,10 @@ runWRealMode logTrace lh pm db conn syncRequests res action = --Production $
             action (hoistDiffusion realModeToWalletWebMode (walletWebModeToRealMode db conn syncRequests) diffusion)
 
 walletServeWebFull
-    :: ( HasConfigurations
+    :: forall ctx m .
+       ( HasConfigurations
        , HasCompileInfo
+       , M.MonadWalletLogic ctx m
        )
     => TraceNamed IO
     -> Log.LoggingHandler
@@ -90,8 +93,8 @@ walletServeWebFull logTrace lh pm diffusion ntpStatus debug address mTlsParams =
   where
     action :: WalletWebMode Application
     action = do
-        liftIO $ logInfo logTrace "Wallet Web API has STARTED!"
-        when debug $ liftIO $ addInitialRichAccount logTrace 0
+        logInfo (natTrace liftIO logTrace) "Wallet Web API has STARTED!"
+        when debug $ M.addInitialRichAccount (natTrace liftIO logTrace) 0
 
         wwmc <- walletWebModeContext
         walletApplication logTrace $

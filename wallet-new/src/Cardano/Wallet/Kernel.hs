@@ -1,5 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
 -- | The kernel of the wallet implementation
 --
 -- The goal is to keep this module mostly self-contained, and not use to many
@@ -18,7 +16,6 @@ module Cardano.Wallet.Kernel (
   , init
   , walletLogMessage
   , walletPassive
-  , wallets
     -- * The only effectful getter you will ever need
   , getWalletSnapshot
     -- * Pure getters acting on a DB snapshot
@@ -27,21 +24,22 @@ module Cardano.Wallet.Kernel (
   , ActiveWallet -- opaque
   , bracketActiveWallet
   , newPending
+  , NewPendingError
   ) where
 
 import           Universum hiding (State, init)
 
 import           Control.Concurrent.Async (async, cancel)
 import           Control.Concurrent.MVar (modifyMVar, modifyMVar_)
-import           Control.Lens.TH
 import qualified Data.Map.Strict as Map
-import           Data.Time.Clock.POSIX (getPOSIXTime)
 
 import           System.Wlog (Severity (..))
 
 import           Data.Acid (AcidState)
 import           Data.Acid.Advanced (query', update')
 import           Data.Acid.Memory (openMemoryState)
+
+import           Cardano.Wallet.Kernel.Internal
 
 import           Cardano.Wallet.Kernel.Diffusion (WalletDiffusion (..))
 import           Cardano.Wallet.Kernel.Keystore (Keystore)
@@ -53,7 +51,6 @@ import           Cardano.Wallet.Kernel.Types (WalletId (..))
 import           Cardano.Wallet.Kernel.DB.AcidState (ApplyBlock (..),
                      CancelPending (..), CreateHdWallet (..), DB,
                      NewPending (..), NewPendingError, Snapshot (..), defDB)
-import           Cardano.Wallet.Kernel.DB.BlockMeta (BlockMeta (..))
 import           Cardano.Wallet.Kernel.DB.HdWallet
 import qualified Cardano.Wallet.Kernel.DB.HdWallet as HD
 import qualified Cardano.Wallet.Kernel.DB.HdWallet.Create as HD
@@ -64,37 +61,17 @@ import           Cardano.Wallet.Kernel.Submission (Cancelled, WalletSubmission,
                      addPending, defaultResubmitFunction, exponentialBackoff,
                      newWalletSubmission, tick)
 import           Cardano.Wallet.Kernel.Submission.Worker (tickSubmissionLayer)
+import           Cardano.Wallet.Kernel.Util (getCurrentTimestamp)
 
 -- Handy re-export of the pure getters
 
 import           Cardano.Wallet.Kernel.DB.Read as Getters
 
-import           Pos.Core (Timestamp (..), TxAux (..))
-
+import           Pos.Core (ProtocolMagic, TxAux (..))
 import           Pos.Core.Chrono (OldestFirst)
 import           Pos.Crypto (EncryptedSecretKey, hash)
 import           Pos.Txp (Utxo)
 
-{-------------------------------------------------------------------------------
-  Passive wallet
--------------------------------------------------------------------------------}
-
--- | Passive wallet
---
--- A passive wallet can receive and process blocks, keeping track of state,
--- but cannot send new transactions.
---
-data PassiveWallet = PassiveWallet {
-      -- | Send log message
-      _walletLogMessage :: Severity -> Text -> IO ()
-      -- ^ Logger
-    , _walletKeystore   :: Keystore
-      -- ^ An opaque handle to a place where we store the 'EncryptedSecretKey'.
-    , _wallets          :: AcidState DB
-      -- ^ Database handle
-    }
-
-makeLenses ''PassiveWallet
 
 {-------------------------------------------------------------------------------
   Passive Wallet Resource Management
@@ -183,10 +160,6 @@ createWalletHdRnd pw@PassiveWallet{..} name spendingPassword assuranceLevel esk 
 
         insertESK _arg = insertWalletESK pw walletId esk >> return (Right accountIds)
 
--- (NOTE: we are abandoning the 'Mockable time' strategy of the Cardano code base)
-getCurrentTimestamp :: IO Timestamp
-getCurrentTimestamp = Timestamp . round . (* 1000000) <$> getPOSIXTime
-
 {-------------------------------------------------------------------------------
   Passive Wallet API implementation
 -------------------------------------------------------------------------------}
@@ -210,11 +183,8 @@ applyBlock :: PassiveWallet
 applyBlock pw@PassiveWallet{..} b
     = do
         blocksByAccount <- prefilterBlock' pw b
-        -- TODO(@uroboros/ryan) do proper metadata initialisation (as part of CBR-239: Support history tracking and queries)
-        let blockMeta = BlockMeta . InDb $ Map.empty
-
         -- apply block to all Accounts in all Wallets
-        void $ update' _wallets $ ApplyBlock (blocksByAccount, blockMeta)
+        void $ update' _wallets $ ApplyBlock blocksByAccount
 
 -- | Apply multiple blocks, one at a time, to all wallets in the PassiveWallet
 --
@@ -228,25 +198,13 @@ applyBlocks = mapM_ . applyBlock
   Active wallet
 -------------------------------------------------------------------------------}
 
--- | Active wallet
---
--- An active wallet can do everything the passive wallet can, but also
--- send new transactions.
-data ActiveWallet = ActiveWallet {
-      -- | The underlying passive wallet
-      walletPassive    :: PassiveWallet
-      -- | The wallet diffusion layer
-    , walletDiffusion  :: WalletDiffusion
-      -- | The wallet submission layer
-    , walletSubmission :: MVar WalletSubmission
-    }
-
 -- | Initialize the active wallet
 bracketActiveWallet :: (MonadMask m, MonadIO m)
-                    => PassiveWallet
+                    => ProtocolMagic
+                    -> PassiveWallet
                     -> WalletDiffusion
                     -> (ActiveWallet -> m a) -> m a
-bracketActiveWallet walletPassive walletDiffusion runActiveWallet = do
+bracketActiveWallet walletProtocolMagic walletPassive walletDiffusion runActiveWallet = do
     let logMsg = _walletLogMessage walletPassive
     let rho = defaultResubmitFunction (exponentialBackoff 255 1.25)
     walletSubmission <- newMVar (newWalletSubmission rho)

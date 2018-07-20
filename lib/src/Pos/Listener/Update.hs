@@ -13,10 +13,10 @@ module Pos.Listener.Update
 import           Universum
 
 import           Formatting (build, sformat, (%))
-import           Mockable (MonadMockable)
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Core (ProtocolMagic)
+import           Pos.Core.Mockable (MonadMockable)
 import           Pos.Core.Update (UpdateProposal (..), UpdateVote (..))
 import           Pos.DB.Class (MonadDB, MonadGState)
 import           Pos.Infra.Recovery.Info (MonadRecoveryInfo)

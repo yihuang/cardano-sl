@@ -13,8 +13,9 @@ import           Universum
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 
-import           Pos.Core (HasGenesisData, StakeholderId, StakesList,
-                     coinToInteger, mkCoin, sumCoins, unsafeIntegerToCoin)
+import           Pos.Core (GenesisData (gdBootStakeholders), HasGenesisData,
+                     StakeholderId, StakesList, coinToInteger, genesisData,
+                     mkCoin, sumCoins, unsafeIntegerToCoin)
 import           Pos.Core.Txp (Tx (..), TxAux (..), TxOutAux (..), TxUndo)
 import           Pos.Txp.Base (txOutStake)
 import           Pos.Txp.Toil.Monad (GlobalToilM, getStake, getTotalStake,
@@ -86,6 +87,8 @@ concatStakes (unzip -> (txas, undo)) = (txasTxOutDistr, undoTxInDistr)
   where
     onlyKnownUndos = catMaybes . toList
     txasTxOutDistr = concatMap concatDistr txas
-    undoTxInDistr = concatMap (txOutStake . toaOut) (foldMap onlyKnownUndos undo)
+    undoTxInDistr = concatMap (txOutStake (gdBootStakeholders genesisData) . toaOut)
+                    (foldMap onlyKnownUndos undo)
     concatDistr (TxAux UnsafeTx {..} _) =
-        concatMap (txOutStake . toaOut) $ toList (map TxOutAux _txOutputs)
+        concatMap (txOutStake  (gdBootStakeholders genesisData) . toaOut)
+        $ toList (map TxOutAux _txOutputs)

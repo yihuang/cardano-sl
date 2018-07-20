@@ -13,13 +13,13 @@ import           Universum
 
 import qualified Data.HashMap.Strict as HM
 import           Formatting (bprint, build, int, sformat, shown, (%))
-import           Mockable (mapConcurrently)
 import           Serokell.Util (listJson)
 
 import           Pos.Context (getOurPublicKey)
 import           Pos.Core (GenesisData (gdBootStakeholders, gdHeavyDelegation),
                      GenesisDelegation (..), GenesisWStakeholders (..),
                      addressHash, gdFtsSeed, genesisData)
+import           Pos.Core.Mockable (mapConcurrently)
 import           Pos.Crypto (ProtocolMagic, pskDelegatePk)
 import qualified Pos.DB.BlockIndex as DB
 import qualified Pos.GState as GS
@@ -62,7 +62,7 @@ runNode' logTrace NodeResources {..} workers' plugins' = \diffusion -> do
     logInfo logTrace $ sformat
         ("Genesis stakeholders ("%int%" addresses, dust threshold "%build%"): "%build)
         (length $ getGenesisWStakeholders genesisStakeholders)
-        bootDustThreshold
+        (bootDustThreshold genesisStakeholders)
         genesisStakeholders
 
     let genesisDelegation = gdHeavyDelegation genesisData

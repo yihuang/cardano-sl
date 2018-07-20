@@ -66,11 +66,14 @@ import           Universum
 
 import           Control.Lens (at)
 import           Control.Lens.TH (makeLenses)
+import qualified Data.ByteString as BS
 import qualified Data.IxSet.Typed as IxSet
 import           Data.SafeCopy (base, deriveSafeCopy)
 
-import qualified Data.Text.Buildable
+import           Test.QuickCheck (Arbitrary (..), oneof, vectorOf)
+
 import           Formatting (bprint, build, (%))
+import qualified Formatting.Buildable
 
 import qualified Pos.Core as Core
 import qualified Pos.Crypto as Core
@@ -90,13 +93,24 @@ newtype WalletName = WalletName Text
 -- | Account name
 newtype AccountName = AccountName Text
 
+instance Buildable AccountName where
+    build (AccountName txt) = bprint build txt
+
 -- | Account index
-newtype HdAccountIx = HdAccountIx Word32
+newtype HdAccountIx = HdAccountIx { getHdAccountIx :: Word32 }
   deriving (Eq, Ord)
 
+-- NOTE(adn) if we need to generate only @hardened@ account indexes, we
+-- need to extend this arbitrary instance accordingly.
+instance Arbitrary HdAccountIx where
+    arbitrary = HdAccountIx <$> arbitrary
+
 -- | Address index
-newtype HdAddressIx = HdAddressIx Word32
+newtype HdAddressIx = HdAddressIx { getHdAddressIx :: Word32 }
   deriving (Eq, Ord)
+
+instance Arbitrary HdAddressIx where
+    arbitrary = HdAddressIx <$> arbitrary
 
 -- | Wallet assurance level
 --
@@ -139,6 +153,12 @@ deriveSafeCopy 1 'base ''HasSpendingPassword
 data HdRootId = HdRootId (InDb Core.Address)
   deriving (Eq, Ord)
 
+instance Arbitrary HdRootId where
+  arbitrary = do
+      (_, esk) <- Core.safeDeterministicKeyGen <$> (BS.pack <$> vectorOf 12 arbitrary)
+                                               <*> pure mempty
+      pure (eskToHdRootId esk)
+
 -- | HD wallet account ID
 data HdAccountId = HdAccountId {
       _hdAccountIdParent :: HdRootId
@@ -146,12 +166,18 @@ data HdAccountId = HdAccountId {
     }
   deriving (Eq, Ord)
 
+instance Arbitrary HdAccountId where
+  arbitrary = HdAccountId <$> arbitrary <*> arbitrary
+
 -- | HD wallet address ID
 data HdAddressId = HdAddressId {
       _hdAddressIdParent :: HdAccountId
     , _hdAddressIdIx     :: HdAddressIx
     }
   deriving (Eq, Ord)
+
+instance Arbitrary HdAddressId where
+  arbitrary = HdAddressId <$> arbitrary <*> arbitrary
 
 -- | Root of a HD wallet
 --
@@ -196,6 +222,14 @@ data HdAccount = HdAccount {
     , _hdAccountCheckpoints :: NonEmpty Checkpoint
     }
 
+instance Buildable HdAccount where
+    build HdAccount{..} =
+        bprint ("HdAccount { id = "   % build
+                         % " name = " % build
+                         % " checkpoints = <checkpoints> "
+                         % " }"
+               ) _hdAccountId _hdAccountName
+
 -- | Address in an account of a HD wallet
 data HdAddress = HdAddress {
       -- | Address ID
@@ -216,6 +250,20 @@ data HdAddress = HdAddress {
       -- TODO: Do we need this at all?
     , _hdAddressIsChange :: Bool
     }
+
+{-------------------------------------------------------------------------------
+  General-utility functions
+-------------------------------------------------------------------------------}
+
+-- | Computes the 'HdRootId' from the given 'EncryptedSecretKey'. See the
+-- comment in the definition of 'makePubKeyAddressBoot' on why this is
+-- acceptable.
+eskToHdRootId :: Core.EncryptedSecretKey -> HdRootId
+eskToHdRootId = HdRootId . InDb . Core.makePubKeyAddressBoot . Core.encToPublic
+
+{-------------------------------------------------------------------------------
+  Template Haskell splices
+-------------------------------------------------------------------------------}
 
 makeLenses ''HdAccountId
 makeLenses ''HdAddressId
@@ -257,6 +305,10 @@ data UnknownHdRoot =
     -- | Unknown root ID
     UnknownHdRoot HdRootId
 
+instance Arbitrary UnknownHdRoot where
+    arbitrary = oneof [ UnknownHdRoot <$> arbitrary
+                      ]
+
 -- | Unknown account
 data UnknownHdAccount =
     -- | Unknown root ID
@@ -264,6 +316,12 @@ data UnknownHdAccount =
 
     -- | Unknown account (implies the root is known)
   | UnknownHdAccount HdAccountId
+  deriving Eq
+
+instance Arbitrary UnknownHdAccount where
+    arbitrary = oneof [ UnknownHdAccountRoot <$> arbitrary
+                      , UnknownHdAccount <$> arbitrary
+                      ]
 
 -- | Unknown address
 data UnknownHdAddress =
@@ -275,6 +333,9 @@ data UnknownHdAddress =
 
     -- | Unknown address (implies the account is known)
   | UnknownHdAddress HdAddressId
+
+    -- | Unknown address (implies it was not derived from the given Address)
+  | UnknownHdCardanoAddress Core.Address
 
 embedUnknownHdRoot :: UnknownHdRoot -> UnknownHdAccount
 embedUnknownHdRoot = go
@@ -442,16 +503,6 @@ assumeHdRootExists _id = return ()
 -- Helper function which can be used as an argument to 'zoomOrCreateHdAddress'
 assumeHdAccountExists :: HdAccountId -> Update' HdWallets e ()
 assumeHdAccountExists _id = return ()
-
-{-------------------------------------------------------------------------------
-  General-utility functions
--------------------------------------------------------------------------------}
-
--- | Computes the 'HdRootId' from the given 'EncryptedSecretKey'. See the
--- comment in the definition of 'makePubKeyAddressBoot' on why this is
--- acceptable.
-eskToHdRootId :: Core.EncryptedSecretKey -> HdRootId
-eskToHdRootId = HdRootId . InDb . Core.makePubKeyAddressBoot . Core.encToPublic
 
 {-------------------------------------------------------------------------------
   Pretty printing

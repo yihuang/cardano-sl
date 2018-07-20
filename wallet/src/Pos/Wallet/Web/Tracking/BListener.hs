@@ -26,6 +26,7 @@ import           Pos.Core.Block (BlockHeader (..), blockHeader, getBlockHeader,
                      mainBlockTxPayload)
 import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.Core.Txp (TxAux (..), TxUndo)
+import           Pos.Core.Util.TimeLimit (CanLogInParallel, logWarningWaitInf)
 import           Pos.DB.BatchOp (SomeBatchOp)
 import           Pos.DB.Class (MonadDBRead)
 import qualified Pos.GState as GS
@@ -33,7 +34,6 @@ import           Pos.Infra.Reporting (MonadReporting, reportOrLogE)
 import           Pos.Infra.Slotting (MonadSlots, MonadSlotsData,
                      getCurrentEpochSlotDuration, getSlotStartPure,
                      getSystemStartM)
-import           Pos.Sinbin.Util.TimeLimit (CanLogInParallel, logWarningWaitInf)
 import           Pos.Txp.Base (flattenTxPayload)
 import qualified Pos.Util.Log as Log
 import           Pos.Util.Log.LogSafe (buildSafe, secretOnlyF, secure)

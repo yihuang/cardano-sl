@@ -35,13 +35,14 @@ import           Data.Conduit (ConduitT, mapOutput, runConduitRes, (.|))
 import qualified Data.Conduit.List as CL
 import qualified Data.HashSet as HS
 import qualified Data.Map as M
-import qualified Data.Text.Buildable
 import qualified Database.RocksDB as Rocks
 import           Formatting (bprint, build, sformat, (%))
+import qualified Formatting.Buildable
 import           Serokell.Util (Color (Red), colorize)
 import           UnliftIO (MonadUnliftIO)
 
-import           Pos.Core (Address, Coin, HasCoreConfiguration, coinF, mkCoin,
+import           Pos.Core (Address, Coin, GenesisData (gdBootStakeholders),
+                     HasCoreConfiguration, coinF, genesisData, mkCoin,
                      sumCoins, unsafeAddCoin, unsafeIntegerToCoin)
 import           Pos.Core.Txp (TxIn (..), TxOutAux (toaOut))
 import           Pos.DB (DBError (..), DBIteratorClass (..), DBTag (GStateDB),
@@ -138,7 +139,8 @@ sanityCheckUtxo
     -> Coin -> m ()
 sanityCheckUtxo logTrace expectedTotalStake = do
     let stakesSource =
-            mapOutput (map snd . txOutStake . toaOut . snd) utxoSource
+            mapOutput (map snd . txOutStake (gdBootStakeholders genesisData)
+                       . toaOut . snd) utxoSource
     calculatedTotalStake <-
         runConduitRes $ stakesSource .| CL.fold foldAdd (mkCoin 0)
     let fmt =

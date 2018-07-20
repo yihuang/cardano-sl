@@ -29,15 +29,15 @@ import           Formatting (build, sformat, (%))
 
 import           Pos.Core (BlockVersionData, EpochIndex, HeaderHash,
                      ProtocolMagic, siEpoch)
+import           Pos.Core.JsonLog.LogEvents (MemPoolModifyReason (..))
+import           Pos.Core.Reporting (reportError)
+import           Pos.Core.Slotting (MonadSlots (..))
+import           Pos.Core.StateLock (Priority (..), StateLock, StateLockMetrics,
+                     withStateLock)
 import           Pos.Core.Txp (TxAux (..), TxId, TxUndo)
 import           Pos.Crypto (WithHash (..))
 import           Pos.DB.Class (MonadGState (..))
 import qualified Pos.DB.GState.Common as GS
-import           Pos.Infra.Reporting (reportError)
-import           Pos.Infra.Slotting (MonadSlots (..))
-import           Pos.Infra.StateLock (Priority (..), StateLock,
-                     StateLockMetrics, withStateLock)
-import           Pos.Sinbin.Util.JsonLog.Events (MemPoolModifyReason (..))
 import           Pos.Txp.Configuration (tcAssetLockedSrcAddrs, txpConfiguration)
 import           Pos.Txp.Logic.Common (buildUtxo)
 import           Pos.Txp.MemState (GenericTxpLocalData (..), MempoolExt,
@@ -69,8 +69,8 @@ txProcessTransaction :: (TxpProcessTransactionMode ctx m)
     -> Trace m Value -- ^ Json log.
     -> ProtocolMagic
     -> (TxId, TxAux) -> m (Either ToilVerFailure ())
-txProcessTransaction logTrace jsonLog pm itw = do
-  withStateLock jsonLog LowPriority ProcessTransaction $ \__tip -> txProcessTransactionNoLock (appendName "txProc" logTrace) pm itw
+txProcessTransaction logTrace jsonL pm itw = do
+  withStateLock jsonL LowPriority ProcessTransaction $ \__tip -> txProcessTransactionNoLock (appendName "txProc" logTrace) pm itw
 
 -- | Unsafe version of 'txProcessTransaction' which doesn't take a
 -- lock. Can be used in tests.

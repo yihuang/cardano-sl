@@ -15,20 +15,16 @@ import qualified Data.List.NonEmpty as NE
 import           Data.Time.Units (Microsecond, Second, fromMicroseconds)
 import           Formatting (Format, bprint, build, fixed, int, now, sformat,
                      shown, (%))
-import           Mockable (delay)
 import           Serokell.Util (enumerate, listJson, pairF)
 import qualified System.Metrics.Label as Label
 import           System.Random (randomRIO)
 
-import           Pos.Block.BlockWorkMode (BlockWorkMode)
 import           Pos.Block.Configuration (HasBlockConfiguration, criticalCQ,
                      criticalCQBootstrap, fixedTimeCQSec, networkDiameter,
                      nonCriticalCQ, nonCriticalCQBootstrap)
 import           Pos.Block.Logic (calcChainQualityFixedTime, calcChainQualityM,
                      calcOverallChainQuality, createGenesisBlockAndApply,
                      createMainBlockAndApply)
-import           Pos.Block.Network.Logic (triggerRecovery)
-import           Pos.Block.Network.Retrieval (retrievalWorker)
 import           Pos.Block.Slog (scCQFixedMonitorState, scCQOverallMonitorState,
                      scCQkMonitorState, scCrucialValuesLabel,
                      scDifficultyMonitorState, scEpochMonitorState,
@@ -41,6 +37,10 @@ import           Pos.Core (BlockVersionData (..), ChainDifficulty, FlatSlotId,
                      getEpochOrSlot, getOurPublicKey, getSlotIndex, slotIdF,
                      unflattenSlotId)
 import           Pos.Core.Chrono (OldestFirst (..))
+import           Pos.Core.JsonLog (CanJsonLog (..))
+import           Pos.Core.Mockable (delay)
+import           Pos.Core.Reporting (HasMisbehaviorMetrics, MetricMonitor (..),
+                     MetricMonitorState, noReportMonitor, recordValue)
 import           Pos.Crypto (ProtocolMagic, ProxySecretKey (pskDelegatePk))
 import           Pos.DB (gsIsBootstrapEra)
 import qualified Pos.DB.BlockIndex as DB
@@ -52,17 +52,17 @@ import qualified Pos.Infra.Diffusion.Types as Diffusion
                      (Diffusion (announceBlockHeader))
 import           Pos.Infra.Recovery.Info (getSyncStatus, getSyncStatusK,
                      needTriggerRecovery, recoveryCommGuard)
-import           Pos.Infra.Reporting (HasMisbehaviorMetrics, MetricMonitor (..),
-                     MetricMonitorState, noReportMonitor, recordValue,
-                     reportOrLogE)
+import           Pos.Infra.Reporting (reportOrLogE)
 import           Pos.Infra.Slotting (ActionTerminationPolicy (..),
                      OnNewSlotParams (..), currentTimeSlotting,
                      defaultOnNewSlotParams, getSlotStartEmpatically,
                      onNewSlot)
 import           Pos.Infra.Util.JsonLog.Events (jlCreatedBlock)
 import           Pos.Infra.Util.TimeLimit (logWarningSWaitLinear)
-import           Pos.Infra.Util.TimeWarp (CanJsonLog (..))
 import qualified Pos.Lrc.DB as LrcDB (getLeadersForEpoch)
+import           Pos.Network.Block.Logic (triggerRecovery)
+import           Pos.Network.Block.Retrieval (retrievalWorker)
+import           Pos.Network.Block.WorkMode (BlockWorkMode)
 
 import           Pos.Update.DB (getAdoptedBVData)
 import           Pos.Util.Trace.Named (TraceNamed, logDebug, logDebugS,

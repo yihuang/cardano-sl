@@ -39,8 +39,9 @@ import           Control.Concurrent.STM
 import           Control.Concurrent.STM.TBQueue
 import qualified Data.Set as S
 import           Data.Typeable
-import           Mockable.Class
-import           Mockable.SharedAtomic
+
+import           Pos.Core.Mockable.Class
+import           Pos.Core.Mockable.SharedAtomic
 
 -- This connection-buffers QDisc needs an implementation of a bounded fifo
 -- buffer such that the head can be inspected and modified.
@@ -95,13 +96,13 @@ decodeFromBuffer
 decodeFromBuffer get buffer = case Bin.runGetIncremental get of
     Bin.Partial continue -> go continue
     Bin.Done _ _ a       -> return (Just a)
-    Bin.Fail _ _ _       -> return Nothing
+    Bin.Fail {}          -> return Nothing
     where
 
     -- Repeatedly read from the buffer and continue the parse.
     -- Leftover data is replaced when Done or Fail is encountered.
     go continue = do
-        outcome <- readBuffer buffer $ \ev -> case ev of
+        outcome <- readBuffer buffer $ \case
             Closed -> (Just Closed, Nothing)
             Lost -> (Just Lost, Nothing)
             Data bs -> case continue (Just (BL.toStrict bs)) of
@@ -138,7 +139,7 @@ newConnectionBuffer = newBuffer
 --   the head of the buffer. Otherwise, the first event is removed.
 --   This will not block on a full queue, only on an empty one.
 recvAtMost :: ( Mockable Buffer m ) => Int -> ConnectionBuffer m -> m ConnectionEvent
-recvAtMost bytes cbuffer = readBuffer cbuffer $ \event -> case event of
+recvAtMost bytes cbuffer = readBuffer cbuffer $ \case
     Lost -> (Nothing, Lost)
     Closed -> (Nothing, Closed)
     Data lbs -> do

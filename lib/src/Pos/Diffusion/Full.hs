@@ -31,8 +31,6 @@ import qualified System.Metrics as Monitoring
 
 import           System.Random (newStdGen)
 
-import           Pos.Block.Network (MsgBlock, MsgGetBlocks, MsgGetHeaders,
-                     MsgHeaders, MsgStream, MsgStreamBlock)
 import           Pos.Communication (EnqueueMsg, HandlerSpecs, InSpecs (..),
                      InvOrDataTK, Listener, MkListeners (..), Msg,
                      MsgSubscribe, MsgSubscribe1, NodeId, OutSpecs (..),
@@ -74,6 +72,8 @@ import           Pos.Infra.Reporting.Ekg (EkgNodeMetrics (..),
                      registerEkgNodeMetrics)
 import           Pos.Infra.Reporting.Health.Types (HealthStatus (..))
 import           Pos.Logic.Types (Logic (..))
+import           Pos.Network.Block.Types (MsgBlock, MsgGetBlocks, MsgGetHeaders,
+                     MsgHeaders, MsgStream, MsgStreamBlock)
 import           Pos.Ssc.Message (MCCommitment (..), MCOpening (..),
                      MCShares (..), MCVssCertificate (..))
 import           Pos.System.Metrics.Constants (withCardanoNamespace)
@@ -264,7 +264,7 @@ diffusionLayerFullExposeInternals fdconf
             ]
 
         -- A single worker checkForReceivedBlocksWorker with
-        -- requestTipOuts from Pos.Block.Network.
+        -- requestTipOuts from Pos.Network.Block.Types
         securityWorkerOutSpecs = toOutSpecs
             [ convH (Proxy :: Proxy MsgGetHeaders)
                     (Proxy :: Proxy MsgHeaders)

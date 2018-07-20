@@ -7,7 +7,6 @@ import           Universum
 import           Control.Exception.Safe (handle)
 import           Data.Maybe (fromMaybe)
 import           Formatting (sformat, shown, (%))
-import           Mockable (Production (..), runProduction)
 import qualified Network.Transport.TCP as TCP (TCPAddr (..))
 import           Pos.Util.Log (LoggerName, logInfo)
 import qualified System.IO.Temp as Temp
@@ -15,6 +14,7 @@ import qualified System.IO.Temp as Temp
 import qualified Pos.Client.CLI as CLI
 import           Pos.Context (NodeContext (..))
 import           Pos.Core (ConfigurationError, epochSlots)
+import           Pos.Core.Mockable (Production (..), runProduction)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.DB.DB (initNodeDBs)
 import           Pos.Infra.Diffusion.Types (Diffusion, hoistDiffusion)

@@ -14,7 +14,6 @@ module Pos.Client.Txp.Network
 import           Universum
 
 import           Formatting (build, sformat, (%))
-import           Mockable (MonadMockable)
 
 import           Pos.Client.Txp.Addresses (MonadAddresses (..))
 import           Pos.Client.Txp.Balances (MonadBalances (..), getOwnUtxo)
@@ -26,6 +25,7 @@ import           Pos.Communication.Message ()
 import           Pos.Communication.Types (InvOrDataTK)
 import           Pos.Core (Address, Coin, makeRedeemAddress, mkCoin,
                      unsafeAddCoin)
+import           Pos.Core.Mockable (MonadMockable)
 import           Pos.Core.Txp (TxAux (..), TxId, TxMsgContents (..), TxOut (..),
                      TxOutAux (..), txaF)
 import           Pos.Crypto (ProtocolMagic, RedeemSecretKey, SafeSigner, hash,

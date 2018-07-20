@@ -17,9 +17,6 @@ library
   exposed-modules:
                        Pos.Update
 
-                       -- Aeson
-                       Pos.Aeson.Update
-
                        Pos.Update.BlockVersion
 
                        -- Misc
@@ -38,9 +35,7 @@ library
                        Pos.Update.Poll.Class
                        Pos.Update.Poll.Modifier
                        Pos.Update.Poll.PollState
-                       Pos.Update.Poll.Trans
                        Pos.Update.Poll.Types
-                       Pos.Update.Poll.RollTrans
                        Pos.Update.Poll.Failure
                        Pos.Update.Poll.Pure
                        Pos.Update.Poll.DBPoll
@@ -64,23 +59,20 @@ library
 
   build-depends:       Cabal
                      , aeson
+                     , aeson-options
                      , base
                      , bytestring
                      , cardano-sl-binary
                      , cardano-sl-core
                      , cardano-sl-crypto
                      , cardano-sl-db
-                     , cardano-sl-infra
                      , cardano-sl-lrc
-                     , cardano-sl-networking
-                     , cardano-sl-sinbin
                      , cardano-sl-util
                      , conduit
                      , containers
                      , contravariant
                      , data-default
                      , deepseq
-                     , directory
                      , ether >= 0.5
                      , exceptions
                      , formatting
@@ -91,12 +83,9 @@ library
                      , reflection
                      , resourcet
                      , rocksdb-haskell-ng
-                     , safe-exceptions
                      , serokell-util
                      , stm
                      , tagged
-                     , template-haskell
-                     , text-format
                      , time-units
                      , transformers
                      , universum

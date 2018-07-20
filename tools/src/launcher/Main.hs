@@ -23,6 +23,7 @@ import           Control.Lens (makeLensesWith)
 import           Data.Aeson (FromJSON, Value (Array, Bool, Object), fromJSON,
                      genericParseJSON, withObject)
 import qualified Data.Aeson as AE
+import           Data.Aeson.Options (defaultOptions)
 import qualified Data.ByteString.Lazy as BS.L
 import qualified Data.HashMap.Strict as HM
 import           Data.List (isSuffixOf)
@@ -37,7 +38,6 @@ import           Options.Applicative (Parser, ParserInfo, ParserResult (..),
                      defaultPrefs, execParserPure, footerDoc, fullDesc,
                      handleParseResult, header, help, helper, info, infoOption,
                      long, metavar, progDesc, renderFailure, short, strOption)
-import           Serokell.Aeson.Options (defaultOptions)
 import           System.Directory (createDirectoryIfMissing, doesFileExist,
                      removeFile)
 import qualified System.Directory as Sys
@@ -71,7 +71,7 @@ import           Pos.DB.Rocks (NodeDBs, closeNodeDBs, dbDeleteDefault,
                      dbGetDefault, dbIterSourceDefault, dbPutDefault,
                      dbWriteBatchDefault, openNodeDBs)
 import           Pos.Infra.Reporting.Http (sendReport)
-import           Pos.Infra.Reporting.Wlog (compressLogs, retrieveLogFiles)
+import           Pos.Infra.Reporting.Logfiles (compressLogs)
 import           Pos.Launcher (HasConfigurations, withConfigurations)
 import           Pos.Launcher.Configuration (ConfigurationOptions (..))
 import           Pos.Network.Update.Download (installerHash)

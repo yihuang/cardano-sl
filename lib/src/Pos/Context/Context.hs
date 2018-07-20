@@ -25,18 +25,15 @@ import           Universum
 import           Control.Lens (lens, makeLensesWith)
 import           Data.Time.Clock (UTCTime)
 
-import           Pos.Block.RetrievalQueue (BlockRetrievalQueue,
-                     BlockRetrievalQueueTag)
 import           Pos.Block.Slog (HasSlogContext (..), HasSlogGState (..),
                      SlogContext (..))
-import           Pos.Block.Types (LastKnownHeader, LastKnownHeaderTag,
-                     RecoveryHeader, RecoveryHeaderTag)
+import           Pos.Block.Types (LastKnownHeader, LastKnownHeaderTag)
 import           Pos.Communication.Types (NodeId)
 import           Pos.Core (HasPrimaryKey (..), Timestamp)
+import           Pos.Core.Reporting (HasMisbehaviorMetrics (..),
+                     MisbehaviorMetrics (..))
 import           Pos.Infra.DHT.Real.Param (KademliaParams)
 import           Pos.Infra.Network.Types (NetworkConfig (..))
-import           Pos.Infra.Reporting.MemState (HasMisbehaviorMetrics (..),
-                     MisbehaviorMetrics (..))
 import           Pos.Infra.Shutdown (HasShutdownContext (..),
                      ShutdownContext (..))
 import           Pos.Infra.Slotting (HasSlottingVar (..),
@@ -46,6 +43,9 @@ import           Pos.Infra.StateLock (StateLock, StateLockMetrics)
 import           Pos.Infra.Util.JsonLog.Events (MemPoolModifyReason (..))
 import           Pos.Launcher.Param (BaseParams (..), NodeParams (..))
 import           Pos.Lrc.Context (LrcContext)
+import           Pos.Network.Block.RetrievalQueue (BlockRetrievalQueue,
+                     BlockRetrievalQueueTag)
+import           Pos.Recovery.Types (RecoveryHeader, RecoveryHeaderTag)
 import           Pos.Ssc.Types (HasSscContext (..), SscContext)
 import           Pos.Txp.Settings (TxpGlobalSettings)
 import           Pos.Update.Context (UpdateContext)

@@ -31,12 +31,12 @@ import           Pos.Core (BlockCount, FlatSlotId, HasProtocolConstants,
 import           Pos.Core.Block (BlockHeader)
 import           Pos.Core.Chrono (NE, OldestFirst (..))
 import           Pos.Core.Configuration (blkSecurityParam)
+import           Pos.Core.Slotting (MonadSlots (..), getCurrentSlotFlat,
+                     slotFromTimestamp)
 import qualified Pos.DB.BlockIndex as DB
 import           Pos.DB.Class (MonadBlockDBRead)
 import           Pos.Exception (traceFatalError)
 import           Pos.GState.BlockExtra (isBlockInMainChain)
-import           Pos.Infra.Slotting (MonadSlots (..), getCurrentSlotFlat,
-                     slotFromTimestamp)
 import           Pos.Util (_neHead)
 import           Pos.Util.Trace.Named (TraceNamed)
 

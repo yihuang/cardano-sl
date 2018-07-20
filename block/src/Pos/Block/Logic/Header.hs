@@ -35,6 +35,7 @@ import           Pos.Core (HeaderHash, blkSecurityParam, bvdMaxHeaderSize,
 import           Pos.Core.Block (BlockHeader (..))
 import           Pos.Core.Chrono (NE, NewestFirst, OldestFirst (..),
                      toNewestFirst, toOldestFirst, _NewestFirst, _OldestFirst)
+import           Pos.Core.Slotting (MonadSlots (getCurrentSlot))
 import           Pos.Crypto.Configuration (ProtocolMagic)
 import           Pos.DB (MonadDBRead)
 import qualified Pos.DB.Block.Load as DB
@@ -42,7 +43,6 @@ import qualified Pos.DB.BlockIndex as DB
 import qualified Pos.DB.GState.Common as GS (getTip)
 import           Pos.Delegation.Cede (dlgVerifyHeader, runDBCede)
 import qualified Pos.GState.BlockExtra as GS
-import           Pos.Infra.Slotting (MonadSlots (getCurrentSlot))
 import qualified Pos.Lrc.DB as LrcDB
 import qualified Pos.Update.DB as GS (getAdoptedBVFull)
 import           Pos.Util.Trace.Named (TraceNamed, appendName, logDebug)

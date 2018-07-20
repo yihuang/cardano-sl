@@ -44,7 +44,7 @@ import qualified Pos.Util.Log as Log
 import qualified Katip as K
 import qualified Katip.Monadic as KM
 
-{-# ANN module "HLint: ignore Reduce duplication" #-}
+{-# ANN module ("HLint: ignore Reduce duplication" :: String) #-}
 
 newtype Production t = Production
     { runProduction :: Log.LogContextT IO t

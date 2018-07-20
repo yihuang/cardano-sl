@@ -47,6 +47,7 @@ library
                      , lens
                      , log-warper >= 1.8
                      , mtl
+                     , reflection >= 2.1
                      , safe-exceptions
                      , serokell-util
                      , universum

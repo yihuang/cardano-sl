@@ -16,6 +16,7 @@ import           Universum hiding (on)
 
 import qualified Control.Concurrent.STM as STM
 import           Control.Lens ((<<.=))
+import           Control.Monad.Morph (generalize)
 import           Control.Monad.State.Class (MonadState (..))
 import qualified Data.Set as S
 import           Data.Time.Units (Millisecond)
@@ -41,7 +42,7 @@ import           Pos.Core.Mockable (withAsync)
 import qualified Pos.GState as DB
 import           Pos.Infra.Slotting (MonadSlots (getCurrentSlot))
 import qualified Pos.Util.Log as Log
-import           Pos.Util.Trace (noTrace)
+import           Pos.Util.Trace (natTrace, noTrace)
 import           Pos.Util.Trace.Named (TraceNamed, appendName, logDebug,
                      logInfo, logWarning)
 
@@ -164,10 +165,10 @@ notifierServer notifierSettings connVar = do
 periodicPollChanges
     :: forall ctx m.
        (ExplorerMode ctx m)
-    => TraceNamed m -> ConnectionsVar -> m ()
+    => TraceNamed Identity -> ConnectionsVar -> m ()
 periodicPollChanges logTrace connVar =
     -- Runs every 5 seconds.
-    runPeriodically logTrace (5000 :: Millisecond) (Nothing, mempty) $ do
+    runPeriodically (natTrace generalize logTrace) (5000 :: Millisecond) (Nothing, mempty) $ do
         curBlock   <- DB.getTip
         mempoolTxs <- lift $ S.fromList <$> getMempoolTxs @ctx
 
@@ -220,10 +221,10 @@ periodicPollChanges logTrace connVar =
 notifierApp
     :: forall ctx m.
        (ExplorerMode ctx m)
-    => TraceNamed m -> NotifierSettings -> m ()
+    => TraceNamed Identity -> NotifierSettings -> m ()
 notifierApp logTrace settings = do
     let logTrace' = appendName "notifier.socket-io" logTrace
-    logInfo logTrace' "Starting"
+    generalize $ logInfo logTrace' "Starting"
     connVar <- liftIO $ STM.newTVarIO mkConnectionsState
-    withAsync (periodicPollChanges logTrace' connVar)
+    withAsync (periodicPollChanges (natTrace generalize logTrace') connVar)
               (\_async -> notifierServer settings connVar)

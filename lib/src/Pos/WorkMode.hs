@@ -45,8 +45,6 @@ import           Pos.Infra.Slotting.Class (MonadSlots (..))
 import           Pos.Infra.Slotting.Impl (currentTimeSlottingSimple,
                      getCurrentSlotBlockingSimple,
                      getCurrentSlotInaccurateSimple, getCurrentSlotSimple)
-import           Pos.Infra.Slotting.MemState (HasSlottingVar (..),
-                     MonadSlotsData)
 import           Pos.Infra.Util.JsonLog.Events (JsonLogConfig)
 --import           Pos.Infra.Util.TimeWarp (CanJsonLog (..))
 import           Pos.Ssc.Mem (SscMemTag)

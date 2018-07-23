@@ -56,6 +56,7 @@ module Pos.Explorer.Socket.Methods
 import           Universum hiding (id)
 
 import           Control.Lens (at, ix, lens, non, (.=), _Just)
+import           Control.Monad.Morph (generalize)
 import           Control.Monad.State (MonadState)
 import           Data.Aeson (ToJSON)
 import qualified Data.List.NonEmpty as NE
@@ -63,6 +64,7 @@ import qualified Data.Set as S
 import           Formatting (sformat, shown, stext, (%))
 import           Network.EngineIO (SocketId)
 import           Network.SocketIO (Socket, socketId)
+
 import qualified Pos.Block.Logic as DB
 import           Pos.Block.Types (Blund)
 import           Pos.Core (Address, HeaderHash)
@@ -77,6 +79,7 @@ import           Pos.Explorer.Core (TxExtra (..))
 import qualified Pos.Explorer.DB as DB
 import qualified Pos.GState as DB
 import           Pos.Util (maybeThrow)
+import           Pos.Util.Trace (natTrace)
 import           Pos.Util.Trace.Named (TraceNamed, appendName, logDebug,
                      logWarning)
 
@@ -309,30 +312,29 @@ unsubscribeFully logTrace sessId = do
 
 broadcast
     :: ({-HasConnectionsState ctx, -}ExplorerMode ctx m, EventName event, ToJSON args)
-    => TraceNamed m -> event -> args -> Set SocketId -> ExplorerSockets m ()
+    => TraceNamed Identity -> event -> args -> Set SocketId -> ExplorerSockets m ()
 broadcast logTrace event args recipients = do
-    {-lift $-}
     forM_ recipients $ \sockid -> do
         mSock <- preview $ csClients . ix sockid . ccConnection . _ProdSocket
         case mSock of
-            Nothing   -> lift $ logWarning logTrace $
+            Nothing   -> generalize $ logWarning logTrace $
                 sformat ("No socket with SocketId="%shown%" registered for using in production") sockid
             Just sock -> lift $ emitTo sock event args
                 `catchAny` handler sockid
   where
-    handler sockid = (logWarning logTrace) .
+    handler sockid = (logWarning (natTrace generalize logTrace)) .
         sformat ("Failed to send to SocketId="%shown%": "%shown) sockid
 
 notifyAddrSubscribers
     :: forall ctx m . ExplorerMode ctx m
-    => TraceNamed m -> Address -> [CTxBrief] -> ExplorerSockets m ()
+    => TraceNamed Identity -> Address -> [CTxBrief] -> ExplorerSockets m ()
 notifyAddrSubscribers logTrace addr cTxEntries = do
     mRecipients <- view $ csAddressSubscribers . at addr
     whenJust mRecipients $ broadcast @ctx logTrace AddrUpdated cTxEntries
 
 notifyBlocksLastPageSubscribers
     :: forall ctx m . ExplorerMode ctx m
-    => TraceNamed m -> ExplorerSockets m ()
+    => TraceNamed Identity -> ExplorerSockets m ()
 notifyBlocksLastPageSubscribers logTrace = do
     recipients <- view csBlocksPageSubscribers
     blocks     <- lift $ getBlocksLastPage @ctx
@@ -340,13 +342,13 @@ notifyBlocksLastPageSubscribers logTrace = do
 
 notifyTxsSubscribers
     :: forall ctx m . ExplorerMode ctx m
-    => TraceNamed m -> [CTxEntry] -> ExplorerSockets m ()
+    => TraceNamed Identity -> [CTxEntry] -> ExplorerSockets m ()
 notifyTxsSubscribers logTrace cTxEntries =
     view csTxsSubscribers >>= broadcast @ctx logTrace TxsUpdated cTxEntries
 
 notifyEpochsLastPageSubscribers
     :: forall ctx m . ExplorerMode ctx m
-    => TraceNamed m -> EpochIndex -> ExplorerSockets m ()
+    => TraceNamed Identity -> EpochIndex -> ExplorerSockets m ()
 notifyEpochsLastPageSubscribers logTrace currentEpoch = do
     -- subscriber
     recipients <- view $ csEpochsLastPageSubscribers

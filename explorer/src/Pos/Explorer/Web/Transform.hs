@@ -18,6 +18,7 @@ import           Universum
 
 import qualified Control.Exception.Safe as E
 import           Control.Monad.Except (MonadError (throwError))
+import           Control.Monad.Morph (generalize)
 import qualified Control.Monad.Reader as Mtl
 import           Servant.Server (Handler, hoistServer)
 
@@ -34,7 +35,8 @@ import           Pos.Update.Configuration (HasUpdateConfiguration)
 import           Pos.Util.CompileInfo (HasCompileInfo)
 import qualified Pos.Util.Log as Log
 import           Pos.Util.Mockable ()
-import           Pos.Util.Trace (noTrace)
+import           Pos.Util.Trace (natTrace)
+import           Pos.Util.Trace.Named (TraceNamed)
 import           Pos.WorkMode (RealMode, RealModeContext (..))
 
 import           Pos.Explorer.BListener (ExplorerBListener,
@@ -89,28 +91,31 @@ type HasExplorerConfiguration =
 
 notifierPlugin
     :: HasExplorerConfiguration
-    => NotifierSettings
+    => TraceNamed Identity
+    -> NotifierSettings
     -> Diffusion ExplorerProd
     -> ExplorerProd ()
-notifierPlugin settings _ = notifierApp noTrace settings
+notifierPlugin logTrace settings _ = notifierApp logTrace settings
 
 explorerPlugin
     :: HasExplorerConfiguration
     => Log.LoggingHandler
+    -> TraceNamed Identity
     -> Word16
     -> Diffusion ExplorerProd
     -> ExplorerProd ()
-explorerPlugin lh = flip $ explorerServeWebReal lh
+explorerPlugin lh logTrace = flip $ explorerServeWebReal lh logTrace
 
 explorerServeWebReal
     :: HasExplorerConfiguration
     => Log.LoggingHandler
+    -> TraceNamed Identity
     -> Diffusion ExplorerProd
     -> Word16
     -> ExplorerProd ()
-explorerServeWebReal lh diffusion port = do
+explorerServeWebReal lh logTrace diffusion port = do
     rctx <- ask
-    let handlers = explorerHandlers noTrace diffusion
+    let handlers = explorerHandlers (natTrace generalize logTrace) diffusion
         server = hoistServer explorerApi (convertHandler lh rctx) handlers
         app = explorerApp (pure server)
     explorerServeImpl app port

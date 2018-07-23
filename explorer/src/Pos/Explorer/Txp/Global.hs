@@ -21,34 +21,35 @@ import           Pos.Txp (ProcessBlundsSettings (..), TxpBlund,
                      TxpGlobalSettings (..), applyBlocksWith, blundToAuxNUndo,
                      processBlunds, txpGlobalSettings)
 import qualified Pos.Util.Modifier as MM
--- import           Pos.Util.Trace (noTrace)
+import           Pos.Util.Trace (noTrace)
 import           Pos.Util.Trace.Named (TraceNamed)
 
 import qualified Pos.Explorer.DB as GS
 import           Pos.Explorer.Txp.Common (buildExplorerExtraLookup)
-import           Pos.Explorer.Txp.Toil (EGlobalToilM, ExplorerExtraLookup (..),
-                     ExplorerExtraModifier (..), eApplyToil)
 -- import           Pos.Explorer.Txp.Toil (EGlobalToilM, ExplorerExtraLookup (..),
---                      ExplorerExtraModifier (..), eApplyToil, eRollbackToil)
+--                      ExplorerExtraModifier (..), eApplyToil)
+import           Pos.Explorer.Txp.Toil (EGlobalToilM, ExplorerExtraLookup (..),
+                     ExplorerExtraModifier (..), eApplyToil, eRollbackToil)
+import           Pos.Explorer.Txp.Toil.Monad (ExplorerExtraM)
 
 -- | Settings used for global transactions data processing used by explorer.
 explorerTxpGlobalSettings
     :: HasConfiguration
     -- :: (MonadIO m, HasConfiguration)
-    => TraceNamed m
+    => TraceNamed ExplorerExtraM
     -> ProtocolMagic
     -> TxpGlobalSettings
-explorerTxpGlobalSettings _{-logTrace-} pm =
+explorerTxpGlobalSettings logTrace pm =
     -- verification is same
     (txpGlobalSettings pm)
-    { tgsApplyBlocks = \tr -> applyBlocksWith tr pm (applySettings tr)
+    { tgsApplyBlocks = \tr -> applyBlocksWith tr pm (applySettings logTrace)
     --TODO applySettings could take the Trace inside applyBlocksWith
-    , tgsRollbackBlocks = \tr -> processBlunds (rollbackSettings tr) . getNewestFirst
+    , tgsRollbackBlocks = \_ -> processBlunds (rollbackSettings logTrace) . getNewestFirst
     }
 
 applySettings ::
-       (MonadIO m, TxpGlobalApplyMode ctx m)
-    => TraceNamed m
+       TxpGlobalApplyMode ctx m
+    => TraceNamed ExplorerExtraM
     -> ProcessBlundsSettings ExplorerExtraLookup ExplorerExtraModifier m
 applySettings _{-logTrace-} =
     ProcessBlundsSettings
@@ -61,12 +62,13 @@ applySettings _{-logTrace-} =
         }
 
 rollbackSettings ::
-       (MonadIO m, TxpGlobalRollbackMode m)
-    => TraceNamed m
+       TxpGlobalRollbackMode m
+    => TraceNamed ExplorerExtraM
     -> ProcessBlundsSettings ExplorerExtraLookup ExplorerExtraModifier m
 rollbackSettings _ = -- logTrace =
     ProcessBlundsSettings
-        { pbsProcessSingle = (const . return . return) () -- return . (eRollbackToil noTrace) . blundToAuxNUndo
+        { pbsProcessSingle = return . (eRollbackToil noTrace) . blundToAuxNUndo
+        -- (const . return . return) ()
         , pbsCreateEnv = buildExplorerExtraLookup
         , pbsExtraOperations = extraOps
         , pbsIsRollback = True
@@ -74,7 +76,7 @@ rollbackSettings _ = -- logTrace =
 
 applySingle ::
        forall ctx m. (HasConfiguration, TxpGlobalApplyMode ctx m)
-    => TraceNamed m
+    => TraceNamed ExplorerExtraM
     -> TxpBlund
     -> m (EGlobalToilM ())
 applySingle logTrace txpBlund = do

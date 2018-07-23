@@ -36,7 +36,6 @@ import           Pos.Txp.Toil (ToilVerFailure (..), extendGlobalToilM,
                      extendLocalToilM)
 import qualified Pos.Txp.Toil as Txp
 import           Pos.Txp.Topsort (topsortTxs)
-import           Pos.Util.Trace (noTrace)
 import           Pos.Util.Trace.Named (TraceNamed, logError)
 import           Pos.Util.Util (Sign (..))
 
@@ -48,12 +47,12 @@ import           Pos.Util.Util (Sign (..))
 -- example, it implies topological sort).
 eApplyToil
     :: HasConfiguration
-    => TraceNamed m
+    => TraceNamed ExplorerExtraM
     -> Maybe Timestamp
     -> [(TxAux, TxUndo)]
     -> HeaderHash
     -> EGlobalToilM ()
-eApplyToil _ mTxTimestamp txun hh = do
+eApplyToil logTrace mTxTimestamp txun hh = do
     extendGlobalToilM $ Txp.applyToil txun
     explorerExtraMToEGlobalToilM $ mapM_ applier $ zip [0..] txun
   where
@@ -65,7 +64,7 @@ eApplyToil _ mTxTimestamp txun hh = do
         extra <- fromMaybe newExtra <$> getTxExtra id
         putTxExtraWithHistory id extra $ getTxRelatedAddrs txAux txUndo
         let balanceUpdate = getBalanceUpdate txAux txUndo
-        updateAddrBalances noTrace balanceUpdate
+        updateAddrBalances logTrace balanceUpdate
         updateUtxoSumFromBalanceUpdate balanceUpdate
 
 -- | Rollback transactions from one block.
@@ -221,7 +220,7 @@ updateAddrBalances logTrace (combineBalanceUpdates -> updates) = mapM_ updater u
                     coin addr
             Just currentBalance
                 | currentBalance < coin ->
-                    lift $ logError noTrace $
+                    logError logTrace $
                         sformat ("updateAddrBalances: attempted to subtract "%build%
                                  " from address "%build%" which only has "%build)
                         coin addr currentBalance

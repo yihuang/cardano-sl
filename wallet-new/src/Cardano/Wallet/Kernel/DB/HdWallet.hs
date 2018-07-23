@@ -533,3 +533,4 @@ instance Buildable UnknownHdAccount where
         = bprint ("UnknownHdAccountRoot: "%build) rootId
     build (UnknownHdAccount accountId)
         = bprint ("UnknownHdAccount accountId: "%build) accountId
+

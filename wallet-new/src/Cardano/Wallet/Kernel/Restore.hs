@@ -1,5 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
-module Cardano.Wallet.Kernel.Restore () where
+module Cardano.Wallet.Kernel.Restore
+ ( restoreWallet
+ ) where
 
 import Universum
 
@@ -16,13 +18,13 @@ import Pos.Crypto (PassPhrase)
 import Pos.DB.Class (MonadDBRead)
 import Pos.DB.Rocks.Types (NodeDBs)
 import Pos.Txp.DB.Utxo (filterUtxo)
-import Pos.Txp.Toil.Types (GenesisUtxo, unGenesisUtxo, Utxo)
+import Pos.Txp.Toil.Types (GenesisUtxo, unGenesisUtxo, Utxo, utxoToModifier)
 import Pos.Wallet.Web.Tracking.Decrypt (decryptAddress, WalletDecrCredentials)
 import Pos.Wallet.Web.Tracking.Sync (firstGenesisHeader, processSyncError)
 
 import Cardano.Wallet.Kernel.Compat (DBReadT, withMonadDBRead)
 import Cardano.Wallet.Kernel.PrefilterTx (WalletKey, prefilter, toHdAddressId)
-import Cardano.Wallet.Kernel.DB.AcidState (CreateHdAddress(..), DB)
+import Cardano.Wallet.Kernel.DB.AcidState (CreateHdAddress(..), UpdateCurrentCheckpointUtxo(..), DB)
 import Cardano.Wallet.Kernel.DB.HdWallet (HdWallets, HdRootId)
 import Cardano.Wallet.Kernel.DB.HdWallet.Create
   (initHdAddress, CreateHdAddressError)
@@ -75,11 +77,12 @@ restoreWalletBalance db (wId, wdc) = do
     for_ (M.elems utxo) $ \toa -> do
        let a = txOutAddress (toaOut toa)
        case decryptAddress wdc a of
+          Nothing -> error "TODO"
           Just wam -> do
              let aId = toHdAddressId wId wam
              liftIO (update' db (CreateHdAddress (initHdAddress aId (InDb a))))
-    -- updateWalletBalancesAndUtxo db (utxoToModifier utxo)
-    where
-      isWalletUtxo :: (TxIn, TxOutAux) -> Bool
-      isWalletUtxo (_, toa) =
-        isJust (decryptAddress wdc (txOutAddress (toaOut toa)))
+    liftIO (update' db (UpdateCurrentCheckpointUtxo (utxoToModifier utxo)))
+  where
+    isWalletUtxo :: (TxIn, TxOutAux) -> Bool
+    isWalletUtxo (_, toa) =
+      isJust (decryptAddress wdc (txOutAddress (toaOut toa)))

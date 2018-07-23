@@ -10,7 +10,8 @@ module Cardano.Wallet.Kernel.Compat
   , getCoreConfigurations
   ) where
 
-import           Control.Monad.IO.Unlift (MonadUnliftIO, askUnliftIO, withUnliftIO, UnliftIO(UnliftIO), unliftIO)
+import           Control.Monad.IO.Unlift (MonadUnliftIO, UnliftIO (UnliftIO),
+                     askUnliftIO, unliftIO, withUnliftIO)
 import           Control.Monad.Trans.Class (MonadTrans)
 import           Control.Monad.Trans.Reader (ReaderT (ReaderT), runReaderT)
 import           Control.Monad.Trans.Resource (transResourceT)
@@ -53,7 +54,7 @@ instance (HasConfiguration, MonadThrow (DBReadT m), MonadRealDB NodeDBs (ReaderT
 --
 -- This is also a monad morphism from @'DBReadT' m@ to @m@.
 withMonadDBRead
-  :: (MonadCatch m, MonadIO m, MonadUnliftIO m)
+  :: (MonadCatch m, MonadUnliftIO m)
   => CoreConfiguration
   -> Maybe GeneratedSecrets
   -> GenesisData

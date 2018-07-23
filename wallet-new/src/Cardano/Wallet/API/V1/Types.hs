@@ -1387,7 +1387,7 @@ instance Arbitrary Transaction where
 deriveSafeBuildable ''Transaction
 instance BuildableSafeGen Transaction where
     buildSafeGen sl Transaction{..} = bprint ("{"
-        %" id="%buildSafe sl
+        -- TODO %" id="%buildSafe sl
         %" confirmations="%build
         %" amount="%buildSafe sl
         %" inputs="%buildSafeList sl
@@ -1395,7 +1395,7 @@ instance BuildableSafeGen Transaction where
         %" type="%buildSafe sl
         %" direction"%buildSafe sl
         %" }")
-        txId
+        -- TODO txId
         txConfirmations
         txAmount
         (toList txInputs)

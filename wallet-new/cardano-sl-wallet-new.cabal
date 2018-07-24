@@ -510,6 +510,7 @@ test-suite wallet-new-specs
                     SwaggerSpec
                     RequestSpec
                     WalletHandlersSpec
+                    WalletNewJson
                     Cardano.Wallet.WalletLayer.QuickCheck
 
   default-language: Haskell2010
@@ -543,6 +544,7 @@ test-suite wallet-new-specs
                     , aeson
                     , bytestring
                     , cardano-sl
+                    , cardano-sl-binary-test
                     , cardano-sl-client
                     , cardano-sl-client
                     , cardano-sl-core
@@ -555,6 +557,7 @@ test-suite wallet-new-specs
                     , directory
                     , directory
                     , formatting
+                    , hedgehog
                     , hspec
                     , lens
                     , QuickCheck

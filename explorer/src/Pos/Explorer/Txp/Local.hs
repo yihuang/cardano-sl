@@ -54,7 +54,7 @@ eTxProcessTransaction ::
     -> (TxId, TxAux)
     -> m (Either ToilVerFailure ())
 eTxProcessTransaction logTrace pm itw =
-    withStateLock noTrace LowPriority ProcessTransaction $
+    withStateLock noTrace{-jsonLogTrace-} LowPriority ProcessTransaction $
         \__tip -> eTxProcessTransactionNoLock logTrace pm itw
 
 eTxProcessTransactionNoLock ::
@@ -81,7 +81,7 @@ eTxProcessTransactionNoLock logTrace pm itw = getCurrentSlot >>= \case
         -> (TxId, TxAux)
         -> ExceptT ToilVerFailure ELocalToilM ()
     processTx' mTxTimestamp bvd epoch tx =
-        eProcessTx logTrace pm bvd epoch tx (TxExtra Nothing mTxTimestamp)
+        eProcessTx noTrace pm bvd epoch tx (TxExtra Nothing mTxTimestamp)
 
 -- | 1. Recompute UtxoView by current MemPool
 --   2. Remove invalid transactions from MemPool
@@ -91,7 +91,7 @@ eTxNormalize
     => TraceNamed m
     -> ProtocolMagic
     -> m ()
-eTxNormalize logTrace pm = do
+eTxNormalize _ pm = do
     extras <- MM.insertionsMap . view eemLocalTxsExtra <$> withTxpLocalData getTxpExtra
     txNormalizeAbstract buildExplorerExtraLookup (normalizeToil' extras)
   where
@@ -103,4 +103,4 @@ eTxNormalize logTrace pm = do
         -> ELocalToilM ()
     normalizeToil' extras bvd epoch txs =
         let toNormalize = HM.toList $ HM.intersectionWith (,) txs extras
-        in eNormalizeToil logTrace pm bvd epoch toNormalize
+        in eNormalizeToil noTrace pm bvd epoch toNormalize

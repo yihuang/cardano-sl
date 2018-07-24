@@ -60,6 +60,7 @@ import           Pos.Txp (MempoolExt, MonadTxpLocal, MonadTxpMem,
                      topsortTxs, txOutAddress, txpProcessTx, unGenesisUtxo,
                      utxoGet, utxoToLookup, withTxpLocalData)
 import           Pos.Util (eitherToThrow, maybeThrow)
+import           Pos.Util.Trace (noTrace)
 import           Pos.Util.Util (HasLens')
 
 ----------------------------------------------------------------------
@@ -265,7 +266,7 @@ instance Exception SaveTxException where
 
 saveTxDefault :: TxHistoryEnv ctx m => ProtocolMagic -> (TxId, TxAux) -> m ()
 saveTxDefault pm txw = do
-    res <- txpProcessTx pm txw
+    res <- txpProcessTx noTrace pm txw
     eitherToThrow (first SaveTxToilFailure res)
 
 txHistoryListToMap :: [TxHistoryEntry] -> Map TxId TxHistoryEntry

@@ -511,8 +511,8 @@ type instance MempoolExt BlockTestMode = EmptyMempoolExt
 
 instance HasConfigurations => MonadTxpLocal (BlockGenMode EmptyMempoolExt BlockTestMode) where
     txpNormalize = withCompileInfo $ txNormalize
-    txpProcessTx = withCompileInfo $ txProcessTransactionNoLock noTrace
+    txpProcessTx = withCompileInfo $ txProcessTransactionNoLock
 
 instance HasConfigurations => MonadTxpLocal BlockTestMode where
     txpNormalize = withCompileInfo $ txNormalize
-    txpProcessTx = withCompileInfo $ txProcessTransactionNoLock noTrace
+    txpProcessTx = withCompileInfo $ txProcessTransactionNoLock

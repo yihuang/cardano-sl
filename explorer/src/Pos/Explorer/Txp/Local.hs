@@ -8,13 +8,13 @@ module Pos.Explorer.Txp.Local
        , eTxNormalize
        ) where
 
--- import           JsonLog (CanJsonLog (..))
 import           Universum
 
+import           Control.Monad.Morph (generalize)
 import qualified Data.HashMap.Strict as HM
 
 import           Pos.Core (BlockVersionData, EpochIndex, Timestamp)
-import           Pos.Core.JsonLog (CanJsonLog (..))
+-- import           Pos.Core.JsonLog (CanJsonLog (..))
 import           Pos.Core.Txp (TxAux (..), TxId)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Infra.Slotting (MonadSlots (getCurrentSlot), getSlotStart)
@@ -27,7 +27,7 @@ import           Pos.Txp.MemState (MempoolExt, TxpLocalWorkMode, getTxpExtra,
                      withTxpLocalData)
 import           Pos.Txp.Toil (ToilVerFailure (..), Utxo)
 import qualified Pos.Util.Modifier as MM
-import           Pos.Util.Trace (noTrace)
+import           Pos.Util.Trace (natTrace, noTrace)
 import           Pos.Util.Trace.Named (TraceNamed)
 import           Pos.Util.Util (HasLens')
 
@@ -53,13 +53,13 @@ eTxProcessTransaction ::
     -> ProtocolMagic
     -> (TxId, TxAux)
     -> m (Either ToilVerFailure ())
-eTxProcessTransaction logTrace pm itw =
+eTxProcessTransaction _ pm itw =
     withStateLock noTrace{-jsonLogTrace-} LowPriority ProcessTransaction $
-        \__tip -> eTxProcessTransactionNoLock logTrace pm itw
+        \__tip -> eTxProcessTransactionNoLock noTrace pm itw
 
 eTxProcessTransactionNoLock ::
        forall ctx m. (MonadIO m, ETxpLocalWorkMode ctx m)
-    => TraceNamed m
+    => TraceNamed Identity
     -> ProtocolMagic
     -> (TxId, TxAux)
     -> m (Either ToilVerFailure ())
@@ -69,7 +69,7 @@ eTxProcessTransactionNoLock logTrace pm itw = getCurrentSlot >>= \case
         -- First get the current @SlotId@ so we can calculate the time.
         -- Then get when that @SlotId@ started and use that as a time for @Tx@.
         mTxTimestamp <- getSlotStart slot
-        txProcessTransactionAbstract logTrace buildContext (processTx' mTxTimestamp) itw
+        txProcessTransactionAbstract (natTrace generalize logTrace) buildContext (processTx' mTxTimestamp) itw
   where
     buildContext :: Utxo -> TxAux -> m ExplorerExtraLookup
     buildContext utxo = buildExplorerExtraLookup utxo . one

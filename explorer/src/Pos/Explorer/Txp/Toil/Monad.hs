@@ -52,8 +52,8 @@ import qualified Pos.Util.Modifier as MM
 
 -- | Utility monad which allows to lookup extra values related to txp and modify them.
 type ExplorerExtraM
- = ReaderT ExplorerExtraLookup (StateT ExplorerExtraModifier ({-NamedPureLogger-} Identity))
--- = ReaderT ExplorerExtraLookup (StateT ExplorerExtraModifier ({-NamedPureLogger-}IdentityT IO))
+ = ReaderT ExplorerExtraLookup (StateT ExplorerExtraModifier Identity)
+--  = ReaderT ExplorerExtraLookup (StateT ExplorerExtraModifier ({-NamedPureLogger-}IdentityT IO))
 
 getTxExtra :: TxId -> ExplorerExtraM (Maybe TxExtra)
 getTxExtra txId = do

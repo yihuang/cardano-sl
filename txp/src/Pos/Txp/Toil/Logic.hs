@@ -22,9 +22,8 @@ import           Serokell.Data.Memory.Units (Byte)
 import           Pos.Binary.Class (biSize)
 import           Pos.Core (AddrAttributes (..), AddrStakeDistribution (..),
                      Address, BlockVersionData (..), EpochIndex,
-                     HasGenesisData, ProtocolMagic, StakeholderId,
-                     addrAttributesUnwrapped, isBootstrapEraBVD,
-                     isRedeemAddress)
+                     HasGenesisData, ProtocolMagic, addrAttributesUnwrapped,
+                     isBootstrapEraBVD, isRedeemAddress)
 import           Pos.Core.Common (integerToCoin)
 import qualified Pos.Core.Common as Fee (TxFeePolicy (..),
                      calculateTxSizeLinear)
@@ -72,19 +71,17 @@ verifyToil pm bvd lockedAssets curEpoch verifyAllIsKnown =
 -- example, it implies topological sort).
 
 
-applyToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM [StakeholderId]
-applyToil [] = pure []
+applyToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM ()
+applyToil [] = pass
 applyToil txun = do
-    sids <- applyTxsToStakes txun
+    applyTxsToStakes txun
     utxoMToGlobalToilM $ mapM_ (applyTxToUtxo' . withTxId . fst) txun
-    pure sids
 
 -- | Rollback transactions from one block.
-rollbackToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM [StakeholderId]
+rollbackToil :: HasGenesisData => [(TxAux, TxUndo)] -> GlobalToilM ()
 rollbackToil txun = do
-    sids <- rollbackTxsStakes txun
+    rollbackTxsStakes txun
     utxoMToGlobalToilM $ mapM_ Utxo.rollbackTxUtxo $ reverse txun
-    pure sids
 
 ----------------------------------------------------------------------------
 -- Local

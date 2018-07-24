@@ -21,10 +21,9 @@ import           Data.Default (Default, def)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.List.NonEmpty as NE
 import           Formatting (build, sformat, (%))
-import           Serokell.Util (listJson)
 
 import           Pos.Core (HasCoreConfiguration, HasGenesisData, ProtocolMagic,
-                     StakeholderId, epochIndexL)
+                     epochIndexL)
 import           Pos.Core.Block.Union (ComponentBlock (..))
 import           Pos.Core.Chrono (NE, NewestFirst (..), OldestFirst (..))
 import           Pos.Core.Txp (TxAux, TxUndo, TxpUndo)
@@ -46,18 +45,7 @@ import           Pos.Txp.Toil (ExtendedGlobalToilM, GlobalToilEnv (..),
                      runGlobalToilMBase, runUtxoM, utxoToLookup, verifyToil)
 import           Pos.Util.AssertMode (inAssertMode)
 import qualified Pos.Util.Modifier as MM
-import           Pos.Util.Trace.Named (TraceNamed, logDebug)
-
-
-logCreatedStakeholderIdsAfterToil
-    :: Applicative m
-    => TraceNamed m
-    -> [StakeholderId]
-    -> m ()
-logCreatedStakeholderIdsAfterToil logTrace createdStakes =
-    unless (null createdStakes) $
-        logDebug logTrace (sformat ("Stakes for "%listJson%" will be created in StakesDB") createdStakes)
-
+import           Pos.Util.Trace.Named (TraceNamed)
 
 ----------------------------------------------------------------------------
 -- Settings
@@ -69,8 +57,9 @@ txpGlobalSettings :: HasGenesisData => ProtocolMagic -> TxpGlobalSettings
 txpGlobalSettings pm =
     TxpGlobalSettings
     { tgsVerifyBlocks = \_ -> verifyBlocks pm
-    , tgsApplyBlocks =  \logTrace -> applyBlocksWith logTrace pm (processBlundsSettings False ((fmap . fmap) (logCreatedStakeholderIdsAfterToil logTrace) applyToil))
-    , tgsRollbackBlocks = rollbackBlocks
+    -- , tgsApplyBlocks =  \logTrace -> applyBlocksWith logTrace pm (processBlundsSettings False ((fmap . fmap) (logCreatedStakeholderIdsAfterToil logTrace) applyToil))
+    , tgsApplyBlocks = \logTrace -> applyBlocksWith logTrace pm (processBlundsSettings False applyToil)
+    , tgsRollbackBlocks = \_ -> rollbackBlocks
     }
 
 ----------------------------------------------------------------------------
@@ -116,7 +105,7 @@ verifyBlocks pm verifyAllIsKnown newChain = runExceptT $ do
 ----------------------------------------------------------------------------
 
 data ProcessBlundsSettings extraEnv extraState m = ProcessBlundsSettings
-    { pbsProcessSingle   :: TxpBlund -> ExtendedGlobalToilM extraEnv extraState (m ())
+    { pbsProcessSingle   :: TxpBlund -> m (ExtendedGlobalToilM extraEnv extraState ())
     , pbsCreateEnv       :: Utxo -> [TxAux] -> m extraEnv
     , pbsExtraOperations :: extraState -> SomeBatchOp
     , pbsIsRollback      :: !Bool
@@ -126,6 +115,7 @@ data ProcessBlundsSettings extraEnv extraState m = ProcessBlundsSettings
     -- resolved all their inputs. But if we want to rollback them, we
     -- should turn known outputs of transactions into 'Utxo'.
     }
+
 
 processBlunds ::
        forall extraEnv extraState m. (TxpCommonMode m, Default extraState)
@@ -154,8 +144,8 @@ processBlunds ProcessBlundsSettings {..} blunds = do
             -> TxpBlund
             -> m (GlobalToilState, extraState)
         step st txpBlund = do
-            let processSingle   = pbsProcessSingle txpBlund
-                txAuxesAndUndos = blundToAuxNUndo txpBlund
+            processSingle <- pbsProcessSingle txpBlund
+            let txAuxesAndUndos = blundToAuxNUndo txpBlund
                 txAuxes = fst <$> txAuxesAndUndos
             baseUtxo <- buildBaseUtxo (st ^. _1 . gtsUtxoModifier) txAuxes
             extraEnv <- pbsCreateEnv baseUtxo txAuxes
@@ -165,14 +155,9 @@ processBlunds ProcessBlundsSettings {..} blunds = do
                         , _gteTotalStake = totalStake
                         }
             let env = (gte, extraEnv)
-            -- The 'processSingle' produces an 'm ()', so that it can do
-            -- logging after it completes ('processSingle' is pure).
-            (finalAction, s) <- runGlobalToilMBase DB.getRealStake . flip runStateT st .
+            runGlobalToilMBase DB.getRealStake . flip execStateT st .
                 usingReaderT env $
                 processSingle
-            finalAction
-            pure s
-
     toBatchOp <$> foldM step (defGlobalToilState, def) blunds
 
 ----------------------------------------------------------------------------
@@ -199,27 +184,25 @@ applyBlocksWith logTrace pm settings blunds = do
 processBlundsSettings ::
        forall m. Monad m
     => Bool
-    -> ([(TxAux, TxUndo)] -> GlobalToilM (m ()))
+    -> ([(TxAux, TxUndo)] -> GlobalToilM ())
     -> ProcessBlundsSettings () () m
 processBlundsSettings isRollback pureAction =
     ProcessBlundsSettings
-        { pbsProcessSingle = processSingle
+        { pbsProcessSingle = \txpBlund -> pure (processSingle txpBlund)
         , pbsCreateEnv = \_ _ -> pure ()
         , pbsExtraOperations = const mempty
         , pbsIsRollback = isRollback
         }
   where
-    processSingle :: TxpBlund -> ExtendedGlobalToilM () () (m ())
+    processSingle :: TxpBlund -> ExtendedGlobalToilM () () ()
     processSingle = zoom _1 . magnify _1 . pureAction . blundToAuxNUndo
 
 rollbackBlocks ::
        forall m. (TxpGlobalRollbackMode m)
-    => TraceNamed m
-    -> NewestFirst NE TxpBlund
+    => NewestFirst NE TxpBlund
     -> m SomeBatchOp
-rollbackBlocks logTrace (NewestFirst blunds) =
-    processBlunds (processBlundsSettings True ((fmap . fmap ) (logCreatedStakeholderIdsAfterToil logTrace) rollbackToil)) blunds
-    --processBlunds (processBlundsSettings True rollbackToil) blunds
+rollbackBlocks (NewestFirst blunds) =
+    processBlunds (processBlundsSettings True rollbackToil) blunds
 
 ----------------------------------------------------------------------------
 -- Helpers

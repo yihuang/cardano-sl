@@ -36,6 +36,37 @@ Library
 
                         Bench.Network.Commons
 
+                        -- Diffusion layer
+                        Pos.Network.Diffusion.Transport.TCP
+                        Pos.Network.Diffusion.Types
+                        Pos.Network.Diffusion.Subscription.Common
+                        Pos.Network.Diffusion.Subscription.Dns
+                        Pos.Network.Diffusion.Subscription.Dht
+                        Pos.Network.Diffusion.Subscription.Status
+                        Pos.Network.Diffusion.Subscription.Subscriber
+
+                        -- Network topology
+                        Pos.Network.Topology.DnsDomains
+                        Pos.Network.Topology.Policy
+                        Pos.Network.Topology.Types
+                        Pos.Network.Topology.Yaml
+                        Pos.Network.Topology.CLI
+
+                        -- Communication
+                        Pos.Network.Communication.Constants
+                        Pos.Network.Communication.Types.Protocol
+                        Pos.Network.Communication.Types.Relay
+                        Pos.Network.Communication.BiP
+                        Pos.Network.Communication.Limits.Instances
+                        Pos.Network.Communication.Listener
+                        Pos.Network.Communication.Protocol
+                        Pos.Network.Communication.Specs
+                        Pos.Network.Communication.Relay
+                        Pos.Network.Communication.Relay.Class
+                        Pos.Network.Communication.Relay.Logic
+                        Pos.Network.Communication.Relay.Types
+                        Pos.Network.Communication.Relay.Util
+
   other-modules:        Ntp.Packet
                         Ntp.Util
                         Data.NonEmptySet
@@ -44,6 +75,7 @@ Library
                       , async
                       , attoparsec
                       , base
+                      , cardano-sl-binary
                       , cardano-sl-core
                       , cardano-sl-util
                       , containers

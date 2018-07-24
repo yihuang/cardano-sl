@@ -14,14 +14,6 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:
-                        -- Diffusion layer
-                        Pos.Infra.Diffusion.Transport.TCP
-                        Pos.Infra.Diffusion.Types
-                        Pos.Infra.Diffusion.Subscription.Common
-                        Pos.Infra.Diffusion.Subscription.Dns
-                        Pos.Infra.Diffusion.Subscription.Dht
-                        Pos.Infra.Diffusion.Subscription.Status
-                        Pos.Infra.Diffusion.Subscription.Subscriber
 
                         -- Reporting
                         Pos.Infra.Reporting
@@ -59,30 +51,8 @@ library
                         Pos.Infra.DHT.Real.CLI
                         Pos.Infra.DHT.Workers
 
-                        -- Pos.Infra.Communication
-                        Pos.Infra.Communication.Constants
-                        Pos.Infra.Communication.Types.Protocol
-                        Pos.Infra.Communication.Types.Relay
-                        Pos.Infra.Communication.BiP
-                        Pos.Infra.Communication.Limits.Instances
-                        Pos.Infra.Communication.Listener
-                        Pos.Infra.Communication.Protocol
-                        Pos.Infra.Communication.Specs
-                        Pos.Infra.Communication.Relay
-                        Pos.Infra.Communication.Relay.Class
-                        Pos.Infra.Communication.Relay.Logic
-                        Pos.Infra.Communication.Relay.Types
-                        Pos.Infra.Communication.Relay.Util
-
                         -- Health Checks
                         Pos.Infra.HealthCheck.Route53
-
-                        -- Network topology
-                        Pos.Infra.Network.DnsDomains
-                        Pos.Infra.Network.Policy
-                        Pos.Infra.Network.Types
-                        Pos.Infra.Network.Yaml
-                        Pos.Infra.Network.CLI
 
                         -- Recovery
                         Pos.Infra.Recovery.Info

@@ -144,12 +144,13 @@ applyBlocksUnsafe
     :: ( MonadBlockApply ctx m
        , HasTxpConfiguration
        )
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> ShouldCallBListener
     -> OldestFirst NE Blund
     -> Maybe PollModifier
     -> m ()
-applyBlocksUnsafe pm scb blunds pModifier = do
+applyBlocksUnsafe logTrace pm scb blunds pModifier = do
     -- Check that all blunds have the same epoch.
     unless (null nextEpoch) $ assertionFailed noTrace $
         sformat ("applyBlocksUnsafe: tried to apply more than we should"%
@@ -169,7 +170,7 @@ applyBlocksUnsafe pm scb blunds pModifier = do
         (b@(Left _,_):|(x:xs)) -> app' (b:|[]) >> app' (x:|xs)
         _                      -> app blunds
   where
-    app x = applyBlocksDbUnsafeDo pm scb x pModifier
+    app x = applyBlocksDbUnsafeDo logTrace pm scb x pModifier
     app' = app . OldestFirst
     (thisEpoch, nextEpoch) =
         spanSafe ((==) `on` view (_1 . epochIndexL)) $ getOldestFirst blunds
@@ -178,16 +179,17 @@ applyBlocksDbUnsafeDo
     :: ( MonadBlockApply ctx m
        , HasTxpConfiguration
        )
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> ShouldCallBListener
     -> OldestFirst NE Blund
     -> Maybe PollModifier
     -> m ()
-applyBlocksDbUnsafeDo pm scb blunds pModifier = do
+applyBlocksDbUnsafeDo logTrace pm scb blunds pModifier = do
     let blocks = fmap fst blunds
     -- Note: it's important to do 'slogApplyBlocks' first, because it
     -- puts blocks in DB.
-    slogBatch <- slogApplyBlocks scb blunds
+    slogBatch <- slogApplyBlocks logTrace scb blunds
     TxpGlobalSettings {..} <- view (lensOf @TxpGlobalSettings)
     usBatch <- SomeBatchOp <$> usApplyBlocks noTrace pm (map toUpdateBlock blocks) pModifier
     delegateBatch <- SomeBatchOp <$> dlgApplyBlocks noTrace (map toDlgBlund blunds)
@@ -208,13 +210,14 @@ applyBlocksDbUnsafeDo pm scb blunds pModifier = do
 -- current tip. It's also assumed that lock on block db is taken already.
 rollbackBlocksUnsafe
     :: MonadBlockApply ctx m
-    => ProtocolMagic
+    => TraceNamed m
+    -> ProtocolMagic
     -> BypassSecurityCheck -- ^ is rollback for more than k blocks allowed?
     -> ShouldCallBListener
     -> NewestFirst NE Blund
     -> m ()
-rollbackBlocksUnsafe pm bsc scb toRollback = do
-    slogRoll <- slogRollbackBlocks bsc scb toRollback
+rollbackBlocksUnsafe logTrace pm bsc scb toRollback = do
+    slogRoll <- slogRollbackBlocks logTrace bsc scb toRollback
     dlgRoll <- SomeBatchOp <$> dlgRollbackBlocks noTrace (map toDlgBlund toRollback)
     usRoll <- SomeBatchOp <$> usRollbackBlocks noTrace
                   (toRollback & each._2 %~ undoUS

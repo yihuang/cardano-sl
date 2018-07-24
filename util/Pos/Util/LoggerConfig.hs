@@ -117,6 +117,12 @@ instance FromJSON LoggerTree where
         (singleFile :: Maybe FilePath) <- fmap normalise <$> o .:? "file"
         (manyFiles :: [FilePath]) <- map normalise <$> (o .:? "files" .!= [])
         handlers <- o .:? "handlers" .!= []
+        let consoleHandler =
+                LogHandler { _lhName = "console",
+                            _lhBackend = StdoutBE,
+                            _lhFpath = Nothing,
+                            _lhSecurityLevel = Just SecretLogLevel,
+                            _lhMinSeverity = Just Debug }
         let fileHandlers =
               map (\fp ->
                 let name = T.pack fp in
@@ -129,7 +135,7 @@ instance FromJSON LoggerTree where
                                 _    -> Just SecretLogLevel
                            }) $
                 maybeToList singleFile ++ manyFiles
-        let _ltHandlers = fileHandlers <> handlers
+        let _ltHandlers = fileHandlers <> handlers <> [consoleHandler]
         (_ltMinSeverity :: Severity) <- o .: "severity" .!= Debug
         return LoggerTree{..}
 
@@ -180,7 +186,7 @@ makeLenses ''LoggerConfig
 --    are not handled here. Currently porting log-warper's definition
 parseLoggerConfig :: MonadIO m => FilePath -> m LoggerConfig
 parseLoggerConfig lcPath =
-    liftIO $ join $ either throwM return <$> Y.decodeFileEither lcPath
+    liftIO $ (either throwM return =<< Y.decodeFileEither lcPath)
 
 -- | set log prefix
 setLogPrefix :: Maybe FilePath -> LoggerConfig -> IO LoggerConfig

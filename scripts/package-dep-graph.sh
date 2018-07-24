@@ -24,7 +24,7 @@ include_test_bench="0"
 use_tred="1"
 format="png"
 
-while getopts "hetfs" opt; do
+while getopts "hetfsj" opt; do
   case $opt in
     h)
       echo "usage: ./${script} OPTS" >&2
@@ -34,6 +34,7 @@ while getopts "hetfs" opt; do
       echo "    -t : include test+bench packages in graph" >&2
       echo "    -f : don't use \`tred\` - render full deg graph" >&2
       echo "    -s : render as SVG" >&2
+      echo "    -j : render as JPG" >&2
       exit 0
       ;;
     e)
@@ -47,6 +48,9 @@ while getopts "hetfs" opt; do
       ;;
     s)
       format="svg"
+      ;;
+    j)
+      format="jpg"
       ;;
     ?)
       echo "Invalid option: -$OPTARG" >&2
@@ -90,6 +94,9 @@ if [ "${format}" = "svg" ]; then
 elif [ "${format}" = "png" ]; then
     outfile="cardano-sl-pkg-deps.png"
     dot -Tpng "${final_dotfile}" -o ${outfile}
+elif [ "${format}" = "jpg" ]; then
+    outfile="cardano-sl-pkg-deps.jpg"
+    dot -Tjpg "${final_dotfile}" -o ${outfile}
 fi
 
 rm -rf "${tmpdir:?}/"

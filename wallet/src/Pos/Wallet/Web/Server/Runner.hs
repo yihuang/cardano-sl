@@ -25,7 +25,6 @@ import           Ntp.Client (NtpStatus)
 import           Servant.Server (Handler)
 
 import           Cardano.NodeIPC (startNodeJsIPC)
-import           Pos.Core.Mockable (Production (..), runProduction)
 import           Pos.Core.NetworkAddress (NetworkAddress)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Infra.Diffusion.Types (Diffusion, hoistDiffusion)
@@ -34,7 +33,6 @@ import           Pos.Launcher.Configuration (HasConfigurations)
 import           Pos.Launcher.Resource (NodeResources (..))
 import           Pos.Launcher.Runner (runRealMode)
 import           Pos.Util.CompileInfo (HasCompileInfo)
-import qualified Pos.Util.Log as Log
 import           Pos.Util.Trace (natTrace)
 import           Pos.Util.Trace.Named (TraceNamed, logInfo)
 import           Pos.Util.Util (HasLens (..))
@@ -57,16 +55,15 @@ runWRealMode
        , HasCompileInfo
        )
     => TraceNamed IO
-    -> Log.LoggingHandler
     -> ProtocolMagic
     -> WalletDB
     -> ConnectionsVar
     -> SyncQueue
     -> NodeResources WalletMempoolExt
     -> (Diffusion WalletWebMode -> WalletWebMode a)
-    -> Production a
-runWRealMode logTrace lh pm db conn syncRequests res action = --Production $
-    runRealMode logTrace lh pm res $ \diffusion ->
+    -> IO a
+runWRealMode logTrace pm db conn syncRequests res action =
+    runRealMode logTrace pm res $ \diffusion ->
         walletWebModeToRealMode db conn syncRequests $
             action (hoistDiffusion realModeToWalletWebMode (walletWebModeToRealMode db conn syncRequests) diffusion)
 
@@ -77,7 +74,6 @@ walletServeWebFull
        , M.MonadWalletLogic ctx m
        )
     => TraceNamed IO
-    -> Log.LoggingHandler
     -> ProtocolMagic
     -> Diffusion WalletWebMode
     -> TVar NtpStatus
@@ -85,7 +81,7 @@ walletServeWebFull
     -> NetworkAddress          -- ^ IP and Port to listen
     -> Maybe TlsParams
     -> WalletWebMode ()
-walletServeWebFull logTrace lh pm diffusion ntpStatus debug address mTlsParams = do
+walletServeWebFull logTrace pm diffusion ntpStatus debug address mTlsParams = do
     ctx <- view shutdownContext
     let portCallback :: Word16 -> IO ()
         portCallback port = flip runReaderT ctx $ startNodeJsIPC logTrace port
@@ -99,22 +95,21 @@ walletServeWebFull logTrace lh pm diffusion ntpStatus debug address mTlsParams =
         wwmc <- walletWebModeContext
         walletApplication logTrace $
             walletServer @WalletWebModeContext @WalletWebMode
-                (natTrace liftIO logTrace) pm diffusion ntpStatus (convertHandler lh wwmc)
+                (natTrace liftIO logTrace) pm diffusion ntpStatus (convertHandler wwmc)
 
 walletWebModeContext :: WalletWebMode WalletWebModeContext
 walletWebModeContext = view (lensOf @WalletWebModeContextTag)
 
 convertHandler
-    :: Log.LoggingHandler
-    -> WalletWebModeContext
+    :: WalletWebModeContext
     -> WalletWebMode a
     -> Handler a
-convertHandler lh wwmc handler =
+convertHandler wwmc handler =
     liftIO (walletRunner handler) `E.catches` excHandlers
   where
 
     walletRunner :: forall a . WalletWebMode a -> IO a
-    walletRunner act = Log.usingLoggerName lh "wallet" $ runProduction $
+    walletRunner act =
         Mtl.runReaderT act wwmc
 
     excHandlers = [E.Handler catchServant]
@@ -123,8 +118,7 @@ convertHandler lh wwmc handler =
 notifierPlugin
     :: (HasConfigurations)
     => TraceNamed IO
-    -> Log.LoggingHandler
     -> WalletWebMode ()
-notifierPlugin logTrace lh = do
+notifierPlugin logTrace = do
     wwmc <- walletWebModeContext
-    launchNotifier (natTrace liftIO logTrace) (convertHandler lh wwmc)
+    launchNotifier (natTrace liftIO logTrace) (convertHandler wwmc)

@@ -136,11 +136,11 @@ addLoggerName t f =
 
 -- | setup logging according to configuration @LoggerConfig@
 --   the backends (scribes) will be registered with katip
-setupLogging :: LoggerConfig -> IO LoggingHandler
+setupLogging :: MonadIO m => LoggerConfig -> m LoggingHandler
 setupLogging lc = do
-    lh <- Internal.newConfig lc
-    scribes <- meta lh lc
-    Internal.registerBackends lh scribes
+    lh <- liftIO $ Internal.newConfig lc
+    scribes <- liftIO $ meta lh lc
+    liftIO $ Internal.registerBackends lh scribes
     return lh
       where
         meta :: LoggingHandler -> LoggerConfig -> IO [(T.Text, K.Scribe)]
@@ -197,13 +197,13 @@ setupLogging lc = do
     @
 -}
 usingLoggerName :: LoggingHandler -> LoggerName -> LogContextT IO a -> IO a
-usingLoggerName lh name f = usingLoggerNames lh [name] f
+usingLoggerName lh name action = usingLoggerNames lh [name] action
 usingLoggerNames :: LoggingHandler -> [LoggerName] -> LogContextT IO a -> IO a
-usingLoggerNames lh names f = do
+usingLoggerNames lh names action = do
     mayle <- Internal.getLogEnv lh
     case mayle of
             Nothing -> error "logging not yet initialized. Abort."
-            Just le -> K.runKatipContextT le () (Internal.s2knames names) $ f
+            Just le -> K.runKatipContextT le () (Internal.s2knames names) $ action
 
 {-| bracket logging
 
@@ -240,7 +240,7 @@ loggerBracket lh name action = do
       finalizer le_ = do
           _ <- liftIO $ K.closeScribes le_
           return ()
-      body le_ = K.runKatipContextT le_ () (Internal.s2kname name) action
+      body le_ = K.runKatipContextT le_ () (Internal.s2kname name) $ action
 
 -- | for compatibility (TODO check if still referenced)
 loadLogConfig :: Maybe FilePath -> Maybe FilePath -> IO LoggingHandler

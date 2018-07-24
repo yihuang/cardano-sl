@@ -15,14 +15,13 @@ import           System.Directory (getModificationTime, listDirectory,
                      removeFile)
 import           System.FilePath ((</>))
 
-import           Pos.Core.Mockable (Delay, Mockable, delay)
+import           Pos.Core.Conc (delay)
 import           Pos.Util.Trace.Named (TraceNamed, logDebug, logError)
 import           Pos.Wallet.Web.State.State (WalletDB)
 
 type MonadAcidCleanup ctx m =
     ( MonadIO m
     , MonadMask m
-    , Mockable Delay m
     )
 
 

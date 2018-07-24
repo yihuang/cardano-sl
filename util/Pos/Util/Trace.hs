@@ -9,8 +9,6 @@ module Pos.Util.Trace
     , noTrace
     , setupLogging
     -- * trace setup
-    --, stdoutTrace
-    --, stdoutTraceConcurrent
     , logTrace
     -- * log messages
     , logDebug
@@ -23,7 +21,7 @@ module Pos.Util.Trace
 
 import           Data.Functor.Contravariant (Contravariant (..), Op (..))
 import qualified Pos.Util.Log as Log
-import           Universum hiding (newEmptyMVar, trace)
+import           Universum hiding (trace)
 
 -- | Abstracts logging.
 newtype Trace m s = Trace
@@ -39,7 +37,10 @@ natTrace :: (forall x . m x -> n x) -> Trace m s -> Trace n s
 natTrace nat (Trace (Op tr)) = Trace $ Op $ nat . tr
 
 -- | setup logging and return a Trace
-setupLogging :: Log.LoggerConfig -> Log.LoggerName -> IO TraceIO
+setupLogging :: MonadIO m
+             => Log.LoggerConfig
+             -> Log.LoggerName
+             -> IO (Trace m (Log.Severity, Text))
 setupLogging lc ln = do
     lh <- Log.setupLogging lc
     return $ logTrace lh ln
@@ -58,9 +59,12 @@ noTrace :: Applicative m => Trace m a
 noTrace = Trace $ Op $ const (pure ())
 
 -- | A 'Trace' that uses logging from @Pos.Util.Log@
-logTrace :: Log.LoggingHandler -> Log.LoggerName -> TraceIO
+logTrace :: MonadIO m
+         => Log.LoggingHandler
+         -> Log.LoggerName
+         -> Trace m (Log.Severity, Text)
 logTrace lh loggerName = Trace $ Op $ \(severity, txt) ->
-    Log.usingLoggerName lh loggerName $ Log.logMessage severity txt
+    liftIO $ Log.usingLoggerName lh loggerName $ Log.logMessage severity txt
 
 logDebug :: TraceIO -> Trace IO Text
 logDebug = contramap ((,) Log.Debug)

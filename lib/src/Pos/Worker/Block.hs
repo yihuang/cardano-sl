@@ -37,8 +37,8 @@ import           Pos.Core (BlockVersionData (..), ChainDifficulty, FlatSlotId,
                      getEpochOrSlot, getOurPublicKey, getSlotIndex, slotIdF,
                      unflattenSlotId)
 import           Pos.Core.Chrono (OldestFirst (..))
-import           Pos.Core.JsonLog (CanJsonLog (..))
-import           Pos.Core.Mockable (delay)
+import           Pos.Core.Conc (delay)
+--import           Pos.Core.JsonLog (CanJsonLog (..))
 import           Pos.Core.Reporting (HasMisbehaviorMetrics, MetricMonitor (..),
                      MetricMonitorState, noReportMonitor, recordValue)
 import           Pos.Crypto (ProtocolMagic, ProxySecretKey (pskDelegatePk))
@@ -57,7 +57,7 @@ import           Pos.Infra.Slotting (ActionTerminationPolicy (..),
                      OnNewSlotParams (..), currentTimeSlotting,
                      defaultOnNewSlotParams, getSlotStartEmpatically,
                      onNewSlot)
-import           Pos.Infra.Util.JsonLog.Events (jlCreatedBlock)
+--import           Pos.Infra.Util.JsonLog.Events (jlCreatedBlock)
 import           Pos.Infra.Util.TimeLimit (logWarningSWaitLinear)
 import qualified Pos.Lrc.DB as LrcDB (getLeadersForEpoch)
 import           Pos.Network.Block.Logic (triggerRecovery)
@@ -142,7 +142,7 @@ blockCreator logTrace pm (slotId@SlotId {..}) diffusion = do
     mGenBlock <- createGenesisBlockAndApply logTrace pm siEpoch
     whenJust mGenBlock $ \createdBlk -> do
         logInfo logTrace $ sformat ("Created genesis block:\n" %build) createdBlk
-        jsonLog $ jlCreatedBlock (Left createdBlk)
+        -- TODO jsonLog $ jlCreatedBlock (Left createdBlk)
 
     -- Then we get leaders for current epoch.
     leadersMaybe <- LrcDB.getLeadersForEpoch siEpoch
@@ -232,7 +232,7 @@ onNewSlotWhenLeader logTrace pm slotId pske diffusion = do
     whenCreated createdBlk = do
             logInfoS logTrace $
                 sformat ("Created a new block:\n" %build) createdBlk
-            jsonLog $ jlCreatedBlock (Right createdBlk)
+            -- TODO jsonLog $ jlCreatedBlock (Right createdBlk)
             void $ Diffusion.announceBlockHeader diffusion $ createdBlk ^. gbHeader
     whenNotCreated = logWarningS logTrace . (mappend "I couldn't create a new block: ")
 

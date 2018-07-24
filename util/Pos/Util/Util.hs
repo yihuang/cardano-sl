@@ -328,16 +328,15 @@ multilineBounds maxSize = F.later formatList
    remaining = maxSize' - half
 
 -- | Catch and log an exception, then rethrow it
-logException :: Log.LoggingHandler -> Log.LoggerName -> IO a -> IO a
-logException lh name = E.handleAsync (\e -> handler e >> E.throw e)
+logException :: (MonadCatch m, Log.WithLogger m) => Log.LoggerName -> m a -> m a
+logException name = E.handleAsync (\e -> handler e >> E.throw e)
   where
-    handler :: E.SomeException -> IO ()
+    handler :: (MonadCatch m, Log.WithLogger m) => E.SomeException -> m ()
     handler exc = do
-        let message = "logException: " <> pretty exc
-        Log.usingLoggerName lh name (Log.logError message) `E.catchAny` \loggingExc -> do
+        let message = name <> " logException: " <> pretty exc
+        Log.logError message `E.catchAny` \loggingExc -> do
             putStrLn message
-            putStrLn $
-                "logException failed to use logging: " <> pretty loggingExc
+            putStrLn $ "logException failed to use logging: " <> pretty loggingExc
 
 -- | 'bracket' which logs given message after acquiring the resource
 -- and before calling the callback with 'Info' severity.

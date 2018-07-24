@@ -41,10 +41,11 @@ import           Pos.Client.Txp.History (MonadTxHistory (..),
 import           Pos.Context (HasNodeContext (..))
 import           Pos.Core (Address, Coin, HasConfiguration, HasPrimaryKey (..),
                      isRedeemAddress, largestHDAddressBoot, mkCoin)
-import           Pos.Core.Mockable (LowLevelAsync, Mockable, Production)
+--import           Pos.Core.JsonLog (CanJsonLog (..))
 import           Pos.Core.Reporting (HasMisbehaviorMetrics (..),
                      MonadReporting (..), Reporter (..))
 import           Pos.Core.Slotting (HasSlottingVar (..), MonadSlotsData)
+import           Pos.Core.StateLock (StateLock)
 import           Pos.Crypto (PassPhrase)
 import           Pos.DB (MonadGState (..))
 import           Pos.DB.Block (dbGetSerBlockRealDefault,
@@ -60,7 +61,6 @@ import           Pos.Infra.Slotting.Class (MonadSlots (..))
 import           Pos.Infra.Slotting.Impl (currentTimeSlottingSimple,
                      getCurrentSlotBlockingSimple,
                      getCurrentSlotInaccurateSimple, getCurrentSlotSimple)
-import           Pos.Infra.StateLock (StateLock)
 import           Pos.Launcher (HasConfigurations)
 import           Pos.Recovery ()
 import           Pos.Ssc.Types (HasSscContext (..))
@@ -103,7 +103,7 @@ data WalletWebModeContext = WalletWebModeContext
     }
 
 -- It's here because of TH for lens
-type WalletWebMode = Mtl.ReaderT WalletWebModeContext Production
+type WalletWebMode = Mtl.ReaderT WalletWebModeContext IO
 
 walletWebModeToRealMode
     :: WalletDB
@@ -220,7 +220,6 @@ type MonadFullWalletWebMode ctx m =
     ( MonadWalletWebMode ctx m
     , MonadWalletWebSockets ctx m
     , MonadReporting m
-    , Mockable LowLevelAsync m
     , HasLens SyncQueue ctx SyncQueue
     )
 

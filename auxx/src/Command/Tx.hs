@@ -12,6 +12,7 @@ module Command.Tx
 
 import           Universum
 
+import qualified Control.Concurrent.MVar as Conc
 import           Control.Concurrent.STM.TQueue (newTQueue, tryReadTQueue,
                      writeTQueue)
 import           Control.Exception.Safe (Exception (..), try)
@@ -38,11 +39,10 @@ import           Pos.Client.Txp.Util (createTx)
 import           Pos.Core (BlockVersionData (bvdSlotDuration),
                      IsBootstrapEraAddr (..), Timestamp (..),
                      deriveFirstHDAddress, makePubKeyAddress, mkCoin)
+import           Pos.Core.Conc (concurrently, currentTime, delay,
+                     forConcurrently, modifySharedAtomic, newSharedAtomic)
 import           Pos.Core.Configuration (genesisBlockVersionData,
                      genesisSecretKeys)
-import           Pos.Core.Mockable (Mockable, SharedAtomic, SharedAtomicT,
-                     concurrently, currentTime, delay, forConcurrently,
-                     modifySharedAtomic, newSharedAtomic)
 import           Pos.Core.Txp (TxAux (..), TxIn (TxInUtxo), TxOut (..),
                      TxOutAux (..), txaF)
 import           Pos.Crypto (EncryptedSecretKey, ProtocolMagic, emptyPassphrase,
@@ -77,7 +77,7 @@ data TxCount = TxCount
       -- How many threads are still sending transactions.
     , _txcThreads   :: !Int }
 
-addTxSubmit :: Mockable SharedAtomic m => SharedAtomicT m TxCount -> m ()
+addTxSubmit :: MonadUnliftIO m => Conc.MVar TxCount -> m ()
 addTxSubmit =
     flip modifySharedAtomic
         (\(TxCount submitted sending) ->

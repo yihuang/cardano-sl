@@ -10,8 +10,7 @@ import           Control.Lens ((%=))
 import           Data.Time.Clock (UTCTime, addUTCTime)
 import           Data.Time.Units (Second)
 
-import           Pos.Core.Mockable (CurrentTime, Delay, Mockable, currentTime,
-                     delay)
+import           Pos.Core.Conc (currentTime, delay)
 import           Pos.Delegation.Class (MonadDelegation, dwMessageCache)
 import           Pos.Delegation.Configuration (HasDlgConfiguration,
                      dlgMessageCacheTimeout)
@@ -29,12 +28,10 @@ type DlgWorkerConstraint ctx m
      = ( MonadIO m
        , MonadDelegation ctx m
        , MonadMask m
-       , Mockable Delay m
        , HasShutdownContext ctx
        , MonadDelegation ctx m
        , MonadReporting m
        , MonadReader ctx m
-       , Mockable CurrentTime m
        , HasDlgConfiguration)
 
 

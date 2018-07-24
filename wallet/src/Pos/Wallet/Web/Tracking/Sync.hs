@@ -63,6 +63,7 @@ import           Pos.Core (Address, BlockCount (..), ChainDifficulty (..),
 import           Pos.Core.Block (BlockHeader (..), getBlockHeader,
                      mainBlockTxPayload)
 import           Pos.Core.Chrono (getNewestFirst)
+import           Pos.Core.StateLock (Priority (..), withStateLockNoMetrics)
 import           Pos.Core.Txp (TxAux (..), TxId, TxUndo)
 import           Pos.Crypto (WithHash (..), shortHashF, withHash)
 import           Pos.DB.Block (getBlund)
@@ -74,7 +75,6 @@ import           Pos.GState.BlockExtra (resolveForwardLink)
 import           Pos.Infra.Slotting (MonadSlots (..), MonadSlotsData,
                      getSlotStartPure, getSystemStartM)
 import           Pos.Infra.Slotting.Types (SlottingData)
-import           Pos.Infra.StateLock (Priority (..), withStateLockNoMetrics)
 import           Pos.Txp (UndoMap, flattenTxPayload, topsortTxs, _txOutputs)
 import           Pos.Util.Log.LogSafe (buildSafe, secretOnlyF, secure)
 import qualified Pos.Util.Modifier as MM

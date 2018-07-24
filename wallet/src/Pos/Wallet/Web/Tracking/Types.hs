@@ -18,9 +18,9 @@ import           Universum
 import           Control.Concurrent.STM (TQueue, writeTQueue)
 
 import           Pos.Core (HasConfiguration)
+import           Pos.Core.StateLock (StateLock)
 import           Pos.DB.Class (MonadDBRead (..))
 import           Pos.Infra.Slotting (MonadSlotsData)
-import           Pos.Infra.StateLock (StateLock)
 import           Pos.Util (HasLens (..))
 
 import           Pos.Wallet.Web.ClientTypes (CId, Wal)

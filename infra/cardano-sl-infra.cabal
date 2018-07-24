@@ -163,6 +163,7 @@ library
                       , time-units
                       , network-transport
                       , universum
+                      , unliftio
                       , unordered-containers
                       , yaml
 

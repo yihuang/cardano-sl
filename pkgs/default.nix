@@ -15036,6 +15036,7 @@ license = stdenv.lib.licenses.mit;
 , transformers
 , universum
 , unix
+, unliftio
 , unordered-containers
 , validation
 }:
@@ -15101,6 +15102,7 @@ time-units
 transformers
 universum
 unix
+unliftio
 unordered-containers
 validation
 ];
@@ -15728,6 +15730,7 @@ license = stdenv.lib.licenses.mit;
 , transformers-base
 , transformers-lift
 , universum
+, unliftio
 , unliftio-core
 , unordered-containers
 , vector
@@ -15794,6 +15797,7 @@ transformers
 transformers-base
 transformers-lift
 universum
+unliftio
 unliftio-core
 unordered-containers
 vector
@@ -16680,6 +16684,7 @@ license = stdenv.lib.licenses.mit;
 , time-units
 , universum
 , unix
+, unliftio
 , unordered-containers
 , yaml
 }:
@@ -16743,6 +16748,7 @@ time
 time-units
 universum
 unix
+unliftio
 unordered-containers
 yaml
 ];
@@ -17318,6 +17324,7 @@ license = stdenv.lib.licenses.mit;
 , cardano-report-server
 , cardano-sl
 , cardano-sl-binary
+, cardano-sl-binary-test
 , cardano-sl-block
 , cardano-sl-client
 , cardano-sl-core
@@ -17325,9 +17332,11 @@ license = stdenv.lib.licenses.mit;
 , cardano-sl-crypto
 , cardano-sl-db
 , cardano-sl-infra
+, cardano-sl-networking
 , cardano-sl-txp
 , cardano-sl-update
 , cardano-sl-util
+, cardano-sl-util-test
 , cardano-sl-wallet
 , containers
 , cpphs
@@ -17338,6 +17347,7 @@ license = stdenv.lib.licenses.mit;
 , filepath
 , formatting
 , Glob
+, hedgehog
 , hourglass
 , hspec
 , lens
@@ -17385,20 +17395,44 @@ configureFlags = [
 isLibrary = true;
 isExecutable = true;
 libraryHaskellDepends = [
+acid-state-exts
 aeson
+ansi-terminal
 base
+bytestring
+cardano-sl
+cardano-sl-client
+cardano-sl-core
+cardano-sl-core-test
+cardano-sl-db
+cardano-sl-infra
+cardano-sl-networking
+cardano-sl-txp
+cardano-sl-util
+cardano-sl-wallet
+containers
+data-default
 directory
 filepath
+log-warper
+network-transport-tcp
+optparse-applicative
+optparse-generic
 parsers
+QuickCheck
+stm
+string-conv
 text
+time
+time-units
 trifecta
 universum
+unordered-containers
 ];
 executableHaskellDepends = [
 acid-state-exts
 aeson
 aeson-options
-ansi-terminal
 ansi-wl-pprint
 asn1-encoding
 asn1-types
@@ -17418,6 +17452,7 @@ cardano-sl-core-test
 cardano-sl-crypto
 cardano-sl-db
 cardano-sl-infra
+cardano-sl-networking
 cardano-sl-txp
 cardano-sl-update
 cardano-sl-util
@@ -17439,12 +17474,10 @@ network-transport-tcp
 optparse-applicative
 optparse-generic
 process
-QuickCheck
 safe-exceptions
 serokell-util
 silently
 stm
-string-conv
 tabl
 tar
 text
@@ -17465,9 +17498,13 @@ cpphs
 testHaskellDepends = [
 aeson
 base
+cardano-sl-binary-test
+cardano-sl-util-test
 directory
+hedgehog
 hspec
 temporary
+universum
 ];
 testToolDepends = [
 cpphs
@@ -18070,7 +18107,6 @@ cardano-sl
 cardano-sl-block
 cardano-sl-client
 cardano-sl-core
-cardano-sl-core-test
 cardano-sl-crypto
 cardano-sl-db
 cardano-sl-delegation
@@ -18212,6 +18248,7 @@ license = stdenv.lib.licenses.mit;
 , cardano-sl-util
 , cardano-sl-util-test
 , cardano-sl-wallet
+, cardano-sl-wallet-test
 , cassava
 , conduit
 , connection
@@ -18320,6 +18357,7 @@ cardano-sl-txp
 cardano-sl-update
 cardano-sl-util
 cardano-sl-wallet
+cardano-sl-wallet-test
 conduit
 connection
 containers
@@ -18491,6 +18529,37 @@ yaml
 doHaddock = false;
 homepage = "https://github.com/input-output-hk/cardano-sl/#readme";
 description = "The Wallet Backend for a Cardano node";
+license = stdenv.lib.licenses.mit;
+
+}) {};
+"cardano-sl-wallet-test" = callPackage
+({
+  mkDerivation
+, base
+, bytestring
+, cardano-sl-core-test
+, cardano-sl-wallet
+, QuickCheck
+, serokell-util
+, stdenv
+, universum
+}:
+mkDerivation {
+
+pname = "cardano-sl-wallet-test";
+version = "1.3.0";
+src = ./../wallet/test;
+libraryHaskellDepends = [
+base
+bytestring
+cardano-sl-core-test
+cardano-sl-wallet
+QuickCheck
+serokell-util
+universum
+];
+doHaddock = false;
+description = "Cardano SL - wallet (Arbitrary instances)";
 license = stdenv.lib.licenses.mit;
 
 }) {};

@@ -64,9 +64,9 @@ import           Pos.Core (BlockVersionData, CoreConfiguration (..),
                      GenesisSpec (..), HasConfiguration, HasProtocolConstants,
                      SlotId, Timestamp (..), epochSlots, genesisSecretKeys,
                      withGenesisSpec)
+import           Pos.Core.Conc (currentTime)
 import           Pos.Core.Configuration (HasGenesisBlockVersionData,
                      withGenesisBlockVersionData)
-import           Pos.Core.Mockable (Production, currentTime, runProduction)
 import           Pos.Core.Reporting (HasMisbehaviorMetrics (..),
                      MonadReporting (..))
 import           Pos.Core.Slotting (MonadSlotsData)
@@ -115,8 +115,6 @@ import           Test.Pos.Configuration (defaultTestBlockVersionData,
 import           Test.Pos.Core.Arbitrary ()
 import           Test.Pos.Crypto.Dummy (dummyProtocolMagic)
 
-import qualified Pos.Util.Log as Log
-import           Pos.Util.LoggerConfig (defaultTestConfiguration)
 
 ----------------------------------------------------------------------------
 -- Parameters
@@ -198,13 +196,10 @@ data TestInitModeContext = TestInitModeContext
 
 makeLensesWith postfixLFields ''TestInitModeContext
 
-type TestInitMode = ReaderT TestInitModeContext Production
+type TestInitMode = ReaderT TestInitModeContext IO
 
 runTestInitMode :: TestInitModeContext -> TestInitMode a -> IO a
-runTestInitMode ctx mode = do
-    lh <- Log.setupLogging (defaultTestConfiguration Log.Debug)
-    Log.usingLoggerName lh "runTestInitMode" $
-        runProduction . flip runReaderT ctx $ mode
+runTestInitMode ctx = flip runReaderT ctx
 
 ----------------------------------------------------------------------------
 -- Main context

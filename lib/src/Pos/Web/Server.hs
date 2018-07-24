@@ -227,7 +227,7 @@ convertHandler
     -> Handler a
 convertHandler nc nodeDBs txpData handler =
     liftIO
-    ( Mtl.runReaderT
+        (Mtl.runReaderT
              handler
              (WebModeContext nodeDBs txpData nc)) `E.catches`
     excHandlers

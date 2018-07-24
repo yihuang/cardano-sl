@@ -29,7 +29,6 @@ import           Control.Monad.Writer (WriterT)
 import           Data.Aeson (encode)
 import           Data.Aeson.Types (ToJSON)
 
-import           Pos.Core.Mockable (Production (..))
 import qualified Pos.Util.Log as Log
 
 import qualified Data.ByteString.Lazy as B
@@ -58,6 +57,5 @@ instance (Monoid w, CanJsonLog m) => CanJsonLog (WriterT w m)
 --instance CanJsonLog m => CanJsonLog (LoggerNameBox m)
 instance CanJsonLog m => CanJsonLog (ResourceT m)
 
-deriving instance CanJsonLog Production
 instance CanJsonLog (Log.LogContextT IO) where
     jsonLog a = Log.logMessage Log.Info $ decodeUtf8 $ B.toStrict $ encode a

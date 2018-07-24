@@ -20,7 +20,7 @@ import qualified System.Metrics as Metrics
 import           System.Metrics.Gauge (Gauge)
 import qualified System.Metrics.Gauge as Gauge
 
-import           Pos.Core.Mockable (CurrentTime, Mockable, currentTime)
+import           Pos.Core.Conc (currentTime)
 import           Pos.System.Metrics.Constants (withCardanoNamespace)
 import           Pos.Util.Trace.Named (TraceNamed, logDebug)
 
@@ -103,9 +103,7 @@ noReportMonitor converter debugFormat st =
 -- | Update the value stored in the 'MetricMonitor's gauge.  Report
 -- this value if it should be reported according to 'MetricMonitor'.
 recordValue ::
-       ( MonadIO m
-       , Mockable CurrentTime m
-       )
+       MonadIO m
     => TraceNamed m
     -> MetricMonitor value
     -> value

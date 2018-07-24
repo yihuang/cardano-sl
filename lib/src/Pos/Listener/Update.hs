@@ -16,14 +16,13 @@ import           Formatting (build, sformat, (%))
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Core (ProtocolMagic)
-import           Pos.Core.Mockable (MonadMockable)
+import           Pos.Core.StateLock (StateLock)
 import           Pos.Core.Update (UpdateProposal (..), UpdateVote (..))
 import           Pos.DB.Class (MonadDB, MonadGState)
 import           Pos.Infra.Recovery.Info (MonadRecoveryInfo)
 import           Pos.Infra.Reporting (MonadReporting)
 import           Pos.Infra.Shutdown.Class (HasShutdownContext)
 import           Pos.Infra.Slotting (MonadSlots)
-import           Pos.Infra.StateLock (StateLock)
 import           Pos.Lrc.Context (HasLrcContext)
 import           Pos.Update.Configuration (HasUpdateConfiguration)
 import           Pos.Update.Context (UpdateContext)
@@ -33,9 +32,8 @@ import           Pos.Util.Trace.Named (TraceNamed, logNotice, logWarning)
 import           Pos.Util.Util (HasLens (..))
 
 
-type UpdateMode ctx m
-    = ( MonadMockable m
-      , MonadIO m
+type UpdateMode ctx m =
+      ( MonadIO m
       , MonadUnliftIO m
       , MonadMask m
       , MonadGState m

@@ -16,11 +16,10 @@ import           Pos.Binary ()
 import           Pos.Client.CLI (CommonNodeArgs (..), NodeArgs (..),
                      SimpleNodeArgs (..))
 import qualified Pos.Client.CLI as CLI
-import           Pos.Core.Mockable (Production (..), runProduction)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.Infra.Ntp.Configuration (NtpConfiguration)
-import           Pos.Launcher (HasConfigurations, NodeParams (..),
-                     loggerBracket, runNodeReal, withConfigurations)
+import           Pos.Launcher (HasConfigurations, NodeParams (..), runNodeReal,
+                     withConfigurations)
 import           Pos.Launcher.Configuration (AssetLockPath (..))
 import           Pos.Launcher.Resource (getRealLoggerConfig)
 import           Pos.Ssc.Types (SscParams)
@@ -40,36 +39,39 @@ loggerName = "node"
 actionWithoutWallet
     :: ( HasConfigurations
        , HasCompileInfo
+       , MonadIO m
        )
     => TraceNamed IO
-    -> Log.LoggingHandler
     -> ProtocolMagic
     -> SscParams
     -> NodeParams
-    -> Production ()
-actionWithoutWallet logTrace lh pm sscParams nodeParams =
-    runNodeReal logTrace lh pm nodeParams sscParams
+    -> m ()
+actionWithoutWallet logTrace pm sscParams nodeParams =
+    liftIO $ runNodeReal logTrace pm nodeParams sscParams
         [updateTriggerWorker (natTrace (lift . liftIO) logTrace)]
 
 action
     :: ( HasConfigurations
        , HasCompileInfo
+       , Log.WithLogger m
+       , MonadCatch m
        )
     => TraceNamed IO
-    -> Log.LoggingHandler
     -> SimpleNodeArgs
     -> NtpConfiguration
     -> ProtocolMagic
-    -> Production ()
-action logTrace lh (SimpleNodeArgs (cArgs@CommonNodeArgs {..}) (nArgs@NodeArgs {..})) ntpConfig pm = do
-    CLI.printInfoOnStart cArgs ntpConfig
-    liftIO $ logInfo logTrace "Wallet is disabled, because software is built w/o it"
+    -> m ()
+action logTrace0 (SimpleNodeArgs (cArgs@CommonNodeArgs {..}) (nArgs@NodeArgs {..})) ntpConfig pm = do
+    CLI.printInfoOnStart logTrace cArgs ntpConfig
+    logInfo logTrace "Wallet is disabled, because software is built w/o it"
     currentParams <- CLI.getNodeParams loggerName cArgs nArgs
 
     let vssSK = fromJust $ npUserSecret currentParams ^. usVss
     let sscParams = CLI.gtSscParams cArgs vssSK (npBehaviorConfig currentParams)
 
-    actionWithoutWallet logTrace lh pm sscParams currentParams
+    actionWithoutWallet logTrace0 pm sscParams currentParams
+      where
+        logTrace = natTrace liftIO logTrace0
 
 main :: IO ()
 main = withCompileInfo $ do
@@ -79,9 +81,6 @@ main = withCompileInfo $ do
     let blPath = AssetLockPath <$> cnaAssetLockPath commonNodeArgs
     lh <- Log.setupLogging =<< getRealLoggerConfig loggingParams
     let logTrace = appendName loggerName $ namedTrace lh
-    Log.usingLoggerName lh "node0" $ runProduction $
-        loggerBracket lh "node1" $ (\a -> liftIO $ logException lh "nodeEx" a) .
-                                   Log.usingLoggerName lh loggerName .
-                                   runProduction $
-                                       withConfigurations (natTrace liftIO logTrace) blPath conf $
-                                           action logTrace lh args
+    Log.loggerBracket lh loggerName . logException loggerName $
+        withConfigurations (natTrace liftIO logTrace) blPath conf $
+            action logTrace args

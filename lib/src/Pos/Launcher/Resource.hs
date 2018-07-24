@@ -10,13 +10,9 @@ module Pos.Launcher.Resource
          -- * Full resources
          NodeResources (..)
 
-       --, allocateNodeResources
-       --, releaseNodeResources
        , bracketNodeResources
 
          -- * Smaller resources
-       , loggerBracket
-
        , getRealLoggerConfig
        ) where
 
@@ -39,8 +35,10 @@ import           Pos.Context (ConnectedPeers (..), NodeContext (..),
                      StartTime (..))
 import           Pos.Core (HasConfiguration, Timestamp, gdStartTime,
                      genesisData)
-import           Pos.Core.Mockable (Production (..))
+import           Pos.Core.JsonLog.LogEvents (JsonLogConfig (..),
+                     jsonLogConfigFromHandle)
 import           Pos.Core.Reporting (initializeMisbehaviorMetrics)
+import           Pos.Core.StateLock (newStateLock)
 import           Pos.DB (MonadDBRead, NodeDBs)
 import           Pos.DB.Rocks (closeNodeDBs, openNodeDBs)
 import           Pos.Delegation (DelegationVar, HasDlgConfiguration,
@@ -52,9 +50,6 @@ import           Pos.Infra.Shutdown.Types (ShutdownContext (..))
 import           Pos.Infra.Slotting (SimpleSlottingStateVar,
                      mkSimpleSlottingStateVar)
 import           Pos.Infra.Slotting.Types (SlottingData)
-import           Pos.Infra.StateLock (newStateLock)
-import           Pos.Infra.Util.JsonLog.Events (JsonLogConfig (..),
-                     jsonLogConfigFromHandle)
 import           Pos.Launcher.Param (BaseParams (..), LoggingParams (..),
                      NodeParams (..))
 import           Pos.Lrc.Context (LrcContext (..), mkLrcSyncData)
@@ -110,9 +105,9 @@ allocateNodeResources
     -> SscParams
     -> TxpGlobalSettings
     -> InitMode ()
-    -> Production (NodeResources ext)
+    -> IO (NodeResources ext)
 allocateNodeResources logTrace0 np@NodeParams {..} sscnp txpSettings initDB = do
-    Log.logInfo "Allocating node resources..."
+    TN.logInfo logTrace "Allocating node resources..."
     npDbPath <- case npDbPathM of
         Nothing -> do
             let dbPath = "node-db" :: FilePath
@@ -188,7 +183,7 @@ allocateNodeResources logTrace0 np@NodeParams {..} sscnp txpSettings initDB = do
 
 -- | Release all resources used by node. They must be released eventually.
 releaseNodeResources ::
-       NodeResources ext -> Production ()
+       NodeResources ext -> IO ()
 releaseNodeResources NodeResources {..} = do
     case nrJsonLogConfig of
         JsonLogDisabled -> return ()
@@ -213,8 +208,8 @@ bracketNodeResources :: forall ext a.
     -> SscParams
     -> TxpGlobalSettings
     -> InitMode ()
-    -> (HasConfiguration => NodeResources ext -> Production a)
-    -> Production a
+    -> (HasConfiguration => NodeResources ext -> IO a)
+    -> IO a
 bracketNodeResources logTrace np sp txp initDB action = do
     let msg = "`NodeResources'"
     let logTraceP = natTrace liftIO logTrace
@@ -247,12 +242,6 @@ getRealLoggerConfig LoggingParams{..} =
         Just True  -> (<>) (consoleActionB defaultHandleAction)
         Just False -> (<>) (consoleActionB (\_ _ -> pass))
 -}
-
--- | RAII for Logging.
-loggerBracket :: Log.LoggingHandler -> Log.LoggerName -> Log.LogContextT Production () -> Production ()
-loggerBracket lh name action = --do
-    Log.loggerBracket lh name action
-
 
 ----------------------------------------------------------------------------
 -- NodeContext

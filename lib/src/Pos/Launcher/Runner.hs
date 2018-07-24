@@ -31,7 +31,7 @@ import           Pos.Context.Context (NodeContext (..))
 import           Pos.Core (StakeholderId, addressHash)
 import           Pos.Core.Configuration (HasProtocolConstants,
                      protocolConstants)
-import           Pos.Core.Mockable.Production (Production (..))
+--import           Pos.Core.JsonLog (CanJsonLog (..))
 import           Pos.Crypto (ProtocolMagic, toPublic)
 import           Pos.Diffusion.Full (FullDiffusionConfiguration (..),
                      diffusionLayerFull)
@@ -56,21 +56,12 @@ import           Pos.Txp (MonadTxpLocal)
 import           Pos.Update.Configuration (HasUpdateConfiguration,
                      lastKnownBlockVersion)
 import           Pos.Util.CompileInfo (HasCompileInfo, compileInfo)
-import qualified Pos.Util.Log as Log
 import           Pos.Util.Trace (natTrace, noTrace)
 import           Pos.Util.Trace.Named (TraceNamed, appendName)
 import           Pos.Web.Server (withRoute53HealthCheckApplication)
 import           Pos.WorkMode (RealMode, RealModeContext (..))
 
--- import qualified Katip as K
-import qualified Katip.Monadic as KM
 
-{-
-runLogger :: Log.LogContextT m a -> m a
-runLogger ctx = do
-    le <- K.initLogEnv "log" "production"
-    KM.runKatipContextT le () [] $ ctx
--}
 ----------------------------------------------------------------------------
 -- High level runners
 ----------------------------------------------------------------------------
@@ -88,12 +79,11 @@ runRealMode
        -- though they should use only @RealModeContext@
        )
     => TraceNamed IO
-    -> Log.LoggingHandler
     -> ProtocolMagic
     -> NodeResources ext
     -> (Diffusion (RealMode ext) -> RealMode ext a)
-    -> Production a
-runRealMode logTrace0 lh pm nr@NodeResources {..} act = Production $ KM.KatipContextT $ ReaderT $ const $ runServer
+    -> IO a
+runRealMode logTrace0 pm nr@NodeResources {..} act = runServer
     logTrace
     pm
     ncNodeParams
@@ -113,29 +103,25 @@ runRealMode logTrace0 lh pm nr@NodeResources {..} act = Production $ KM.KatipCon
     logic :: Logic (RealMode ext)
     logic = logicFull logTrace' noTrace pm ourStakeholderId securityParams -- TODO jsonLog
     makeLogicIO :: Diffusion IO -> Logic IO
-    makeLogicIO diffusion = hoistLogic (elimRealMode logTrace lh pm nr diffusion) logic
+    makeLogicIO diffusion = hoistLogic (elimRealMode logTrace pm nr diffusion) logic
     act' :: Diffusion IO -> IO a
     act' diffusion =
-        let diffusion' = hoistDiffusion liftIO (elimRealMode logTrace lh pm nr diffusion) diffusion
-        in elimRealMode logTrace lh pm nr diffusion (act diffusion')
+        let diffusion' = hoistDiffusion liftIO (elimRealMode logTrace pm nr diffusion) diffusion
+        in elimRealMode logTrace pm nr diffusion (act diffusion')
 
 -- | RealMode runner: creates a JSON log configuration and uses the
--- resources provided to eliminate the RealMode, yielding a Production (IO).
+-- resources provided to eliminate the RealMode, yielding an IO.
 elimRealMode
     :: forall t ext.
        ( HasCompileInfo)
     => TraceNamed IO
-    -> Log.LoggingHandler
     -> ProtocolMagic
     -> NodeResources ext
     -> Diffusion IO
     -> RealMode ext t
     -> IO t
-elimRealMode logTrace lh pm NodeResources {..} diffusion action =
-    -- K.runKatipContextT mempty () mempty $
-    Log.usingLoggerName lh "realMode" $
-    runProduction $ do
-        Mtl.runReaderT action (rmc nrJsonLogConfig)
+elimRealMode logTrace pm NodeResources {..} diffusion action = do
+    Mtl.runReaderT action (rmc nrJsonLogConfig)
   where
     NodeContext {..} = nrContext
     NodeParams {..} = ncNodeParams

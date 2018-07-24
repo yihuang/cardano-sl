@@ -32,14 +32,13 @@ import           Pos.Communication.Types (NodeId)
 import           Pos.Core (HasPrimaryKey (..), Timestamp)
 import           Pos.Core.Reporting (HasMisbehaviorMetrics (..),
                      MisbehaviorMetrics (..))
+import           Pos.Core.Slotting (HasSlottingVar (..), SlottingData)
+import           Pos.Core.StateLock (StateLock, StateLockMetrics)
 import           Pos.Infra.DHT.Real.Param (KademliaParams)
 import           Pos.Infra.Network.Types (NetworkConfig (..))
 import           Pos.Infra.Shutdown (HasShutdownContext (..),
                      ShutdownContext (..))
-import           Pos.Infra.Slotting (HasSlottingVar (..),
-                     SimpleSlottingStateVar)
-import           Pos.Infra.Slotting.Types (SlottingData)
-import           Pos.Infra.StateLock (StateLock, StateLockMetrics)
+import           Pos.Infra.Slotting.Impl.Simple (SimpleSlottingStateVar)
 import           Pos.Infra.Util.JsonLog.Events (MemPoolModifyReason (..))
 import           Pos.Launcher.Param (BaseParams (..), NodeParams (..))
 import           Pos.Lrc.Context (LrcContext)

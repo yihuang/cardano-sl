@@ -14,7 +14,7 @@ import           Formatting (build, sformat, shown, (%))
 import           UnliftIO (MonadUnliftIO)
 
 import           Pos.Core (ProxySKHeavy)
-import           Pos.Core.Mockable (CurrentTime, Delay, Mockable)
+import           Pos.Core.StateLock (StateLock)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.DB.Class (MonadBlockDBRead, MonadGState)
 import           Pos.Delegation.Class (MonadDelegation)
@@ -23,7 +23,6 @@ import           Pos.Delegation.Logic (PskHeavyVerdict (..),
                      processProxySKHeavy)
 import           Pos.Infra.Communication.Protocol (Message)
 import           Pos.Infra.Communication.Relay (DataMsg)
-import           Pos.Infra.StateLock (StateLock)
 import           Pos.Lrc.Context (HasLrcContext)
 import           Pos.Util (HasLens')
 import           Pos.Util.Trace.Named (TraceNamed, logDebug, logWarning)
@@ -39,8 +38,6 @@ type DlgListenerConstraint ctx m
        , MonadUnliftIO m
        , MonadDelegation ctx m
        , MonadMask m
-       , Mockable Delay m
-       , Mockable CurrentTime m
        , MonadGState m
        , MonadBlockDBRead m
        , HasLens' ctx StateLock

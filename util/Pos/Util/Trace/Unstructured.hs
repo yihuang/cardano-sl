@@ -146,18 +146,18 @@ logWarningSP logTrace = traceLogItemSP logTrace Log.Warning
 logErrorSP logTrace   = traceLogItemSP logTrace Log.Error
 
 -- | setup logging and return a Trace
-setupLogging :: Log.LoggerConfig -> Log.LoggerName -> IO (Trace IO LogItem)
+setupLogging :: MonadIO m => Log.LoggerConfig -> Log.LoggerName -> IO (Trace m LogItem)
 setupLogging lc ln = do
     lh <- Log.setupLogging lc
     return $ unstructuredTrace ln lh
 
-unstructuredTrace :: Log.LoggerName -> Log.LoggingHandler -> Trace IO LogItem
+unstructuredTrace :: MonadIO m => Log.LoggerName -> Log.LoggingHandler -> Trace m LogItem
 unstructuredTrace ln lh = Trace $ Op $ \logitem ->
     let --privacy = liPrivacy (lnItem namedLogitem)
         severity = liSeverity logitem
         message = liMessage logitem
     in
-    Log.usingLoggerName lh ln $ Log.logMessage severity message
+    liftIO $ Log.usingLoggerName lh ln $ Log.logMessage severity message
 
 {-
 -- | Log an exception if it's raised.

@@ -19,7 +19,7 @@ import           Pos.Client.KeyStorage (MonadKeys)
 import           Pos.Client.Txp.History (MonadTxHistory (..))
 import           Pos.Client.Txp.Network (TxMode)
 import           Pos.Core (ChainDifficulty)
-import           Pos.Core.JsonLog (CanJsonLog)
+--import           Pos.Core.JsonLog (CanJsonLog)
 import           Pos.Update (ConfirmedProposalState (..))
 import           Pos.WorkMode (EmptyMempoolExt)
 
@@ -61,5 +61,5 @@ type MonadWallet m
       , MonadKeys m
       , MonadBlockchainInfo m
       , MonadUpdates m
-      , CanJsonLog m
+      --, CanJsonLog m
       )

@@ -44,7 +44,6 @@ import           Network.Wai.Middleware.Cors (cors, corsMethods,
                      corsRequestHeaders, simpleCorsResourcePolicy,
                      simpleMethods)
 import           Ntp.Client (NtpStatus)
-import           Pos.Core.Mockable
 import           Pos.Infra.Diffusion.Types (Diffusion (..))
 import           Pos.Wallet.Web (cleanupAcidStatePeriodically)
 import           Pos.Wallet.Web.Pending.Worker (startPendingTxsResubmitter)
@@ -211,7 +210,7 @@ legacyWalletBackend logTrace pm WalletBackendParams {..} ntpStatus = pure $ \dif
 walletBackend :: TraceNamed IO
               -> ProtocolMagic
               -> NewWalletBackendParams
-              -> (PassiveWalletLayer Production, PassiveWallet)
+              -> (PassiveWalletLayer IO, PassiveWallet)
               -> Plugin Kernel.WalletMode
 walletBackend logTrace protocolMagic (NewWalletBackendParams WalletBackendParams{..}) (passiveLayer, passiveWallet) =
     pure $ \diffusion -> do
@@ -229,7 +228,7 @@ walletBackend logTrace protocolMagic (NewWalletBackendParams WalletBackendParams
             Nothing
             (Just portCallback)
   where
-    getApplication :: ActiveWalletLayer Production -> Kernel.WalletMode Application
+    getApplication :: ActiveWalletLayer IO -> Kernel.WalletMode Application
     getApplication active = do
       logInfo "New wallet API has STARTED!"
       return $ withMiddleware walletRunMode $
@@ -238,8 +237,8 @@ walletBackend logTrace protocolMagic (NewWalletBackendParams WalletBackendParams
         else
           Servant.serve API.walletAPI $ Server.walletServer active
 
-    lower :: env -> ReaderT env Production a -> IO a
-    lower env = runProduction . (`runReaderT` env)
+    lower :: env -> ReaderT env IO a -> IO a
+    lower env m = runReaderT m env
 
 -- | A @Plugin@ to resubmit pending transactions.
 resubmitterPlugin :: HasConfigurations => ProtocolMagic -> Plugin WalletWebMode

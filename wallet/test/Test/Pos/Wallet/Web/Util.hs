@@ -45,12 +45,12 @@ import           Pos.Core.Block (blockHeader)
 import           Pos.Core.Chrono (OldestFirst (..))
 import           Pos.Core.Common (IsBootstrapEraAddr (..), deriveLvl2KeyPair)
 import           Pos.Core.Genesis (poorSecretToEncKey)
+import           Pos.Core.StateLock (Priority (..), modifyStateLock)
 import           Pos.Core.Txp (TxIn, TxOut (..), TxOutAux (..))
 import           Pos.Crypto (EncryptedSecretKey, PassPhrase, ProtocolMagic,
                      ShouldCheckPassphrase (..), emptyPassphrase,
                      firstHardened)
 import           Pos.Generator.Block (genBlocks)
-import           Pos.Infra.StateLock (Priority (..), modifyStateLock)
 import           Pos.Launcher (HasConfigurations)
 import           Pos.Txp.Toil (Utxo)
 import           Pos.Util (HasLens (..), _neLast)

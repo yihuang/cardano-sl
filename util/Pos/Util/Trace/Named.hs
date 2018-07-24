@@ -110,7 +110,7 @@ named = contramap (LogNamed mempty)
 
 -- | setup logging and return a Trace
 setupLogging
-    :: (MonadIO m)
+    :: MonadIO m
     => Log.LoggerConfig -> Log.LoggerName -> m (TraceNamed m)
 setupLogging lc ln = do
     lh <- liftIO $ Log.setupLogging lc
@@ -118,8 +118,7 @@ setupLogging lc ln = do
     return $ appendName ln nt
 
 namedTrace
-    :: (MonadIO m)
-    => Log.LoggingHandler -> TraceNamed m
+    :: MonadIO m => Log.LoggingHandler -> TraceNamed m
 namedTrace lh = Trace $ Op $ \namedLogitem ->
     let loggerNames =  lnName namedLogitem
         litem = lnItem namedLogitem
@@ -128,7 +127,8 @@ namedTrace lh = Trace $ Op $ \namedLogitem ->
         message  = TrU.liMessage litem
     in
     liftIO $ case privacy of
-        TrU.Both    -> Log.usingLoggerNames lh loggerNames $ Log.logMessage severity message
+        TrU.Both    -> Log.usingLoggerNames lh loggerNames $
+            Log.logMessage severity message
         -- pass to every logging scribe
         TrU.Public  -> Log.usingLoggerNames lh loggerNames $
             logMCond lh severity message selectPublicLogs

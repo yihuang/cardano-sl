@@ -84,8 +84,8 @@ import           Pos.Util.CompileInfo (HasCompileInfo, compileInfo,
 import qualified Pos.Util.Log as Log
 import qualified Pos.Util.LoggerConfig (lcBasePath)
 
-import           Launcher.Environment (substituteEnvVarsValue)
-import           Launcher.Logging (reportErrorDefault)
+import           Pos.Tools.Launcher.Environment (substituteEnvVarsValue)
+import           Pos.Tools.Launcher.Logging (reportErrorDefault)
 
 data LauncherOptions = LO
     { loNodePath            :: !FilePath

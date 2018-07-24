@@ -22,9 +22,9 @@ import           Universum
 
 import           Data.Time.Units (Microsecond, Second, convertUnit)
 import           Formatting (sformat, shown, stext, (%))
+import           UnliftIO (MonadUnliftIO)
 
-import           Pos.Core.Mockable (Async, Delay, Mockable, delay,
-                     withAsyncWithUnmask)
+import           Pos.Core.Conc (delay, withAsyncWithUnmask)
 import           Pos.Crypto.Random (randomNumber)
 import           Pos.Util.Trace.Named (TraceNamed, logWarning, logWarningS)
 
@@ -39,8 +39,7 @@ data WaitingDelta
     deriving (Show)
 
 -- | Constraint for something that can be logged in parallel with other action.
-type CanLogInParallel m =
-    (Mockable Delay m, Mockable Async m, MonadMask m, MonadIO m)
+type CanLogInParallel m = (MonadMask m, MonadIO m, MonadUnliftIO m)
 
 
 -- | Run action and print warning if it takes more time than expected.
@@ -119,10 +118,9 @@ logWarningWaitInf
     -> Second -> Text -> m a -> m a
 logWarningWaitInf tr = logWarningLongAction tr False . (`WaitGeometric` 1.3) . convertUnit
 
--- TODO remove MonadIO in preference to some `Mockable Random`
 -- | Wait random number of 'Microsecond'`s between min and max.
 waitRandomInterval
-    :: (MonadIO m, Mockable Delay m)
+    :: MonadIO m
     => Microsecond -> Microsecond -> m ()
 waitRandomInterval minT maxT = do
     interval <-
@@ -132,7 +130,7 @@ waitRandomInterval minT maxT = do
 
 -- | Wait random interval and then perform given action.
 runWithRandomIntervals
-    :: (MonadIO m, Mockable Delay m)
+    :: MonadIO m
     => TraceNamed m
     -> Microsecond -> Microsecond -> m () -> m ()
 runWithRandomIntervals tr minT maxT action = do

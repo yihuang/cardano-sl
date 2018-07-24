@@ -21,6 +21,8 @@ import           Pos.Core (Block, BlockHeader, BlockVersionData,
                      HasConfiguration, HeaderHash, ProxySKHeavy, StakeholderId,
                      TxAux (..), addressHash, getCertId, lookupVss)
 import           Pos.Core.Chrono (NE, NewestFirst, OldestFirst)
+import           Pos.Core.JsonLog.LogEvents (JLTxR (..))
+import           Pos.Core.Slotting (MonadSlots)
 import           Pos.Core.Ssc (getCommitmentsMap)
 import           Pos.Core.Txp (TxMsgContents (..))
 import           Pos.Core.Update (UpdateProposal (..), UpdateVote (..))
@@ -31,8 +33,6 @@ import           Pos.DB.Class (MonadBlockDBRead, MonadDBRead, MonadGState (..),
                      SerializedBlock)
 import qualified Pos.DB.Class as DB (MonadDBRead (dbGetSerBlock))
 import qualified Pos.GState.BlockExtra as DB (resolveForwardLink, streamBlocks)
-import           Pos.Infra.Slotting (MonadSlots)
-import           Pos.Infra.Util.JsonLog.Events (JLTxR (..))
 import           Pos.Listener.Delegation (DlgListenerConstraint)
 import qualified Pos.Listener.Delegation as Delegation (handlePsk)
 import           Pos.Listener.Txp (TxpMode)

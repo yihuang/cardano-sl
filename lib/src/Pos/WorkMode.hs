@@ -25,8 +25,7 @@ import           Pos.Block.Slog (HasSlogContext (..), HasSlogGState (..))
 import           Pos.Context (HasNodeContext (..), HasPrimaryKey (..),
                      HasSscContext (..), NodeContext)
 import           Pos.Core (HasConfiguration)
---import           Pos.Core.JsonLog (CanJsonLog (..))
-import           Pos.Core.Mockable (Production)
+import           Pos.Core.JsonLog.LogEvents (JsonLogConfig)
 import           Pos.Core.Reporting (HasMisbehaviorMetrics (..))
 import           Pos.Core.Slotting (HasSlottingVar (..), MonadSlotsData)
 import           Pos.DB (MonadGState (..), NodeDBs)
@@ -45,7 +44,6 @@ import           Pos.Infra.Slotting.Class (MonadSlots (..))
 import           Pos.Infra.Slotting.Impl (currentTimeSlottingSimple,
                      getCurrentSlotBlockingSimple,
                      getCurrentSlotInaccurateSimple, getCurrentSlotSimple)
-import           Pos.Infra.Util.JsonLog.Events (JsonLogConfig)
 import           Pos.Ssc.Mem (SscMemTag)
 import           Pos.Ssc.Types (SscState)
 import           Pos.Txp (GenericTxpLocalData, HasTxpConfiguration, MempoolExt,
@@ -76,7 +74,7 @@ data RealModeContext ext = RealModeContext
 
 type EmptyMempoolExt = ()
 
-type RealMode ext = Mtl.ReaderT (RealModeContext ext) Production
+type RealMode ext = Mtl.ReaderT (RealModeContext ext) IO
 
 makeLensesWith postfixLFields ''RealModeContext
 
@@ -132,27 +130,14 @@ instance HasSlogGState (RealModeContext ext) where
 instance HasNodeContext (RealModeContext ext) where
     nodeContext = rmcNodeContext_L
 
-{-
-instance HasLoggerName' (RealModeContext ext) where
-    loggerName = rmcLoggerName_L
--}
-
 {- TODO
 instance HasJsonLogConfig (RealModeContext ext) where
     jsonLogConfig = rmcJsonLogConfig_L
 -}
-
 {-
-instance {-# OVERLAPPING #-} HasLoggerName (RealMode ext) where
-    askLoggerName = askLoggerNameDefault
-    modifyLoggerName = modifyLoggerNameDefault
--}
-
-{- TODO
 instance {-# OVERLAPPING #-} CanJsonLog (RealMode ext) where
     jsonLog = jsonLogDefault
 -}
-
 instance (HasConfiguration, MonadSlotsData ctx (RealMode ext))
       => MonadSlots ctx (RealMode ext)
   where

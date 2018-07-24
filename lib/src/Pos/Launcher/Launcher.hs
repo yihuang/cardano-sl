@@ -9,11 +9,6 @@ module Pos.Launcher.Launcher
 
 import           Universum
 
--- FIXME we use Production in here only because it gives a 'HasLoggerName'
--- instance so that 'bracketNodeResources' can log.
--- Get rid of production and use a 'Trace IO' instead.
-import           Pos.Core.Mockable.Production (Production (..))
-
 import           Pos.Core.Configuration (epochSlots)
 import           Pos.Crypto (ProtocolMagic)
 import           Pos.DB.DB (initNodeDBs)
@@ -27,7 +22,6 @@ import           Pos.Launcher.Scenario (runNode)
 import           Pos.Ssc.Types (SscParams)
 import           Pos.Txp (txpGlobalSettings)
 import           Pos.Util.CompileInfo (HasCompileInfo)
-import qualified Pos.Util.Log as Log
 import           Pos.Util.Trace (natTrace)
 import           Pos.Util.Trace.Named (TraceNamed)
 import           Pos.WorkMode (EmptyMempoolExt, RealMode)
@@ -43,17 +37,15 @@ runNodeReal
        , HasCompileInfo
        )
     => TraceNamed IO
-    -> Log.LoggingHandler
     -> ProtocolMagic
     -> NodeParams
     -> SscParams
     -> [Diffusion (RealMode EmptyMempoolExt) -> RealMode EmptyMempoolExt ()]
-    -> Production ()
-runNodeReal logTrace lh pm np sscnp plugins = --Log.usingLoggerName lh "runNodeReal" $ runProduction $
-    --TODO appendName "runNodeReal" to Trace
+    -> IO ()
+runNodeReal logTrace pm np sscnp plugins =
     bracketNodeResources (natTrace liftIO logTrace) np sscnp (txpGlobalSettings pm) (initNodeDBs pm epochSlots)
         action
   where
-    action :: NodeResources EmptyMempoolExt -> Production ()
+    action :: NodeResources EmptyMempoolExt -> IO ()
     action nr@NodeResources {..} =
-      runRealMode logTrace lh pm nr (runNode (natTrace liftIO logTrace) pm nr plugins)
+      runRealMode logTrace pm nr (runNode (natTrace liftIO logTrace) pm nr plugins)

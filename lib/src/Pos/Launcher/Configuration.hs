@@ -136,7 +136,6 @@ withConfigurationsM logTrace mAssetLockPath cfo act = do
 
     where
     logInfo' :: Text -> m ()
-    --logInfo' = liftIO . usingLoggerName logName . logInfo
     logInfo' = logInfo logTrace
 
 withConfigurations
@@ -147,7 +146,6 @@ withConfigurations
     -> (HasConfigurations => NtpConfiguration -> ProtocolMagic -> m r)
     -> m r
 withConfigurations logTrace mAssetLockPath cfo act = do
-    --loggerName <- askLoggerName
     withConfigurationsM logTrace mAssetLockPath cfo act
 
 addAssetLock :: Set Address -> TxpConfiguration -> TxpConfiguration

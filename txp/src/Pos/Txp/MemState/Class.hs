@@ -29,7 +29,6 @@ import           Data.Default (Default (..))
 import qualified Data.HashMap.Strict as HM
 
 import           Pos.Core (HeaderHash)
-import           Pos.Core.Mockable (CurrentTime, Mockable)
 import           Pos.Core.Reporting (MonadReporting)
 import           Pos.Core.Slotting (MonadSlots (..))
 import           Pos.Core.Txp (TxAux, TxId)
@@ -129,7 +128,6 @@ type TxpLocalWorkMode ctx m =
     , MonadGState m
     , MonadSlots ctx m
     , MonadTxpMem (MempoolExt m) ctx m
-    , Mockable CurrentTime m
     , MonadMask m
     , MonadReporting m
     , HasTxpConfiguration

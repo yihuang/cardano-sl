@@ -56,7 +56,9 @@ import           Pos.Client.Txp.History (MonadTxHistory (..),
 import           Pos.Context (ConnectedPeers (..))
 import           Pos.Core (HasConfiguration, Timestamp (..),
                      largestHDAddressBoot)
-import           Pos.Core.JsonLog (CanJsonLog (..))
+--import           Pos.Core.JsonLog (CanJsonLog (..))
+import           Pos.Core.StateLock (StateLock, StateLockMetrics (..),
+                     newStateLock)
 import           Pos.Core.Txp (TxAux)
 import           Pos.Crypto (PassPhrase)
 import           Pos.DB (MonadDB (..), MonadDBRead (..), MonadGState (..))
@@ -74,10 +76,8 @@ import           Pos.Infra.Shutdown (HasShutdownContext (..),
 import           Pos.Infra.Slotting (HasSlottingVar (..), MonadSlots (..),
                      MonadSlotsData, SimpleSlottingStateVar,
                      mkSimpleSlottingStateVar)
-import           Pos.Infra.StateLock (StateLock, StateLockMetrics (..),
-                     newStateLock)
 import           Pos.Infra.Util.JsonLog.Events (HasJsonLogConfig (..),
-                     JsonLogConfig (..), MemPoolModifyReason, jsonLogDefault)
+                     JsonLogConfig (..), MemPoolModifyReason)
 import           Pos.Launcher (HasConfigurations)
 import           Pos.Lrc (LrcContext)
 import           Pos.Recovery.Types (RecoveryHeader, RecoveryHeaderTag)
@@ -308,8 +308,10 @@ instance HasLens UpdateContext WalletTestContext UpdateContext where
 instance HasJsonLogConfig WalletTestContext where
     jsonLogConfig = lens (const JsonLogDisabled) const
 
+{-
 instance {-# OVERLAPPING #-} CanJsonLog WalletTestMode where
     jsonLog = jsonLogDefault
+-}
 
 {-
 instance HasLoggerName' WalletTestContext where

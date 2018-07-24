@@ -245,7 +245,8 @@ genAndApplyBlockFixedTxs txs = do
                              (EnableTxPayload False)
                              (InplaceDB False)
     let blund = emptyBlund & _1 . _Right . mainBlockTxPayload .~ txPayload
-    lift $ applyBlocksUnsafe dummyProtocolMagic
+    lift $ applyBlocksUnsafe noTrace
+                             dummyProtocolMagic
                              (ShouldCallBListener False)
                              (one blund)
                              Nothing

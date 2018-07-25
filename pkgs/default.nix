@@ -16426,6 +16426,7 @@ license = stdenv.lib.licenses.mit;
 , bytestring
 , cardano-sl-core
 , cardano-sl-crypto
+, cardano-sl-infra
 , cardano-sl-update
 , cardano-sl-util
 , cardano-sl-wallet
@@ -16531,6 +16532,7 @@ aeson
 base
 bytestring
 cardano-sl-core
+cardano-sl-infra
 cardano-sl-update
 cardano-sl-util
 cardano-sl-wallet

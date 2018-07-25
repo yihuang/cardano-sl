@@ -15075,7 +15075,6 @@ cardano-sl-crypto
 cardano-sl-db
 cardano-sl-generator
 cardano-sl-infra
-cardano-sl-networking
 cardano-sl-ssc
 cardano-sl-txp
 cardano-sl-update
@@ -15123,6 +15122,7 @@ cardano-sl
 cardano-sl-core
 cardano-sl-crypto
 cardano-sl-infra
+cardano-sl-networking
 cardano-sl-txp
 cardano-sl-util
 formatting

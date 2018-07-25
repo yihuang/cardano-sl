@@ -32,7 +32,6 @@ import           Pos.Ssc.Configuration (HasSscConfiguration)
 import           Pos.Txp (HasTxpConfiguration, MempoolExt, MonadTxpLocal (..))
 import           Pos.Update.Configuration (HasUpdateConfiguration)
 import           Pos.Util.CompileInfo (HasCompileInfo)
-import qualified Pos.Util.Log as Log
 import           Pos.Util.Trace (natTrace)
 import           Pos.Util.Trace.Named (TraceNamed)
 import           Pos.WorkMode (RealMode, RealModeContext (..))
@@ -97,34 +96,31 @@ notifierPlugin logTrace settings _ = notifierApp logTrace settings
 
 explorerPlugin
     :: HasExplorerConfiguration
-    => Log.LoggingHandler
-    -> TraceNamed Identity
+    => TraceNamed Identity
     -> Word16
     -> Diffusion ExplorerProd
     -> ExplorerProd ()
-explorerPlugin lh logTrace = flip $ explorerServeWebReal lh logTrace
+explorerPlugin logTrace = flip $ explorerServeWebReal logTrace
 
 explorerServeWebReal
     :: HasExplorerConfiguration
-    => Log.LoggingHandler
-    -> TraceNamed Identity
+    => TraceNamed Identity
     -> Diffusion ExplorerProd
     -> Word16
     -> ExplorerProd ()
-explorerServeWebReal lh logTrace diffusion port = do
+explorerServeWebReal logTrace diffusion port = do
     rctx <- ask
     let handlers = explorerHandlers (natTrace generalize logTrace) diffusion
-        server = hoistServer explorerApi (convertHandler lh rctx) handlers
+        server = hoistServer explorerApi (convertHandler rctx) handlers
         app = explorerApp (pure server)
     explorerServeImpl app port
 
 convertHandler
     :: HasConfiguration
-    => Log.LoggingHandler
-    -> RealModeContext ExplorerExtraModifier
+    => RealModeContext ExplorerExtraModifier
     -> ExplorerProd a
     -> Handler a
-convertHandler lh rctx handler =
+convertHandler rctx handler =
     let extraCtx = makeExtraCtx
         ioAction = realRunner $
                    runExplorerProd extraCtx

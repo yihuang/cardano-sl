@@ -40,7 +40,6 @@ import           Pos.Txp (GenericTxpLocalData (..), MempoolExt, MonadTxpMem,
                      TxpHolderTag, mkTxpLocalData)
 import           Pos.Util (postfixLFields)
 import qualified Pos.Util.Log as Log
-import           Pos.Util.LoggerConfig (defaultInteractiveConfiguration)
 import           Pos.Util.Util (HasLens (..))
 
 import           Pos.Explorer.ExtraContext (ExtraContext, ExtraContextT,
@@ -145,8 +144,8 @@ initExplorerTestContext tp@TestParams {..} = do
     let initCtx = ExplorerTestInitContext
             { eticDBPureVar      = dbPureVar
             }
-    lh <- liftIO $ Log.setupLogging (defaultInteractiveConfiguration Log.Debug)
-    liftIO $ runTestInitMode lh initCtx $ do
+    --lh <- liftIO $ Log.setupLogging (defaultInteractiveConfiguration Log.Debug)
+    liftIO $ runTestInitMode initCtx $ do
         DB.initNodeDBs dummyProtocolMagic epochSlots
         lcLrcSync <- newTVarIO =<< mkLrcSyncData
         let _gscLrcContext = LrcContext {..}
